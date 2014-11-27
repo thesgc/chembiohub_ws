@@ -1,6 +1,0 @@
-[submodule "cbh_chembl_model_extension"]
-	path = cbh_chembl_model_extension
-	url = git@github.com:thesgc/cbh_chembl_model_extension
-[submodule "cbh_chembl_ws_extension"]
-	path = cbh_chembl_ws_extension
-	url = git@github.com:thesgc/cbh_chembl_ws_extension

@@ -7,14 +7,14 @@ threading._DummyThread._Thread__stop = lambda x: 42
 TASTYPIE_ALLOW_MISSING_SLASH = True
 TASTYPIE_CANNED_ERROR = "An internal server error occurred. Please contact ChEMBL help."
 
-DEBUG = False
+DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-WS_BASE_URL='/chembiohub_ws'
+WS_BASE_URL='/chemblws'
 WS_DOCS_TITLE='Chem Bio Hub web services based upon ChEMBL web services live documentation'
 
 ADMINS = (
-    ('Michael Nowotka', 'mnowotka@ebi.ac.uk'),
+    ('Andrew Stretton', 'andrew.stretton@sgc.ox.ac.uk'),
     )
 
 MANAGERS = ADMINS
@@ -74,7 +74,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT '/home/vagrant/work/mychembl/chembiohub_ws/deployment/static'
+STATIC_ROOT = '/home/vagrant/work/mychembl/chembiohub_ws/deployment/static'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -137,6 +137,8 @@ INSTALLED_APPS = (
     'chembl_core_db',
     'chembl_core_model',
     'chembl_webservices',
+    'cbh_chembl_ws_extension',
+    'cbh_chembl_model_extension',
     )
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
