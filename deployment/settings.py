@@ -137,6 +137,8 @@ INSTALLED_APPS = (
     'chembl_core_db',
     'chembl_core_model',
     'chembl_webservices',
+    'cbh_chembl_ws_extension ',
+    'cbh_chembl_model_extension ',
     )
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
