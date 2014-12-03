@@ -1,0 +1,6 @@
+[submodule "ws_sub"]
+	path = ws_sub
+	url = git@github.com:thesgc/cbh_chembl_ws_extension.git
+[submodule "model_sub"]
+	path = model_sub
+	url = git@github.com:thesgc/cbh_chembl_model_extension.git
