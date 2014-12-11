@@ -1,0 +1,24 @@
+[submodule "src/cbh_chembl_ws_extension"]
+	path = src/cbh_chembl_ws_extension
+	url = git@github.com:thesgc/cbh_chembl_ws_extension.git
+[submodule "src/chembl_beaker"]
+	path = src/chembl_beaker
+	url = git@github.com:thesgc/chembl_beaker.git
+[submodule "src/chembl_business_model"]
+	path = src/chembl_business_model
+	url = git@github.com:thesgc/chembl_business_model.git
+[submodule "src/chembl_extras"]
+	path = src/chembl_extras
+	url = git@github.com:thesgc/chembl_extras.git
+[submodule "src/cbh_chembl_model_extension"]
+	path = src/cbh_chembl_model_extension
+	url = git@github.com:thesgc/cbh_chembl_model_extension.git
+[submodule "src/chembl_core_db"]
+	path = src/chembl_core_db
+	url = git@github.com:thesgc/chembl_core_db.git
+[submodule "src/chembl_webservices"]
+	path = src/chembl_webservices
+	url = git@github.com:thesgc/chembl_webservices.git
+[submodule "src/chembl_core_model"]
+	path = src/chembl_core_model
+	url = git@github.com:thesgc/chembl_core_model.git
