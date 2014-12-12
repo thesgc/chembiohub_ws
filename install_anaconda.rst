@@ -66,7 +66,7 @@ Now Install the RDKit globally in order to make the database work
   
   sh rdkit_install.sh
   
-Now install openbabel and add it to the python path
+Now install openbabel and indigo and add them to python path
 
   wget http://sourceforge.net/projects/openbabel/files/openbabel/2.3.2/openbabel-2.3.2.tar.gz
   
@@ -84,4 +84,39 @@ Now install openbabel and add it to the python path
   
   make install
   
-  echo $PYTHONPATH=g >> ~/.bashrc
+Indigo like this:
+
+  wget https://dl.dropboxusercontent.com/u/10967207/indigo-python-1.1.11-linux.zip
+
+  unzip indigo-python-1.1.11-linux.zip
+
+  rm indigo-python-1.1.11-linux.zip
+
+  echo "export PYTHONPATH=:/home/vagrant/chembiohub_ws/indigo-python-1.1.11-linux:/home/vagrant/Tools/openbabel-install/lib" >> ~/.bashrc 
+
+Now we need to link in the ng-chem package as a bower dependency for the front end. This is done by first installing nodejs and bower 
+
+
+  sudo apt-get install nodejs
+  
+  sudo apt-get install npm
+  
+  sudo npm install -g bower
+
+  sudo apt-get install nodejs-legacy
+  
+Next go to the folder in src and run bower link to create a symlink 
+
+  cd /home/vagrant/chembiohub_ws/src/ng-chem
+  
+  bower link
+  
+Next install the symlinked packacke in the static files folder with:
+
+  cd /home/vagrant/chembiohub_ws/deployment/static
+  
+  bower link ng-chem
+  
+You can now make changes to ng-chem in src and have them reflect in the static files for the app more generally
+
+
