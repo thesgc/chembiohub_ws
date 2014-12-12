@@ -9,6 +9,6 @@ All relevant code is in the /src/ directory as sub repositories
 
 These are installed in your local anaconda install as shown in 
 
-[[install_anaconda.rst]]
+[install anaconda](install_anaconda.rst)
 
 
