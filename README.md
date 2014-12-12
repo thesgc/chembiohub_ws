@@ -7,6 +7,8 @@ The concept of the project is to extend chembl_core_model and chembl_webservices
 
 All relevant code is in the /src/ directory as sub repositories
 
-These are installed in your local anaconda install as shown in [[install_anaconda.rst]]
+These are installed in your local anaconda install as shown in 
+
+[[install_anaconda.rst]]
 
 
