@@ -92,7 +92,8 @@ Indigo like this:
 
   rm indigo-python-1.1.11-linux.zip
 
-  echo "export PYTHONPATH=:/home/vagrant/chembiohub_ws/indigo-python-1.1.11-linux:/home/vagrant/Tools/openbabel-install/lib" >> ~/.bashrc 
+  echo "export PYTHONPATH=:/home/vagrant/chembiohub_ws:/home/vagrant/chembiohub_ws/indigo-python-1.1.11-linux:/home/vagrant/Tools/openbabel-install/lib"  >> ~/.bashrc 
+  echo 'export DJANGO_SETTINGS_MODULE="deployment.settings"'  >> ~/.bashrc 
 
 Now we need to link in the ng-chem package as a bower dependency for the front end. This is done by first installing nodejs and bower 
 
@@ -109,13 +110,9 @@ Next go to the folder in src and run bower link to create a symlink
 
   cd /home/vagrant/chembiohub_ws/src/ng-chem
   
-  bower link
+  bower install
   
-Next install the symlinked packacke in the static files folder with:
-
-  cd /home/vagrant/chembiohub_ws/deployment/static
-  
-  bower link ng-chem
+We now add this folder to STATICFILES_DIRS to allow it to be served
   
 You can now make changes to ng-chem in src and have them reflect in the static files for the app more generally
 
