@@ -10,7 +10,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "../virtualbox.box"
+  config.vm.box = "http://staging.chembiohub.ox.ac.uk/all_deps.box"
 
   config.vm.network "forwarded_port", guest: 80, host: 8000, auto_correct: true
   config.vm.network "forwarded_port", guest: 9612, host: 9612, auto_correct: true
@@ -20,7 +20,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.provider "virtualbox" do |v|
     v.memory = 4096
     v.cpus = 2
-    v.customize(['storagectl', :id, '--name', 'SATAController', '--hostiocache', 'off'])
+    #v.customize(['storagectl', :id, '--name', 'SATAController', '--hostiocache', 'off'])
   end
   # Disable automatic box update checking. If you disable this, then
   # boxes will only be checked for updates when the user runs
@@ -129,6 +129,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # chef-validator, unless you changed the configuration.
   #
   #   chef.validation_client_name = "ORGNAME-validator"
-  config.vm.synced_folder   "../../", "/home/vagrant/work"
+  config.vm.synced_folder   ".", "/home/vagrant/chembiohub_ws"
 
 end

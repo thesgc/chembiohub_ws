@@ -22,3 +22,6 @@
 [submodule "src/chembl_core_model"]
 	path = src/chembl_core_model
 	url = git@github.com:thesgc/chembl_core_model.git
+[submodule "src/standardiser"]
+	path = src/standardiser
+	url = git@github.com:thesgc/standardiser.git

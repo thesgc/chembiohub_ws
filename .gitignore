@@ -52,3 +52,5 @@ docs/_build/
 
 # PyBuilder
 target/
+/.vagrant/
+/indigo-python-1.1.11-linux/
