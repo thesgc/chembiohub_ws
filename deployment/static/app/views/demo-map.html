@@ -1,0 +1,128 @@
+<div class="row">
+	
+	<div class="container">
+		<div class="row">
+			<div class="alert alert-info">
+				<p><strong>Map the fields in your SD file to those in the registration system. </strong><br/>Known fields have already been mapped, other fields that you would like displayed should be dragged to the 'other' section.<br/>You can map multiple fields to one column header</p>
+			</div>
+		</div>
+		<div class="row">
+
+			<!-- <div class="col-lg-3 col-md-3">
+
+				<div draggable>
+					<ul class="list-unstyled dimensions-list">
+						
+						<li class="dimension" data-dimension="{'key':'one', 'type':'number'}">one</li>
+						<li class="dimension" data-dimension="{'key':'one', 'type':'number'}">two</li>
+						<li class="dimension" data-dimension="{'key':'one', 'type':'number'}">three</li>
+					</ul>
+				</div>
+
+			</div>
+
+			<div class="col-lg-9 col-md-9">
+				
+				<div droppable class="well">
+					<ul class="dimensions-container list-unstyled">
+
+					</ul>
+				</div>
+
+			</div> -->
+
+			<div class="col-lg-3 col-md-3">
+
+				<div class="row">
+					<div class="col-xs-12">
+						<p class="nexa blue">Unmapped column headers</p>
+						<ul class="list-unstyled dimensions-list sortable">
+							
+							<li class="dimension draggable  alert-success" style="cursor:pointer; padding:10px;"><div>catalogue_no</div></li>
+							<li class="dimension draggable  alert-success" style="cursor:pointer; padding:10px;"><div>lab_id</div></li>
+							<li class="dimension draggable  alert-success" style="cursor:pointer; padding:10px;"><div>pur_percent</div></li>
+							<li class="dimension draggable  alert-success" style="cursor:pointer; padding:10px;"><div>for_pi</div></li>
+							<li class="dimension draggable  alert-success" style="cursor:pointer; padding:10px;"><div>extra_data</div></li>
+							<li class="dimension draggable  alert-success" style="cursor:pointer; padding:10px;"><div>old_project_id</div></li>
+							<li class="dimension draggable  alert-success" style="cursor:pointer; padding:10px;"><div>approved_by</div></li>
+						</ul>
+					</div>
+				</div>
+				
+
+			</div>
+
+			<div class="col-lg-9 col-md-9">
+				<div class="row">
+					<div class="col-md-4">
+						<p class="nexa blue">Source ID</p>
+						<ul class="dimensions-container list-unstyled sortable well" style="min-height:100px;">
+
+						</ul>
+					</div>
+
+					<div class="col-md-4">
+						<p class="nexa blue">Project ID</p>
+						<ul class="dimensions-container list-unstyled sortable well" style="min-height:100px;">
+
+						</ul>
+					</div>
+					
+					<div class="col-md-4">
+						<p class="nexa blue">Supplier</p>
+						<ul class="dimensions-container list-unstyled sortable well" style="min-height:100px;">
+
+						</ul>
+					</div>
+				</div>
+
+				<div class="row">
+					<div class="col-md-4">
+						<p class="nexa blue">Purity</p>
+						<ul class="dimensions-container list-unstyled sortable well" style="min-height:100px;">
+
+						</ul>
+					</div>
+
+					<div class="col-md-4">
+						<p class="nexa blue">Comments</p>
+						<ul class="dimensions-container list-unstyled sortable well" style="min-height:100px;">
+
+						</ul>
+					</div>
+					
+					<div class="col-md-4">
+						<p class="nexa blue">Other</p>
+						<ul class="dimensions-container list-unstyled sortable well" style="min-height:100px;">
+
+						</ul>
+					</div>
+				</div>
+				
+					
+				
+
+			</div>
+
+		</div>	
+	</div>
+</div>
+<div>
+			<a class="btn btn-primary pull-left" role="button" ui-sref="demo.add">Back</a>
+			<a class="btn btn-primary pull-right" role="button" ui-sref="demo.validate">Next</a>
+			<!-- <a class="btn btn-danger" ng-click="addAlert()">Add Alert</a> -->
+		</div>
+
+<script>
+//
+ 
+    $( ".sortable" ).sortable();
+    $( ".draggable" ).draggable({
+      connectToSortable: ".sortable"
+    });
+    $( ".droppable" ).droppable({
+      accept: 'li.dimension',
+      snap: true
+    });
+//
+  </script>

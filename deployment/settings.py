@@ -1,11 +1,13 @@
 # Django settings for chembl_webservices project.
-
 import os, sys
 import threading
 threading._DummyThread._Thread__stop = lambda x: 42
 
 TASTYPIE_ALLOW_MISSING_SLASH = True
 TASTYPIE_CANNED_ERROR = "An internal server error occurred. Please contact ChEMBL help."
+
+
+LOGIN_REDIRECT_URL = '/static/app/index.html'
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -74,7 +76,7 @@ MEDIA_URL = ''
 # Don't put anything in this directory yourself; store your static files
 # in apps' "static/" subdirectories and in STATICFILES_DIRS.
 # Example: "/home/media/media.lawrence.com/static/"
-STATIC_ROOT = '/home/vagrant/work/mychembl/chembiohub_ws/deployment/static'
+STATIC_ROOT = '/home/vagrant/chembiohub_ws/deployment/static'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -85,6 +87,7 @@ STATICFILES_DIRS = (
 # Put strings here, like "/home/html/static" or "C:/www/django/static".
 # Always use forward slashes, even on Windows.
 # Don't forget to use absolute paths, not relative paths.
+'/home/vagrant/chembiohub_ws/src/ng-chem',
 )
 
 # List of finder classes that know how to find static files in
@@ -115,6 +118,10 @@ TEMPLATE_CONTEXT_PROCESSORS = (
     )
 
 MIDDLEWARE_CLASSES = (
+'django.contrib.sessions.middleware.SessionMiddleware',
+'django.middleware.common.CommonMiddleware',
+'django.contrib.auth.middleware.AuthenticationMiddleware',
+#'django.contrib.messages.middleware.MessageMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     )
 
@@ -131,19 +138,30 @@ TEMPLATE_DIRS = (
 )
 
 INSTALLED_APPS = (
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.sites',
+    'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
     'tastypie',
+	'deployment',
+
     'chembl_core_db',
     'chembl_core_model',
- 'south',   
+    'south',   
    #'chembl_business_model', 
-   'chembl_webservices',
-    'chembl_extras',
-'chembl_business_model', 
- #   'cbh_chembl_ws_extension ',
- #   'cbh_chembl_model_extension ',
-    )
+ #  'chembl_webservices',
+   'chembl_extras',
+   'chembl_business_model', 
+   
+
+   'cbh_chembl_model_extension',	
+   'cbh_chembl_ws_extension',
+   'deployment'
+
+   )
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
@@ -190,4 +208,5 @@ CACHES = {
 }
 
 CACHE_MIDDLEWARE_SECONDS = 3000000
-
+#import cbh_chembl_ws_extension
+#import cbh_chembl_model_extension

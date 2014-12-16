@@ -1,0 +1,527 @@
+/*
+ * Author: Carlos Alvarez
+ * URL: http://alvarez.is
+ *
+ * Project Name: FLATTY - Free Bootstrap 3 Theme
+ * Version: 1.0
+ * URL: http://blacktie.co
+ */
+
+body {
+  background-color: rgb(224, 222, 217);
+  font-family: Verdana,Helvetica,Arial,sans-serif;
+  font-weight: 300;
+  font-size: 16px;
+  color: #555;
+  -webkit-font-smoothing: antialiased;
+  -webkit-overflow-scrolling: touch;
+  /*padding-top:70px;*/
+}
+
+.container {
+  padding-top: 0px;
+  margin-top: 0px;
+}
+
+/* Titles */
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: Verdana,Helvetica,Arial,sans-serif;
+  font-weight: 300;
+  color: #333;
+}
+
+h1 {
+  font-size: 40px;
+}
+
+h3 {
+  color: #002148;
+  font-weight: 400;
+}
+
+h4 {
+  color: #002148;
+  font-weight: 400;
+  font-size: 20px;
+}
+
+/* Paragraph & Typographic */
+
+p {
+  line-height: 28px;
+  margin-bottom: 25px;
+  font-size: 16px;
+}
+
+.centered {
+  text-align: center;
+}
+
+/* Links */
+
+a {
+  color: #002147;
+  word-wrap: break-word;
+  -webkit-transition: color 0.1s ease-in, background 0.1s ease-in;
+  -moz-transition: color 0.1s ease-in, background 0.1s ease-in;
+  -ms-transition: color 0.1s ease-in, background 0.1s ease-in;
+  -o-transition: color 0.1s ease-in, background 0.1s ease-in;
+  transition: color 0.1s ease-in, background 0.1s ease-in;
+  &:hover, &:focus {
+    /*color: rgb(224, 222, 217) !important;*/
+    color: #007770;
+    text-decoration: none;
+    outline: 0;
+  }
+  &:before, &:after {
+    -webkit-transition: color 0.1s ease-in, background 0.1s ease-in;
+    -moz-transition: color 0.1s ease-in, background 0.1s ease-in;
+    -ms-transition: color 0.1s ease-in, background 0.1s ease-in;
+    -o-transition: color 0.1s ease-in, background 0.1s ease-in;
+    transition: color 0.1s ease-in, background 0.1s ease-in;
+  }
+}
+
+.ifr {
+  display: block;
+}
+
+hr {
+  display: block;
+  height: 1px;
+  border: 0;
+  border-top: 1px solid #ccc;
+  margin: 1em 0;
+  padding: 0;
+}
+
+.navbar-default {
+  padding-top: 2px;
+  background-color: #002147;
+  border-color: transparent;
+  .navbar-brand, .navbar-nav > li > a {
+    color: white;
+  }
+}
+
+/* Helpers */
+
+.mt {
+  margin-top: 40px;
+  margin-bottom: 40px;
+}
+
+.spacer {
+  margin-top: 2px;
+  margin-bottom: 2px;
+}
+
+.form-control {
+  height: 42px;
+  font-size: 18px;
+  width: 280px;
+}
+
+i {
+  margin: 8px;
+  color: #002147;
+}
+
+.leftcolumn {
+  -webkit-transform: rotate(-90deg);
+  /* Firefox */
+  -moz-transform: rotate(-90deg);
+  /* IE */
+  -ms-transform: rotate(-90deg);
+  /* Opera */
+  -o-transform: rotate(-90deg);
+  /* Internet Explorer */
+  filter: progid:DXImageTransform.Microsoft.BasicImage(rotation=3);
+  height: 40px;
+  width: 40px;
+  display: table-cell;
+  background-color: red;
+}
+
+.tableheader {
+  width: 30%;
+  background-color: rgb(53, 60, 71);
+  color: rgb(0, 0, 0);
+  vertical-align: top;
+}
+
+h1.tablehead, h2.tablehead, h3.tablehead, h4.tablehead {
+  color: #ffffff;
+}
+
+.padded-div {
+  display: table-cell;
+  vertical-align: middle;
+  width: 80%;
+  margin-bottom: 10px;
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+@media (max-width: 767px) {
+  .flexbig {
+    display: inherit;
+  }
+}
+
+@media (min-width: 767px) {
+  .flexbig {
+    display: flex;
+  }
+}
+
+.flex {
+  display: flex;
+}
+
+.overflowhiden {
+  overflow: hidden;
+}
+
+.eightycentered {
+  background-color: rgb(53, 60, 71);
+  p {
+    color: white;
+  }
+}
+
+.pantonegreen {
+  background-color: rgb(105, 145, 55);
+}
+
+.pantoneorange {
+  background-color: rgb(207, 122, 48);
+}
+
+.pantoneyellow {
+  background-color: rgb(245, 207, 71);
+}
+
+.pantonepink {
+  background-color: rgb(190, 15, 52);
+}
+
+.pantonegold {
+  background-color: rgb(0, 119, 112);
+}
+
+.pantoneblue {
+  background-color: rgb(68, 104, 125);
+}
+
+.container h1, h2, h3, h4 {
+  margin-top: 1px;
+}
+
+.wide {
+  width: 100%;
+}
+
+.left {
+  text-align: left;
+  padding: 10px 10px 10px 10px;
+  background-color: rgba(255, 255, 255, 0.3);
+  color: white;
+  list-style-type: none;
+}
+
+.inblock {
+  display: inline-block;
+  width: 60%;
+  vertical-align: top;
+  min-height: 249px;
+}
+
+/* HeaderWrap */
+
+#headerwrap {
+  /* background: url(../img/bg01.jpg) no-repeat center top; */
+  background-color: #002147;
+  display: block;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  background-attachment: relative;
+  background-position: center center;
+  min-height: 10em;
+  width: 100%;
+  -webkit-background-size: 100%;
+  -moz-background-size: 100%;
+  -o-background-size: 100%;
+  background-size: 100%;
+  -webkit-background-size: cover;
+  -moz-background-size: cover;
+  -o-background-size: cover;
+  background-size: cover;
+  h1 {
+    margin-top: 0.1em;
+    margin-bottom: 0.5em;
+    color: white;
+    font-size: 2em;
+    font-weight: 400;
+    letter-spacing: 1px;
+  }
+  h2 {
+    color: white;
+    font-size: 1.3em;
+    margin-bottom: 0.5em;
+  }
+}
+
+.btn-warning {
+  color: rgb(255, 255, 255);
+  background-color: rgb(0, 119, 112);
+  border-color: rgb(0, 119, 112);
+  &:hover {
+    color: rgb(255, 255, 255);
+    background-color: rgb(105, 145, 59);
+    border-color: rgb(105, 145, 59);
+  }
+}
+
+/*
+.btn-lg {
+  padding: 5px 30px;
+  font-size: 28px;
+  line-height: 2.66;
+  border-radius: 10px;
+}*/
+
+.mendeley .btn-warning {
+  color: rgb(255, 255, 255);
+  background-color: rgb(169, 27, 38);
+  border-color: rgb(169, 27, 38);
+  width: 200px;
+  display: inline-block;
+}
+
+.linkedin .btn-warning {
+  color: rgb(255, 255, 255);
+  background-color: rgb(0, 102, 153);
+  border-color: rgb(0, 102, 153);
+  width: 200px;
+  display: inline-block;
+}
+
+.eposters .btn-warning {
+  color: rgb(255, 255, 255);
+  background-color: rgb(141, 186, 68);
+  border-color: rgb(141, 186, 68);
+  width: 200px;
+  display: inline-block;
+}
+
+.slideshare .btn-warning {
+  color: rgb(80, 165, 167);
+  background-color: rgb(51, 51, 51);
+  border-color: rgb(51, 51, 51);
+  width: 200px;
+  display: inline-block;
+}
+
+.academia .btn-warning {
+  color: rgb(255, 255, 255);
+  background-color: rgb(11, 43, 63);
+  border-color: rgb(11, 43, 63);
+  width: 200px;
+  display: inline-block;
+}
+
+.researchgate .btn-warning {
+  color: rgb(142, 212, 37);
+  background-color: rgb(102, 102, 102);
+  border-color: rgb(102, 102, 102);
+  width: 200px;
+  display: inline-block;
+}
+
+.profile_data {
+  width: 200px;
+  display: inline-block;
+  font-size: 0.7em;
+  background-color: rgb(168, 169, 173);
+  padding: 5px;
+  border-radius: 6px;
+}
+
+.logo-cbh {
+  max-width: 150px;
+  display: inline-block;
+  img {
+    padding-left: 20px;
+    width: 100%;
+    height: auto;
+  }
+}
+
+.logo-oxweb {
+  /*max-width:115px;*/
+  display: inline-block;
+  img {
+    padding-left: 20px;
+    width: 100%;
+    height: auto;
+  }
+}
+
+.floatwrap {
+  float: left;
+  margin-right: 10px;
+  max-width: 25%;
+  min-width: 25%;
+}
+
+#oxpoints-map {
+  width: 90%;
+  height: 350px;
+  margin: 0 auto;
+}
+
+.navbar-fixed-top {
+  border-width: 0px;
+}
+
+.navbar {
+  margin-bottom: 0;
+  border-radius: 0;
+  li a {
+    font-size: 13px;
+  }
+}
+
+.navbar-collapse {
+  box-shadow: none;
+  border-top: 0;
+}
+
+.footer {
+  background-color: #002147;
+  margin: 0;
+  padding-bottom: 0;
+  width: 100%;
+  color: #eee;
+  font-size: 0.8em;
+  .row {
+    margin-top: 20px;
+  }
+  a {
+    color: #fff;
+    &:hover, &:focus {
+      color: #007770;
+    }
+  }
+}
+
+.copyright {
+  margin-bottom: 20px;
+}
+
+.social-icon {
+  max-width: 36px;
+}
+
+/* Footer css */
+@media (max-width: 767px) {
+  .footer {
+    text-decoration: underline;
+  }
+}
+
+@media (min-width: 767px) {
+  .footer {
+    min-height: 90px;
+  }
+}
+
+.footer {
+  img {
+    max-height: 100px;
+  }
+  .funding img {
+    max-height: 50px;
+  }
+}
+
+.center {
+  text-align: center;
+}
+
+.urlbox {
+  /*  border-radius: 35px;    
+    border-width: 1px;
+    border-style: solid;
+    border-color: #c4d9df #a4c3ca #83afb7;      */
+  /*    width: 500px;
+      height: 35px;
+      padding: 10px;
+      margin: 200px auto 50px;*/
+  /* Clear floats */
+  display: none;
+}
+
+.iconholder {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.testimonial {
+  font-style: italic;
+  font-size: 1.4em;
+}
+
+/*.testimonial-source {*/
+
+.panel-footer {
+  margin-bottom: 0;
+  text-align: right;
+  width: 100%;
+  background-color: transparent;
+  border: 0;
+}
+
+span.source-name {
+  font-size: 1.5em;
+}
+
+.tab-content {
+  background-color: #fff;
+  padding: 20px;
+}
+
+#themes .btn-success {
+  /* background-clip: content-box; */
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #fff;
+}
+
+.white-bg {
+  background-color: #fff;
+  border-radius: 4px;
+}
+
+#agenda .row {
+  margin-top: 5px;
+  padding: 10px;
+}
+
+.row.blue {
+  background-color: #002147;
+  color: #eee;
+}
+
+@mixin border-radius($radius) {
+  -webkit-border-radius: $radius;
+     -moz-border-radius: $radius;
+      -ms-border-radius: $radius;
+          border-radius: $radius;
+}
+
+.grunt-test { @include border-radius(10px); }

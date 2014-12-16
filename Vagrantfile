@@ -12,10 +12,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # Every Vagrant virtual environment requires a box to build off of.
   config.vm.box = "http://staging.chembiohub.ox.ac.uk/all_deps.box"
 
-  config.vm.network "forwarded_port", guest: 80, host: 8000, auto_correct: true
   config.vm.network "forwarded_port", guest: 9612, host: 9612, auto_correct: true
   config.vm.network "forwarded_port", guest: 5432, host: 5432, auto_correct: true
-  config.vm.network "forwarded_port", guest: 8000, host: 8001, auto_correct: true
+  config.vm.network "forwarded_port", guest: 8000, host: 8000, auto_correct: true
 
   config.vm.provider "virtualbox" do |v|
     v.memory = 4096

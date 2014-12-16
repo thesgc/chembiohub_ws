@@ -1,0 +1,193 @@
+h1, h2, h3 {
+	font-family: NexaBold; 
+	color: #fff;
+}
+h1 {
+	font-size:3em;
+}
+h2 {
+	font-size:0.9em;
+}
+p.nexa {
+	font-family: NexaLight;
+	font-size: 1.1em;
+	padding:0 10px;
+}
+#subheading, .subheading {
+	background-color:#72777f;
+	padding-top:10px;
+}
+.subheading{
+	padding:10px;	
+}
+.navbar-header [class*='col-'] {
+	padding: 0;
+}
+.navbar-default .navbar-nav>li>a:focus, .navbar-default .navbar-nav>li>a:hover {
+	color: #007770;
+}
+.logo-oxweb img {
+	padding-left: 0;
+}
+div#social-icons {
+	margin-top: -8px;
+	text-align: center;
+}
+div#social-icons img {
+	margin-right:10px;
+	height:100%;
+	transition: 0.2s ease-in-out;
+	border-radius:50%;
+}
+div#social-icons img:hover {
+	background-color: #002147;
+}
+div#slogan {
+	text-align:center;
+}
+#postal-addr {
+	text-align:right;
+}
+.blue {
+	color: #002147;
+}
+.blue-bg {
+	background-color: #002147;	
+}
+.img-circle.blue-bg {
+	height:150px;
+	width:150px;
+	margin: 0 auto 10px;
+	transition:0.2s ease-in-out;
+}
+.img-circle.blue-bg.capabilities {
+	background-color: rgb(190,15,52);
+}
+.img-circle.blue-bg.people {
+	background-color: rgb(68,104,125);
+}
+.img-circle.blue-bg.data {
+	background-color: rgb(170,179,0);
+}
+.img-circle.blue-bg.extra {
+	background-color: rgb(207,122,48);
+	padding-top: 20px;
+	text-align: center;
+}
+span.date-number {
+	font-size: 5em;
+	line-height: 1em;
+	color: #fff;
+	font-family: NexaBold;
+}
+span.date-month {
+	font-size: 3em;
+	line-height: 1em;
+	color: #fff;
+	font-family: NexaBold;
+}
+.entry-point {
+	padding-top: 10px;
+}
+div.extra-div {
+	background-color:#ddd;
+}
+.img-circle.blue-bg:hover {
+	background-color: #002147;	
+}
+.attn {
+	background-color: #007770;
+	color:#fff;
+	padding:6px;
+	border-radius: 5px;
+}
+span.img-helper {
+	display: inline-block;
+    height: 100%;
+    vertical-align: middle;
+}
+div.testimonial {
+	border: 1px solid #007770;
+}
+div.testimonial div {
+	padding:10px;
+}
+p.testimonial {
+	font-style: italic;
+}
+.testimonial {
+	font-size:1em;
+	line-height:1.1em;
+	text-align:left;
+	margin-bottom: 10px;
+}
+.attribution {
+	line-height:1.1em;
+	font-size:0.9em;
+	color:#fff;
+	background-color:#007770;
+	padding:10px;
+	margin-bottom:0;
+
+}
+.source-name {
+	padding:0px;
+	font-style: normal;
+}
+/* Small devices (tablets, 768px and up) */
+@media (min-width: 768px) { 
+
+	h1 {
+		font-size:4em;
+	}
+	h2 {
+		font-size:0.9em;
+	}
+	div#social-icons {
+		text-align: right;
+	}
+	div#slogan {
+		text-align:inherit;
+	}
+
+}
+
+/* Medium devices (desktops, 992px and up) */
+@media (min-width: 992px) { 
+
+	h1 {
+		font-size:4.5em;
+	}
+	h2 {
+		font-size:1.3em;
+	}
+
+}
+
+/* Large devices (large desktops, 1200px and up) */
+@media (min-width: 1200px) {
+	h1 {
+		font-size:5em;
+	}
+	h2 {
+		font-size:1.5em;
+	}
+}
+
+#footer {
+	font-size: 0.9em;
+	font-family: NexaLight;
+}
+
+.intro {
+	/*font-size:3.5em;*/
+	font-size:4em;
+	text-align: center;
+	padding-top: 20px;
+}
+.img-circle img {
+	width: 100px;
+}
+#ppl-overlay {
+  font-family: NexaLight;
+}

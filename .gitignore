@@ -54,3 +54,5 @@ docs/_build/
 target/
 /.vagrant/
 /indigo-python-1.1.11-linux/
+
+bower_components/

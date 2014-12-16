@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<link rel="icon" href="/favicon.ico" type="image/x-icon">
+	<link rel="shortcut icon" href="/favicon.ico" type="image/x-icon"> 
+
+	<title>ChemBioHub</title>
+
+	<!-- Bootstrap core CSS -->
+	<link href="css/bootstrap.min.css" rel="stylesheet">
+
+	<!-- Custom styles for this template -->
+	<link href="css/main.css" rel="stylesheet">
+
+
+	<link href="css/font.css" rel="stylesheet">
+
+	<link href="templates/sass/cbh-template-header.css" rel="stylesheet">
+
+
+	<!-- Fonts from Google Fonts -->
+	<link href='http://fonts.googleapis.com/css?family=Lato:300,400,900' rel='stylesheet' type='text/css'>
+
+	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+    <!--[if lt IE 9]>
+      <script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+      <script src="https://oss.maxcdn.com/libs/respond.js/1.3.0/respond.min.js"></script>
+    <![endif]-->
+  </head>
+
+  <body>
+
+<!-- HEADER STARTS HERE - WILL BE FROM THE THEME DEPENDENCY -->
+
+
+<!-- HEADER FINISHES HERE -->
+
+
+<div class="container">
+
+</div><!-- /container -->
+
+
+<!-- footer here -->
+
+
+<!-- footer ends here -->
+
+    <script src="https://code.jquery.com/jquery-1.10.2.min.js"></script>
+    <script type="text/javascript" src="vendorjs/FeedEk.js"></script>	
+
+    <script src="http://chembiohub.ox.ac.uk/static/js/bootstrap.min.js"></script>
+
+    <!-- Google Analytics - uncomment when on live-->
+    <script>
+            /*(function(b,o,i,l,e,r){b.GoogleAnalyticsObject=l;b[l]||(b[l]=
+            function(){(b[l].q=b[l].q||[]).push(arguments)});b[l].l=+new Date;
+            e=o.createElement(i);r=o.getElementsByTagName(i)[0];
+            e.src='//www.google-analytics.com/analytics.js';
+            r.parentNode.insertBefore(e,r)}(window,document,'script','ga'));
+ga('create','UA-55063522-1');ga('send','pageview');*/
+</script>
+<script>
+$('a[href*=#]:not([href=#])').click(function() {
+    if (location.pathname.replace(/^\//,'') == this.pathname.replace(/^\//,'') 
+        || location.hostname == this.hostname) {
+
+        var target = $(this.hash);
+        target = target.length ? target : $('[name=' + this.hash.slice(1) +']');
+           if (target.length) {
+             $('html,body').animate({
+                 scrollTop: target.offset().top
+            }, 1000);
+            return false;
+        }
+    }
+});
+
+$('#blog-widget').FeedEk({
+    FeedUrl : 'https://chembiohub.ox.ac.uk/blog/feed.xml',
+  MaxCount : 3,
+    ShowDesc : true,
+    ShowPubDate:true,
+    DescCharacterLimit:300,
+    TitleLinkTarget:'_blank'
+  });
+
+$('#forum-widget').FeedEk({
+    FeedUrl : 'http://chembiohub.ox.ac.uk/askbot/feeds/rss/',
+  MaxCount : 5,
+    ShowDesc : true,
+    ShowPubDate:true,
+    DescCharacterLimit:100,
+    TitleLinkTarget:'_blank'
+  });
+</script>
+<script type="text/javascript" src="vendorjs/jquery.githubRepoWidget.min.js"></script>	
+
+</body>
+
+</html>

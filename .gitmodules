@@ -25,3 +25,6 @@
 [submodule "src/standardiser"]
 	path = src/standardiser
 	url = git@github.com:thesgc/standardiser.git
+[submodule "src/ng-chem"]
+	path = src/ng-chem
+	url = git@github.com:thesgc/ng-chem.git
