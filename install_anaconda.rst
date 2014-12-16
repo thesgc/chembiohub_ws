@@ -1,10 +1,15 @@
 In order to install chembiohub web services and all chembl dependencies on anaconda, run the following:
 ===============================
 
-Clone the repository
+Clone the repository recursively
+   
+   cd /var/www
+   git clone git@github.com:thesgc/chembiohub_ws.git --recursive
 
 Install anaconda locally:
 
+  cd ~
+  
   wget http://repo.continuum.io/miniconda/Miniconda-latest-Linux-x86_64.sh -O miniconda.sh
   
   chmod +x miniconda.sh
@@ -35,7 +40,7 @@ Then change to that directory and add channels
     
 Now create a virtualenv using the conda requirements file
 
-  ./conda create --yes python=2.7.6 -m -n beaker --file=/var/www/chembl_beaker/anaconda_requirements.txt
+  ./conda create --yes python=2.7.6 -m -n beaker --file=/var/www/chembiohub_ws/anaconda_requirements.txt
 
 Now install all of the dependency apt gets in the environment
 
