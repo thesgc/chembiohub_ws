@@ -68,7 +68,7 @@ CREATE TABLE action_type (
 );
 
 
-ALTER TABLE public.action_type OWNER TO chembl;
+ALTER TABLE public.action_type OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN action_type.action_type; Type: COMMENT; Schema: public; Owner: chembl
@@ -122,7 +122,7 @@ CREATE TABLE activities (
 );
 
 
-ALTER TABLE public.activities OWNER TO chembl;
+ALTER TABLE public.activities OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN activities.activity_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -285,7 +285,7 @@ CREATE TABLE activity_stds_lookup (
 );
 
 
-ALTER TABLE public.activity_stds_lookup OWNER TO chembl;
+ALTER TABLE public.activity_stds_lookup OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN activity_stds_lookup.std_act_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -342,7 +342,7 @@ CREATE TABLE assay_parameters (
 );
 
 
-ALTER TABLE public.assay_parameters OWNER TO chembl;
+ALTER TABLE public.assay_parameters OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN assay_parameters.assay_param_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -382,7 +382,7 @@ CREATE TABLE assay_type (
 );
 
 
-ALTER TABLE public.assay_type OWNER TO chembl;
+ALTER TABLE public.assay_type OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN assay_type.assay_type; Type: COMMENT; Schema: public; Owner: chembl
@@ -431,7 +431,7 @@ CREATE TABLE assays (
 );
 
 
-ALTER TABLE public.assays OWNER TO chembl;
+ALTER TABLE public.assays OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN assays.assay_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -521,7 +521,7 @@ COMMENT ON COLUMN assays.assay_subcellular_fraction IS 'Name of subcellular frac
 -- Name: COLUMN assays.tid; Type: COMMENT; Schema: public; Owner: chembl
 --
 
-COMMENT ON COLUMN assays.tid IS 'Target identifier to which this assay has been mapped. Foreign key to target_dictionary. From ChEMBL_15 onwards, an assay will have only a single target assigned.';
+COMMENT ON COLUMN assays.tid IS 'Target identifier to which this assay has been mapped. Foreign key to target_dictionary. FROM cbh_chembl_usr_15 onwards, an assay will have only a single target assigned.';
 
 
 --
@@ -599,7 +599,7 @@ CREATE TABLE atc_classification (
 );
 
 
-ALTER TABLE public.atc_classification OWNER TO chembl;
+ALTER TABLE public.atc_classification OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN atc_classification.who_name; Type: COMMENT; Schema: public; Owner: chembl
@@ -688,7 +688,7 @@ CREATE TABLE auth_group (
 );
 
 
-ALTER TABLE public.auth_group OWNER TO chembl;
+ALTER TABLE public.auth_group OWNER TO cbh_chembl_usr;
 
 --
 -- Name: auth_group_id_seq; Type: SEQUENCE; Schema: public; Owner: chembl
@@ -702,7 +702,7 @@ CREATE SEQUENCE auth_group_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_group_id_seq OWNER TO chembl;
+ALTER TABLE public.auth_group_id_seq OWNER TO cbh_chembl_usr;
 
 --
 -- Name: auth_group_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: chembl
@@ -722,7 +722,7 @@ CREATE TABLE auth_group_permissions (
 );
 
 
-ALTER TABLE public.auth_group_permissions OWNER TO chembl;
+ALTER TABLE public.auth_group_permissions OWNER TO cbh_chembl_usr;
 
 --
 -- Name: auth_group_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: chembl
@@ -736,7 +736,7 @@ CREATE SEQUENCE auth_group_permissions_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_group_permissions_id_seq OWNER TO chembl;
+ALTER TABLE public.auth_group_permissions_id_seq OWNER TO cbh_chembl_usr;
 
 --
 -- Name: auth_group_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: chembl
@@ -757,7 +757,7 @@ CREATE TABLE auth_permission (
 );
 
 
-ALTER TABLE public.auth_permission OWNER TO chembl;
+ALTER TABLE public.auth_permission OWNER TO cbh_chembl_usr;
 
 --
 -- Name: auth_permission_id_seq; Type: SEQUENCE; Schema: public; Owner: chembl
@@ -771,7 +771,7 @@ CREATE SEQUENCE auth_permission_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_permission_id_seq OWNER TO chembl;
+ALTER TABLE public.auth_permission_id_seq OWNER TO cbh_chembl_usr;
 
 --
 -- Name: auth_permission_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: chembl
@@ -799,7 +799,7 @@ CREATE TABLE auth_user (
 );
 
 
-ALTER TABLE public.auth_user OWNER TO chembl;
+ALTER TABLE public.auth_user OWNER TO cbh_chembl_usr;
 
 --
 -- Name: auth_user_groups; Type: TABLE; Schema: public; Owner: chembl; Tablespace: 
@@ -812,7 +812,7 @@ CREATE TABLE auth_user_groups (
 );
 
 
-ALTER TABLE public.auth_user_groups OWNER TO chembl;
+ALTER TABLE public.auth_user_groups OWNER TO cbh_chembl_usr;
 
 --
 -- Name: auth_user_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: chembl
@@ -826,7 +826,7 @@ CREATE SEQUENCE auth_user_groups_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_user_groups_id_seq OWNER TO chembl;
+ALTER TABLE public.auth_user_groups_id_seq OWNER TO cbh_chembl_usr;
 
 --
 -- Name: auth_user_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: chembl
@@ -847,7 +847,7 @@ CREATE SEQUENCE auth_user_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_user_id_seq OWNER TO chembl;
+ALTER TABLE public.auth_user_id_seq OWNER TO cbh_chembl_usr;
 
 --
 -- Name: auth_user_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: chembl
@@ -867,7 +867,7 @@ CREATE TABLE auth_user_user_permissions (
 );
 
 
-ALTER TABLE public.auth_user_user_permissions OWNER TO chembl;
+ALTER TABLE public.auth_user_user_permissions OWNER TO cbh_chembl_usr;
 
 --
 -- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE; Schema: public; Owner: chembl
@@ -881,7 +881,7 @@ CREATE SEQUENCE auth_user_user_permissions_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.auth_user_user_permissions_id_seq OWNER TO chembl;
+ALTER TABLE public.auth_user_user_permissions_id_seq OWNER TO cbh_chembl_usr;
 
 --
 -- Name: auth_user_user_permissions_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: chembl
@@ -901,7 +901,7 @@ CREATE TABLE binding_sites (
 );
 
 
-ALTER TABLE public.binding_sites OWNER TO chembl;
+ALTER TABLE public.binding_sites OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN binding_sites.site_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -940,7 +940,7 @@ CREATE TABLE bio_component_sequences (
 );
 
 
-ALTER TABLE public.bio_component_sequences OWNER TO chembl;
+ALTER TABLE public.bio_component_sequences OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN bio_component_sequences.component_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -1002,7 +1002,7 @@ CREATE TABLE biotherapeutic_components (
 );
 
 
-ALTER TABLE public.biotherapeutic_components OWNER TO chembl;
+ALTER TABLE public.biotherapeutic_components OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN biotherapeutic_components.biocomp_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -1035,7 +1035,7 @@ CREATE TABLE biotherapeutics (
 );
 
 
-ALTER TABLE public.biotherapeutics OWNER TO chembl;
+ALTER TABLE public.biotherapeutics OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN biotherapeutics.molregno; Type: COMMENT; Schema: public; Owner: chembl
@@ -1066,7 +1066,7 @@ CREATE TABLE cbh_chembl_model_extension_cbhcompoundbatch (
 );
 
 
-ALTER TABLE public.cbh_chembl_model_extension_cbhcompoundbatch OWNER TO chembl;
+ALTER TABLE public.cbh_chembl_model_extension_cbhcompoundbatch OWNER TO cbh_chembl_usr;
 
 --
 -- Name: cbh_chembl_model_extension_cbhcompoundbatch_id_seq; Type: SEQUENCE; Schema: public; Owner: chembl
@@ -1080,7 +1080,7 @@ CREATE SEQUENCE cbh_chembl_model_extension_cbhcompoundbatch_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.cbh_chembl_model_extension_cbhcompoundbatch_id_seq OWNER TO chembl;
+ALTER TABLE public.cbh_chembl_model_extension_cbhcompoundbatch_id_seq OWNER TO cbh_chembl_usr;
 
 --
 -- Name: cbh_chembl_model_extension_cbhcompoundbatch_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: chembl
@@ -1107,7 +1107,7 @@ CREATE TABLE cell_dictionary (
 );
 
 
-ALTER TABLE public.cell_dictionary OWNER TO chembl;
+ALTER TABLE public.cell_dictionary OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN cell_dictionary.cell_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -1186,7 +1186,7 @@ CREATE TABLE chembl_id_lookup (
 );
 
 
-ALTER TABLE public.chembl_id_lookup OWNER TO chembl;
+ALTER TABLE public.chembl_id_lookup OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN chembl_id_lookup.chembl_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -1227,7 +1227,7 @@ CREATE TABLE component_class (
 );
 
 
-ALTER TABLE public.component_class OWNER TO chembl;
+ALTER TABLE public.component_class OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN component_class.component_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -1265,7 +1265,7 @@ CREATE TABLE component_domains (
 );
 
 
-ALTER TABLE public.component_domains OWNER TO chembl;
+ALTER TABLE public.component_domains OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN component_domains.compd_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -1323,7 +1323,7 @@ CREATE TABLE component_sequences (
 );
 
 
-ALTER TABLE public.component_sequences OWNER TO chembl;
+ALTER TABLE public.component_sequences OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN component_sequences.component_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -1408,7 +1408,7 @@ CREATE TABLE component_synonyms (
 );
 
 
-ALTER TABLE public.component_synonyms OWNER TO chembl;
+ALTER TABLE public.component_synonyms OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN component_synonyms.compsyn_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -1495,7 +1495,7 @@ CREATE TABLE compound_properties (
 );
 
 
-ALTER TABLE public.compound_properties OWNER TO chembl;
+ALTER TABLE public.compound_properties OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN compound_properties.molregno; Type: COMMENT; Schema: public; Owner: chembl
@@ -1666,7 +1666,7 @@ CREATE TABLE compound_records (
 );
 
 
-ALTER TABLE public.compound_records OWNER TO chembl;
+ALTER TABLE public.compound_records OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN compound_records.record_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -1730,7 +1730,7 @@ CREATE TABLE compound_structures (
 );
 
 
-ALTER TABLE public.compound_structures OWNER TO chembl;
+ALTER TABLE public.compound_structures OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN compound_structures.molregno; Type: COMMENT; Schema: public; Owner: chembl
@@ -1779,7 +1779,7 @@ CREATE TABLE confidence_score_lookup (
 );
 
 
-ALTER TABLE public.confidence_score_lookup OWNER TO chembl;
+ALTER TABLE public.confidence_score_lookup OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN confidence_score_lookup.confidence_score; Type: COMMENT; Schema: public; Owner: chembl
@@ -1812,7 +1812,7 @@ CREATE TABLE corsheaders_corsmodel (
 );
 
 
-ALTER TABLE public.corsheaders_corsmodel OWNER TO chembl;
+ALTER TABLE public.corsheaders_corsmodel OWNER TO cbh_chembl_usr;
 
 --
 -- Name: corsheaders_corsmodel_id_seq; Type: SEQUENCE; Schema: public; Owner: chembl
@@ -1826,7 +1826,7 @@ CREATE SEQUENCE corsheaders_corsmodel_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.corsheaders_corsmodel_id_seq OWNER TO chembl;
+ALTER TABLE public.corsheaders_corsmodel_id_seq OWNER TO cbh_chembl_usr;
 
 --
 -- Name: corsheaders_corsmodel_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: chembl
@@ -1845,7 +1845,7 @@ CREATE TABLE curation_lookup (
 );
 
 
-ALTER TABLE public.curation_lookup OWNER TO chembl;
+ALTER TABLE public.curation_lookup OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN curation_lookup.curated_by; Type: COMMENT; Schema: public; Owner: chembl
@@ -1871,7 +1871,7 @@ CREATE TABLE data_validity_lookup (
 );
 
 
-ALTER TABLE public.data_validity_lookup OWNER TO chembl;
+ALTER TABLE public.data_validity_lookup OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN data_validity_lookup.data_validity_comment; Type: COMMENT; Schema: public; Owner: chembl
@@ -1902,7 +1902,7 @@ CREATE TABLE defined_daily_dose (
 );
 
 
-ALTER TABLE public.defined_daily_dose OWNER TO chembl;
+ALTER TABLE public.defined_daily_dose OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN defined_daily_dose.atc_code; Type: COMMENT; Schema: public; Owner: chembl
@@ -1958,7 +1958,7 @@ CREATE TABLE django_content_type (
 );
 
 
-ALTER TABLE public.django_content_type OWNER TO chembl;
+ALTER TABLE public.django_content_type OWNER TO cbh_chembl_usr;
 
 --
 -- Name: django_content_type_id_seq; Type: SEQUENCE; Schema: public; Owner: chembl
@@ -1972,7 +1972,7 @@ CREATE SEQUENCE django_content_type_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.django_content_type_id_seq OWNER TO chembl;
+ALTER TABLE public.django_content_type_id_seq OWNER TO cbh_chembl_usr;
 
 --
 -- Name: django_content_type_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: chembl
@@ -1992,7 +1992,7 @@ CREATE TABLE django_session (
 );
 
 
-ALTER TABLE public.django_session OWNER TO chembl;
+ALTER TABLE public.django_session OWNER TO cbh_chembl_usr;
 
 --
 -- Name: django_site; Type: TABLE; Schema: public; Owner: chembl; Tablespace: 
@@ -2005,7 +2005,7 @@ CREATE TABLE django_site (
 );
 
 
-ALTER TABLE public.django_site OWNER TO chembl;
+ALTER TABLE public.django_site OWNER TO cbh_chembl_usr;
 
 --
 -- Name: django_site_id_seq; Type: SEQUENCE; Schema: public; Owner: chembl
@@ -2019,7 +2019,7 @@ CREATE SEQUENCE django_site_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.django_site_id_seq OWNER TO chembl;
+ALTER TABLE public.django_site_id_seq OWNER TO cbh_chembl_usr;
 
 --
 -- Name: django_site_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: chembl
@@ -2053,7 +2053,7 @@ CREATE TABLE docs (
 );
 
 
-ALTER TABLE public.docs OWNER TO chembl;
+ALTER TABLE public.docs OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN docs.doc_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -2167,7 +2167,7 @@ CREATE TABLE domains (
 );
 
 
-ALTER TABLE public.domains OWNER TO chembl;
+ALTER TABLE public.domains OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN domains.domain_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -2229,7 +2229,7 @@ CREATE TABLE drug_mechanism (
 );
 
 
-ALTER TABLE public.drug_mechanism OWNER TO chembl;
+ALTER TABLE public.drug_mechanism OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN drug_mechanism.mec_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -2336,7 +2336,7 @@ CREATE TABLE formulations (
 );
 
 
-ALTER TABLE public.formulations OWNER TO chembl;
+ALTER TABLE public.formulations OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN formulations.product_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -2428,7 +2428,7 @@ CREATE TABLE ligand_eff (
 );
 
 
-ALTER TABLE public.ligand_eff OWNER TO chembl;
+ALTER TABLE public.ligand_eff OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN ligand_eff.activity_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -2480,7 +2480,7 @@ CREATE TABLE mechanism_refs (
 );
 
 
-ALTER TABLE public.mechanism_refs OWNER TO chembl;
+ALTER TABLE public.mechanism_refs OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN mechanism_refs.mecref_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -2528,7 +2528,7 @@ CREATE TABLE molecule_atc_classification (
 );
 
 
-ALTER TABLE public.molecule_atc_classification OWNER TO chembl;
+ALTER TABLE public.molecule_atc_classification OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN molecule_atc_classification.mol_atc_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -2615,7 +2615,7 @@ CREATE TABLE molecule_dictionary (
 );
 
 
-ALTER TABLE public.molecule_dictionary OWNER TO chembl;
+ALTER TABLE public.molecule_dictionary OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN molecule_dictionary.molregno; Type: COMMENT; Schema: public; Owner: chembl
@@ -2810,7 +2810,7 @@ CREATE TABLE molecule_hierarchy (
 );
 
 
-ALTER TABLE public.molecule_hierarchy OWNER TO chembl;
+ALTER TABLE public.molecule_hierarchy OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN molecule_hierarchy.molregno; Type: COMMENT; Schema: public; Owner: chembl
@@ -2846,7 +2846,7 @@ CREATE TABLE molecule_synonyms (
 );
 
 
-ALTER TABLE public.molecule_synonyms OWNER TO chembl;
+ALTER TABLE public.molecule_synonyms OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN molecule_synonyms.molregno; Type: COMMENT; Schema: public; Owner: chembl
@@ -2895,7 +2895,7 @@ CREATE SEQUENCE molregno_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.molregno_id_seq OWNER TO chembl;
+ALTER TABLE public.molregno_id_seq OWNER TO cbh_chembl_usr;
 
 --
 -- Name: molregno_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: chembl
@@ -2916,7 +2916,7 @@ CREATE SEQUENCE octmp_summary_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.octmp_summary_id_seq OWNER TO chembl;
+ALTER TABLE public.octmp_summary_id_seq OWNER TO cbh_chembl_usr;
 
 --
 -- Name: octmp_summary; Type: TABLE; Schema: public; Owner: chembl; Tablespace: 
@@ -2930,7 +2930,7 @@ CREATE TABLE octmp_summary (
 );
 
 
-ALTER TABLE public.octmp_summary OWNER TO chembl;
+ALTER TABLE public.octmp_summary OWNER TO cbh_chembl_usr;
 
 --
 -- Name: organism_class; Type: TABLE; Schema: public; Owner: chembl; Tablespace: 
@@ -2946,7 +2946,7 @@ CREATE TABLE organism_class (
 );
 
 
-ALTER TABLE public.organism_class OWNER TO chembl;
+ALTER TABLE public.organism_class OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN organism_class.oc_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -2993,7 +2993,7 @@ CREATE TABLE parameter_type (
 );
 
 
-ALTER TABLE public.parameter_type OWNER TO chembl;
+ALTER TABLE public.parameter_type OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN parameter_type.parameter_type; Type: COMMENT; Schema: public; Owner: chembl
@@ -3024,7 +3024,7 @@ CREATE TABLE predicted_binding_domains (
 );
 
 
-ALTER TABLE public.predicted_binding_domains OWNER TO chembl;
+ALTER TABLE public.predicted_binding_domains OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN predicted_binding_domains.predbind_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -3089,7 +3089,7 @@ CREATE TABLE products (
 );
 
 
-ALTER TABLE public.products OWNER TO chembl;
+ALTER TABLE public.products OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN products.dosage_form; Type: COMMENT; Schema: public; Owner: chembl
@@ -3195,7 +3195,7 @@ CREATE TABLE protein_class_synonyms (
 );
 
 
-ALTER TABLE public.protein_class_synonyms OWNER TO chembl;
+ALTER TABLE public.protein_class_synonyms OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN protein_class_synonyms.protclasssyn_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -3242,7 +3242,7 @@ CREATE TABLE protein_classification (
 );
 
 
-ALTER TABLE public.protein_classification OWNER TO chembl;
+ALTER TABLE public.protein_classification OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN protein_classification.protein_class_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -3304,7 +3304,7 @@ CREATE TABLE protein_family_classification (
 );
 
 
-ALTER TABLE public.protein_family_classification OWNER TO chembl;
+ALTER TABLE public.protein_family_classification OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN protein_family_classification.protein_class_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -3386,7 +3386,7 @@ CREATE TABLE relationship_type (
 );
 
 
-ALTER TABLE public.relationship_type OWNER TO chembl;
+ALTER TABLE public.relationship_type OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN relationship_type.relationship_type; Type: COMMENT; Schema: public; Owner: chembl
@@ -3415,7 +3415,7 @@ CREATE TABLE research_companies (
 );
 
 
-ALTER TABLE public.research_companies OWNER TO chembl;
+ALTER TABLE public.research_companies OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN research_companies.co_stem_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -3462,7 +3462,7 @@ CREATE TABLE research_stem (
 );
 
 
-ALTER TABLE public.research_stem OWNER TO chembl;
+ALTER TABLE public.research_stem OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN research_stem.res_stem_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -3491,7 +3491,7 @@ CREATE TABLE site_components (
 );
 
 
-ALTER TABLE public.site_components OWNER TO chembl;
+ALTER TABLE public.site_components OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN site_components.sitecomp_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -3539,7 +3539,7 @@ CREATE TABLE source (
 );
 
 
-ALTER TABLE public.source OWNER TO chembl;
+ALTER TABLE public.source OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN source.src_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -3574,7 +3574,7 @@ CREATE TABLE south_migrationhistory (
 );
 
 
-ALTER TABLE public.south_migrationhistory OWNER TO chembl;
+ALTER TABLE public.south_migrationhistory OWNER TO cbh_chembl_usr;
 
 --
 -- Name: south_migrationhistory_id_seq; Type: SEQUENCE; Schema: public; Owner: chembl
@@ -3588,7 +3588,7 @@ CREATE SEQUENCE south_migrationhistory_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.south_migrationhistory_id_seq OWNER TO chembl;
+ALTER TABLE public.south_migrationhistory_id_seq OWNER TO cbh_chembl_usr;
 
 --
 -- Name: south_migrationhistory_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: chembl
@@ -3610,7 +3610,7 @@ CREATE TABLE target_components (
 );
 
 
-ALTER TABLE public.target_components OWNER TO chembl;
+ALTER TABLE public.target_components OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN target_components.tid; Type: COMMENT; Schema: public; Owner: chembl
@@ -3657,7 +3657,7 @@ CREATE TABLE target_dictionary (
 );
 
 
-ALTER TABLE public.target_dictionary OWNER TO chembl;
+ALTER TABLE public.target_dictionary OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN target_dictionary.tid; Type: COMMENT; Schema: public; Owner: chembl
@@ -3722,7 +3722,7 @@ CREATE TABLE target_relations (
 );
 
 
-ALTER TABLE public.target_relations OWNER TO chembl;
+ALTER TABLE public.target_relations OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN target_relations.tid; Type: COMMENT; Schema: public; Owner: chembl
@@ -3763,7 +3763,7 @@ CREATE TABLE target_type (
 );
 
 
-ALTER TABLE public.target_type OWNER TO chembl;
+ALTER TABLE public.target_type OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN target_type.target_type; Type: COMMENT; Schema: public; Owner: chembl
@@ -3800,7 +3800,7 @@ CREATE TABLE tastypie_apiaccess (
 );
 
 
-ALTER TABLE public.tastypie_apiaccess OWNER TO chembl;
+ALTER TABLE public.tastypie_apiaccess OWNER TO cbh_chembl_usr;
 
 --
 -- Name: tastypie_apiaccess_id_seq; Type: SEQUENCE; Schema: public; Owner: chembl
@@ -3814,7 +3814,7 @@ CREATE SEQUENCE tastypie_apiaccess_id_seq
     CACHE 1;
 
 
-ALTER TABLE public.tastypie_apiaccess_id_seq OWNER TO chembl;
+ALTER TABLE public.tastypie_apiaccess_id_seq OWNER TO cbh_chembl_usr;
 
 --
 -- Name: tastypie_apiaccess_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: chembl
@@ -3842,7 +3842,7 @@ CREATE TABLE usan_stems (
 );
 
 
-ALTER TABLE public.usan_stems OWNER TO chembl;
+ALTER TABLE public.usan_stems OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN usan_stems.usan_stem_id; Type: COMMENT; Schema: public; Owner: chembl
@@ -3904,7 +3904,7 @@ CREATE TABLE version (
 );
 
 
-ALTER TABLE public.version OWNER TO chembl;
+ALTER TABLE public.version OWNER TO cbh_chembl_usr;
 
 --
 -- Name: COLUMN version.name; Type: COMMENT; Schema: public; Owner: chembl
@@ -3938,7 +3938,7 @@ CREATE TABLE ws_cache (
 );
 
 
-ALTER TABLE public.ws_cache OWNER TO chembl;
+ALTER TABLE public.ws_cache OWNER TO cbh_chembl_usr;
 
 --
 -- Name: id; Type: DEFAULT; Schema: public; Owner: chembl
@@ -7392,8 +7392,8 @@ GRANT ALL ON SCHEMA public TO PUBLIC;
 --
 
 REVOKE ALL ON TABLE action_type FROM PUBLIC;
-REVOKE ALL ON TABLE action_type FROM chembl;
-GRANT ALL ON TABLE action_type TO chembl;
+REVOKE ALL ON TABLE action_type FROM cbh_chembl_usr;
+GRANT ALL ON TABLE action_type TO cbh_chembl_usr;
 
 
 --
@@ -7401,8 +7401,8 @@ GRANT ALL ON TABLE action_type TO chembl;
 --
 
 REVOKE ALL ON TABLE activities FROM PUBLIC;
-REVOKE ALL ON TABLE activities FROM chembl;
-GRANT ALL ON TABLE activities TO chembl;
+REVOKE ALL ON TABLE activities FROM cbh_chembl_usr;
+GRANT ALL ON TABLE activities TO cbh_chembl_usr;
 
 
 --
@@ -7410,8 +7410,8 @@ GRANT ALL ON TABLE activities TO chembl;
 --
 
 REVOKE ALL ON TABLE activity_stds_lookup FROM PUBLIC;
-REVOKE ALL ON TABLE activity_stds_lookup FROM chembl;
-GRANT ALL ON TABLE activity_stds_lookup TO chembl;
+REVOKE ALL ON TABLE activity_stds_lookup FROM cbh_chembl_usr;
+GRANT ALL ON TABLE activity_stds_lookup TO cbh_chembl_usr;
 
 
 --
@@ -7419,8 +7419,8 @@ GRANT ALL ON TABLE activity_stds_lookup TO chembl;
 --
 
 REVOKE ALL ON TABLE assay_parameters FROM PUBLIC;
-REVOKE ALL ON TABLE assay_parameters FROM chembl;
-GRANT ALL ON TABLE assay_parameters TO chembl;
+REVOKE ALL ON TABLE assay_parameters FROM cbh_chembl_usr;
+GRANT ALL ON TABLE assay_parameters TO cbh_chembl_usr;
 
 
 --
@@ -7428,8 +7428,8 @@ GRANT ALL ON TABLE assay_parameters TO chembl;
 --
 
 REVOKE ALL ON TABLE assay_type FROM PUBLIC;
-REVOKE ALL ON TABLE assay_type FROM chembl;
-GRANT ALL ON TABLE assay_type TO chembl;
+REVOKE ALL ON TABLE assay_type FROM cbh_chembl_usr;
+GRANT ALL ON TABLE assay_type TO cbh_chembl_usr;
 
 
 --
@@ -7437,8 +7437,8 @@ GRANT ALL ON TABLE assay_type TO chembl;
 --
 
 REVOKE ALL ON TABLE assays FROM PUBLIC;
-REVOKE ALL ON TABLE assays FROM chembl;
-GRANT ALL ON TABLE assays TO chembl;
+REVOKE ALL ON TABLE assays FROM cbh_chembl_usr;
+GRANT ALL ON TABLE assays TO cbh_chembl_usr;
 
 
 --
@@ -7446,8 +7446,8 @@ GRANT ALL ON TABLE assays TO chembl;
 --
 
 REVOKE ALL ON TABLE atc_classification FROM PUBLIC;
-REVOKE ALL ON TABLE atc_classification FROM chembl;
-GRANT ALL ON TABLE atc_classification TO chembl;
+REVOKE ALL ON TABLE atc_classification FROM cbh_chembl_usr;
+GRANT ALL ON TABLE atc_classification TO cbh_chembl_usr;
 
 
 --
@@ -7455,8 +7455,8 @@ GRANT ALL ON TABLE atc_classification TO chembl;
 --
 
 REVOKE ALL ON TABLE binding_sites FROM PUBLIC;
-REVOKE ALL ON TABLE binding_sites FROM chembl;
-GRANT ALL ON TABLE binding_sites TO chembl;
+REVOKE ALL ON TABLE binding_sites FROM cbh_chembl_usr;
+GRANT ALL ON TABLE binding_sites TO cbh_chembl_usr;
 
 
 --
@@ -7464,8 +7464,8 @@ GRANT ALL ON TABLE binding_sites TO chembl;
 --
 
 REVOKE ALL ON TABLE bio_component_sequences FROM PUBLIC;
-REVOKE ALL ON TABLE bio_component_sequences FROM chembl;
-GRANT ALL ON TABLE bio_component_sequences TO chembl;
+REVOKE ALL ON TABLE bio_component_sequences FROM cbh_chembl_usr;
+GRANT ALL ON TABLE bio_component_sequences TO cbh_chembl_usr;
 
 
 --
@@ -7473,8 +7473,8 @@ GRANT ALL ON TABLE bio_component_sequences TO chembl;
 --
 
 REVOKE ALL ON TABLE biotherapeutic_components FROM PUBLIC;
-REVOKE ALL ON TABLE biotherapeutic_components FROM chembl;
-GRANT ALL ON TABLE biotherapeutic_components TO chembl;
+REVOKE ALL ON TABLE biotherapeutic_components FROM cbh_chembl_usr;
+GRANT ALL ON TABLE biotherapeutic_components TO cbh_chembl_usr;
 
 
 --
@@ -7482,8 +7482,8 @@ GRANT ALL ON TABLE biotherapeutic_components TO chembl;
 --
 
 REVOKE ALL ON TABLE biotherapeutics FROM PUBLIC;
-REVOKE ALL ON TABLE biotherapeutics FROM chembl;
-GRANT ALL ON TABLE biotherapeutics TO chembl;
+REVOKE ALL ON TABLE biotherapeutics FROM cbh_chembl_usr;
+GRANT ALL ON TABLE biotherapeutics TO cbh_chembl_usr;
 
 
 --
@@ -7491,8 +7491,8 @@ GRANT ALL ON TABLE biotherapeutics TO chembl;
 --
 
 REVOKE ALL ON TABLE cell_dictionary FROM PUBLIC;
-REVOKE ALL ON TABLE cell_dictionary FROM chembl;
-GRANT ALL ON TABLE cell_dictionary TO chembl;
+REVOKE ALL ON TABLE cell_dictionary FROM cbh_chembl_usr;
+GRANT ALL ON TABLE cell_dictionary TO cbh_chembl_usr;
 
 
 --
@@ -7500,8 +7500,8 @@ GRANT ALL ON TABLE cell_dictionary TO chembl;
 --
 
 REVOKE ALL ON TABLE chembl_id_lookup FROM PUBLIC;
-REVOKE ALL ON TABLE chembl_id_lookup FROM chembl;
-GRANT ALL ON TABLE chembl_id_lookup TO chembl;
+REVOKE ALL ON TABLE chembl_id_lookup FROM cbh_chembl_usr;
+GRANT ALL ON TABLE chembl_id_lookup TO cbh_chembl_usr;
 
 
 --
@@ -7509,8 +7509,8 @@ GRANT ALL ON TABLE chembl_id_lookup TO chembl;
 --
 
 REVOKE ALL ON TABLE component_class FROM PUBLIC;
-REVOKE ALL ON TABLE component_class FROM chembl;
-GRANT ALL ON TABLE component_class TO chembl;
+REVOKE ALL ON TABLE component_class FROM cbh_chembl_usr;
+GRANT ALL ON TABLE component_class TO cbh_chembl_usr;
 
 
 --
@@ -7518,8 +7518,8 @@ GRANT ALL ON TABLE component_class TO chembl;
 --
 
 REVOKE ALL ON TABLE component_domains FROM PUBLIC;
-REVOKE ALL ON TABLE component_domains FROM chembl;
-GRANT ALL ON TABLE component_domains TO chembl;
+REVOKE ALL ON TABLE component_domains FROM cbh_chembl_usr;
+GRANT ALL ON TABLE component_domains TO cbh_chembl_usr;
 
 
 --
@@ -7527,8 +7527,8 @@ GRANT ALL ON TABLE component_domains TO chembl;
 --
 
 REVOKE ALL ON TABLE component_sequences FROM PUBLIC;
-REVOKE ALL ON TABLE component_sequences FROM chembl;
-GRANT ALL ON TABLE component_sequences TO chembl;
+REVOKE ALL ON TABLE component_sequences FROM cbh_chembl_usr;
+GRANT ALL ON TABLE component_sequences TO cbh_chembl_usr;
 
 
 --
@@ -7536,8 +7536,8 @@ GRANT ALL ON TABLE component_sequences TO chembl;
 --
 
 REVOKE ALL ON TABLE component_synonyms FROM PUBLIC;
-REVOKE ALL ON TABLE component_synonyms FROM chembl;
-GRANT ALL ON TABLE component_synonyms TO chembl;
+REVOKE ALL ON TABLE component_synonyms FROM cbh_chembl_usr;
+GRANT ALL ON TABLE component_synonyms TO cbh_chembl_usr;
 
 
 --
@@ -7545,8 +7545,8 @@ GRANT ALL ON TABLE component_synonyms TO chembl;
 --
 
 REVOKE ALL ON TABLE compound_properties FROM PUBLIC;
-REVOKE ALL ON TABLE compound_properties FROM chembl;
-GRANT ALL ON TABLE compound_properties TO chembl;
+REVOKE ALL ON TABLE compound_properties FROM cbh_chembl_usr;
+GRANT ALL ON TABLE compound_properties TO cbh_chembl_usr;
 
 
 --
@@ -7554,8 +7554,8 @@ GRANT ALL ON TABLE compound_properties TO chembl;
 --
 
 REVOKE ALL ON TABLE compound_records FROM PUBLIC;
-REVOKE ALL ON TABLE compound_records FROM chembl;
-GRANT ALL ON TABLE compound_records TO chembl;
+REVOKE ALL ON TABLE compound_records FROM cbh_chembl_usr;
+GRANT ALL ON TABLE compound_records TO cbh_chembl_usr;
 
 
 --
@@ -7563,8 +7563,8 @@ GRANT ALL ON TABLE compound_records TO chembl;
 --
 
 REVOKE ALL ON TABLE compound_structures FROM PUBLIC;
-REVOKE ALL ON TABLE compound_structures FROM chembl;
-GRANT ALL ON TABLE compound_structures TO chembl;
+REVOKE ALL ON TABLE compound_structures FROM cbh_chembl_usr;
+GRANT ALL ON TABLE compound_structures TO cbh_chembl_usr;
 
 
 --
@@ -7572,8 +7572,8 @@ GRANT ALL ON TABLE compound_structures TO chembl;
 --
 
 REVOKE ALL ON TABLE confidence_score_lookup FROM PUBLIC;
-REVOKE ALL ON TABLE confidence_score_lookup FROM chembl;
-GRANT ALL ON TABLE confidence_score_lookup TO chembl;
+REVOKE ALL ON TABLE confidence_score_lookup FROM cbh_chembl_usr;
+GRANT ALL ON TABLE confidence_score_lookup TO cbh_chembl_usr;
 
 
 --
@@ -7581,8 +7581,8 @@ GRANT ALL ON TABLE confidence_score_lookup TO chembl;
 --
 
 REVOKE ALL ON TABLE curation_lookup FROM PUBLIC;
-REVOKE ALL ON TABLE curation_lookup FROM chembl;
-GRANT ALL ON TABLE curation_lookup TO chembl;
+REVOKE ALL ON TABLE curation_lookup FROM cbh_chembl_usr;
+GRANT ALL ON TABLE curation_lookup TO cbh_chembl_usr;
 
 
 --
@@ -7590,8 +7590,8 @@ GRANT ALL ON TABLE curation_lookup TO chembl;
 --
 
 REVOKE ALL ON TABLE data_validity_lookup FROM PUBLIC;
-REVOKE ALL ON TABLE data_validity_lookup FROM chembl;
-GRANT ALL ON TABLE data_validity_lookup TO chembl;
+REVOKE ALL ON TABLE data_validity_lookup FROM cbh_chembl_usr;
+GRANT ALL ON TABLE data_validity_lookup TO cbh_chembl_usr;
 
 
 --
@@ -7599,8 +7599,8 @@ GRANT ALL ON TABLE data_validity_lookup TO chembl;
 --
 
 REVOKE ALL ON TABLE defined_daily_dose FROM PUBLIC;
-REVOKE ALL ON TABLE defined_daily_dose FROM chembl;
-GRANT ALL ON TABLE defined_daily_dose TO chembl;
+REVOKE ALL ON TABLE defined_daily_dose FROM cbh_chembl_usr;
+GRANT ALL ON TABLE defined_daily_dose TO cbh_chembl_usr;
 
 
 --
@@ -7608,8 +7608,8 @@ GRANT ALL ON TABLE defined_daily_dose TO chembl;
 --
 
 REVOKE ALL ON TABLE docs FROM PUBLIC;
-REVOKE ALL ON TABLE docs FROM chembl;
-GRANT ALL ON TABLE docs TO chembl;
+REVOKE ALL ON TABLE docs FROM cbh_chembl_usr;
+GRANT ALL ON TABLE docs TO cbh_chembl_usr;
 
 
 --
@@ -7617,8 +7617,8 @@ GRANT ALL ON TABLE docs TO chembl;
 --
 
 REVOKE ALL ON TABLE domains FROM PUBLIC;
-REVOKE ALL ON TABLE domains FROM chembl;
-GRANT ALL ON TABLE domains TO chembl;
+REVOKE ALL ON TABLE domains FROM cbh_chembl_usr;
+GRANT ALL ON TABLE domains TO cbh_chembl_usr;
 
 
 --
@@ -7626,8 +7626,8 @@ GRANT ALL ON TABLE domains TO chembl;
 --
 
 REVOKE ALL ON TABLE drug_mechanism FROM PUBLIC;
-REVOKE ALL ON TABLE drug_mechanism FROM chembl;
-GRANT ALL ON TABLE drug_mechanism TO chembl;
+REVOKE ALL ON TABLE drug_mechanism FROM cbh_chembl_usr;
+GRANT ALL ON TABLE drug_mechanism TO cbh_chembl_usr;
 
 
 --
@@ -7635,8 +7635,8 @@ GRANT ALL ON TABLE drug_mechanism TO chembl;
 --
 
 REVOKE ALL ON TABLE formulations FROM PUBLIC;
-REVOKE ALL ON TABLE formulations FROM chembl;
-GRANT ALL ON TABLE formulations TO chembl;
+REVOKE ALL ON TABLE formulations FROM cbh_chembl_usr;
+GRANT ALL ON TABLE formulations TO cbh_chembl_usr;
 
 
 --
@@ -7644,8 +7644,8 @@ GRANT ALL ON TABLE formulations TO chembl;
 --
 
 REVOKE ALL ON TABLE ligand_eff FROM PUBLIC;
-REVOKE ALL ON TABLE ligand_eff FROM chembl;
-GRANT ALL ON TABLE ligand_eff TO chembl;
+REVOKE ALL ON TABLE ligand_eff FROM cbh_chembl_usr;
+GRANT ALL ON TABLE ligand_eff TO cbh_chembl_usr;
 
 
 --
@@ -7653,8 +7653,8 @@ GRANT ALL ON TABLE ligand_eff TO chembl;
 --
 
 REVOKE ALL ON TABLE mechanism_refs FROM PUBLIC;
-REVOKE ALL ON TABLE mechanism_refs FROM chembl;
-GRANT ALL ON TABLE mechanism_refs TO chembl;
+REVOKE ALL ON TABLE mechanism_refs FROM cbh_chembl_usr;
+GRANT ALL ON TABLE mechanism_refs TO cbh_chembl_usr;
 
 
 --
@@ -7662,8 +7662,8 @@ GRANT ALL ON TABLE mechanism_refs TO chembl;
 --
 
 REVOKE ALL ON TABLE molecule_atc_classification FROM PUBLIC;
-REVOKE ALL ON TABLE molecule_atc_classification FROM chembl;
-GRANT ALL ON TABLE molecule_atc_classification TO chembl;
+REVOKE ALL ON TABLE molecule_atc_classification FROM cbh_chembl_usr;
+GRANT ALL ON TABLE molecule_atc_classification TO cbh_chembl_usr;
 
 
 --
@@ -7671,8 +7671,8 @@ GRANT ALL ON TABLE molecule_atc_classification TO chembl;
 --
 
 REVOKE ALL ON TABLE molecule_dictionary FROM PUBLIC;
-REVOKE ALL ON TABLE molecule_dictionary FROM chembl;
-GRANT ALL ON TABLE molecule_dictionary TO chembl;
+REVOKE ALL ON TABLE molecule_dictionary FROM cbh_chembl_usr;
+GRANT ALL ON TABLE molecule_dictionary TO cbh_chembl_usr;
 
 
 --
@@ -7680,8 +7680,8 @@ GRANT ALL ON TABLE molecule_dictionary TO chembl;
 --
 
 REVOKE ALL ON TABLE molecule_hierarchy FROM PUBLIC;
-REVOKE ALL ON TABLE molecule_hierarchy FROM chembl;
-GRANT ALL ON TABLE molecule_hierarchy TO chembl;
+REVOKE ALL ON TABLE molecule_hierarchy FROM cbh_chembl_usr;
+GRANT ALL ON TABLE molecule_hierarchy TO cbh_chembl_usr;
 
 
 --
@@ -7689,8 +7689,8 @@ GRANT ALL ON TABLE molecule_hierarchy TO chembl;
 --
 
 REVOKE ALL ON TABLE molecule_synonyms FROM PUBLIC;
-REVOKE ALL ON TABLE molecule_synonyms FROM chembl;
-GRANT ALL ON TABLE molecule_synonyms TO chembl;
+REVOKE ALL ON TABLE molecule_synonyms FROM cbh_chembl_usr;
+GRANT ALL ON TABLE molecule_synonyms TO cbh_chembl_usr;
 
 
 --
@@ -7698,8 +7698,8 @@ GRANT ALL ON TABLE molecule_synonyms TO chembl;
 --
 
 REVOKE ALL ON TABLE octmp_summary FROM PUBLIC;
-REVOKE ALL ON TABLE octmp_summary FROM chembl;
-GRANT ALL ON TABLE octmp_summary TO chembl;
+REVOKE ALL ON TABLE octmp_summary FROM cbh_chembl_usr;
+GRANT ALL ON TABLE octmp_summary TO cbh_chembl_usr;
 
 
 --
@@ -7707,8 +7707,8 @@ GRANT ALL ON TABLE octmp_summary TO chembl;
 --
 
 REVOKE ALL ON TABLE organism_class FROM PUBLIC;
-REVOKE ALL ON TABLE organism_class FROM chembl;
-GRANT ALL ON TABLE organism_class TO chembl;
+REVOKE ALL ON TABLE organism_class FROM cbh_chembl_usr;
+GRANT ALL ON TABLE organism_class TO cbh_chembl_usr;
 
 
 --
@@ -7716,8 +7716,8 @@ GRANT ALL ON TABLE organism_class TO chembl;
 --
 
 REVOKE ALL ON TABLE parameter_type FROM PUBLIC;
-REVOKE ALL ON TABLE parameter_type FROM chembl;
-GRANT ALL ON TABLE parameter_type TO chembl;
+REVOKE ALL ON TABLE parameter_type FROM cbh_chembl_usr;
+GRANT ALL ON TABLE parameter_type TO cbh_chembl_usr;
 
 
 --
@@ -7725,8 +7725,8 @@ GRANT ALL ON TABLE parameter_type TO chembl;
 --
 
 REVOKE ALL ON TABLE predicted_binding_domains FROM PUBLIC;
-REVOKE ALL ON TABLE predicted_binding_domains FROM chembl;
-GRANT ALL ON TABLE predicted_binding_domains TO chembl;
+REVOKE ALL ON TABLE predicted_binding_domains FROM cbh_chembl_usr;
+GRANT ALL ON TABLE predicted_binding_domains TO cbh_chembl_usr;
 
 
 --
@@ -7734,8 +7734,8 @@ GRANT ALL ON TABLE predicted_binding_domains TO chembl;
 --
 
 REVOKE ALL ON TABLE products FROM PUBLIC;
-REVOKE ALL ON TABLE products FROM chembl;
-GRANT ALL ON TABLE products TO chembl;
+REVOKE ALL ON TABLE products FROM cbh_chembl_usr;
+GRANT ALL ON TABLE products TO cbh_chembl_usr;
 
 
 --
@@ -7743,8 +7743,8 @@ GRANT ALL ON TABLE products TO chembl;
 --
 
 REVOKE ALL ON TABLE protein_class_synonyms FROM PUBLIC;
-REVOKE ALL ON TABLE protein_class_synonyms FROM chembl;
-GRANT ALL ON TABLE protein_class_synonyms TO chembl;
+REVOKE ALL ON TABLE protein_class_synonyms FROM cbh_chembl_usr;
+GRANT ALL ON TABLE protein_class_synonyms TO cbh_chembl_usr;
 
 
 --
@@ -7752,8 +7752,8 @@ GRANT ALL ON TABLE protein_class_synonyms TO chembl;
 --
 
 REVOKE ALL ON TABLE protein_classification FROM PUBLIC;
-REVOKE ALL ON TABLE protein_classification FROM chembl;
-GRANT ALL ON TABLE protein_classification TO chembl;
+REVOKE ALL ON TABLE protein_classification FROM cbh_chembl_usr;
+GRANT ALL ON TABLE protein_classification TO cbh_chembl_usr;
 
 
 --
@@ -7761,8 +7761,8 @@ GRANT ALL ON TABLE protein_classification TO chembl;
 --
 
 REVOKE ALL ON TABLE protein_family_classification FROM PUBLIC;
-REVOKE ALL ON TABLE protein_family_classification FROM chembl;
-GRANT ALL ON TABLE protein_family_classification TO chembl;
+REVOKE ALL ON TABLE protein_family_classification FROM cbh_chembl_usr;
+GRANT ALL ON TABLE protein_family_classification TO cbh_chembl_usr;
 
 
 --
@@ -7770,8 +7770,8 @@ GRANT ALL ON TABLE protein_family_classification TO chembl;
 --
 
 REVOKE ALL ON TABLE relationship_type FROM PUBLIC;
-REVOKE ALL ON TABLE relationship_type FROM chembl;
-GRANT ALL ON TABLE relationship_type TO chembl;
+REVOKE ALL ON TABLE relationship_type FROM cbh_chembl_usr;
+GRANT ALL ON TABLE relationship_type TO cbh_chembl_usr;
 
 
 --
@@ -7779,8 +7779,8 @@ GRANT ALL ON TABLE relationship_type TO chembl;
 --
 
 REVOKE ALL ON TABLE research_companies FROM PUBLIC;
-REVOKE ALL ON TABLE research_companies FROM chembl;
-GRANT ALL ON TABLE research_companies TO chembl;
+REVOKE ALL ON TABLE research_companies FROM cbh_chembl_usr;
+GRANT ALL ON TABLE research_companies TO cbh_chembl_usr;
 
 
 --
@@ -7788,8 +7788,8 @@ GRANT ALL ON TABLE research_companies TO chembl;
 --
 
 REVOKE ALL ON TABLE research_stem FROM PUBLIC;
-REVOKE ALL ON TABLE research_stem FROM chembl;
-GRANT ALL ON TABLE research_stem TO chembl;
+REVOKE ALL ON TABLE research_stem FROM cbh_chembl_usr;
+GRANT ALL ON TABLE research_stem TO cbh_chembl_usr;
 
 
 --
@@ -7797,8 +7797,8 @@ GRANT ALL ON TABLE research_stem TO chembl;
 --
 
 REVOKE ALL ON TABLE site_components FROM PUBLIC;
-REVOKE ALL ON TABLE site_components FROM chembl;
-GRANT ALL ON TABLE site_components TO chembl;
+REVOKE ALL ON TABLE site_components FROM cbh_chembl_usr;
+GRANT ALL ON TABLE site_components TO cbh_chembl_usr;
 
 
 --
@@ -7806,8 +7806,8 @@ GRANT ALL ON TABLE site_components TO chembl;
 --
 
 REVOKE ALL ON TABLE source FROM PUBLIC;
-REVOKE ALL ON TABLE source FROM chembl;
-GRANT ALL ON TABLE source TO chembl;
+REVOKE ALL ON TABLE source FROM cbh_chembl_usr;
+GRANT ALL ON TABLE source TO cbh_chembl_usr;
 
 
 --
@@ -7815,8 +7815,8 @@ GRANT ALL ON TABLE source TO chembl;
 --
 
 REVOKE ALL ON TABLE target_components FROM PUBLIC;
-REVOKE ALL ON TABLE target_components FROM chembl;
-GRANT ALL ON TABLE target_components TO chembl;
+REVOKE ALL ON TABLE target_components FROM cbh_chembl_usr;
+GRANT ALL ON TABLE target_components TO cbh_chembl_usr;
 
 
 --
@@ -7824,8 +7824,8 @@ GRANT ALL ON TABLE target_components TO chembl;
 --
 
 REVOKE ALL ON TABLE target_dictionary FROM PUBLIC;
-REVOKE ALL ON TABLE target_dictionary FROM chembl;
-GRANT ALL ON TABLE target_dictionary TO chembl;
+REVOKE ALL ON TABLE target_dictionary FROM cbh_chembl_usr;
+GRANT ALL ON TABLE target_dictionary TO cbh_chembl_usr;
 
 
 --
@@ -7833,8 +7833,8 @@ GRANT ALL ON TABLE target_dictionary TO chembl;
 --
 
 REVOKE ALL ON TABLE target_relations FROM PUBLIC;
-REVOKE ALL ON TABLE target_relations FROM chembl;
-GRANT ALL ON TABLE target_relations TO chembl;
+REVOKE ALL ON TABLE target_relations FROM cbh_chembl_usr;
+GRANT ALL ON TABLE target_relations TO cbh_chembl_usr;
 
 
 --
@@ -7842,8 +7842,8 @@ GRANT ALL ON TABLE target_relations TO chembl;
 --
 
 REVOKE ALL ON TABLE target_type FROM PUBLIC;
-REVOKE ALL ON TABLE target_type FROM chembl;
-GRANT ALL ON TABLE target_type TO chembl;
+REVOKE ALL ON TABLE target_type FROM cbh_chembl_usr;
+GRANT ALL ON TABLE target_type TO cbh_chembl_usr;
 
 
 --
@@ -7851,8 +7851,8 @@ GRANT ALL ON TABLE target_type TO chembl;
 --
 
 REVOKE ALL ON TABLE usan_stems FROM PUBLIC;
-REVOKE ALL ON TABLE usan_stems FROM chembl;
-GRANT ALL ON TABLE usan_stems TO chembl;
+REVOKE ALL ON TABLE usan_stems FROM cbh_chembl_usr;
+GRANT ALL ON TABLE usan_stems TO cbh_chembl_usr;
 
 
 --
@@ -7860,8 +7860,8 @@ GRANT ALL ON TABLE usan_stems TO chembl;
 --
 
 REVOKE ALL ON TABLE version FROM PUBLIC;
-REVOKE ALL ON TABLE version FROM chembl;
-GRANT ALL ON TABLE version TO chembl;
+REVOKE ALL ON TABLE version FROM cbh_chembl_usr;
+GRANT ALL ON TABLE version TO cbh_chembl_usr;
 
 
 --
