@@ -3,7 +3,13 @@ from .base import *
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
-
+STATIC_ROOT = '/home/vagrant/chembiohub_ws/deployment/static'
+STATICFILES_DIRS = (
+# Put strings here, like "/home/html/static" or "C:/www/django/static".
+# Always use forward slashes, even on Windows.
+# Don't forget to use absolute paths, not relative paths.
+'/home/vagrant/chembiohub_ws/src/ng-chem',
+)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
