@@ -40,7 +40,7 @@ Then change to that directory and add channels
     
 Now create a virtualenv using the conda requirements file
 
-  ./conda create --yes python=2.7.6 -m -n beaker --file=/var/www/chembiohub_ws/anaconda_requirements.txt
+  ./conda create --yes python=2.7.6 -m -n chembiohub_ws --file=/var/www/chembiohub_ws/anaconda_requirements.txt
 
 Now install all of the dependency apt gets in the environment
 
@@ -101,8 +101,32 @@ Indigo like this:
 
   rm indigo-python-1.1.11-linux.zip
 
-  echo "export PYTHONPATH=:/home/vagrant/chembiohub_ws:/home/vagrant/chembiohub_ws/indigo-python-1.1.11-linux:/home/vagrant/Tools/openbabel-install/lib"  >> ~/.bashrc 
-  echo 'export DJANGO_SETTINGS_MODULE="deployment.settings"'  >> ~/.bashrc 
+  echo "export PYTHONPATH=:/var/www/chembiohub_ws:/home/chembiohub/indigo-python-1.1.11-linux:/home/chembiohub/Tools/openbabel-install/lib"  >> ~/.bashrc 
+  echo 'export DJANGO_SETTINGS_MODULE="deployment.settings.staging"'  >> ~/.bashrc 
+
+Next we need to link all of our pip packages that are currently subrepos, we can do this by running:
+
+
+   pip install django-cors-headers
+   cd /var/www/chembiohub_ws/src/chembl_core_db
+   python setup.py develop
+   cd ../chembl_core_model/
+   python setup.py develop
+   cd ../chembl_webservices/
+   python setup.py develop
+   cd ../chembl_business_model/
+   python setup.py develop
+   cd ../standardiser/
+   python setup.py develop
+   cd ../chembl_beaker/
+   python setup.py develop
+   cd ../cbh_chembl_model_extension/
+   python setup.py develop
+   cd ../cbh_chembl_ws_extension/
+   python setup.py develop
+   cd ../chembl_extras/
+   python setup.py develop
+
 
 Now we need to link in the ng-chem package as a bower dependency for the front end. This is done by first installing nodejs and bower 
 
@@ -115,7 +139,7 @@ Now we need to link in the ng-chem package as a bower dependency for the front e
 
   sudo apt-get install nodejs-legacy
   
-Next go to the folder in src and run bower link to create a symlink 
+Next go to the folder in src and run bower install
 
   cd /home/vagrant/chembiohub_ws/src/ng-chem
   
@@ -124,5 +148,7 @@ Next go to the folder in src and run bower link to create a symlink
 We now add this folder to STATICFILES_DIRS to allow it to be served
   
 You can now make changes to ng-chem in src and have them reflect in the static files for the app more generally
+
+
 
 
