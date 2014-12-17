@@ -167,6 +167,16 @@ We now add this folder to STATICFILES_DIRS to allow it to be served
   
 You can now make changes to ng-chem in src and have them reflect in the static files for the app more generally
 
+Now create a secret settings file and add a database user for the app
+
+   create user cbh_chembl_usr with password 'xxxxxx';
+
+   create database cbh_chembl_db;
+
+   grant all privileges on  cbh_chembl_db to cbh_chembl_usr;
+
+   grant all privileges on  database cbh_chembl_db to cbh_chembl_usr;
+   
 
 
 
