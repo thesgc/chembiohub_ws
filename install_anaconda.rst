@@ -73,6 +73,8 @@ Now Install the RDKit globally in order to make the database work
   
 Now install openbabel and indigo and add them to python path
 
+  cd ~
+  
   wget http://sourceforge.net/projects/openbabel/files/openbabel/2.3.2/openbabel-2.3.2.tar.gz
   
   tar -xvf openbabel-2.3.2.tar.gz
@@ -85,7 +87,9 @@ Now install openbabel and indigo and add them to python path
   
   cmake .. -DPYTHON_BINDINGS=ON -DCMAKE_INSTALL_PREFIX=~/Tools/openbabel-install
   
-  make
+  #compile with 8 threads for speed
+  
+  make -j8
   
   make install
   
