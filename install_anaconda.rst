@@ -108,23 +108,41 @@ Next we need to link all of our pip packages that are currently subrepos, we can
 
 
    pip install django-cors-headers
+   
    cd /var/www/chembiohub_ws/src/chembl_core_db
+   
    python setup.py develop
+   
    cd ../chembl_core_model/
+   
    python setup.py develop
+   
    cd ../chembl_webservices/
+   
    python setup.py develop
+   
    cd ../chembl_business_model/
+   
    python setup.py develop
+   
    cd ../standardiser/
+   
    python setup.py develop
+   
    cd ../chembl_beaker/
+   
    python setup.py develop
+   
    cd ../cbh_chembl_model_extension/
+   
    python setup.py develop
+   
    cd ../cbh_chembl_ws_extension/
+   
    python setup.py develop
+   
    cd ../chembl_extras/
+   
    python setup.py develop
 
 
