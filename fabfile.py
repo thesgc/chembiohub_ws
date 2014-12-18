@@ -31,6 +31,7 @@ def stage():
 
 dirs = ["cbh_chembl_model_extension",
         "cbh_chembl_ws_extension",
+        "ng-chem",
         "chembl_beaker",
         "chembl_business_model",
         "chembl_core_db",
@@ -38,13 +39,21 @@ dirs = ["cbh_chembl_model_extension",
         "chembl_extras",
         "chembl_webservices",
         "standardiser",
-        "ng-chem"
+        
         ]
 
 
 def prep():
+    count = 3
+    _prep(count)
+
+def prepall():
+    _prep(len(dirs))
+
+
+def _prep(dircount):
     dirnow = os.getcwd()
-    for directory in dirs:
+    for directory in dirs[0:dircount-1]:
         with lcd(dirnow + "/src/" + directory):
             try:
                 local("git add  .")
