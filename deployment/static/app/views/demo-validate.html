@@ -1,29 +1,29 @@
-<div class="row">
+<!-- <div class="row">
     <div class="alert alert-info">
         <p><strong>Compound structure validation. </strong><br/>Compound Structures have been validated as shown below, where a change has been made a warning is displayed.</p>
     </div>
 </div>
-<div class="row" ng-show="validatedData.length > 0">
-    <div class="col-xs-1"/>
-    <div class="col-xs-2"  ng-repeat="stage in validatedData[0]">
-        <h2><small>{{stage.name}} </small></h2>
-    </div>
+ -->
+
+<ul class="nav nav-tabs pull-right">
+    <li class="tab alert-danger" role="tab"><a ui-sref="demo.validate.pains"><span class="nexa">PAINS</span></a></li>
+    <li class="tab alert-danger" role="tab"><a ui-sref="demo.validate.pains">Reactivity</a></li>
+    <li class="tab alert-danger" role="tab"><a ui-sref="demo.validate.pains">Toxicity</a></li>
+    <li class="tab alert-warning" role="tab"><a ui-sref="demo.validate.standardise">Standardisation</a></li>
+</ul>
+
+<ul class="nav navbar-nav align-center text-center col-xs-12">
+              <li class="col-xs-2 col-xs-offset-2 alert-danger"><a ui-sref-active="active" ui-sref="demo.validate.pains"><h2><small>PAINS <span class="glyphicon glyphicon-ok add text-success hidden"></span> </small></h2><img src="images/add.svg" class="svg" alt="add" title="add"></a></li>
+              <li class="col-xs-2"><a ui-sref-active="active" ui-sref="demo.map"><h2><small>map <span class="glyphicon glyphicon-ok map text-success hidden"></span></small></h2><img src="images/map.svg" class="svg" alt="map" title="map"></a></a></li>
+              <li class="col-xs-2"><a ui-sref-active="active" ui-sref="demo.validate"><h2><small>validate <span class="glyphicon glyphicon-ok validate text-success hidden"></span></small></h2><img src="images/validate.svg" class="svg" alt="validate" title="validate"></a></a></li>
+              <li class="col-xs-2"><a ui-sref-active="active" ui-sref="demo.finish"><h2><small>finish <span class="glyphicon glyphicon-ok text-success finish hidden"></span></small></h2><img src="images/finish.svg" class="svg" alt="finish" title="finish"></a></a></li>
+          </ul>
+
+<div class="row">
+    
 </div>
 
 
-<div class="row" ng-repeat="val in validatedData">
-<div class="col-xs-1"/>
-<div class="col-xs-2" style="min-height:180px; " ng-repeat="stage in val">
-         <chemsvg ng-show="$first || $last" size="100" smiles="stage.smiles" base-url="'http://localhost:8000/utils/smiles2svg/'"></chemsvg>
-        <span ng-hide="$first || $last"> 
-            <process-step start-smiles="val[$index -1].smiles" 
-                end-smiles="stage.smiles" 
-                name="stage.name" 
-                status="stage.status">
-            </process-step>  
 
-        </span>
-</div>
-</div>
-
+<div  class="form-views" ui-view></div>
 
