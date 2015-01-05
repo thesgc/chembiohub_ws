@@ -7,6 +7,8 @@ TASTYPIE_ALLOW_MISSING_SLASH = True
 TASTYPIE_CANNED_ERROR = "An internal server error occurred. Please contact ChEMBL help."
 
 
+
+OPEN_SOURCE = True
 LOGIN_REDIRECT_URL = '/reg/app/index.html'
 
 DEBUG = False

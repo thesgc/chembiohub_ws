@@ -3,6 +3,8 @@ from .base import *
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+ID_PREFIX = "DEV"
+
 STATIC_ROOT = '/home/vagrant/chembiohub_ws/deployment/static'
 STATICFILES_DIRS = (
 # Put strings here, like "/home/html/static" or "C:/www/django/static".
