@@ -4,6 +4,7 @@ DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
 
+ID_PREFIX = "UOXSTA"
 
 
 # Absolute path to the directory static files should be collected to.
