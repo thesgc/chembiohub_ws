@@ -44,7 +44,7 @@ dirs = ["cbh_chembl_model_extension",
 
 
 def prep():
-    count = 3
+    count = 4
     _prep(count)
 
 def prepall():
