@@ -54,7 +54,9 @@ def prepall():
 def _prep(dircount):
     dirnow = os.getcwd()
     for directory in dirs[0:dircount-1]:
+
         with lcd(dirnow + "/src/" + directory):
+            print(directory)
             try:
                 local("git add  .")
             except:
