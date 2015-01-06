@@ -1,0 +1,24 @@
+<h2 class="blue">Standardise!</h2>
+<div class="row" ng-show="validatedData.length > 0">
+    <div class="col-xs-1"/>
+    <div class="col-xs-2"  ng-repeat="stage in validatedData[0]">
+        <h2><small>{{stage.name}} </small></h2>
+    </div>
+</div>
+
+<div class="row" ng-repeat="val in validatedData">
+<div class="col-xs-1"/>
+<div class="col-xs-2" style="min-height:180px; " ng-repeat="stage in val">
+         <chemsvg ng-show="$first || $last" size="100" smiles="stage.smiles" base-url="'http://localhost:8000/utils/smiles2svg/'"></chemsvg>
+        <span ng-hide="$first || $last"> 
+            <process-step start-smiles="val[$index -1].smiles" 
+                end-smiles="stage.smiles" 
+                name="stage.name" 
+                status="stage.status">
+            </process-step>  
+
+        </span>
+</div>
+</div>
+
+

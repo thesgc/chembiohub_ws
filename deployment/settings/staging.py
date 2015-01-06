@@ -5,6 +5,7 @@ TEMPLATE_DEBUG = DEBUG
 
 LOGIN_REDIRECT_URL = '/reg/app/index.html'
 
+ID_PREFIX = "UOXSTA"
 
 
 # Absolute path to the directory static files should be collected to.

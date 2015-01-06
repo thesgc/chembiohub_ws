@@ -1,0 +1,28 @@
+<div class="row">
+	<div class="alert alert-info">
+		<p><strong>Add your compounds to be registered. </strong><br/>Paste a list of SMILES, Standard InChiKeys or upload SD, Excel or MOL files.</p>
+	</div>
+</div>
+<div class="row">
+	<form name="inputForm">
+
+	<div class="col-xs-8">
+		<div class="form-group mt">
+			<label for="text_input" class="blue text-center"><strong class="nexa">Paste your SMILES or IDs here</strong></label>
+			<textarea id="text_input" name="text_input" class="form-control" rows="5" ng-model="input_string" ng-model-options="{ debounce:700 }"></textarea>
+		</div>
+		<div class="form-group mt">
+			<label for="file_input" class="blue text-center"><strong class="nexa">Or upload a file here</strong></label>
+			<input type="file" id="file_input">
+		</div>
+
+	</div>
+
+	</form>
+	
+</div>
+<div class="row">
+	<div class="col-xs-8">
+		<a class="btn btn-primary pull-right" role="button" ui-sref="demo.map" ng-click="parseInput()">Next</a>
+	</div>
+</div>

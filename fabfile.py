@@ -44,7 +44,7 @@ dirs = ["cbh_chembl_model_extension",
 
 
 def prep():
-    count = 3
+    count = 4
     _prep(count)
 
 def prepall():
@@ -54,7 +54,9 @@ def prepall():
 def _prep(dircount):
     dirnow = os.getcwd()
     for directory in dirs[0:dircount-1]:
+
         with lcd(dirnow + "/src/" + directory):
+            print(directory)
             try:
                 local("git add  .")
             except:
@@ -64,11 +66,11 @@ def _prep(dircount):
             except:
                 pass
             try:
-                local("git pull")
+                local("git pull orign master")
             except:
                 pass
             try: 
-                local("git push")
+                local("git push orign mater")
             except:
                 pass
     try:
@@ -80,11 +82,11 @@ def _prep(dircount):
     except:
         pass
     try:
-        local("git pull")
+        local("git pull origin master")
     except:
         pass
     try: 
-        local("git push")
+        local("git push origin master")
     except:
         pass
 

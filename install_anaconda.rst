@@ -106,7 +106,8 @@ Indigo like this:
 
 Next we need to link all of our pip packages that are currently subrepos, we can do this by running:
 
-
+   source ~/miniconda/bin/activate [YOUR_ENV_NAME]
+   
    pip install django-cors-headers
    
    cd /var/www/chembiohub_ws/src/chembl_core_db

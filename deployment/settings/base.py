@@ -7,6 +7,8 @@ TASTYPIE_ALLOW_MISSING_SLASH = True
 TASTYPIE_CANNED_ERROR = "An internal server error occurred. Please contact ChEMBL help."
 
 
+
+OPEN_SOURCE = True
 LOGIN_REDIRECT_URL = '/reg/app/index.html'
 
 DEBUG = False
@@ -24,7 +26,7 @@ MANAGERS = ADMINS
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'chembl_19', # Or path to database file if using sqlite3.
+        'NAME': 'cbh_chembl', # Or path to database file if using sqlite3.
         'USER': 'chembl', # Not used with sqlite3.
         'PASSWORD': 'chembl', # Not used witis oracle
         'HOST': '127.0.0.1', # Set to empty string for localhost. Not used with sqlite3.
@@ -33,8 +35,8 @@ DATABASES = {
 }
 
 EXPORT_MODE = True
-CORE_TABLES_MANAGED = False
-APP_SPECIFIC_TABLES_MANAGED = False
+CORE_TABLES_MANAGED = True
+APP_SPECIFIC_TABLES_MANAGED = True
 COMPOUND_MOLS_TABLE = 'mols_rdkit'
 CTAB_COLUMN = 'm'
 
