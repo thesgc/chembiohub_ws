@@ -70,7 +70,7 @@ def _prep(dircount):
             except:
                 pass
             try: 
-                local("git push origin mater")
+                local("git push origin master")
             except:
                 pass
     try:
