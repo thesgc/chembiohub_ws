@@ -66,11 +66,11 @@ def _prep(dircount):
             except:
                 pass
             try:
-                local("git pull orign master")
+                local("git pull origin master")
             except:
                 pass
             try: 
-                local("git push orign mater")
+                local("git push origin mater")
             except:
                 pass
     try:
