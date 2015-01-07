@@ -3,6 +3,7 @@ from .base import *
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
 
+LOGIN_REDIRECT_URL = '/reg/app/index.html'
 
 ID_PREFIX = "UOXSTA"
 
