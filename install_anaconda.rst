@@ -146,6 +146,10 @@ Next we need to link all of our pip packages that are currently subrepos, we can
    
    python setup.py develop
 
+   cd ../django-flow/
+   
+   python setup.py develop
+
 
 Now we need to link in the ng-chem package as a bower dependency for the front end. This is done by first installing nodejs and bower 
 
