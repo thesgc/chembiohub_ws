@@ -58,3 +58,4 @@ target/
 bower_components/
 deployment/settings/stagingsecret.py
 deployment/settings/secret.py
+deployment/static/
