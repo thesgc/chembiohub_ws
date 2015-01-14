@@ -11,6 +11,8 @@ def _deploy(code_dir, process_name):
     #         run("git clone user@vcshost:/path/to/repo/.git %s" % code_dir)
     with cd(code_dir):          
         sudo("git pull origin master", user="chembiohub") 
+        sudo("git submodule init", user="chembiohub") 
+        sudo("git submodule update", user="chembiohub") 
         sudo("git submodule foreach git pull origin master", user="chembiohub")        
         sudo("supervisorctl reload")
         sudo("service apache2 reload reload")
