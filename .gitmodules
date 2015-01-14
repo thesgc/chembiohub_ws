@@ -28,6 +28,3 @@
 [submodule "src/ng-chem"]
 	path = src/ng-chem
 	url = git@github.com:thesgc/ng-chem.git
-[submodule "src/django-flow"]
-	path = src/django-flow
-	url = git@github.com:thesgc/django-flowjs.git
