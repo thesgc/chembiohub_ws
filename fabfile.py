@@ -10,12 +10,13 @@ def _deploy(code_dir, process_name):
     #     if run("test -d %s" % code_dir).failed:
     #         run("git clone user@vcshost:/path/to/repo/.git %s" % code_dir)
     with cd(code_dir):          
-        sudo("git pull --recurse-submodules", user="chembiohub")        
+        sudo("git pull origin master", user="chembiohub") 
+        sudo("git submodule foreach git pull origin master", user="chembiohub")        
         sudo("supervisorctl reload")
         sudo("service apache2 reload reload")
         with cd("src/ng-chem"):
             run("bower install") 
-        sudo("source /home/chembiohub/.bashrc &&  source /home/chembiohub/anaconda/bin/activate chembiohub_ws && python manage.py syncdb --migrate && python manage.py collectstatic", user="chembiohub") 
+        sudo("source /home/chembiohub/.bashrc &&  source /home/chembiohub/anaconda/bin/activate chembiohub_ws && pip install -r requirements_additional.txt && python manage.py migrate cbh_chembl_model_extension &&   python manage.py syncdb  && python manage.py collectstatic", user="chembiohub") 
 
 
 

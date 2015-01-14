@@ -43,7 +43,5 @@ STATICFILES_DIRS = (
 
 # List of finder classes that know how to find static files in
 # various locations.
-INSTALLED_APPS = INSTALLED_APPS + (
-  'flowjs',
-)
+
 INCHI_BINARIES_LOCATION = {"1.02" :"/home/vagrant/INCHI-1-BIN/linux/64bit/inchi-1"}
