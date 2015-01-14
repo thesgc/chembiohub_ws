@@ -4,7 +4,15 @@ In order to install chembiohub web services and all chembl dependencies on anaco
 Clone the repository recursively
    
    cd /var/www
+   
    git clone git@github.com:thesgc/chembiohub_ws.git --recursive
+   
+   cd chembiohub_ws
+   
+   git submodule init
+   
+   git submodule update
+   
 
 Install anaconda locally:
 
@@ -102,7 +110,22 @@ Indigo like this:
   rm indigo-python-1.1.11-linux.zip
 
   echo "export PYTHONPATH=:/var/www/chembiohub_ws:/home/chembiohub/indigo-python-1.1.11-linux:/home/chembiohub/Tools/openbabel-install/lib"  >> ~/.bashrc 
+  
   echo 'export DJANGO_SETTINGS_MODULE="deployment.settings.staging"'  >> ~/.bashrc 
+
+Inchi binaries like this:
+
+  cd ~/Tools
+  
+  wget http://www.iupac.org/fileadmin/user_upload/publications/e-resources/inchi/1.03/INCHI-1-BIN.zip
+  
+  unzip INCHI-1-BIN.zip
+  
+  gunzip INCHI-1-BIN/linux/64bit/inchi-1.gz
+  
+Now ensure that the setting in deployment/settings/base.py matches the location of the inchi binary file - for this install it is:
+
+  INCHI_BINARIES_LOCATION = {"1.02" :"/home/chembiohub/Tools/INCHI-1-BIN/linux/64bit/inchi-1"}
 
 Next we need to link all of our pip packages that are currently subrepos, we can do this by running:
 
@@ -182,6 +205,23 @@ Now create a secret settings file and add a database user for the app
 
    grant all privileges on  database cbh_chembl_db to cbh_chembl_usr;
    
+Now migrate the database for the application by running the following:
 
+   source ~/miniconda/bin/activate [YOUR_ENV_NAME]
+
+   python manage.py mysyncdb
+   
+   python manage.py migrate flowjs
+
+   python manage.py migrate cbh_chembl_model_extension
+   
+In order for mysyncdb to work you must have the setting in your settings file:
+
+   CORE_TABLES_MANAGED = True
+   
+   APP_SPECIFIC_TABLES_MANAGED = True
+   
+
+   
 
 
