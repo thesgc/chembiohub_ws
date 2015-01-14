@@ -16,6 +16,10 @@ def _deploy(code_dir, process_name):
         sudo("service apache2 reload reload")
         with cd("src/ng-chem"):
             run("bower install") 
+
+        for dirname in dirs[1:]:
+            with cd("src/%s" % dirname):
+                sudo("source /home/chembiohub/.bashrc &&  source /home/chembiohub/anaconda/bin/activate chembiohub_ws && python setup.py install ", user="chembiohub")
         sudo("source /home/chembiohub/.bashrc &&  source /home/chembiohub/anaconda/bin/activate chembiohub_ws && pip install -r requirements_additional.txt && python manage.py migrate cbh_chembl_model_extension &&   python manage.py syncdb  && python manage.py collectstatic", user="chembiohub") 
 
 
@@ -30,16 +34,20 @@ def stage():
     _deploy("/var/www/chembiohub_ws", "chem_bio_hub_ws")
 
 
-dirs = ["cbh_chembl_model_extension",
-        "cbh_chembl_ws_extension",
-        "ng-chem",
-        "chembl_beaker",
-        "chembl_business_model",
-        "chembl_core_db",
+dirs = ["ng-chem",
+ "chembl_core_db",
         "chembl_core_model",
+ "chembl_business_model",
+        
         "chembl_extras",
         "chembl_webservices",
+        "cbh_chembl_model_extension",
+                "django-flowjs",
         "standardiser",
+        "chembl_beaker",
+
+        "cbh_chembl_ws_extension",
+       
         
         ]
 
