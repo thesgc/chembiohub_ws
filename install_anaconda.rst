@@ -123,6 +123,8 @@ Inchi binaries like this:
   
   gunzip INCHI-1-BIN/linux/64bit/inchi-1.gz
   
+  chmod +x INCHI-1-BIN/linux/64bit/inchi-1
+  
 Now ensure that the setting in deployment/settings/base.py matches the location of the inchi binary file - for this install it is:
 
   INCHI_BINARIES_LOCATION = {"1.02" :"/home/chembiohub/Tools/INCHI-1-BIN/linux/64bit/inchi-1"}
