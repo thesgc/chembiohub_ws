@@ -117,7 +117,7 @@ MIDDLEWARE_CLASSES = (
 'django.contrib.sessions.middleware.SessionMiddleware',
 'django.middleware.common.CommonMiddleware',
 'django.contrib.auth.middleware.AuthenticationMiddleware',
-#'django.contrib.messages.middleware.MessageMiddleware',
+'django.contrib.messages.middleware.MessageMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     )
 
@@ -140,9 +140,14 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    "guardian",
+        'grappelli',
+
+    'django.contrib.admin',
     'corsheaders',
     'tastypie',
     'deployment',
+
 
     'chembl_core_db',
     'chembl_core_model',
