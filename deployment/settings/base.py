@@ -209,3 +209,5 @@ CACHE_MIDDLEWARE_SECONDS = 3000000
 #import cbh_chembl_ws_extension
 #import cbh_chembl_model_extension
 INCHI_BINARIES_LOCATION = {"1.02" :"/home/chembiohub/Tools/INCHI-1-BIN/linux/64bit/inchi-1"}
+
+OPEN_BABEL_EXECUTABLE = "/home/chembiohub/openbabel-2.3.2/build/bin/babel"
