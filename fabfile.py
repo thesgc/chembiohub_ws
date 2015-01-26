@@ -17,7 +17,8 @@ def _deploy(code_dir, process_name):
         sudo("supervisorctl reload")
         sudo("service apache2 reload reload")
         with cd("src/ng-chem"):
-            run("bower install") 
+            sudo("su chembiohub -c 'bower install ' ")
+ 
 
         for dirname in dirs[1:]:
             with cd("src/%s" % dirname):
