@@ -18,7 +18,7 @@ def _deploy(code_dir, process_name):
         sudo("service apache2 reload reload")
         with cd("src/ng-chem"):
             sudo("chown -R astretton:users .")
-            sudo("bower install", user="astretton") 
+            sudo("bower install", user="chembiohub") 
 
         for dirname in dirs[1:]:
             with cd("src/%s" % dirname):
