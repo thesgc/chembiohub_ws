@@ -117,7 +117,7 @@ MIDDLEWARE_CLASSES = (
 'django.contrib.sessions.middleware.SessionMiddleware',
 'django.middleware.common.CommonMiddleware',
 'django.contrib.auth.middleware.AuthenticationMiddleware',
-#'django.contrib.messages.middleware.MessageMiddleware',
+'django.contrib.messages.middleware.MessageMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     )
 
@@ -140,9 +140,13 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+        'grappelli',
+
+    'django.contrib.admin',
     'corsheaders',
     'tastypie',
     'deployment',
+
 
     'chembl_core_db',
     'chembl_core_model',
@@ -151,14 +155,14 @@ INSTALLED_APPS = (
  #  'chembl_webservices',
    'chembl_extras',
    'chembl_business_model', 
-   
+        'flowjs',
+
 
    'cbh_chembl_model_extension',    
    'cbh_chembl_ws_extension',
-     'flowjs',
 
-   'deployment'
-
+   'deployment',
+'chembl_webservices'
    )
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
