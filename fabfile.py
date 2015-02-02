@@ -61,7 +61,7 @@ def prepall():
 
 def _prep(dircount):
     dirnow = os.getcwd()
-    for directory in dirs[0:dircount-1]:
+    for directory in dirs:
 
         with lcd(dirnow + "/src/" + directory):
             print(directory)
