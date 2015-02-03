@@ -9,7 +9,7 @@ TASTYPIE_CANNED_ERROR = "An internal server error occurred. Please contact ChEMB
 
 
 OPEN_SOURCE = True
-LOGIN_REDIRECT_URL = '/reg/app/index.html'
+LOGIN_REDIRECT_URL = '/reg/app/index.html#/projects'
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
@@ -215,3 +215,5 @@ CACHE_MIDDLEWARE_SECONDS = 3000000
 INCHI_BINARIES_LOCATION = {"1.02" :"/home/chembiohub/Tools/INCHI-1-BIN/linux/64bit/inchi-1"}
 
 OPEN_BABEL_EXECUTABLE = "/home/chembiohub/openbabel-2.3.2/build/bin/babel"
+
+ALLOWED_INCLUDE_ROOTS = ("/home/vagrant/",)

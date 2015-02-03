@@ -32,7 +32,7 @@ STATIC_ROOT = '/home/vagrant/chembiohub_ws/deployment/static'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/static/'
+STATIC_URL = '/reg/'
 
 # Additional locations of static files
 STATICFILES_DIRS = (
