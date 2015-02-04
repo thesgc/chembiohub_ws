@@ -218,4 +218,4 @@ OPEN_BABEL_EXECUTABLE = "/home/chembiohub/openbabel-2.3.2/build/bin/babel"
 
 ALLOWED_INCLUDE_ROOTS = ("/home/vagrant/",)
 
-ALLOWED_HOSTS = ["*.chembiohub.ox.ac.uk"]
+ALLOWED_HOSTS = ["staging.chembiohub.ox.ac.uk", "staging.chembiohub.ox.ac.uk"]
