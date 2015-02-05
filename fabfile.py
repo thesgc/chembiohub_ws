@@ -23,7 +23,7 @@ def _deploy(code_dir, process_name):
         for dirname in dirs[1:]:
             with cd("src/%s" % dirname):
                 sudo("source /home/chembiohub/.bashrc &&  source /home/chembiohub/anaconda/bin/activate chembiohub_ws && python setup.py install ", user="chembiohub")
-        sudo("source /home/chembiohub/.bashrc &&  source /home/chembiohub/anaconda/bin/activate chembiohub_ws && python manage.py syncdb && python manage.py migrate flowjs && python manage.py migrate cbh_chembl_model_extension  && python manage.py collectstatic", user="chembiohub") 
+        sudo("source /home/chembiohub/.bashrc &&  source /home/chembiohub/anaconda/bin/activate chembiohub_ws && python manage.py syncdb && python manage.py migrate flowjs && python manage.py migrate cbh_chembl_model_extension  && python manage.py collectstatic --noinput", user="chembiohub") 
 
 
 

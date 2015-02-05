@@ -1,6 +1,6 @@
 from .base import *
 
-DEBUG = True
+DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 LOGIN_REDIRECT_URL = '/reg/app/#/projects'
@@ -28,5 +28,6 @@ STATICFILES_DIRS = (
 
 # List of finder classes that know how to find static files in
 # various locations.
+
 
 from .stagingsecret import *
