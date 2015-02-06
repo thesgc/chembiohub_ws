@@ -12,7 +12,10 @@ def _deploy(code_dir, process_name):
     with cd(code_dir):          
         sudo("git pull origin master", user="chembiohub") 
         sudo("git submodule init", user="chembiohub") 
-        sudo("git submodule update", user="chembiohub") 
+        try:
+            sudo("git submodule update", user="chembiohub") 
+        except:
+            pass
         sudo("git submodule foreach git pull origin master", user="chembiohub")        
         sudo("supervisorctl reload")
         sudo("service apache2 reload reload")
