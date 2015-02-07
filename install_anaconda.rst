@@ -1,3 +1,5 @@
+#!/bin/bash
+set -e
 #In order to install chembiohub web services and all chembl dependencies on anaconda, run the following:
 #===============================
 
