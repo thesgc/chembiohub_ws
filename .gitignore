@@ -55,7 +55,7 @@ docs/_build/
 target/
 /.vagrant/
 /indigo-python-1.1.11-linux/
-
+node_modules/
 bower_components/
 deployment/settings/stagingsecret.py
 deployment/settings/secret.py
