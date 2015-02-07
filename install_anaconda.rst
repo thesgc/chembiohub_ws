@@ -1,7 +1,7 @@
-In order to install chembiohub web services and all chembl dependencies on anaconda, run the following:
-===============================
+#In order to install chembiohub web services and all chembl dependencies on anaconda, run the following:
+#===============================
 
-Clone the repository recursively
+###Clone the repository recursively
    
    cd /var/www
    
@@ -14,7 +14,7 @@ Clone the repository recursively
    git submodule update
    
 
-Install anaconda locally:
+###Install anaconda locally:
 
   cd ~
   
@@ -24,7 +24,7 @@ Install anaconda locally:
   
   sh miniconda.sh
   
-Then change to that directory and add channels
+###Then change to that directory and add channels
 
   cd miniconda/bin
   
@@ -46,17 +46,17 @@ Then change to that directory and add channels
   
   ./conda config --add channels https://conda.binstar.org/zero323 
     
-Now create a virtualenv using the conda requirements file
+###Now create a virtualenv using the conda requirements file
 
   ./conda create --yes python=2.7.6 -m -n chembiohub_ws --file=/var/www/chembiohub_ws/anaconda_requirements.txt
 
-Now install all of the dependency apt gets in the environment
+###Now install all of the dependency apt gets in the environment
 
   wget https://raw.githubusercontent.com/chembl/mychembl/master/install_core_libs.sh
 
   sh install_core_libs.sh
 
-Now add a user for the install
+###Now add a user for the install
 
   sudo su postgres
   
@@ -68,18 +68,18 @@ Now add a user for the install
   
   exit
   
-edit pg_hba.conf and add a line for your user 
+###edit pg_hba.conf and add a line for your user 
 
   sudo vim /etc/postgresql/9.3/main/pg_hba.conf
   local all astretton ident
 
-Now Install the RDKit globally in order to make the database work
+###Now Install the RDKit globally in order to make the database work
 
   wget https://github.com/chembl/mychembl/blob/master/rdkit_install.sh
   
   sh rdkit_install.sh
   
-Now install openbabel and indigo and add them to python path
+###Now install openbabel and indigo and add them to python path
 
   cd ~
   
@@ -101,7 +101,7 @@ Now install openbabel and indigo and add them to python path
   
   make install
   
-Indigo like this:
+###Indigo like this:
 
   wget https://dl.dropboxusercontent.com/u/10967207/indigo-python-1.1.11-linux.zip
 
@@ -113,7 +113,7 @@ Indigo like this:
   
   echo 'export DJANGO_SETTINGS_MODULE="deployment.settings.staging"'  >> ~/.bashrc 
 
-Inchi binaries like this:
+###Inchi binaries like this:
 
   cd ~/Tools
   
@@ -125,11 +125,11 @@ Inchi binaries like this:
   
   chmod +x INCHI-1-BIN/linux/64bit/inchi-1
   
-Now ensure that the setting in deployment/settings/base.py matches the location of the inchi binary file - for this install it is:
+###Now ensure that the setting in deployment/settings/base.py matches the location of the inchi binary file - for this install it is:
 
   INCHI_BINARIES_LOCATION = {"1.02" :"/home/chembiohub/Tools/INCHI-1-BIN/linux/64bit/inchi-1"}
 
-Next we need to link all of our pip packages that are currently subrepos, we can do this by running:
+###Next we need to link all of our pip packages that are currently subrepos, we can do this by running:
 
    source ~/miniconda/bin/activate [YOUR_ENV_NAME]
    
@@ -176,7 +176,7 @@ Next we need to link all of our pip packages that are currently subrepos, we can
    python setup.py develop
 
 
-Now we need to link in the ng-chem package as a bower dependency for the front end. This is done by first installing nodejs and bower 
+###Now we need to link in the ng-chem package as a bower dependency for the front end. This is done by first installing nodejs and bower 
 
 
   sudo apt-get install nodejs
@@ -187,17 +187,17 @@ Now we need to link in the ng-chem package as a bower dependency for the front e
 
   sudo apt-get install nodejs-legacy
   
-Next go to the folder in src and run bower install
+###Next go to the folder in src and run bower install
 
   cd /home/vagrant/chembiohub_ws/src/ng-chem
   
   bower install
   
-We now add this folder to STATICFILES_DIRS to allow it to be served
+###We now add this folder to STATICFILES_DIRS to allow it to be served
   
-You can now make changes to ng-chem in src and have them reflect in the static files for the app more generally
+###You can now make changes to ng-chem in src and have them reflect in the static files for the app more generally
 
-Now create a secret settings file and add a database user for the app
+###Now create a secret settings file and add a database user for the app
 
    create user cbh_chembl_usr with password 'xxxxxx';
 
@@ -207,7 +207,7 @@ Now create a secret settings file and add a database user for the app
 
    grant all privileges on  database cbh_chembl_db to cbh_chembl_usr;
    
-Now migrate the database for the application by running the following:
+###Now migrate the database for the application by running the following:
 
    source ~/miniconda/bin/activate [YOUR_ENV_NAME]
 
@@ -217,11 +217,11 @@ Now migrate the database for the application by running the following:
 
    python manage.py migrate cbh_chembl_model_extension
    
-In order for mysyncdb to work you must have the setting in your settings file:
+###In order for mysyncdb to work you must have the setting in your settings file:
 
-   CORE_TABLES_MANAGED = True
+####   CORE_TABLES_MANAGED = True
    
-   APP_SPECIFIC_TABLES_MANAGED = True
+####   APP_SPECIFIC_TABLES_MANAGED = True
    
 
    
