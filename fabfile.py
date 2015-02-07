@@ -17,8 +17,6 @@ def _deploy(code_dir, process_name):
         except:
             pass
         sudo("git submodule foreach git pull origin master", user="chembiohub")        
-        sudo("supervisorctl reload")
-        sudo("service apache2 reload reload")
         with cd("src/ng-chem"):
             sudo("su chembiohub -c 'bower install ' ")
  #           sudo("su chembiohub -c 'grunt build ' ")
@@ -28,8 +26,8 @@ def _deploy(code_dir, process_name):
             with cd("src/%s" % dirname):
                 sudo("source /home/chembiohub/.bashrc &&  source /home/chembiohub/anaconda/bin/activate chembiohub_ws && python setup.py install ", user="chembiohub")
         sudo("source /home/chembiohub/.bashrc &&  source /home/chembiohub/anaconda/bin/activate chembiohub_ws && python manage.py syncdb && python manage.py migrate flowjs && python manage.py migrate cbh_chembl_model_extension  && python manage.py collectstatic --noinput", user="chembiohub") 
-
-
+        sudo("supervisorctl reload")
+        sudo("service apache2 reload reload")
 
 def prod():
     # env.hosts = ['chembiohub.ox.ac.uk']
