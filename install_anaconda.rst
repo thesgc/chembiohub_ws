@@ -2,7 +2,6 @@
 #===============================
 
 ###Clone the repository recursively
-   
    cd /var/www
    
    git clone git@github.com:thesgc/chembiohub_ws.git --recursive
