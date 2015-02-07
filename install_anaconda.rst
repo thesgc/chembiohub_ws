@@ -1,17 +1,23 @@
+
+
+
 #!/bin/bash
 set -e
 #In order to install chembiohub web services and all chembl dependencies on anaconda, run the following:
 #===============================
+###First create the user that will run all the code
+
+
+
 
 ###Now install all of the dependency apt gets in the environment
 
   wget https://raw.githubusercontent.com/chembl/mychembl/master/install_core_libs.sh
 
+  sed "s/gem install gist//g" install_core_libs.sh > install_core_libs.sh
   sh install_core_libs.sh
 
 ###Now add a user for the install
-
-  exit
 
   sudo su postgres
   
@@ -21,37 +27,14 @@ set -e
   
   \q
   
-  exit
+  
   
 ###edit pg_hba.conf and add a line for your user 
 
   cat "local all vagrant ident" > /etc/postgresql/9.3/main/pg_hba.conf
-
+exit
   sudo service postgresql restart
   
-
-###Now Install the RDKit globally in order to make the database work
-
-  wget https://github.com/chembl/mychembl/blob/master/rdkit_install.sh
-  
-  sh rdkit_install.sh
-
-
-###Bower and node
-
-  sudo apt-get install nodejs
-  
-  sudo apt-get install npm
-  
-  sudo npm install -g bower
-
-  sudo apt-get install nodejs-legacy
-
-###Add a user and switch to it for the non root installs
-
-   
-   sudo su
-
    sudo apt-get install apache2
 
     sudo useradd -G www-data -s /bin/bash -m chembiohub
@@ -59,6 +42,51 @@ set -e
     sudo su chembiohub
 
 
+
+###Now Install the RDKit globally in order to make the database work
+  export RDKIT_SOURCE_ROOT=$HOME/rdkit
+
+wget http://sourceforge.net/projects/rdkit/files/rdkit/Q3_2014/RDKit_2014_09_2.tar.gz
+tar -xvf RDKit_2014_09_2.tar.gz
+mv rdkit-Release_2014_09_2 rdkit 
+
+export RDBASE=$HOME/rdkit
+export LD_LIBRARY_PATH=$RDBASE/lib:$LD_LIBRARY_PATH
+export PYTHONPATH=$RDBASE:$PYTHONPATH
+cd rdkit
+mkdir build
+cd build
+cmake -DRDK_BUILD_INCHI_SUPPORT=ON -DBOOST_ROOT=/usr/include ..
+make -j4 installcheck
+
+sudo su postgres
+
+psql
+
+drop user vagrant;
+
+\q
+
+exit
+###Bower and node
+
+  sudo apt-get install -y nodejs
+  
+  sudo apt-get install -y npm
+  
+  sudo npm install -g bower
+
+  sudo apt-get install -y nodejs-legacy
+
+   
+
+cd ~
+wget http://bitbucket.org/eigen/eigen/get/2.0.15.tar.bz2 
+tar xvf 2.0.15.tar.bz2
+cd eigen-eigen-0938af7840b0/; mkdir build; cd build; cmake ..
+sudo make install  # Does the job.
+cd ../..
+sudo apt-get install pkg-config
   
 ###Now install openbabel and indigo and add them to python path
 
@@ -80,10 +108,11 @@ set -e
   
   make -j8
   
-  make install
+  make -j8 install
   
 ###Indigo like this:
 
+cd ~
   wget https://dl.dropboxusercontent.com/u/10967207/indigo-python-1.1.11-linux.zip
 
   unzip indigo-python-1.1.11-linux.zip
@@ -106,6 +135,11 @@ set -e
   gunzip INCHI-1-BIN/linux/64bit/inchi-1.gz
   
   chmod +x INCHI-1-BIN/linux/64bit/inchi-1
+
+
+
+
+
 
 
 
