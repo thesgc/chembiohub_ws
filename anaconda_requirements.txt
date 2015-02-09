@@ -62,6 +62,6 @@ ssl_match_hostname=3.4.0.2=py27_0
 system=5.8=1
 tk=8.5.15=0
 tornado=4.0.2=py27_0
-xlsxwriter=0.6.6=0
+xlsxwriter
 zeromq=4.0.4=0
 zlib=1.2.7=0

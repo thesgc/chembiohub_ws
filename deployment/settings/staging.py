@@ -3,7 +3,7 @@ from .base import *
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
-LOGIN_REDIRECT_URL = '/reg/app/#/projects'
+LOGIN_REDIRECT_URL = '/reg/app/index.html#/projects/list'
 
 ID_PREFIX = "UOXSTA"
 
