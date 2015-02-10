@@ -51,4 +51,8 @@ LOGIN_REDIRECT_URL = '/reg/app/index.html#/projects'
 WS_BASE_URL='/{prefix}_ws'
 '''
 
-
+datatbase_creation_script = '''
+CREATE DATABASE {prefix}_reg_db;
+CREATE USER {prefix}_reg_user;
+GRANT ALL PRIVILEGES on DATABASE {prefix}_reg_db to {prefix}_reg_user;
+'''
