@@ -14,4 +14,41 @@ apache_template = '''   ProxyPass /{prefix}/reg !
     </Directory>
   ProxyPass /{prefix}/ http://localhost:{port}/{prefix}/
   ProxyPassReverse /{prefix}/ http://localhost:{port}/{prefix}/
+  #Protect the static directory
+  <Location /{prefix}/>
+    WebAuthExtraRedirect on
+    AuthType WebAuth
+    require valid-user
+    RequestHeader set "X-WEBAUTH-USER" "%{WEBAUTH_USER}e"
+    RequestHeader set "X-REMOTE-USER" "%{REMOTE_USER}e"
+    # strip the X-Forwarded-Proto header from incoming requests
+    RequestHeader unset X-Forwarded-Proto
+    # set the header for requests using HTTPS
+    RequestHeader set X-Forwarded-Proto https env=HTTPS
+</location>
+  #Protect the webservice 
+  <Location /{prefix}_ws/>
+    WebAuthExtraRedirect on
+    AuthType WebAuth
+    require valid-user
+    RequestHeader set "X-WEBAUTH-USER" "%{WEBAUTH_USER}e"
+    RequestHeader set "X-REMOTE-USER" "%{REMOTE_USER}e"
+    # strip the X-Forwarded-Proto header from incoming requests
+    RequestHeader unset X-Forwarded-Proto
+    # set the header for requests using HTTPS
+    RequestHeader set X-Forwarded-Proto https env=HTTPS
+</location>
 '''
+
+local_settings_template = '''
+DATABASES = {
+    
+}
+SECRET_KEY = '{secret_key}'
+SESSION_COOKIE_PATH = '{prefix}'
+
+LOGIN_REDIRECT_URL = '/reg/app/index.html#/projects'
+WS_BASE_URL='/{prefix}_ws'
+'''
+
+
