@@ -1,7 +1,9 @@
 prefix = "test"
 port = "8081"
 base_folder = "/var/www"
-
+password = ""
+secret_key = ""
+anaconda_base = ""
 
 apache_template = '''   ProxyPass /{prefix}/reg !
     Alias /{prefix}/reg {base_folder}/{prefix}/chembiohub_ws/deployment/static/dist
