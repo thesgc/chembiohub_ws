@@ -49,6 +49,16 @@ SESSION_COOKIE_PATH = '{prefix}'
 
 LOGIN_REDIRECT_URL = '/reg/app/index.html#/projects'
 WS_BASE_URL='/{prefix}_ws'
+
+STATIC_ROOT = '{base_folder}/{prefix}/chembiohub_ws/deployment/static'
+MEDIA_ROOT = '{media_folder}/{prefix}'
+
+STATIC_URL = '/{prefix}/reg/'
+
+STATICFILES_DIRS = (
+'/var/www/chembiohub_ws/src/ng-chem',
+)
+
 '''
 
 datatbase_creation_script = '''
