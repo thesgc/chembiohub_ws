@@ -56,7 +56,7 @@ MEDIA_ROOT = '{media_folder}/{prefix}'
 STATIC_URL = '/{prefix}/reg/'
 
 STATICFILES_DIRS = (
-'/var/www/chembiohub_ws/src/ng-chem',
+'{base_folder}/{prefix}/src/ng-chem',
 )
 
 '''
