@@ -42,7 +42,14 @@ apache_template = '''   ProxyPass /{prefix}/reg !
 
 local_settings_template = '''
 DATABASES = {
-    
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': '{prefix}_db',
+        'USER': '{prefix}_user',
+        'PASSWORD': '{password}',
+        'HOST': 'localhost',
+        'PORT': '5432',
+    }
 }
 SECRET_KEY = '{secret_key}'
 SESSION_COOKIE_PATH = '{prefix}'
