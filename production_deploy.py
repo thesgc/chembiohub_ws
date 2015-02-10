@@ -47,7 +47,7 @@ DATABASES = {
 SECRET_KEY = '{secret_key}'
 SESSION_COOKIE_PATH = '{prefix}'
 
-LOGIN_REDIRECT_URL = '/reg/app/index.html#/projects'
+LOGIN_REDIRECT_URL = '/{prefix}/reg/#/projects/list'
 WS_BASE_URL='/{prefix}_ws'
 
 STATIC_ROOT = '{base_folder}/{prefix}/chembiohub_ws/deployment/static'
