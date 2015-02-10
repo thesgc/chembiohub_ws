@@ -77,7 +77,7 @@ GRANT ALL PRIVILEGES on DATABASE {prefix}_reg_db to {prefix}_reg_user;
 supervisor_config = '''
 [program:{prefix}_reg]
 directory={base_folder}/{prefix}/chembiohub_ws
-command=/home/chembiohub/miniconda/envs/{prefix}/bin/gunicorn  chembiocrunch.wsgi:application -b 127.0.0.1:8085  --workers 8 --settings=chembiocrunch.settings.production --error-logfile -
+command=/home/chembiohub/miniconda/envs/{prefix}/bin/gunicorn  chembiocrunch.wsgi:application -b 127.0.0.1:{port}  --workers 8 --settings=chembiocrunch.settings.{prefix} --error-logfile -
 user=astretton
 autostart=true
 autorestart=true
