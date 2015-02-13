@@ -3,7 +3,7 @@
 
 #!/bin/bash
 set -e
-#In order to install chembiohub web services and all chembl dependencies on anaconda, run the following:
+###In order to install chembiohub web services and all chembl dependencies on anaconda, run the following:
 #===============================
 ###First create the user that will run all the code
 
@@ -14,8 +14,8 @@ set -e
 
   wget https://raw.githubusercontent.com/chembl/mychembl/master/install_core_libs.sh
 
-  sed "s/gem install gist//g" install_core_libs.sh > install_core_libs.sh
-  sh install_core_libs.sh
+  sed "s/gem install gist//g" install_core_libs.sh >> install_core_libs1.sh
+  sh install_core_libs1.sh
 
 ###Now add a user for the install
 
