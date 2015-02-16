@@ -36,7 +36,7 @@ STATICFILES_DIRS = (
 # Put strings here, like "/home/html/static" or "C:/www/django/static".
 # Always use forward slashes, even on Windows.
 # Don't forget to use absolute paths, not relative paths.
-'/home/vagrant/chembiohub_ws/src/ng-chem/',
+'/home/work/temp/src/ng-chem/',
 )
 
 # List of finder classes that know how to find static files in
@@ -53,13 +53,13 @@ ALLOWED_HOSTS =["testserver"]
 
 
 
-STATIC_ROOT = '/home/astretton/work/chembiohub_ws/deployment/static'
+STATIC_ROOT = '/home/astretton/work/temp/deployment/static'
 STATICFILES_DIRS = (
 # Put strings here, like "/home/html/static" or "C:/www/django/static".
 # Always use forward slashes, even on Windows.
 # Don't forget to use absolute paths, not relative paths.
 #'/home/vagrant/chembiohub_ws/src/ng-chem',
-'/home/astretton/work/chembiohub_ws/src/ng-chem',
+'/home/astretton/work/temp/src/ng-chem',
 
 )
 
