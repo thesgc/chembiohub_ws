@@ -35,3 +35,4 @@ wsgi-intercept
 xlrd
 xmltodict
 XlsxWriter
+gunicorn
