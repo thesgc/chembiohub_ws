@@ -216,6 +216,6 @@ INCHI_BINARIES_LOCATION = {"1.02" :"/home/chembiohub/Tools/INCHI-1-BIN/linux/64b
 
 OPEN_BABEL_EXECUTABLE = "/home/chembiohub/openbabel-2.3.2/build/bin/babel"
 
-ALLOWED_INCLUDE_ROOTS = ("/home/vagrant/",)
+ALLOWED_INCLUDE_ROOTS = ("/home/vagrant/",'/var/www/chembiohub_ws/')
 
-ALLOWED_HOSTS = ["staging.chembiohub.ox.ac.uk", "staging.chembiohub.ox.ac.uk"]
+ALLOWED_HOSTS = [ "staging.chembiohub.ox.ac.uk"]

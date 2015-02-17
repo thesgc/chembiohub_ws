@@ -33,3 +33,6 @@ shortuuid
 simplejson
 wsgi-intercept
 xlrd
+xmltodict
+XlsxWriter
+gunicorn
