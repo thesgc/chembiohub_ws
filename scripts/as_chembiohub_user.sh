@@ -1,4 +1,12 @@
 cd ~
+mkdir boost
+wget -O boost_1_56_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.56.0/boost_1_56_0.tar.gz/download
+tar xzvf boost_1_56_0.tar.gz
+cd boost_1_56_0/
+./bootstrap.sh --with-libraries=python,regex --prefix=/home/chembiohub/boost
+./bjam install
+
+
 ###Now Install the RDKit globally in order to make the database work
   export RDKIT_SOURCE_ROOT=$HOME/rdkit
 
@@ -12,7 +20,7 @@ export PYTHONPATH=$RDBASE:$PYTHONPATH
 cd rdkit
 mkdir build
 cd build
-cmake -DRDK_BUILD_INCHI_SUPPORT=ON -DBOOST_ROOT=/usr/include ..
+cmake -DRDK_BUILD_INCHI_SUPPORT=ON -DCMAKE_INSTALL_PREFIX=/home/chembiohub/boost/ -DBoost_INCLUDE_DIR=/home/chembiohub/boost/include .. ##-DBOOST_ROOT=/usr/include 
 make -j4 installcheck
 
 ###Bower and node
