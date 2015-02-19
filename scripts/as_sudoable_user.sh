@@ -1,7 +1,7 @@
 
 
 #!/bin/bash
-set -e
+#set -e
 #In order to install chembiohub web services and all chembl dependencies on anaconda, run the following:
 #===============================
 ###First create the user that will run all the code
@@ -14,7 +14,7 @@ cd ~
   wget https://raw.githubusercontent.com/chembl/mychembl/master/install_core_libs.sh
 
   sed "s/gem install gist//g" install_core_libs.sh >> install_core_libs1.sh
- # sh install_core_libs1.sh
+ sh install_core_libs1.sh
 
 ###Now add a user for the install
 POSTGRES_COMMAND = "psql template1 -c 'DROP ROLE IF EXISTS $USER; create user $USER with superuser; CREATE EXTENSION IF NOT EXISTS hstore'"
