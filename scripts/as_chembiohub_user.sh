@@ -6,6 +6,7 @@ cd boost_1_56_0/
 ./bootstrap.sh --with-libraries=python,regex --prefix=/home/chembiohub/boost
 ./bjam install
 
+cd ~
 
 ###Now Install the RDKit globally in order to make the database work
   export RDKIT_SOURCE_ROOT=$HOME/rdkit
@@ -13,7 +14,6 @@ cd boost_1_56_0/
 wget http://sourceforge.net/projects/rdkit/files/rdkit/Q3_2014/RDKit_2014_09_2.tar.gz
 tar -xvf RDKit_2014_09_2.tar.gz
 mv rdkit-Release_2014_09_2 rdkit 
-
 export RDBASE=$HOME/rdkit
 export LD_LIBRARY_PATH=$RDBASE/lib:$LD_LIBRARY_PATH
 export PYTHONPATH=$RDBASE:$PYTHONPATH
