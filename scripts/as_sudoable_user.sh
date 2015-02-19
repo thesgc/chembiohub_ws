@@ -17,13 +17,16 @@ cd ~
  sh install_core_libs1.sh
 
 ###Now add a user for the install
-POSTGRES_COMMAND = "psql template1 -c 'DROP ROLE IF EXISTS $USER; create user $USER with superuser; CREATE EXTENSION IF NOT EXISTS hstore'"
+export POSTGRES_COMMAND="psql template1 -c 'DROP ROLE IF EXISTS $USER; create user $USER with superuser; CREATE EXTENSION IF NOT EXISTS hstore'"
  sudo su postgres -c $POSTGRES_COMMAND
   
-  
+
 ###edit pg_hba.conf and add a line for your user 
-ECHO_COMMAND = 'echo "local all $USER ident" >> /etc/postgresql/9.3/main/pg_hba.conf'
-  sudo su postgres -c $ECHO_COMMAND
+export ECHO_COMMAND = 'echo "local all $USER ident" >> /etc/postgresql/9.3/main/pg_hba.conf'
+#If version is only 9.1
+export ECHO_2 = 'echo "local all $USER ident" >> /etc/postgresql/9.1/main/pg_hba.conf'
+
+  sudo su postgres -c '$ECHO_COMMAND || $ECHO_2'
 
   sudo service postgresql restart
   
