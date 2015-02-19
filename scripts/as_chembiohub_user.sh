@@ -20,7 +20,7 @@ export PYTHONPATH=$RDBASE:$PYTHONPATH
 cd rdkit
 mkdir build
 cd build
-cmake -DRDK_BUILD_INCHI_SUPPORT=ON -DCMAKE_INSTALL_PREFIX=/home/chembiohub/boost/ -DBoost_INCLUDE_DIR=/home/chembiohub/boost/include .. ##-DBOOST_ROOT=/usr/include 
+cmake  -DBoost_INCLUDE_DIR=/home/chembiohub/boost/include .. ##-DBOOST_ROOT=/usr/include 
 make -j4 installcheck
 
 ###Bower and node
