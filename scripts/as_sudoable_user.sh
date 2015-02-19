@@ -56,6 +56,9 @@ id -u chembiohub &>/dev/null ||   sudo useradd -G www-data -s /bin/bash -m chemb
 cd /tmp
 wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/scripts/as_chembiohub_user.sh
 
+sudo apt-get install -y flex bison build-essential python-numpy cmake python-dev sqlite3 libsqlite3-dev
+libboost-dev libboost-python-dev libboost-regex-dev
+
 sudo su chembiohub -c 'bash as_chembiohub_user.sh'
 
 export DROPCOMMAND='psql template1 -c "DROP ROLE IF EXISTS $USER;"'
