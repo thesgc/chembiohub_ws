@@ -52,8 +52,11 @@ cd ../..
 sudo apt-get install pkg-config
 
 id -u chembiohub &>/dev/null ||   sudo useradd -G www-data -s /bin/bash -m chembiohub
-   
-sudo su chembiohub -c 'bash scripts/as_chembiohub_user.sh'
+
+cd /tmp
+wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/scripts/as_chembiohub_user.sh
+
+sudo su chembiohub -c 'bash as_chembiohub_user.sh'
 
 export DROPCOMMAND='psql template1 -c "DROP ROLE IF EXISTS $USER;"'
 
