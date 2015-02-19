@@ -53,9 +53,9 @@ sudo apt-get install pkg-config
 
 id -u chembiohub &>/dev/null ||   sudo useradd -G www-data -s /bin/bash -m chembiohub
    
-sudo su chembiohub -c chembiohub.sh
+sudo su chembiohub -c 'bash scripts/chembiohub.sh'
 
-DROP_COMMAND = "psql template1 -c 'DROP ROLE IF EXISTS $USER; '"
+export DROP_COMMAND = "psql template1 -c 'DROP ROLE IF EXISTS $USER; '"
 
   sudo su postgres -c $DROP_COMMAND
 
