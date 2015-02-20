@@ -36,3 +36,4 @@ xlrd
 xmltodict
 XlsxWriter
 gunicorn
+raven

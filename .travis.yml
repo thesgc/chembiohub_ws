@@ -1,0 +1,30 @@
+language: python
+python:
+- 2.7
+#- 3.3
+notifications:
+email: false
+# Setup anaconda
+before_install:
+- bash scripts/as_sudoable_user.sh
+
+# The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
+- sudo rm -rf /dev/shm
+- sudo ln -s /run/shm /dev/shm
+# Install packages
+install:
+# - conda install --yes python=$TRAVIS_PYTHON_VERSION pip pandas numexpr Cython pytables matplotlib pillow lxml
+# # Coverage packages are on my binstar channel
+# # - conda install --yes -c dan_blanchard python-coveralls nose-cov
+# - pip install -r requirements/test.txt
+# - conda create --yes -m -n chembiocrunch pip pandas numexpr Cython pytables matplotlib pillow lxml
+# - source activate chembiocrunch
+# - pip install -r requirements/test.txt
+# Run test
+# script:
+# -
+# - nosetests --with-cov --cov YOUR_PACKAGE_NAME_HERE --cov-config .coveragerc --logging-level=INFO
+# Calculate coverage
+# after_success:
+# - coveralls --config_file .coveragerc
+#Thanks to https://gist.github.com/dan-blanchard/7045057
