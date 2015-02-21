@@ -17,8 +17,7 @@ cd ~
  sh install_core_libs1.sh
 
 ###Now add a user for the install
-export POSTGRES_COMMAND="psql template1 -c 'DROP ROLE IF EXISTS $USER; create user $USER with superuser; CREATE EXTENSION IF NOT EXISTS hstore'"
- sudo su postgres -c "$POSTGRES_COMMAND"
+
   
 
 ###edit pg_hba.conf and add a line for your user 
@@ -71,3 +70,5 @@ export PYTHONPATH=$RDBASE:$PYTHONPATH
 cd /home/chembiohub/rdkit/Code/PgSQL/rdkit/
 sudo make install
 
+export POSTGRES_COMMAND="psql template1 -c ' CREATE EXTENSION IF NOT EXISTS hstore; CREATE EXTENSION IF NOT EXISTS rdkit;'"
+ sudo su postgres -c "$POSTGRES_COMMAND"
