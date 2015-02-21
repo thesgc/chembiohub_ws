@@ -12,7 +12,7 @@ wget -O boost_1_56_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.
 tar xzf boost_1_56_0.tar.gz
 cd boost_1_56_0/
 ./bootstrap.sh --with-libraries=python,regex --prefix=/home/chembiohub/boost
-./bjam install -d10
+./bjam install -d0
 cp stage/lib/*.so ~/anaconda/lib
 cp -r boost /home/chembiohub/anaconda/include
 
