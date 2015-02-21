@@ -7,12 +7,12 @@ cd ~
 
 
 cd ~
-mkdir boost
+mkdir boost 
 wget -O boost_1_56_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.56.0/boost_1_56_0.tar.gz/download
 tar xzf boost_1_56_0.tar.gz
 cd boost_1_56_0/
 ./bootstrap.sh --with-libraries=python,regex --prefix=/home/chembiohub/boost
-./bjam install
+./bjam install -d10
 cp stage/lib/*.so ~/anaconda/lib
 cp -r boost /home/chembiohub/anaconda/include
 
@@ -32,7 +32,7 @@ cd rdkit
 mkdir build
 cd build
 cmake -DPYTHON_LIBRARY=/home/chembiohub/anaconda/lib/python2.7/config/libpython2.7.a -DPYTHON_INCLUDE_DIR=/home/chembiohub/anaconda/include/python2.7 -DBOOST_ROOT=/home/chembiohub/anaconda ..
-make -j4 installcheck
+make -j4 install
 
 ###Bower and node
 
