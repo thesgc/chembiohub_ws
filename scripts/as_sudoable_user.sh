@@ -62,7 +62,7 @@ libboost-dev libboost-python-dev libboost-regex-dev
 
 sudo su chembiohub -c 'bash as_chembiohub_user.sh'
 
-export DROPCOMMAND='psql template1 -c "DROP ROLE IF EXISTS $USER;"'
+export DROPCOMMAND='psql template1 -c "CREATE EXTENSION rdkit; DROP ROLE IF EXISTS $USER;"'
 
   sudo su postgres -c $DROPCOMMAND
 
