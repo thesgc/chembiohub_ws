@@ -15,14 +15,14 @@ cd build
 
 
 
-if [$1 = 'travis']
-then
+#if [$1 = 'travis']
+#then
 #cmake -DPYTHON_LIBRARY=/home/chembiohub/anaconda/lib/python2.7/config/libpython2.7.a -DPYTHON_INCLUDE_DIR=/home/chembiohub/anaconda/include/python2.7 -DBOOST_ROOT=/home/chembiohub/anaconda ..
 #make -j4 install
-else
+#else
 cmake -DRDK_BUILD_INCHI_SUPPORT=ON -DBOOST_ROOT=/usr/include ..
 make -j4 install
-fi
+#fi
 
 cd $RDBASE/Code/PgSQL/rdkit
 make
