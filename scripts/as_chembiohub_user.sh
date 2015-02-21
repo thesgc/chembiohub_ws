@@ -1,3 +1,10 @@
+  wget http://09c8d0b2229f813c1b93-c95ac804525aac4b6dba79b00b39d1d3.r79.cf1.rackcdn.com/Anaconda-2.1.0-Linux-x86_64.sh -O anaconda.sh
+  
+  chmod +x anaconda.sh
+  
+  bash anaconda.sh -b
+
+
 cd ~
 mkdir boost
 wget -O boost_1_56_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.56.0/boost_1_56_0.tar.gz/download
@@ -85,11 +92,7 @@ cd ~
 
 wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/anaconda_requirements.txt
 wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/pip_requirements.txt
-  wget http://09c8d0b2229f813c1b93-c95ac804525aac4b6dba79b00b39d1d3.r79.cf1.rackcdn.com/Anaconda-2.1.0-Linux-x86_64.sh -O anaconda.sh
-  
-  chmod +x anaconda.sh
-  
-  bash anaconda.sh -b
+
   
 ###Then change to that directory and add channels
 
