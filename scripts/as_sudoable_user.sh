@@ -57,8 +57,7 @@ id -u chembiohub &>/dev/null ||   sudo useradd -G www-data -s /bin/bash -m chemb
 cd /tmp
 wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/scripts/as_chembiohub_user.sh
 
-sudo apt-get install -y flex bison build-essential python-numpy cmake python-dev sqlite3 libsqlite3-dev
-libboost-dev libboost-python-dev libboost-regex-dev
+sudo apt-get install -y flex bison build-essential python-numpy cmake python-dev sqlite3 libsqlite3-dev libboost-dev libboost-python-dev libboost-regex-dev
 export COMM='bash as_chembiohub_user.sh $USER' 
 sudo su chembiohub -c '$COMM' 
 
