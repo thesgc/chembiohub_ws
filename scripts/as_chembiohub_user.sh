@@ -31,7 +31,7 @@ cd ~
   
   #chmod +x /tmp/anaconda.sh
   
-  bash /tmp/anaconda.sh -b
+  bash /var/cache/wget/Anaconda-2.1.0-Linux-x86_64.sh -b
 
 
 
