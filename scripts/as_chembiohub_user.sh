@@ -13,14 +13,21 @@ export PYTHONPATH=$RDBASE:$PYTHONPATH
 cd rdkit
 mkdir build
 cd build
+
+
+cd $RDBASE/Code/PgSQL/rdkit
+make && make install && make installcheck 
 if [$1 = 'travis']
 then
 #cmake -DPYTHON_LIBRARY=/home/chembiohub/anaconda/lib/python2.7/config/libpython2.7.a -DPYTHON_INCLUDE_DIR=/home/chembiohub/anaconda/include/python2.7 -DBOOST_ROOT=/home/chembiohub/anaconda ..
 #make -j4 install
 else
 cmake -DRDK_BUILD_INCHI_SUPPORT=ON -DBOOST_ROOT=/usr/include ..
-make -j4 check
+make -j4 install
 fi
+
+cd $RDBASE/Code/PgSQL/rdkit
+make
 
 cd ~
   wget http://09c8d0b2229f813c1b93-c95ac804525aac4b6dba79b00b39d1d3.r79.cf1.rackcdn.com/Anaconda-2.1.0-Linux-x86_64.sh -O anaconda.sh
@@ -125,5 +132,4 @@ pip install -r ../../pip_requirements.txt
 
 
 
-#cd $RDBASE/Code/PgSQL/rdkit
-#make && make install && make installcheck 
+
