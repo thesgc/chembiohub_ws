@@ -5,6 +5,9 @@ tar xzf boost_1_56_0.tar.gz
 cd boost_1_56_0/
 ./bootstrap.sh --with-libraries=python,regex --prefix=/home/chembiohub/boost
 ./bjam install
+cp stage/lib/*.so ~/anaconda/lib
+cp -r boost /home/chembiohub/anaconda/include
+
 
 cd ~
 
@@ -20,7 +23,7 @@ export PYTHONPATH=$RDBASE:$PYTHONPATH
 cd rdkit
 mkdir build
 cd build
-cmake  -DBoost_INCLUDE_DIR=/home/chembiohub/boost/include .. ##-DBOOST_ROOT=/usr/include 
+cmake -DPYTHON_LIBRARY=/home/chembiohub/anaconda/lib/python2.7/config/libpython2.7.a -DPYTHON_INCLUDE_DIR=/home/chembiohub/anaconda/include/python2.7 -DBOOST_ROOT=/home/chembiohub/anaconda ..
 make -j4 installcheck
 
 ###Bower and node
