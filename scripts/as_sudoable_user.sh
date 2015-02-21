@@ -18,15 +18,15 @@ cd ~
 
 ###Now add a user for the install
 export POSTGRES_COMMAND="psql template1 -c 'DROP ROLE IF EXISTS $USER; create user $USER with superuser; CREATE EXTENSION IF NOT EXISTS hstore'"
- sudo su postgres -c $POSTGRES_COMMAND
+ sudo su postgres -c "$POSTGRES_COMMAND"
   
 
 ###edit pg_hba.conf and add a line for your user 
-export ECHO_COMMAND='echo "local all $USER ident" >> /etc/postgresql/9.3/main/pg_hba.conf'
+export ECHO_COMMAND="echo 'local all $USER ident' >> /etc/postgresql/9.3/main/pg_hba.conf"
 #If version is only 9.1
-export ECHO_2='echo "local all $USER ident" >> /etc/postgresql/9.1/main/pg_hba.conf'
+export ECHO_2="echo 'local all $USER ident' >> /etc/postgresql/9.1/main/pg_hba.conf"
 
-  sudo su postgres -c '$ECHO_COMMAND' ||   sudo su postgres -c '$ECHO_2'
+  sudo su postgres -c "$ECHO_COMMAND" ||   sudo su postgres -c "$ECHO_2"
 
 
   sudo service postgresql restart
@@ -58,8 +58,8 @@ cd /tmp
 wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/scripts/as_chembiohub_user.sh
 
 #sudo apt-get install -f -y flex bison build-essential python-numpy cmake python-dev sqlite3 libsqlite3-dev
-export COMM='bash as_chembiohub_user.sh $USER' 
-sudo su chembiohub -c '$COMM' 
+export COMM="bash as_chembiohub_user.sh $USER"
+sudo su chembiohub -c "$COMM" 
 
 #export DROPCOMMAND='psql template1 -c "CREATE EXTENSION rdkit; DROP ROLE IF EXISTS $USER;" '
 #echo $DROPCOMMAND
