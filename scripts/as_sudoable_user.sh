@@ -18,18 +18,6 @@ cd ~
 
 ###Now add a user for the install
 
-  
-
-###edit pg_hba.conf and add a line for your user 
-export ECHO_COMMAND="echo 'local all $USER ident' >> /etc/postgresql/9.3/main/pg_hba.conf"
-#If version is only 9.1
-export ECHO_2="echo 'local all $USER ident' >> /etc/postgresql/9.1/main/pg_hba.conf"
-
-  sudo su postgres -c "$ECHO_COMMAND" ||   sudo su postgres -c "$ECHO_2"
-
-
-  sudo service postgresql restart
-  
    sudo apt-get install -y apache2 
 sudo apt-get install -y libapache2-mod-proxy-html libxml2-devsudo apt-get install libxml2-dev
 sudo a2enmod proxy proxy_http headers
