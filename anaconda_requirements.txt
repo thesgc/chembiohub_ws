@@ -2,7 +2,7 @@
 # $ conda create --name <env> --file <this file>
 # platform: linux-64
 biopython=1.64=np18py27_0
-boost=1.55.0=py27_2
+#boost=1.55.0=py27_2
 brisa-media-renderer=0.1.1=py27_0
 bzip2=1.0.6=0
 cairo=1.12.18=0
@@ -15,10 +15,10 @@ freetype=2.4.10=0
 glib=2.40.0=1
 gobject-introspection=1.40.0=1
 ipython=2.3.1=py27_0
-ipython-notebook=2.3.1=py27_0
-ipython-qtconsole=2.3.1=py27_0
+#ipython-notebook=2.3.1=py27_0
+#ipython-qtconsole=2.3.1=py27_0
 jinja2=2.7.3=py27_1
-jpeg=8d=0
+#jpeg=8d=0
 lcms=1.19=0
 libffi=3.0.13=0
 libpng=1.5.13=1
@@ -33,7 +33,7 @@ networkx=1.9.1=py27_0
 numpy=1.8.2=py27_0
 openssl=1.0.1h=1
 pandas=0.14.1=np18py27_0
-paste=1.7.5.1=py27_0
+#paste=1.7.5.1=py27_0
 pil=1.1.7=py27_1
 pillow=2.5.1=py27_0
 pip=1.5.6=py27_0
@@ -48,12 +48,12 @@ pyqt=4.10.4=py27_0
 python=2.7.6=2
 pytz=2014.9=py27_0
 pyzmq=14.4.1=py27_0
-qt=4.8.5=0
-rdkit=2014.03.1=np18py27_2
+#qt=4.8.5=0
+#rdkit=2014.03.1=np18py27_2
 readline=6.2=2
 requests=2.5.0=py27_0
-scikit-learn=0.14.1=np18py27_1
-scipy=0.14.0=np18py27_0
+#scikit-learn=0.14.1=np18py27_1
+#scipy=0.14.0=np18py27_0
 setuptools=7.0=py27_0
 sip=4.15.5=py27_0
 six=1.8.0=py27_0
