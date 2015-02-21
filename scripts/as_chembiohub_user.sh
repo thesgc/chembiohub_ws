@@ -14,8 +14,7 @@ mkdir build
 cd build
 
 
-cd $RDBASE/Code/PgSQL/rdkit
-make && make install && make installcheck 
+
 if [$1 = 'travis']
 then
 #cmake -DPYTHON_LIBRARY=/home/chembiohub/anaconda/lib/python2.7/config/libpython2.7.a -DPYTHON_INCLUDE_DIR=/home/chembiohub/anaconda/include/python2.7 -DBOOST_ROOT=/home/chembiohub/anaconda ..
