@@ -6,8 +6,8 @@
 #===============================
 ###First create the user that will run all the code
 
-
-
+sudo mkdir -p /var/cache/wget
+sudo chmod ugo+rw -R /var/cache/wget
 cd ~
 ###Now install all of the dependency apt gets in the environment
 
