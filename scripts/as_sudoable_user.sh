@@ -65,6 +65,9 @@ sudo su chembiohub -c "$COMM"
 #echo $DROPCOMMAND
 #  sudo su postgres -c '$DROPCOMMAND'
 
-
-
+export RDBASE=/home/chembiohub/rdkit
+export LD_LIBRARY_PATH=$RDBASE/lib:$LD_LIBRARY_PATH
+export PYTHONPATH=$RDBASE:$PYTHONPATH
+cd /home/chembiohub/rdkit/Code/PgSQL/rdkit/
+sudo make install
 
