@@ -22,11 +22,12 @@ export POSTGRES_COMMAND="psql template1 -c 'DROP ROLE IF EXISTS $USER; create us
   
 
 ###edit pg_hba.conf and add a line for your user 
-export ECHO_COMMAND = 'echo "local all $USER ident" >> /etc/postgresql/9.3/main/pg_hba.conf'
+export ECHO_COMMAND='echo "local all $USER ident" >> /etc/postgresql/9.3/main/pg_hba.conf'
 #If version is only 9.1
-export ECHO_2 = 'echo "local all $USER ident" >> /etc/postgresql/9.1/main/pg_hba.conf'
+export ECHO_2='echo "local all $USER ident" >> /etc/postgresql/9.1/main/pg_hba.conf'
 
-  sudo su postgres -c '$ECHO_COMMAND || $ECHO_2'
+  sudo su postgres -c '$ECHO_COMMAND' ||   sudo su postgres -c '$ECHO_2'
+
 
   sudo service postgresql restart
   
