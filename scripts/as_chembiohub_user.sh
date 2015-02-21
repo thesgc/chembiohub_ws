@@ -6,33 +6,6 @@ cd ~
   bash anaconda.sh -b
 
 
-cd ~
-mkdir boost 
-wget -O boost_1_56_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.56.0/boost_1_56_0.tar.gz/download
-tar xzf boost_1_56_0.tar.gz
-cd boost_1_56_0/
-./bootstrap.sh --with-libraries=python,regex 
-./b2 -j4
-cp stage/lib/*.so ~/anaconda/lib
-cp -r boost /home/chembiohub/anaconda/include
-
-
-cd ~
-
-###Now Install the RDKit globally in order to make the database work
-  export RDKIT_SOURCE_ROOT=$HOME/rdkit
-
-wget http://sourceforge.net/projects/rdkit/files/rdkit/Q3_2014/RDKit_2014_09_2.tar.gz
-tar -xvf RDKit_2014_09_2.tar.gz
-mv rdkit-Release_2014_09_2 rdkit 
-export RDBASE=$HOME/rdkit
-export LD_LIBRARY_PATH=$RDBASE/lib:$LD_LIBRARY_PATH
-export PYTHONPATH=$RDBASE:$PYTHONPATH
-cd rdkit
-mkdir build
-cd build
-cmake -DPYTHON_LIBRARY=/home/chembiohub/anaconda/lib/python2.7/config/libpython2.7.a -DPYTHON_INCLUDE_DIR=/home/chembiohub/anaconda/include/python2.7 -DBOOST_ROOT=/home/chembiohub/anaconda ..
-make -j4 install
 
 ###Bower and node
 
@@ -119,10 +92,37 @@ wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/pip_requireme
     
 ###Now create a virtualenv using the conda requirements file
 
-  ./conda create --yes python=2.7.6 -m -n chembiohub_ws --file=../../anaconda_requirements.txt
+  ./conda create --yes -m -n chembiohub_ws --file=../../anaconda_requirements.txt
 source activate chembiohub_ws
 pip install -r ../../pip_requirements.txt
 
 
 
+cd ~
+mkdir boost 
+wget -O boost_1_56_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.56.0/boost_1_56_0.tar.gz/download
+tar xzf boost_1_56_0.tar.gz
+cd boost_1_56_0/
+./bootstrap.sh --with-libraries=python,regex 
+./b2 -j4
+cp stage/lib/*.so ~/anaconda/lib
+cp -r boost /home/chembiohub/anaconda/include
+
+
+cd ~
+
+###Now Install the RDKit globally in order to make the database work
+  export RDKIT_SOURCE_ROOT=$HOME/rdkit
+
+wget http://sourceforge.net/projects/rdkit/files/rdkit/Q3_2014/RDKit_2014_09_2.tar.gz
+tar -xvf RDKit_2014_09_2.tar.gz
+mv rdkit-Release_2014_09_2 rdkit 
+export RDBASE=$HOME/rdkit
+export LD_LIBRARY_PATH=$RDBASE/lib:$LD_LIBRARY_PATH
+export PYTHONPATH=$RDBASE:$PYTHONPATH
+cd rdkit
+mkdir build
+cd build
+cmake -DPYTHON_LIBRARY=/home/chembiohub/anaconda/lib/python2.7/config/libpython2.7.a -DPYTHON_INCLUDE_DIR=/home/chembiohub/anaconda/include/python2.7 -DBOOST_ROOT=/home/chembiohub/anaconda ..
+make -j4 install
 
