@@ -11,7 +11,7 @@ mkdir boost
 wget -O boost_1_56_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.56.0/boost_1_56_0.tar.gz/download
 tar xzf boost_1_56_0.tar.gz
 cd boost_1_56_0/
-./bootstrap.sh --with-libraries=python,regex --prefix=/home/chembiohub/boost
+./bootstrap.sh --with-libraries=python,regex 
 ./b2 -j4
 cp stage/lib/*.so ~/anaconda/lib
 cp -r boost /home/chembiohub/anaconda/include
