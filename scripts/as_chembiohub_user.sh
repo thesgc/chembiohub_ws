@@ -2,7 +2,7 @@
 
 
 cd ~
-  wget http://09c8d0b2229f813c1b93-c95ac804525aac4b6dba79b00b39d1d3.r79.cf1.rackcdn.com/Anaconda-2.1.0-Linux-x86_64.sh -O anaconda.sh
+  wget -N -P /var/cache/wget http://09c8d0b2229f813c1b93-c95ac804525aac4b6dba79b00b39d1d3.r79.cf1.rackcdn.com/Anaconda-2.1.0-Linux-x86_64.sh -O anaconda.sh
   
   chmod +x anaconda.sh
   
@@ -17,7 +17,7 @@ cd ~
 
   cd ~
   
-  wget http://sourceforge.net/projects/openbabel/files/openbabel/2.3.2/openbabel-2.3.2.tar.gz
+  wget -N -P /var/cache/wget http://sourceforge.net/projects/openbabel/files/openbabel/2.3.2/openbabel-2.3.2.tar.gz
   
   tar -xvf openbabel-2.3.2.tar.gz
   
@@ -38,7 +38,7 @@ cd ~
 ###Indigo like this:
 
 cd ~
-  wget https://dl.dropboxusercontent.com/u/10967207/indigo-python-1.1.11-linux.zip
+  wget -N -P /var/cache/wget https://dl.dropboxusercontent.com/u/10967207/indigo-python-1.1.11-linux.zip
 
   unzip indigo-python-1.1.11-linux.zip
 
@@ -67,8 +67,8 @@ cd ~
   cd ~
   rm anaconda_requirements.txt pip_requirements.txt
 
-wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/anaconda_requirements.txt
-wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/pip_requirements.txt
+wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/anaconda_requirements.txt -O anaconda_requirements.txt
+wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/pip_requirements.txt -O pip_requirements.txt
 
   
 ###Then change to that directory and add channels
@@ -103,7 +103,7 @@ pip install -r ../../pip_requirements.txt
 
 cd ~
 mkdir boost 
-wget -O boost_1_56_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.56.0/boost_1_56_0.tar.gz/download
+wget -N -P /var/cache/wget -O boost_1_56_0.tar.gz http://sourceforge.net/projects/boost/files/boost/1.56.0/boost_1_56_0.tar.gz/download
 tar xzf boost_1_56_0.tar.gz
 cd boost_1_56_0/
 ./bootstrap.sh --with-libraries=python,regex 
@@ -117,7 +117,7 @@ cd ~
 ###Now Install the RDKit globally in order to make the database work
   export RDKIT_SOURCE_ROOT=$HOME/rdkit
 
-wget http://sourceforge.net/projects/rdkit/files/rdkit/Q3_2014/RDKit_2014_09_2.tar.gz
+wget -N -P /var/cache/wget http://sourceforge.net/projects/rdkit/files/rdkit/Q3_2014/RDKit_2014_09_2.tar.gz
 tar -xvf RDKit_2014_09_2.tar.gz
 mv rdkit-Release_2014_09_2 rdkit 
 export RDBASE=$HOME/rdkit
