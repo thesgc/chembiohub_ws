@@ -59,7 +59,7 @@ wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/scripts/as_ch
 
 sudo apt-get install -y flex bison build-essential python-numpy cmake python-dev sqlite3 libsqlite3-dev
 libboost-dev libboost-python-dev libboost-regex-dev
-export COMM='echo $COMM && bash as_chembiohub_user.sh $USER' 
+export COMM='bash as_chembiohub_user.sh $USER' 
 sudo su chembiohub -c '$COMM' 
 
 #export DROPCOMMAND='psql template1 -c "CREATE EXTENSION rdkit; DROP ROLE IF EXISTS $USER;" '
