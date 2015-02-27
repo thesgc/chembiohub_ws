@@ -5,7 +5,7 @@
 #In order to install chembiohub web services and all chembl dependencies on anaconda, run the following:
 #===============================
 ###First create the user that will run all the code
-sudo apt-get install -y ruby gem ruby-dev
+sudo apt-get install -y ruby gem ruby-dev unzip
  sudo gem install compass
 sudo mkdir -p /var/cache/wget
 sudo chmod ugo+rw -R /var/cache/wget
