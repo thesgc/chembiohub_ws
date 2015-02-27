@@ -27,7 +27,7 @@ sudo a2enmod proxy proxy_http headers
 
   sudo apt-get install -y npm
 
-  sudo npm install -g bower
+  sudo npm install -g bower grunt-cli
 
   sudo apt-get install -y nodejs-legacy
 
