@@ -27,9 +27,10 @@ sudo a2enmod proxy proxy_http headers
 
   sudo apt-get install -y npm
 
-  sudo npm install -g bower grunt-cli
 
   sudo apt-get install -y nodejs-legacy
+
+  sudo npm install -g bower grunt-cli coffee-script
 
 cd ~
 wget http://bitbucket.org/eigen/eigen/get/2.0.15.tar.bz2
