@@ -6,6 +6,7 @@ threading._DummyThread._Thread__stop = lambda x: 42
 TASTYPIE_ALLOW_MISSING_SLASH = True
 TASTYPIE_CANNED_ERROR = "An internal server error occurred. Please contact ChEMBL help."
 
+ID_PREFIX = "UOX"
 
 
 OPEN_SOURCE = True
