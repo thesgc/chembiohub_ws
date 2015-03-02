@@ -67,3 +67,4 @@ export POSTGRES_COMMAND="psql template1 -c ' CREATE EXTENSION IF NOT EXISTS hsto
  sudo su postgres -c "$POSTGRES_COMMAND"
 
 sudo mkdir /var/www/automated_reg_installs
+sudo chown -R chembiohub:www-data /var/www/automated_reg_installs
