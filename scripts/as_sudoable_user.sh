@@ -65,3 +65,5 @@ sudo make install
 
 export POSTGRES_COMMAND="psql template1 -c ' CREATE EXTENSION IF NOT EXISTS hstore; CREATE EXTENSION IF NOT EXISTS rdkit;'"
  sudo su postgres -c "$POSTGRES_COMMAND"
+
+sudo mkdir /var/www/automated_reg_installs
