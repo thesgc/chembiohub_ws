@@ -5,6 +5,7 @@ TEMPLATE_DEBUG = DEBUG
 
 ID_PREFIX = "DEV"
 
+WEBSERVICES_NAME='devapi'
 
 
 LOGIN_REDIRECT_URL = "/#/projects/list"
