@@ -30,6 +30,8 @@ sudo a2enmod proxy proxy_http headers
   sudo npm install -g bower
 
   sudo apt-get install -y nodejs-legacy
+  sudo apt-get install -y ruby gem ruby-dev
+  sudo gem install compass
 
 cd ~
 wget http://bitbucket.org/eigen/eigen/get/2.0.15.tar.bz2
