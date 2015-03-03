@@ -5,7 +5,7 @@
 #In order to install chembiohub web services and all chembl dependencies on anaconda, run the following:
 #===============================
 ###First create the user that will run all the code
-sudo apt-get install -y ruby gem ruby-dev unzip
+sudo apt-get install -y ruby gem ruby-dev unzip fabric
  sudo gem install compass
 sudo mkdir -p /var/cache/wget
 sudo chmod ugo+rw -R /var/cache/wget
@@ -30,6 +30,8 @@ sudo a2enmod proxy proxy_http headers
 
 
   sudo apt-get install -y nodejs-legacy
+  sudo apt-get install -y ruby gem ruby-dev
+  sudo gem install compass
 
   sudo npm install -g bower grunt-cli coffee-script
 
@@ -65,3 +67,6 @@ sudo make install
 
 export POSTGRES_COMMAND="psql template1 -c ' CREATE EXTENSION IF NOT EXISTS hstore; CREATE EXTENSION IF NOT EXISTS rdkit;'"
  sudo su postgres -c "$POSTGRES_COMMAND"
+
+sudo mkdir /var/www/automated_reg_installs
+sudo chown -R chembiohub:www-data /var/www/automated_reg_installs
