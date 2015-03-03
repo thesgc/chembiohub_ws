@@ -10,7 +10,7 @@ ID_PREFIX = "UOX"
 
 
 OPEN_SOURCE = True
-LOGIN_REDIRECT_URL = '/reg/app/index.html#/projects'
+LOGIN_REDIRECT_URL = '/r/#/projects/list'
 
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
