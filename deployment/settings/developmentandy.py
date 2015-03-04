@@ -8,6 +8,7 @@ ID_PREFIX = "DEV"
 WEBSERVICES_NAME='devapi'
 
 LOGIN_REDIRECT_URL = "/#/projects/list"
+LOGOUT_REDIRECT_URL = "login"
 
 DATABASES = {
     'default': {

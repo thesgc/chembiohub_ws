@@ -4,6 +4,7 @@ DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
 LOGIN_REDIRECT_URL = '/reg/app/index.html#/projects/list'
+LOGOUT_REDIRECT_URL = "login"
 
 ID_PREFIX = "UOXSTA"
 
