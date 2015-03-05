@@ -28,6 +28,8 @@ DATABASES = {
         'TEST_NAME' : 'tester_cbh_chembl'
     },
 }
+CSRF_COOKIE_NAME = "devapicsrftoken"
+SESSION_COOKIE_NAME = "devapi_sessionid"
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
