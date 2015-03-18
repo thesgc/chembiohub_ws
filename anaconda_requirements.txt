@@ -2,7 +2,7 @@
 # $ conda create --name <env> --file <this file>
 # platform: linux-64
 biopython=1.64=np18py27_0
-#boost=1.55.0=py27_2
+boost=1.55.0=py27_2
 brisa-media-renderer=0.1.1=py27_0
 bzip2=1.0.6=0
 cairo=1.12.18=0
@@ -49,7 +49,7 @@ python=2.7.6=2
 pytz=2014.9=py27_0
 pyzmq=14.4.1=py27_0
 #qt=4.8.5=0
-#rdkit=2014.03.1=np18py27_2
+rdkit=2014.03.1=np18py27_2
 readline=6.2=2
 requests=2.5.0=py27_0
 #scikit-learn=0.14.1=np18py27_1
