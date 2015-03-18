@@ -17,6 +17,9 @@ LOGOUT_REDIRECT_URL = "login"
 DEBUG = False
 TEMPLATE_DEBUG = DEBUG
 
+GITHUB_GIST_USER = "chembiohub"
+GITHUB_GIST_TOKEN = "206fafb78cfb47976e58b8ffa7fca49bdf18bec0"
+
 WS_BASE_URL='/chemblws'
 WS_DOCS_TITLE='Chem Bio Hub web services based upon ChEMBL web services live documentation'
 
