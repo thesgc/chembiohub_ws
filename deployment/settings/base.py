@@ -7,7 +7,7 @@ TASTYPIE_ALLOW_MISSING_SLASH = True
 TASTYPIE_CANNED_ERROR = "An internal server error occurred. Please contact ChEMBL help."
 
 ID_PREFIX = "UOX"
-
+BEAKER_PATH =  "https://staging.chembiohub.ox.ac.uk/utils/"
 SESSION_COOKIE_HTTPONLY = False
 SESSION_SAVE_EVERY_REQUEST = True
 OPEN_SOURCE = True

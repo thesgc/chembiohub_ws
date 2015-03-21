@@ -7,7 +7,7 @@ ID_PREFIX = "DEV"
 
 WEBSERVICES_NAME='devapi'
 
-
+LOGGING = None
 LOGIN_REDIRECT_URL = "/#/projects/list"
 LOGOUT_REDIRECT_URL = "login"
 STATIC_ROOT = '/home/vagrant/chembiohub_ws/deployment/static'
