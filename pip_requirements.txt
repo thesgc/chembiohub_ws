@@ -1,5 +1,5 @@
 BeautifulSoup
-django==1.5.5
+django
 South
 amqp
 anyjson

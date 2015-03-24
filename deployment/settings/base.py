@@ -140,8 +140,9 @@ TEMPLATE_DIRS = (
 # Always use forward slashes, even on Windows.
 # Don't forget to use absolute paths, not relative paths.
 )
-
 INSTALLED_APPS = (
+        "django_hstore",
+
     'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
@@ -158,7 +159,6 @@ INSTALLED_APPS = (
 
     'chembl_core_db',
     'chembl_core_model',
-    'south',   
    #'chembl_business_model', 
  #  'chembl_webservices',
    'chembl_extras',
@@ -169,8 +169,6 @@ INSTALLED_APPS = (
    'cbh_chembl_model_extension',    
    'cbh_chembl_ws_extension',
 
-   'deployment',
-'chembl_webservices'
    )
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
