@@ -13,7 +13,7 @@ defusedxml
 django-celery
 django-cors-headers
 django-extensions
-django-grappelli==2.4.12
+django-grappelli
 django-guardian
 django-hstore
 django-picklefield
