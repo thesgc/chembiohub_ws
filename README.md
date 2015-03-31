@@ -21,19 +21,42 @@ This will download the vagrant box from our internet location and you can then l
 
     vagrant ssh
   
-You should now see the prompt to show that the newbeak virtualenv is enabled. Addtionally, openbabel python libraries are on the classpath.
+You should now see the prompt to show that the  virtualenv is enabled. Addtionally, openbabel python libraries are on the classpath.
 
-It should now be possible to run
+    cd ~/chembiohub_ws/
+    python manage.py runserver 0.0.0.0:8000
 
-    run_beaker
-  
-In order to see the beaker web services
+You will now have the server running inside the vagrant box.
 
-Addtionally, to see the chembiohub version of the chembl web services, you can run
+On your local box open a second terminal window and change directory to the ng-chem repository
+Install the bower dependencies using the following for an ubuntu machine
+   sudo apt-get install -y nodejs
+  sudo apt-get install -y npm
+  sudo apt-get install -y nodejs-legacy
+  sudo apt-get install -y ruby gem ruby-dev
+  sudo gem install compass
 
-    cd ~/chembiohub_ws/deployment/
-    python manage.py runserver
-  
+  sudo npm install -g bower grunt-cli coffee-script
+
+You can then run
+   npm install
+   bower install
+
+You can then run the server using
+
+   grunt serve
+   
+This will allow the server to run locally with live reload on port 9000
+
+In order to create a superuser run:
+
+   python manage.py createsuperuser
+   
+in the vagrant propmt
+
+Add project permissions for your new user by going to the admin URL at
+   localhost:8000/devapi/admin
+
 All of these are in development mode only, for a production install you will need to set up an appropriate settings file and follow the instructions in [install anaconda](install_anaconda.rst) 
 
 
