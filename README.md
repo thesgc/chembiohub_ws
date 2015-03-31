@@ -54,8 +54,21 @@ In order to create a superuser run:
    
 in the vagrant propmt
 
-Add project permissions for your new user by going to the admin URL at
-   localhost:8000/devapi/admin
+Log in to the site by going to the login URL at:
+
+    localhost:9000/devapi/login
+
+Add a project for your new user by going to the admin URL at
+    localhost:8000/devapi/admin
+
+Next add a custom field config for the project
+
+As creator of the project you will have permissions for the project.
+
+Other project permissions can be edited on a per-user or per group basis
+
+
+
 
 All of these are in development mode only, for a production install you will need to set up an appropriate settings file and follow the instructions in [install anaconda](install_anaconda.rst) 
 
