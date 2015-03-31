@@ -63,8 +63,7 @@ Add a project for your new user by going to the admin URL at
 Next add a custom field config for the project
 
     
-    Next go back to localhost:9000/devapi/login and you will be redirected to the projects list with the new project in it
-
+Next go back to localhost:9000/devapi/login and you will be redirected to the projects list with the new project in it
 
 As creator of the project you will have permissions for the project.
 
