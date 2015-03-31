@@ -1,14 +1,14 @@
 
-#wget http://www.iupac.org/fileadmin/user_upload/publications/e-resources/inchi/1.03/INCHI-1-BIN.zip
-#unzip INCHI-1-BIN.zip
-#gunzip INCHI-1-BIN/linux/64bit/inchi-1.gz
+wget http://www.iupac.org/fileadmin/user_upload/publications/e-resources/inchi/1.03/INCHI-1-BIN.zip
+unzip INCHI-1-BIN.zip
+gunzip INCHI-1-BIN/linux/64bit/inchi-1.gz
 
 cd chembiohub_ws
-#wget https://dl.dropboxusercontent.com/u/10967207/indigo-python-1.1.11-linux.zip
+wget https://dl.dropboxusercontent.com/u/10967207/indigo-python-1.1.11-linux.zip
 
-#unzip indigo-python-1.1.11-linux.zip
+unzip indigo-python-1.1.11-linux.zip
 
-#rm indigo-python-1.1.11-linux.zip
+rm indigo-python-1.1.11-linux.zip
 
 
 echo 'source ~/miniconda/bin/activate chembiohub_ws' >> /home/vagrant/.bashrc
