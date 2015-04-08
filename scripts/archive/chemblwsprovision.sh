@@ -11,56 +11,7 @@ unzip indigo-python-1.1.11-linux.zip
 rm indigo-python-1.1.11-linux.zip
 
 
+echo 'source ~/miniconda/bin/activate chembiohub_ws' >> /home/vagrant/.bashrc
+echo 'export PYTHONPATH=:/home/vagrant/chembiohub_ws:/home/vagrant/chembiohub_ws/indigo-python-1.1.11-linux:/home/vagrant/Tools/openbabel-install/lib:/home/vagrant/chembiohub_ws:/home/vagrant/chembiohub_ws/src/chembl_core_db/:/home/vagrant/chembiohub_ws/src/chembl_core_model/:/home/vagrant/chembiohub_ws/src/chembl_business_model/:/home/vagrant/chembiohub_ws/src/standardiser/:/home/vagrant/chembiohub_ws/src/chembl_beaker/:/home/vagrant/chembiohub_ws/src/cbh_chembl_model_extension/:/home/vagrant/chembiohub_ws/src/cbh_chembl_ws_extension/:/home/vagrant/chembiohub_ws/src/django-flowjs/' >> /home/vagrant/.bashrc
+echo 'export DJANGO_SETTINGS_MODULE="deployment.settings.development"' >> /home/vagrant/.bashrc
 
-echo "" >> ~/.bashrc 
-echo 'export DJANGO_SETTINGS_MODULE="deployment.settings.staging"' >> ~/.bashrc
-
-source ~/miniconda/bin/activate newbeak
-pip install django-cors-headers
-cd ~/chembiohub_ws/src/chembl_core_db
-python setup.py install
-python setup.py develop
-
-cd ../chembl_core_model/
-python setup.py install
-python setup.py develop
-
-cd ../chembl_webservices/
-python setup.py install
-python setup.py develop
-
-cd ../chembl_business_model/
-python setup.py install
-python setup.py develop
-
-cd ../standardiser/
-python setup.py install
-python setup.py develop
-
-cd ../chembl_beaker/
-python setup.py install
-python setup.py develop
-
-cd ../cbh_chembl_model_extension/
-python setup.py install
-python setup.py develop
-
-cd ../cbh_chembl_ws_extension/
-python setup.py install
-python setup.py develop
-
-cd ../chembl_extras/
-python setup.py install
-python setup.py develop
-
-sudo apt-get install nodejs -y
-
-sudo apt-get install npm -y
-
-sudo npm install -g bower
-
-sudo apt-get install nodejs-legacy -y
-
-cd /home/vagrant/chembiohub_ws/src/ng-chem
-
-bower install
