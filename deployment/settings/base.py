@@ -140,7 +140,8 @@ TEMPLATE_DIRS = (
 # Don't forget to use absolute paths, not relative paths.
 )
 INSTALLED_APPS = (
-        "django_hstore",
+
+       "django_hstore",
 
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -152,19 +153,21 @@ INSTALLED_APPS = (
 
     'django.contrib.admin',
     'tastypie',
-    'deployment',
+   'deployment',
 
 
-    'chembl_core_db',
-    'chembl_core_model',
-   'chembl_business_model', 
-        'flowjs',
+   'chembl_core_db',
+   'chembl_core_model',
+  'chembl_business_model', 
+       'flowjs',
 
 
-   'cbh_chembl_model_extension',    
-   'cbh_chembl_ws_extension',
+  'cbh_chembl_model_extension',    
+  'cbh_chembl_ws_extension',
 
    )
+
+
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 

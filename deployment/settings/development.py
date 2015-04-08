@@ -45,7 +45,7 @@ STATICFILES_DIRS = (
 # Put strings here, like "/home/html/static" or "C:/www/django/static".
 # Always use forward slashes, even on Windows.
 # Don't forget to use absolute paths, not relative paths.
-'/home/vagrant/chembiohub_ws/src/ng-chem/',
+# '/home/vagrant/chembiohub_ws/src/ng-chem/',
 )
 
 # List of finder classes that know how to find static files in
@@ -59,3 +59,20 @@ OPEN_BABEL_EXECUTABLE = "/home/vagrant/openbabel-2.3.2/build/bin/babel"
 ANONYMOUS_USER_ID = -1
 
 ALLOWED_HOSTS =["testserver"]
+
+
+INSTALLED_APPS = (            'devserver',
+) + INSTALLED_APPS
+
+
+DEVSERVER_MODULES = (
+    'devserver.modules.sql.SQLRealTimeModule',
+    'devserver.modules.sql.SQLSummaryModule',
+    'devserver.modules.profile.ProfileSummaryModule',
+
+    # 'devserver.modules.profile.LineProfilerModule',
+)
+
+DEVSERVER_AUTO_PROFILE = True 
+
+DEVSERVER_DEFAULT_ADDR = '0.0.0.0'

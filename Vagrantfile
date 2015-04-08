@@ -18,7 +18,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provider "virtualbox" do |v|
     v.memory = 4096
-    v.cpus = 2
+    v.cpus = 4
     #v.customize(['storagectl', :id, '--name', 'SATAController', '--hostiocache', 'off'])
   end
   # Disable automatic box update checking. If you disable this, then
@@ -33,7 +33,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   # Create a private network, which allows host-only access to the machine
   # using a specific IP.
-  # config.vm.network "private_network", ip: "192.168.33.10"
+  config.vm.network "private_network", ip: "192.168.33.10"
 
   # Create a public network, which generally matched to bridged network.
   # Bridged networks make the machine appear as another physical device on
@@ -128,7 +128,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # chef-validator, unless you changed the configuration.
   #
   #   chef.validation_client_name = "ORGNAME-validator"
-  config.vm.synced_folder   ".", "/home/vagrant/chembiohub_ws"
+  config.vm.synced_folder   ".", "/home/vagrant/chembiohub_ws" , type: "nfs"
   config.vm.provision :shell, :path => "scripts/archive/chemblwsprovision.sh"
 
 end
