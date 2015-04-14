@@ -62,7 +62,7 @@ ALLOWED_HOSTS =["testserver"]
 
 
 INSTALLED_APPS = (            'devserver',
-) + INSTALLED_APPS
+) + INSTALLED_APPS + ('cbh_chembl_id_generator',)
 
 
 DEVSERVER_MODULES = (

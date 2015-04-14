@@ -31,3 +31,6 @@
 [submodule "django-flowjs"]
 	path = src/django-flowjs
 	url = git://github.com/thesgc/django-flowjs.git
+[submodule "src/cbh_chembl_id_generator"]
+	path = src/cbh_chembl_id_generator
+	url = git@github.com:thesgc/cbh_chembl_id_generator.git
