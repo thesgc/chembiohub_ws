@@ -18,7 +18,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
   config.vm.provider "virtualbox" do |v|
     v.memory = 4096
-    v.cpus = 4
+    v.cpus = 2
     #v.customize(['storagectl', :id, '--name', 'SATAController', '--hostiocache', 'off'])
   end
   # Disable automatic box update checking. If you disable this, then

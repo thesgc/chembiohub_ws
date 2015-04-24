@@ -62,7 +62,7 @@ ALLOWED_HOSTS =["testserver"]
 
 
 INSTALLED_APPS = (            'devserver',
-) + INSTALLED_APPS
+) + INSTALLED_APPS + ('cbh_chembl_id_generator',)
 
 
 DEVSERVER_MODULES = (
@@ -72,7 +72,7 @@ DEVSERVER_MODULES = (
 
     # 'devserver.modules.profile.LineProfilerModule',
 )
+DEVSERVER_TRUNCATE_SQL = False
 
-DEVSERVER_AUTO_PROFILE = True 
-
+INTERNAL_IPS =('0.0.0.0',)
 DEVSERVER_DEFAULT_ADDR = '0.0.0.0'
