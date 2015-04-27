@@ -5,7 +5,7 @@ TEMPLATE_DEBUG = DEBUG
 
 ID_PREFIX = "DEV"
 
-WEBSERVICES_NAME='devapi'
+WEBSERVICES_NAME='dev/api'
 
 LOGIN_REDIRECT_URL = "/#/projects/list"
 LOGOUT_REDIRECT_URL = "login"
@@ -28,17 +28,21 @@ DATABASES = {
 # Example: "/home/media/media.lawrence.com/static/"
 STATIC_ROOT = '/home/vagrant/chembiohub_ws/deployment/static'
 
-# URL prefix for static files.
-# Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/reg/'
 
-# Additional locations of static files
 STATICFILES_DIRS = (
 # Put strings here, like "/home/html/static" or "C:/www/django/static".
 # Always use forward slashes, even on Windows.
 # Don't forget to use absolute paths, not relative paths.
-'/home/work/temp/src/ng-chem/',
+'/var/www/chembiohub_ws/src/ng-chem/dist',
 )
+
+
+
+# URL prefix for static files.
+# Example: "http://media.lawrence.com/static/"
+STATIC_URL = 'devapi/r'
+
+# Additional locations of static files
 
 # List of finder classes that know how to find static files in
 # various locations.

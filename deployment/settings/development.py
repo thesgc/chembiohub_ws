@@ -5,17 +5,11 @@ TEMPLATE_DEBUG = DEBUG
 
 ID_PREFIX = "DEV"
 
-WEBSERVICES_NAME='devapi'
+WEBSERVICES_NAME='dev/api'
 
 LOGIN_REDIRECT_URL = "/#/projects/list"
 LOGOUT_REDIRECT_URL = "login"
-STATIC_ROOT = '/home/vagrant/chembiohub_ws/deployment/static'
-STATICFILES_DIRS = (
-# Put strings here, like "/home/html/static" or "C:/www/django/static".
-# Always use forward slashes, even on Windows.
-# Don't forget to use absolute paths, not relative paths.
-'/home/vagrant/chembiohub_ws/src/ng-chem',
-)
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
@@ -38,15 +32,23 @@ STATIC_ROOT = '/home/vagrant/chembiohub_ws/deployment/static'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
-STATIC_URL = '/reg/'
-
-# Additional locations of static files
 STATICFILES_DIRS = (
 # Put strings here, like "/home/html/static" or "C:/www/django/static".
 # Always use forward slashes, even on Windows.
 # Don't forget to use absolute paths, not relative paths.
-# '/home/vagrant/chembiohub_ws/src/ng-chem/',
+'/home/vagrant/chembiohub_ws/src/ng-chem/dist',
 )
+
+
+TEMPLATE_DIRS = [
+'/home/vagrant/chembiohub_ws/src/ng-chem/dist',
+
+]
+    
+
+# URL prefix for static files.
+# Example: "http://media.lawrence.com/static/"
+STATIC_URL = '/devapi/r/'
 
 # List of finder classes that know how to find static files in
 # various locations.
