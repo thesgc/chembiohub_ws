@@ -5,7 +5,7 @@ TEMPLATE_DEBUG = DEBUG
 
 ID_PREFIX = "DEV"
 
-WEBSERVICES_NAME='dev/api'
+WEBSERVICES_NAME='dev'
 
 LOGIN_REDIRECT_URL = "/#/projects/list"
 LOGOUT_REDIRECT_URL = "login"
@@ -21,8 +21,8 @@ DATABASES = {
         'TEST_NAME' : 'tester_cbh_chembl'
     },
 }
-CSRF_COOKIE_NAME = "devapicsrftoken"
-SESSION_COOKIE_NAME = "devapi_sessionid"
+CSRF_COOKIE_NAME = "devcsrftoken"
+SESSION_COOKIE_NAME = "dev_sessionid"
 
 # Absolute path to the directory static files should be collected to.
 # Don't put anything in this directory yourself; store your static files
