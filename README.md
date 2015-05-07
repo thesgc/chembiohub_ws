@@ -13,7 +13,7 @@ In order to get started using vagrant then run to get all the subrepos:
 
     git clone  --recursive  git@github.com:thesgc/chembiohub_ws.git
   
-Next run:
+Next we create a vagrant machine to run our python code:
 
     vagrant up
   
@@ -28,7 +28,11 @@ You should now see the prompt to show that the  virtualenv is enabled. Addtional
 
 You will now have the server running inside the vagrant box.
 
+In order to take advantage of live reload on the front end then we use grunt serve for development.
+
 On your local box open a second terminal window and change directory to the ng-chem repository
+    cd src/ng-chem
+
 Install the bower dependencies using the following for an ubuntu machine
    sudo apt-get install -y nodejs
   sudo apt-get install -y npm
@@ -56,10 +60,10 @@ in the vagrant propmt
 
 Log in to the site by going to the login URL at:
 
-    localhost:9000/devapi/login
+    http://localhost:9000/dev/login
 
 Add a project for your new user by going to the admin URL at
-    localhost:8000/devapi/admin
+    localhost:8000/dev/admin
 Next add a custom field config for the project
 
     
