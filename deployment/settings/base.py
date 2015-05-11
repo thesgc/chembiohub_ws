@@ -23,7 +23,19 @@ WS_DOCS_TITLE='Chem Bio Hub web services based upon ChEMBL web services live doc
 ADMINS = (
     ('Andrew Stretton', 'andrew.stretton@sgc.ox.ac.uk'),
     )
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 
+EMAIL_HOST_PASSWORD = ''
+EMAIL_HOST_USER = ''
+EMAIL_PORT = 25
+EMAIL_USE_TLS = False
+EMAIL_HOST = 'localhost'
+
+
+# The email address to send on behalf of
+SERVER_EMAIL = 'root@localhost'
+
+# If you're u
 MANAGERS = ADMINS
 
 DATABASES = {
