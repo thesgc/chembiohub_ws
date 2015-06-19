@@ -36,5 +36,5 @@ xlrd
 xmltodict
 XlsxWriter
 gunicorn
-pymongo==2.4.2
-django-mongo-sessions
+django-redis-sessions
+elasticsearch
