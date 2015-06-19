@@ -225,15 +225,15 @@ PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 #     },
 # }
 # Set your DSN value
-RAVEN_CONFIG = {
-    'dsn': 'http://799d9560a5a24a6abc5383e8a4435111:ebc6d747d1654709b812974757213e85@163.1.63.22/2',
-}
+# RAVEN_CONFIG = {
+#     'dsn': 'http://799d9560a5a24a6abc5383e8a4435111:ebc6d747d1654709b812974757213e85@163.1.63.22/2',
+# }
 
-# Add raven to the list of installed apps
-INSTALLED_APPS = INSTALLED_APPS + (
-    # ...
-    'raven.contrib.django.raven_compat',
-)
+# # Add raven to the list of installed apps
+# INSTALLED_APPS = INSTALLED_APPS + (
+#     # ...
+#     'raven.contrib.django.raven_compat',
+# )
 
 CACHES = {
     'default': {

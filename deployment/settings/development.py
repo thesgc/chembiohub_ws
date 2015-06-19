@@ -10,6 +10,15 @@ WEBSERVICES_NAME='dev'
 LOGIN_REDIRECT_URL = "/#/projects/list"
 LOGOUT_REDIRECT_URL = "login"
 
+SESSION_REDIS_HOST = 'localhost'
+SESSION_REDIS_PORT = 6379
+SESSION_REDIS_DB = 0
+SESSION_REDIS_PREFIX = 'session'
+SESSION_ENGINE = 'redis_sessions.session'
+
+
+
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
