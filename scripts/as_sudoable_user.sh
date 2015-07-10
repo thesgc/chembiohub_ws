@@ -21,7 +21,7 @@ cd ~
 
    sudo apt-get install -y apache2 
 sudo apt-get install -y libapache2-mod-proxy-html libxml2-devsudo apt-get install libxml2-dev
-sudo a2enmod proxy proxy_http headers expires
+sudo a2enmod proxy proxy_http headers expires rewrite
   sudo apt-get install -y supervisor
 
   sudo apt-get install -y nodejs
