@@ -21,7 +21,7 @@ cd ~
 
    sudo apt-get install -y apache2 
 sudo apt-get install -y libapache2-mod-proxy-html libxml2-devsudo apt-get install libxml2-dev
-sudo a2enmod proxy proxy_http headers expires
+sudo a2enmod proxy proxy_http headers expires rewrite
   sudo apt-get install -y supervisor
 
   sudo apt-get install -y nodejs
@@ -34,6 +34,29 @@ sudo a2enmod proxy proxy_http headers expires
   sudo gem install compass
 
   sudo npm install -g bower grunt-cli coffee-script
+sudo apt-get install openjdk-7-jre-headless -y
+wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+
+echo "deb http://packages.elastic.co/elasticsearch/1.5/debian stable main" | sudo tee -a /etc/apt/sources.list
+
+sudo apt-get update && sudo apt-get install elasticsearch
+
+sudo update-rc.d elasticsearch defaults 95 10
+
+sudo service elasticsearch start
+
+
+sudo apt-get install tcl8.5
+wget http://download.redis.io/releases/redis-stable.tar.gz
+tar xzf redis-stable.tar.gz
+cd redis-stable
+make
+sudo make install
+make test
+cd utils
+sudo ./install_server.sh
+sudo update-rc.d redis_6379 defaults
+
 
 cd ~
 wget http://bitbucket.org/eigen/eigen/get/2.0.15.tar.bz2
