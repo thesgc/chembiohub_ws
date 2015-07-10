@@ -35,6 +35,17 @@ sudo a2enmod proxy proxy_http headers expires rewrite
 
   sudo npm install -g bower grunt-cli coffee-script
 
+wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
+
+echo "deb http://packages.elastic.co/elasticsearch/1.5/debian stable main" | sudo tee -a /etc/apt/sources.list
+
+sudo apt-get update && sudo apt-get install elasticsearch
+
+sudo update-rc.d elasticsearch defaults 95 10
+
+sudo service elasticsearch start
+
+
 cd ~
 wget http://bitbucket.org/eigen/eigen/get/2.0.15.tar.bz2
 tar xvf 2.0.15.tar.bz2
