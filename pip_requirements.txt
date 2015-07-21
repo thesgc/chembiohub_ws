@@ -17,6 +17,7 @@ django-grappelli
 django-guardian
 django-hstore
 django-picklefield
+django-solo
 django-tastypie
 enum34
 kombu

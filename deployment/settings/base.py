@@ -176,6 +176,7 @@ INSTALLED_APPS = (
 
   'cbh_chembl_model_extension',    
   'cbh_chembl_ws_extension',
+  'solo',
 
    )
 
