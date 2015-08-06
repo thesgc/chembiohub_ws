@@ -72,7 +72,7 @@ ANONYMOUS_USER_ID = -1
 ALLOWED_HOSTS =["testserver"]
 
 
-INSTALLED_APPS = (            'devserver',
+INSTALLED_APPS = (            'devserver','cbh_core_model','cbh_datastore_model','cbh_datastore_ws','cbh_core_ws',
 ) + INSTALLED_APPS + ('cbh_chembl_id_generator',)
 
 
