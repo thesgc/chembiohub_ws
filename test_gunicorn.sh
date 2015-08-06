@@ -1,1 +1,0 @@
-/home/astretton/chemreg_deploy/configs/chembiohub.ox.ac.uk/gunicorn/test_gunicorn.sh
