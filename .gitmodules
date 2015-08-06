@@ -25,3 +25,6 @@
 [submodule "src/cbh_chembl_id_generator"]
 	path = src/cbh_chembl_id_generator
 	url = git@github.com:thesgc/cbh_chembl_id_generator.git
+[submodule "src/cbh_core_model"]
+	path = src/cbh_core_model
+	url = git@github.com:thesgc/cbh_core_model.git
