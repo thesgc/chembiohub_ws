@@ -80,7 +80,9 @@ sudo su postgres -c "make installcheck"
   make -j8
   
   make -j8 install
-  
-
-  
-  
+  #cache the bower repos locally
+cd /tmp
+  git clone https://github.com/thesgc/ng-chem
+cd ng-chem
+npm install
+bower install
