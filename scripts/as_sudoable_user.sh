@@ -64,13 +64,7 @@ sudo apt-get install redis-server -y
 sudo update-rc.d redis_6379 defaults
 
 
-cd ~
-wget http://bitbucket.org/eigen/eigen/get/2.0.15.tar.bz2
-tar xvf 2.0.15.tar.bz2
-cd eigen-eigen-0938af7840b0/; mkdir build; cd build; cmake ..
-sudo make install  # Does the job.
-cd ../..
-sudo apt-get install pkg-config
+
 [[ "vagrant" = $USER ]] && myuser="vagrant" || myuser="chembiohub"
 
 cd /tmp
@@ -81,6 +75,13 @@ sudo  wget http://09c8d0b2229f813c1b93-c95ac804525aac4b6dba79b00b39d1d3.r79.cf1.
 
 if [[ "vagrant" != $USER ]]
   then 
+  cd ~
+wget http://bitbucket.org/eigen/eigen/get/2.0.15.tar.bz2
+tar xvf 2.0.15.tar.bz2
+cd eigen-eigen-0938af7840b0/; mkdir build; cd build; cmake ..
+sudo make install  # Does the job.
+cd ../..
+sudo apt-get install pkg-config -y
   id -u chembiohub &>/dev/null ||   sudo useradd -G www-data -s /bin/bash -m chembiohub
   export COMM="bash as_chembiohub_user.sh $USER"
   sudo su chembiohub -c "$COMM" 
