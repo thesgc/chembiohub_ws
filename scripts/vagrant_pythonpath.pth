@@ -1,1 +1,14 @@
-/home/vagrant/chemreg:/home/vagrant/Tools/openbabel-install/lib:/home/vagrant/chemreg:/home/vagrant/chemreg/src/chembl_core_db/:/home/vagrant/chemreg/src/chembl_core_model/:/home/vagrant/chemreg/src/chembl_business_model/:/home/vagrant/chemreg/src/cbh_chembl_model_extension/:/home/vagrant/chemreg/src/cbh_chembl_ws_extension/:/home/vagrant/chemreg/src/django-flowjs/:/home/vagrant/chemreg/src/cbh_chembl_id_generator:/home/vagrant/chemreg/src/cbh_core_model/:/home/vagrant/chemreg/src/cbh_core_ws/:/home/vagrant/chemreg/src/cbh_datastore_model/:/home/vagrant/chemreg/src/cbh_datastore_ws/
+/home/vagrant/chemreg
+/home/vagrant/Tools/openbabel-install/lib
+/home/vagrant/chemreg
+/home/vagrant/chemreg/src/chembl_core_db/
+/home/vagrant/chemreg/src/chembl_core_model/
+/home/vagrant/chemreg/src/chembl_business_model/
+/home/vagrant/chemreg/src/cbh_chembl_model_extension/
+/home/vagrant/chemreg/src/cbh_chembl_ws_extension/
+/home/vagrant/chemreg/src/django-flowjs/
+/home/vagrant/chemreg/src/cbh_chembl_id_generator
+/home/vagrant/chemreg/src/cbh_core_model/
+/home/vagrant/chemreg/src/cbh_core_ws/
+/home/vagrant/chemreg/src/cbh_datastore_model/
+/home/vagrant/chemreg/src/cbh_datastore_ws/
