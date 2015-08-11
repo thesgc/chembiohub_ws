@@ -40,3 +40,20 @@ wget https://raw.githubusercontent.com/thesgc/mychembl/master/install_core_libs_
 
 sh install_core_libs_Ubuntu.sh
 
+# operating system, currently only Ubuntu and CentOS are supported:
+python -mplatform | grep Ubuntu && export AUX_OS_NAME="Ubuntu" || export AUX_OS_NAME="CentOS"
+
+# rdkit tookit (http://www.rdkit.org/) repository location:
+export RDKIT_REPO="https://github.com/rdkit/rdkit"
+
+# rdkit release tag:
+export RDKIT_RELEASE="Release_2015_03_1"
+
+# indigo toolkit location
+export INDIGO_FILENAME="indigo-python-1.1.11-linux"
+export INDIGO_LOCATION="https://dl.dropboxusercontent.com/u/10967207/${INDIGO_FILENAME}.zip"
+
+wget https://raw.githubusercontent.com/thesgc/mychembl/master/rdkit_install.sh
+
+sh rdkit_install.sh
+
