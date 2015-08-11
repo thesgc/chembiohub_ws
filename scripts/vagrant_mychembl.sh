@@ -52,6 +52,7 @@ export RDKIT_RELEASE="Release_2015_03_1"
 # indigo toolkit location
 export INDIGO_FILENAME="indigo-python-1.1.11-linux"
 export INDIGO_LOCATION="https://dl.dropboxusercontent.com/u/10967207/${INDIGO_FILENAME}.zip"
+sudo -H pip install numpy
 
 wget https://raw.githubusercontent.com/thesgc/mychembl/master/rdkit_install.sh
 
