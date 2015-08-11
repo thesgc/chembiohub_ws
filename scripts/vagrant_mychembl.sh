@@ -81,10 +81,6 @@ sudo su postgres -c "make installcheck"
   
   make -j8 install
   
-  sudo su postgres -c "create user cbh_chembl with password "
-  
-  mkdir ~/.local/lib/python2.7/site-packages -p
-  cd ~/.local/lib/python2.7/site-packages/
-  wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/scripts/vagrant_pythonpath.pth
+
   
   
