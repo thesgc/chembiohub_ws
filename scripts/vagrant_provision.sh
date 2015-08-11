@@ -9,4 +9,4 @@ source ~/.bashrc
   mkdir ~/.local/lib/python2.7/site-packages -p
   cd ~/.local/lib/python2.7/site-packages/
   wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/scripts/vagrant_pythonpath.pth
-pip install django_devserver
+pip install git+git://github.com/dcramer/django-devserver#egg=django-devserver
