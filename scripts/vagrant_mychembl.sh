@@ -87,3 +87,12 @@ cd ng-chem
 npm install
 bower install
 sudo npm install -g grunt grunt-cli
+cd ~/Tools
+  
+  wget http://www.iupac.org/fileadmin/user_upload/publications/e-resources/inchi/1.03/INCHI-1-BIN.zip
+  
+  unzip INCHI-1-BIN.zip
+  
+  gunzip INCHI-1-BIN/linux/64bit/inchi-1.gz
+  
+  chmod +x INCHI-1-BIN/linux/64bit/inchi-1
