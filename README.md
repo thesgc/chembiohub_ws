@@ -10,11 +10,17 @@ All relevant code is in the /src/ directory as sub repositories
 These are installed in your local anaconda install as shown in  [install anaconda](install_anaconda.rst) but this has been done for you on the vagrant install.
 
 In order to get started using vagrant then run to get all the subrepos:
+    cd /srv
+    ls -l
+    sudo chown -R $USER /srv
+    git clone git@github.com:thesgc/chembiohub_ws.git
+    cd chembiohub_ws/
+    git submodule init
+    git submodule update
 
-    git clone  --recursive  git@github.com:thesgc/chembiohub_ws.git
-  
 Next we create a vagrant machine to run our python code:
 
+    cd vagrant
     vagrant up
   
 This will download the vagrant box from our internet location and you can then log in by:
