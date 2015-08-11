@@ -103,7 +103,7 @@ fi
 #  sudo su postgres -c '$DROPCOMMAND'
 
 
+ echo "create user chembl with password 'chembl'; create database cbh_chembl ; grant all privileges on database cbh_chembl to chembl;" > /tmp/creator
 
-export POSTGRES_COMMAND="psql template1 -c ' CREATE EXTENSION IF NOT EXISTS hstore; CREATE EXTENSION IF NOT EXISTS rdkit;'"
- sudo su postgres -c "$POSTGRES_COMMAND"
+ sudo su postgres < /tmp/creator
 
