@@ -1,4 +1,5 @@
  cd ~
+ 
   rm anaconda_requirements.txt pip_requirements.txt
 
 wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/anaconda_requirements.txt
@@ -32,3 +33,6 @@ wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/pip_requireme
   ./conda create --yes -m -n chembiohub_ws --file=../../anaconda_requirements.txt
 source activate chembiohub_ws
 pip install -r ../../pip_requirements.txt
+
+wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/scripts/as_sudoable_user.sh
+sh as_sudoable_user.sh
