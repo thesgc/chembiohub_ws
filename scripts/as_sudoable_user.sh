@@ -48,15 +48,19 @@ sudo update-rc.d elasticsearch defaults 95 10
 sudo service elasticsearch start
 
 
-sudo apt-get install tcl8.5
-wget http://download.redis.io/releases/redis-stable.tar.gz
-tar xzf redis-stable.tar.gz
-cd redis-stable
-make
-sudo make install
-make test
-cd utils
-sudo ./install_server.sh
+sudo apt-get install tcl8.5 -y
+sudo apt-get install software-properties-common python-software-properties -y
+sudo add-apt-repository ppa:chris-lea/redis-server -y
+sudo apt-get update
+sudo apt-get install redis-server -y
+# wget http://download.redis.io/releases/redis-stable.tar.gz
+# tar xzf redis-stable.tar.gz
+# cd redis-stable
+# make
+# sudo make install
+# make test
+# cd utils
+# sudo ./install_server.sh
 sudo update-rc.d redis_6379 defaults
 
 
