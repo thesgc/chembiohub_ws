@@ -65,8 +65,7 @@ cd eigen-eigen-0938af7840b0/; mkdir build; cd build; cmake ..
 sudo make install  # Does the job.
 cd ../..
 sudo apt-get install pkg-config
-
-id -u chembiohub &>/dev/null ||   sudo useradd -G www-data -s /bin/bash -m chembiohub
+[[ "vagrant" = $USER ]] && myuser="vagrant" || myuser="chembiohub"
 
 cd /tmp
 wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/scripts/as_chembiohub_user.sh
@@ -74,18 +73,26 @@ sudo wget http://sourceforge.net/projects/rdkit/files/rdkit/Q3_2014/RDKit_2014_0
 
 sudo  wget http://09c8d0b2229f813c1b93-c95ac804525aac4b6dba79b00b39d1d3.r79.cf1.rackcdn.com/Anaconda-2.1.0-Linux-x86_64.sh -N -P /var/cache/wget 
 
+if [[ "vagrant" != $USER ]]
+  then 
+  id -u chembiohub &>/dev/null ||   sudo useradd -G www-data -s /bin/bash -m chembiohub
+  export COMM="bash as_chembiohub_user.sh $USER"
+  sudo su chembiohub -c "$COMM" 
+else
+  bash as_chembiohub_user.sh $USER
+fi
+
 #sudo apt-get install -f -y flex bison build-essential python-numpy cmake python-dev sqlite3 libsqlite3-dev
-export COMM="bash as_chembiohub_user.sh $USER"
-sudo su chembiohub -c "$COMM" 
+
 
 #export DROPCOMMAND='psql template1 -c "CREATE EXTENSION rdkit; DROP ROLE IF EXISTS $USER;" '
 #echo $DROPCOMMAND
 #  sudo su postgres -c '$DROPCOMMAND'
 
-export RDBASE=/home/chembiohub/rdkit
+export RDBASE=/home/$myuser/rdkit
 export LD_LIBRARY_PATH=$RDBASE/lib:$LD_LIBRARY_PATH
 export PYTHONPATH=$RDBASE:$PYTHONPATH
-cd /home/chembiohub/rdkit/Code/PgSQL/rdkit/
+cd /home/$myuser/rdkit/Code/PgSQL/rdkit/
 sudo make install
 
 export POSTGRES_COMMAND="psql template1 -c ' CREATE EXTENSION IF NOT EXISTS hstore; CREATE EXTENSION IF NOT EXISTS rdkit;'"
