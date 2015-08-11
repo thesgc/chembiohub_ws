@@ -2,9 +2,11 @@ from .base import *
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
+INCHI_BINARIES_LOCATION = {"1.02" :"/home/vagrant/Tools/INCHI-1-BIN/linux/64bit/inchi-1"}
+
+OPEN_BABEL_EXECUTABLE = "/home/vagrant/openbabel-2.3.2/build/bin/babel"
 
 ID_PREFIX = "DEV"
-
 WEBSERVICES_NAME='dev'
 
 LOGIN_REDIRECT_URL = "/#/projects/list"
@@ -17,7 +19,8 @@ SESSION_REDIS_PREFIX = 'session'
 SESSION_ENGINE = 'redis_sessions.session'
 
 
-
+MEDIA_ROOT = '/home/vagrant/media/'
+FLOWJS_PATH = MEDIA_ROOT + 'flow'
 
 DATABASES = {
     'default': {
@@ -62,9 +65,6 @@ STATIC_URL = '/devapi/r/'
 # List of finder classes that know how to find static files in
 # various locations.
 
-INCHI_BINARIES_LOCATION = {"1.02" :"/home/vagrant/INCHI-1-BIN/linux/64bit/inchi-1"}
-
-OPEN_BABEL_EXECUTABLE = "/home/vagrant/openbabel-2.3.2/build/bin/babel"
 
 
 ANONYMOUS_USER_ID = -1
@@ -87,3 +87,5 @@ DEVSERVER_TRUNCATE_SQL = False
 
 INTERNAL_IPS =('0.0.0.0',)
 DEVSERVER_DEFAULT_ADDR = '0.0.0.0'
+DEVSERVER_DEFAULT_PORT = '8888'
+

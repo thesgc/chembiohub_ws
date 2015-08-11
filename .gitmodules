@@ -4,9 +4,6 @@
 [submodule "src/chembl_business_model"]
 	path = src/chembl_business_model
 	url = git://github.com/thesgc/chembl_business_model.git
-[submodule "src/chembl_extras"]
-	path = src/chembl_extras
-	url = git://github.com/thesgc/chembl_extras.git
 [submodule "src/cbh_chembl_model_extension"]
 	path = src/cbh_chembl_model_extension
 	url = git://github.com/thesgc/cbh_chembl_model_extension.git
