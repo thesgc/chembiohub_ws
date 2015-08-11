@@ -59,3 +59,24 @@ wget https://raw.githubusercontent.com/thesgc/mychembl/master/rdkit_install.sh
 sh rdkit_install.sh
 
 sudo su postgres -c "make installcheck"
+
+
+  cd ~
+  
+  wget http://sourceforge.net/projects/openbabel/files/openbabel/2.3.2/openbabel-2.3.2.tar.gz
+  
+  tar -xvf openbabel-2.3.2.tar.gz
+  
+  cd openbabel-2.3.2
+  
+  mkdir build
+  
+  cd build
+  
+  cmake .. -DPYTHON_BINDINGS=ON -DCMAKE_INSTALL_PREFIX=~/Tools/openbabel-install
+  
+  #compile with 8 threads for speed
+  
+  make -j8
+  
+  make -j8 install
