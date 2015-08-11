@@ -86,4 +86,4 @@ cd /tmp
 cd ng-chem
 npm install
 bower install
-sudo npm install -g grunt
+sudo npm install -g grunt grunt-cli
