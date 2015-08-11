@@ -105,5 +105,4 @@ fi
 
  echo "create user chembl with password 'chembl'; create database cbh_chembl ; grant all privileges on database cbh_chembl to chembl;" > /tmp/creator
 
- sudo su postgres < /tmp/creator
-
+sudo su postgres -c "psql < /tmp/creator"
