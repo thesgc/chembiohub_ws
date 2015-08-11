@@ -12,9 +12,9 @@ sudo chmod ugo+rw -R /var/cache/wget
 cd ~
 ###Now install all of the dependency apt gets in the environment
 
-  wget https://raw.githubusercontent.com/chembl/mychembl/master/install_core_libs.sh
+  wget https://raw.githubusercontent.com/chembl/mychembl/master/install_core_libs_Ubuntu.sh
 
-  sed "s/gem install gist//g" install_core_libs.sh >> install_core_libs1.sh
+  sed "s/gem install gist//g" install_core_libs_Ubuntu.sh >> install_core_libs1.sh
  sh install_core_libs1.sh
 
 ###Now add a user for the install
