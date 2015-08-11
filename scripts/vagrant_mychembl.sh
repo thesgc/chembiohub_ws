@@ -80,3 +80,19 @@ sudo su postgres -c "make installcheck"
   make -j8
   
   make -j8 install
+  #cache the bower repos locally
+cd /tmp
+  git clone https://github.com/thesgc/ng-chem
+cd ng-chem
+npm install
+bower install
+sudo npm install -g grunt grunt-cli
+cd ~/Tools
+  
+  wget http://www.iupac.org/fileadmin/user_upload/publications/e-resources/inchi/1.03/INCHI-1-BIN.zip
+  
+  unzip INCHI-1-BIN.zip
+  
+  gunzip INCHI-1-BIN/linux/64bit/inchi-1.gz
+  
+  chmod +x INCHI-1-BIN/linux/64bit/inchi-1
