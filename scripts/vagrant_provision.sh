@@ -15,3 +15,4 @@ cd ~/chemreg/src/ng-chem/
 sudo chmod o+w -R .
 sudo npm install
 bower install
+echo "source ~/anaconda/bin/activate chembiohub_ws" > ~/.bashrc
