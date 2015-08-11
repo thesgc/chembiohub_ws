@@ -108,3 +108,5 @@ fi
 sudo su postgres -c "psql < /tmp/creator"
 
 echo 'export DJANGO_SETTINGS_MODULE="deployment.settings.development"' > ~/.bashrc
+
+source ~/.bashrc
