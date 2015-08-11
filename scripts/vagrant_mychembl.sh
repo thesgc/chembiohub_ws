@@ -58,3 +58,4 @@ wget https://raw.githubusercontent.com/thesgc/mychembl/master/rdkit_install.sh
 
 sh rdkit_install.sh
 
+sudo su postgres -c "make installcheck"
