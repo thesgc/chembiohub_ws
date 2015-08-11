@@ -20,7 +20,7 @@ if [[ "vagrant" != $USER ]]
 
 ###Now add a user for the install
 
-   sudo apt-get install -y apache2 
+   sudo apt-get install -y apache2 postgresql-client-common
  fi
 sudo apt-get install -y libapache2-mod-proxy-html libxml2-devsudo apt-get install libxml2-dev
 sudo a2enmod proxy proxy_http headers expires rewrite
