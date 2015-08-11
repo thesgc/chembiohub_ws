@@ -78,8 +78,14 @@ if [[ "vagrant" != $USER ]]
   id -u chembiohub &>/dev/null ||   sudo useradd -G www-data -s /bin/bash -m chembiohub
   export COMM="bash as_chembiohub_user.sh $USER"
   sudo su chembiohub -c "$COMM" 
-else
-  bash as_chembiohub_user.sh $USER
+  export RDBASE=/home/$myuser/rdkit
+export LD_LIBRARY_PATH=$RDBASE/lib:$LD_LIBRARY_PATH
+export PYTHONPATH=$RDBASE:$PYTHONPATH
+cd /home/$myuser/rdkit/Code/PgSQL/rdkit/
+sudo make install
+sudo mkdir /var/www/automated_reg_installs
+sudo chown -R chembiohub:www-data /var/www/automated_reg_installs
+
 fi
 
 #sudo apt-get install -f -y flex bison build-essential python-numpy cmake python-dev sqlite3 libsqlite3-dev
@@ -89,14 +95,8 @@ fi
 #echo $DROPCOMMAND
 #  sudo su postgres -c '$DROPCOMMAND'
 
-export RDBASE=/home/$myuser/rdkit
-export LD_LIBRARY_PATH=$RDBASE/lib:$LD_LIBRARY_PATH
-export PYTHONPATH=$RDBASE:$PYTHONPATH
-cd /home/$myuser/rdkit/Code/PgSQL/rdkit/
-sudo make install
+
 
 export POSTGRES_COMMAND="psql template1 -c ' CREATE EXTENSION IF NOT EXISTS hstore; CREATE EXTENSION IF NOT EXISTS rdkit;'"
  sudo su postgres -c "$POSTGRES_COMMAND"
 
-sudo mkdir /var/www/automated_reg_installs
-sudo chown -R chembiohub:www-data /var/www/automated_reg_installs
