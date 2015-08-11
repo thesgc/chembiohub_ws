@@ -10,3 +10,8 @@ source ~/.bashrc
   cd ~/.local/lib/python2.7/site-packages/
   wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/scripts/vagrant_pythonpath.pth
 pip install git+git://github.com/dcramer/django-devserver#egg=django-devserver
+
+cd ~/chemreg/src/ng-chem/
+sudo chmod o+w -R .
+sudo npm install
+bower install
