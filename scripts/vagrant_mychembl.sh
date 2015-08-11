@@ -36,4 +36,4 @@ sh as_sudoable_user.sh
 source activate chembiohub_ws
 pip install -r ../../pip_requirements.txt
 
-
+https://raw.githubusercontent.com/thesgc/mychembl/master/bootstrap.sh
