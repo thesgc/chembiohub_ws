@@ -5,7 +5,8 @@
 wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/anaconda_requirements.txt
 wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/pip_requirements.txt
 
-  
+  wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/scripts/as_sudoable_user.sh
+sh as_sudoable_user.sh
 ###Then change to that directory and add channels
 
   cd anaconda/bin
@@ -34,5 +35,4 @@ wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/pip_requireme
 source activate chembiohub_ws
 pip install -r ../../pip_requirements.txt
 
-wget https://raw.githubusercontent.com/thesgc/chembiohub_ws/master/scripts/as_sudoable_user.sh
-sh as_sudoable_user.sh
+
