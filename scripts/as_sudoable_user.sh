@@ -11,7 +11,8 @@ sudo mkdir -p /var/cache/wget
 sudo chmod ugo+rw -R /var/cache/wget
 cd ~
 ###Now install all of the dependency apt gets in the environment
-
+if [[ "vagrant" != $USER ]]
+  then
   wget https://raw.githubusercontent.com/chembl/mychembl/master/install_core_libs_Ubuntu.sh
 
   sed "s/gem install gist//g" install_core_libs_Ubuntu.sh >> install_core_libs1.sh
@@ -20,6 +21,7 @@ cd ~
 ###Now add a user for the install
 
    sudo apt-get install -y apache2 
+ fi
 sudo apt-get install -y libapache2-mod-proxy-html libxml2-devsudo apt-get install libxml2-dev
 sudo a2enmod proxy proxy_http headers expires rewrite
   sudo apt-get install -y supervisor
