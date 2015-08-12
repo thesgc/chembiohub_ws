@@ -7,8 +7,8 @@ ENV['VAGRANT_DEFAULT_PROVIDER'] = 'virtualbox'
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.define "mychembl" do |mychembl|
         mychembl.vm.hostname = "mychembl"
-        mychembl.vm.box = "trusty-server"
-        mychembl.vm.box_url = "http://staging.chembiohub.ox.ac.uk/package.box"
+        mychembl.vm.box = "trusty-server10"
+        mychembl.vm.box_url = "http://staging.chembiohub.ox.ac.uk/package2.box"
     end
     config.vm.provider "virtualbox" do |v|
         v.memory = 4096
@@ -21,8 +21,8 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
     config.vm.network "forwarded_port", guest: 80, host: 8000, auto_correct: true
     config.vm.network "forwarded_port", guest: 9612, host: 9612, auto_correct: true
     config.vm.network "forwarded_port", guest: 5432, host: 5432, auto_correct: true
-    config.vm.synced_folder   "../", "/home/vagrant/chemreg" , type: "nfs"
-    config.vm.provision :shell, :path => "../scripts/vagrant_mychembl.sh"
+    config.vm.synced_folder   "/srv/chembiohub_ws", "/home/vagrant/chemreg" , type: "nfs"
+    config.vm.provision :shell, :path => "../scripts/vagrant_provision.sh"
     config.vm.network "private_network", ip: "192.168.33.11"
 
 
