@@ -1,0 +1,12 @@
+./src/cbh_chembl_id_generator
+./src/cbh_chembl_model_extension
+./src/cbh_chembl_ws_extension
+./src/cbh_core_model
+./src/cbh_core_ws
+./src/cbh_datastore_model
+./src/cbh_datastore_ws
+./src/chembl_business_model
+./src/chembl_core_db
+./src/chembl_core_model
+./src/chembl_extras
+./src/django-flowjs
