@@ -54,6 +54,7 @@ TEMPLATE_DIRS = [
 
 ]
     
+TASTYPIE_DOC_API = 'cbh_datastore_ws.urls.api'
 
 # URL prefix for static files.
 # Example: "http://media.lawrence.com/static/"
@@ -72,8 +73,8 @@ ANONYMOUS_USER_ID = -1
 ALLOWED_HOSTS =["testserver"]
 
 
-INSTALLED_APPS = (            'devserver','cbh_core_model','cbh_datastore_model','cbh_datastore_ws','cbh_core_ws',
-) + INSTALLED_APPS + ('cbh_chembl_id_generator',)
+INSTALLED_APPS = (    'tastypie_spore_docs',        'devserver','cbh_core_model','cbh_datastore_model','cbh_datastore_ws','cbh_core_ws',
+) + INSTALLED_APPS + ('cbh_chembl_id_generator', )
 
 
 DEVSERVER_MODULES = (
