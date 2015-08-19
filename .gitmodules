@@ -18,7 +18,7 @@
 	url = git@github.com:strets123/chembl_core_model.git
 [submodule "src/ng-chem"]
 	path = src/ng-chem
-	url = git://github.com/thesgc/ng-chem.git
+	url = git://github.com/paulbarrett79/ng-chem.git
 [submodule "django-flowjs"]
 	path = src/django-flowjs
 	url = git://github.com/thesgc/django-flowjs.git
