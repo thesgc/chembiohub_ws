@@ -40,3 +40,4 @@ gunicorn
 django-redis-sessions
 elasticsearch
 jsonpatch
+inflection
