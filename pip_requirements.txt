@@ -1,5 +1,5 @@
 BeautifulSoup
-django==1.7.7
+django==1.7.9
 South
 amqp
 anyjson
@@ -12,7 +12,7 @@ clint
 defusedxml
 django-celery
 django-cors-headers
-django-extensions
+django-extensions==1.4.9
 django-grappelli
 django-guardian
 django-hstore
@@ -41,3 +41,4 @@ django-redis-sessions
 elasticsearch
 jsonpatch
 inflection
+tastypie_spore_docs
