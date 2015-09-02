@@ -28,3 +28,13 @@ In a second terminal run
     cd ~/chembiohub_ws/src/ng-chem
     grunt serve
 
+You should now be able to log on to the server and set up ChemBio Hub ChemReg
+
+First log on to the system via:
+
+http://localhost:8000/dev/login
+
+You will see a list of 3 projects
+
+For this tutorial we are going to import some zinc data and add a plugin to add a custom descriptor to our data.
+
