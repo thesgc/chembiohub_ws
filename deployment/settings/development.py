@@ -2,7 +2,7 @@ from .base import *
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
-INCHI_BINARIES_LOCATION = {"1.02" :"/home/vagrant/Tools/INCHI-1-BIN/linux/64bit/inchi-1"}
+INCHI_BINARIES_LOCATION = {"1.02" :"/home/vagrant/INCHI-1-BIN/linux/64bit/inchi-1"}
 
 OPEN_BABEL_EXECUTABLE = "/home/vagrant/openbabel-2.3.2/build/bin/babel"
 
@@ -87,5 +87,5 @@ DEVSERVER_TRUNCATE_SQL = False
 
 INTERNAL_IPS =('0.0.0.0',)
 DEVSERVER_DEFAULT_ADDR = '0.0.0.0'
-DEVSERVER_DEFAULT_PORT = '8888'
+DEVSERVER_DEFAULT_PORT = '8000'
 
