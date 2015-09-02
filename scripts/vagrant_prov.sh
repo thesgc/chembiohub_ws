@@ -1,4 +1,4 @@
-cd ~/chembiohub_ws/src/ng-chem
+cd /home/vagrant/chembiohub_ws/src/ng-chem
 
 npm install
 bower install
