@@ -10,14 +10,32 @@ WEBSERVICES_NAME='dev'
 LOGIN_REDIRECT_URL = "/#/projects/list"
 LOGOUT_REDIRECT_URL = "login"
 
-SESSION_REDIS_HOST = 'localhost'
-SESSION_REDIS_PORT = 6379
-SESSION_REDIS_DB = 0
-SESSION_REDIS_PREFIX = 'session'
-SESSION_ENGINE = 'redis_sessions.session'
+# SESSION_REDIS_HOST = 'localhost'
+# SESSION_REDIS_PORT = 6379
+# SESSION_REDIS_DB = 0
+# SESSION_REDIS_PREFIX = 'session'
+# SESSION_ENGINE = 'redis_sessions.session'
+
+#
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "redis://127.0.0.1:6379/1",
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
 
 
+SESSION_ENGINE = "django.contrib.sessions.backends.cache"
+SESSION_CACHE_ALIAS = "default"
 
+RQ_QUEUES = {
+    'default': {
+        'USE_REDIS_CACHE': 'default',
+    },
+}
 
 DATABASES = {
     'default': {

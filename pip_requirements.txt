@@ -37,7 +37,8 @@ xlrd
 xmltodict
 XlsxWriter
 gunicorn
-django-redis-sessions
+django-redis
+django-rq
 elasticsearch
 jsonpatch
 inflection
