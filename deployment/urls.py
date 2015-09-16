@@ -6,6 +6,7 @@ urlpatterns = patterns('',
    (r'^', include('cbh_chembl_ws_extension.urls')),
    (r'^', include('cbh_datastore_ws.urls')),
    (r'^', include('tastypie_spore_docs.urls')),
+    (r'^django-rq/', include('django_rq.urls')),
 
     )
 

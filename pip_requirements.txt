@@ -43,3 +43,5 @@ elasticsearch
 jsonpatch
 inflection
 tastypie_spore_docs
+dpath
+

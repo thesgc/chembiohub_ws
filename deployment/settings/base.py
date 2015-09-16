@@ -174,21 +174,17 @@ INSTALLED_APPS = (
     'django.contrib.messages',
     'django.contrib.staticfiles',
         'grappelli',
-
     'django.contrib.admin',
     'tastypie',
    'deployment',
-
-
    'chembl_core_db',
    'chembl_core_model',
   'chembl_business_model', 
        'flowjs',
-
-
   'cbh_chembl_model_extension',    
   'cbh_chembl_ws_extension',
   'solo',
+    "django_rq",
 
    )
 
