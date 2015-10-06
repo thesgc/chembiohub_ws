@@ -29,6 +29,6 @@ STATICFILES_DIRS = (
 
 # List of finder classes that know how to find static files in
 # various locations.
-INSTALLED_APPS = INSTALLED_APPS + ('cbh_chembl_id_generator',)
+
 
 from .stagingsecret import *

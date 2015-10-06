@@ -72,8 +72,11 @@ ANONYMOUS_USER_ID = -1
 ALLOWED_HOSTS =["testserver"]
 
 
+# INSTALLED_APPS = (            'devserver',
+# ) + INSTALLED_APPS + ('cbh_chembl_id_generator',)
+
 INSTALLED_APPS = (            'devserver',
-) + INSTALLED_APPS + ('cbh_chembl_id_generator',)
+) + INSTALLED_APPS
 
 
 DEVSERVER_MODULES = (

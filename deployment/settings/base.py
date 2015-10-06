@@ -173,7 +173,7 @@ INSTALLED_APPS = (
   'chembl_business_model', 
        'flowjs',
 
-
+  'cbh_chembl_id_generator',
   'cbh_chembl_model_extension',    
   'cbh_chembl_ws_extension',
   'solo',
