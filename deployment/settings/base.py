@@ -142,8 +142,8 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-
-# MIDDLEWARE_CLASSES = (
+API_CACHE_ENABLE = True
+API_CACHE_LENGTH = 900
 # 'django.contrib.sessions.middleware.SessionMiddleware',
 # 'django.contrib.auth.middleware.AuthenticationMiddleware',
 
