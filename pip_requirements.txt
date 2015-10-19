@@ -1,5 +1,5 @@
 BeautifulSoup
-django==1.7.9
+django==1.7.10
 South
 amqp
 anyjson
@@ -18,7 +18,7 @@ django-guardian
 django-hstore
 django-picklefield
 django-solo
-django-tastypie
+-e git+git@github.com:django-tastypie/django-tastypie.git#egg=c4e90b195df8f3940965f12ae4d5d6a11fad8944
 enum34
 kombu
 lxml
