@@ -163,12 +163,9 @@ TEMPLATE_DIRS = (
 # Always use forward slashes, even on Windows.
 # Don't forget to use absolute paths, not relative paths.
 )
-# GEOMETRY_BACKEND = ''
 
-GDAL_LIBRARY_PATH = '/home/vagrant/miniconda/bin/chembiohub_ws/lib/libgdal.so' 
-GEOS_LIBRARY_PATH = '/home/vagrant/miniconda/bin/chembiohub_ws/lib/libgeos_c.so'
+
 INSTALLED_APPS = (
-    'django.contrib.gis',
         'tastypie',
 
        "django_hstore",

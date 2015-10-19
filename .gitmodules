@@ -37,3 +37,6 @@
 [submodule "src/cbh_core_ws"]
 	path = src/cbh_core_ws
 	url = git@github.com:thesgc/cbh_core_ws.git
+[submodule "src/django-tastypie"]
+	path = src/django-tastypie
+	url = git@github.com:thesgc/django-tastypie.git

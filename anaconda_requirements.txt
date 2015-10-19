@@ -64,4 +64,3 @@ tornado=4.0.2=py27_0
 xlsxwriter
 zeromq=4.0.4=0
 zlib=1.2.7=0
-gdal=2.0.0=np110py27_0
