@@ -1,12 +1,10 @@
 BeautifulSoup
 django==1.7.10
-South
 amqp
 anyjson
 args
 behave
 billiard
-bottle
 celery
 clint
 defusedxml
@@ -18,7 +16,7 @@ django-guardian
 django-hstore
 django-picklefield
 django-solo
--e git+git@github.com:django-tastypie/django-tastypie.git#egg=c4e90b195df8f3940965f12ae4d5d6a11fad8944
+-e git+git@github.com:django-tastypie/django-tastypie.git#egg=master
 enum34
 kombu
 lxml
