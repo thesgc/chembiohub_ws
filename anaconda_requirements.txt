@@ -1,6 +1,7 @@
 # This file may be used to create an environment using:
 # $ conda create --name <env> --file <this file>
 # platform: linux-64
+fuzzywuzzy=0.2-py27_0
 biopython=1.64=np18py27_0
 boost=1.55.0=py27_2
 brisa-media-renderer=0.1.1=py27_0

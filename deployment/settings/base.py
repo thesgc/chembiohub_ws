@@ -7,7 +7,7 @@ TASTYPIE_ALLOW_MISSING_SLASH = True
 TASTYPIE_CANNED_ERROR = "An internal server error occurred. Please contact ChEMBL help."
 
 ID_PREFIX = "UOX"
-BEAKER_PATH =  "http://staging.chembiohub.ox.ac.uk/utils/"
+BEAKER_PATH =  "https://chembiohub.ox.ac.uk/utils/"
 SESSION_COOKIE_HTTPONLY = False
 SESSION_SAVE_EVERY_REQUEST = True
 OPEN_SOURCE = True
@@ -142,7 +142,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-API_CACHE_ENABLE = True
+API_CACHE_ENABLE = False
 API_CACHE_LENGTH = 900
 # 'django.contrib.sessions.middleware.SessionMiddleware',
 # 'django.contrib.auth.middleware.AuthenticationMiddleware',
