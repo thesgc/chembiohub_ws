@@ -44,7 +44,7 @@ pyqt=4.10.4=py27_0
 python=2.7.6=2
 pytz=2014.9=py27_0
 pyzmq=14.4.1=py27_0
-rdkit=2014.03.1=np18py27_2
+rdkit=2015.03.1 np19py27_0
 readline=6.2=2
 requests=2.5.0=py27_0
 setuptools=7.0=py27_0
