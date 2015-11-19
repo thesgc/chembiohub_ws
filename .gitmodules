@@ -1,6 +1,6 @@
 [submodule "src/cbh_chembl_ws_extension"]
 	path = src/cbh_chembl_ws_extension
-	url = git://github.com/strets123/cbh_chembl_ws_extension.git
+	url = git://github.com/thesgc/cbh_chembl_ws_extension.git
 [submodule "src/chembl_business_model"]
 	path = src/chembl_business_model
 	url = git://github.com/thesgc/chembl_business_model.git
@@ -9,16 +9,16 @@
 	url = git://github.com/thesgc/chembl_extras.git
 [submodule "src/cbh_chembl_model_extension"]
 	path = src/cbh_chembl_model_extension
-	url = git://github.com/strets123/cbh_chembl_model_extension.git
+	url = git://github.com/thesgc/cbh_chembl_model_extension.git
 [submodule "src/chembl_core_db"]
 	path = src/chembl_core_db
 	url = git://github.com/thesgc/chembl_core_db.git
 [submodule "src/chembl_core_model"]
 	path = src/chembl_core_model
-	url = git@github.com:strets123/chembl_core_model.git
+	url = git@github.com:thesgc/chembl_core_model.git
 [submodule "src/ng-chem"]
 	path = src/ng-chem
-	url = git://github.com/paulbarrett79/ng-chem.git
+	url = git://github.com/thesgc/ng-chem.git
 [submodule "django-flowjs"]
 	path = src/django-flowjs
 	url = git://github.com/thesgc/django-flowjs.git
