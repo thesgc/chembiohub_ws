@@ -6,7 +6,7 @@ DATABASES = {
         'NAME': 'chembiohub_db', # Or path to database file if using sqlite3.
         'USER': 'chembiohub', # Not used with sqlite3.
         'PASSWORD': '', # Not used witis oracle
-        'HOST': '/home/chembiohub/postgressocket/.s.PGSQL.5432', # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': '/home/chembiohub/postgressocket/', # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '', # Set to empty string for default. Not used with sqlite3.
     },
 }
