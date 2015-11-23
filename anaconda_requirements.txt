@@ -1,15 +1,19 @@
 # This file may be used to create an environment using:
 # $ conda create --name <env> --file <this file>
 # platform: linux-64
-cairocffi=0.6=py27_0
-bzip2=1.0.6=0
-pandas=0.17.0=np110py27_0
+fuzzywuzzy=0.2-py27_0
 biopython=1.66=np110py27_0
+brisa-media-renderer=0.1.1=py27_0
+bzip2=1.0.6=0
 cairo=1.12.18=0
+cairocffi=0.5.3=py27_0
+cffi=0.8.6=py27_0
 cython=0.21.1=py27_0
 dateutil=2.1=py27_2
 decorator=3.4.0=py27_0
 freetype=2.4.10=0
+glib=2.40.0=1
+gobject-introspection=1.40.0=1
 ipython=2.3.1=py27_0
 jinja2=2.7.3=py27_1
 lcms=1.19=0
@@ -20,21 +24,27 @@ libtiff=4.0.2=1
 libxml2=2.9.0=0
 libxslt=1.1.28=0
 markupsafe=0.23=py27_0
+mpld3=0.2=py27_0
+netifaces=0.10.4=py27_1
 networkx=1.9.1=py27_0
+numpy=1.8.2=py27_0
 openssl=1.0.1h=1
+pandas=0.14.1=np18py27_0
 pillow=2.5.1=py27_0
 pip=1.5.6=py27_0
 pixman=0.26.2=0
+psycopg2=2.4.6=py27_0
 py2cairo=1.10.0=py27_2
 pycparser=2.10=py27_0
 pygments=2.0.1=py27_0
+pygobject3=3.12.0=py27_0
 pyparsing=2.0.1=py27_0
+pyqt=4.10.4=py27_0
 python=2.7.6=2
 pytz=2014.9=py27_0
 pyzmq=14.4.1=py27_0
+rdkit=2015.03.1 np19py27_0
 readline=6.2=2
-rdkit=2015.09.2=np110py27_0
-rdkit-postgresql=2015.09.2=py27_1
 requests=2.5.0=py27_0
 setuptools=7.0=py27_0
 sip=4.15.5=py27_0
@@ -46,4 +56,3 @@ tk=8.5.15=0
 xlsxwriter
 zeromq=4.0.4=0
 zlib=1.2.7=0
-openbabel=2.3.90.2git.9dd91b=py27_0
