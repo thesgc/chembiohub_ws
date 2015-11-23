@@ -2,8 +2,9 @@
 # $ conda create --name <env> --file <this file>
 # platform: linux-64
 cairocffi=0.6=py27_0
-biopython=1.64=np19py27_0
 bzip2=1.0.6=0
+pandas=0.17.0=np110py27_0
+biopython=1.66=np110py27_0
 cairo=1.12.18=0
 cython=0.21.1=py27_0
 dateutil=2.1=py27_2
@@ -31,8 +32,9 @@ pyparsing=2.0.1=py27_0
 python=2.7.6=2
 pytz=2014.9=py27_0
 pyzmq=14.4.1=py27_0
-rdkit=2015.03.1=np19py27_0
 readline=6.2=2
+rdkit=2015.09.2=np110py27_0
+rdkit-postgresql=2015.09.2=py27_1
 requests=2.5.0=py27_0
 setuptools=7.0=py27_0
 sip=4.15.5=py27_0
