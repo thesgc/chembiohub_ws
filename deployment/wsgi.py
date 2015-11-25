@@ -17,11 +17,7 @@ framework.
 import os
 import sys
 import site
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "deployment.settings")
-site.addsitedir('/home/chembl/.virtualenvs/chembl_webservices/lib/python2.7/site-packages/')
-sys.path.append('/home/chembl/chembl_webservices/deployment/deployment')
-
-os.environ['LD_LIBRARY_PATH']='/home/chembl/rdkit/lib'
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "deployment.settings.default")
 
 # This application object is used by any WSGI server configured to use this
 # file. This includes Django's development server, if the WSGI_APPLICATION
