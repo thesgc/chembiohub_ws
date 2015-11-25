@@ -66,6 +66,7 @@ LOGIN_URL = '/chembiohub/login'
 LOGOUT_REDIRECT_URL = '/chembiohub/login'
 WEBSERVICES_NAME='chembiohub/api'
 
+INCHI_BINARIES_LOCATION = {"1.02" :"/srv/chembiohub/INCHI-1-BIN/linux/64bit/inchi-1"}
 
 SESSION_CACHE_ALIAS= 'chembiohub'
 CACHES = {

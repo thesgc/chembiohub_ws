@@ -188,6 +188,7 @@ INSTALLED_APPS = (
        'cbh_datastore_ws',
   'cbh_chembl_model_extension',    
   'cbh_chembl_ws_extension',
+  'cbh_chembl_id_generator',
   'solo',
     "django_rq",
 
