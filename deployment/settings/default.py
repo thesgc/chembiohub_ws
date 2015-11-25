@@ -57,7 +57,10 @@ RQ_QUEUES = {
 SESSION_COOKIE_NAME = 'chembiohub_sessionid'
 CSRF_COOKIE_NAME = 'chembiohubcsrftoken'
 STATIC_ROOT = '/srv/chembiohub/chembiohub_ws/deployment/static'
-MEDIA_ROOT = '/home/chembiohub/media'
+MEDIA_ROOT = '/home/chembiohub/media/'
+FLOWJS_PATH = MEDIA_ROOT + 'flow'
+
+
 LOGIN_REDIRECT_URL = '/chembiohub/#/projects/list'
 LOGIN_URL = '/chembiohub/login'
 LOGOUT_REDIRECT_URL = '/chembiohub/login'
