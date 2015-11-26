@@ -1,5 +1,4 @@
 #-i https://pypi.anaconda.org/pypi/simple cairocffi
-pandas
 netifaces
 fuzzywuzzy
 BeautifulSoup
@@ -18,10 +17,9 @@ django-grappelli==2.7.2
 django-hstore==1.3.8
 django-picklefield
 django-solo
-git+https://github.com/django-tastypie/django-tastypie.git
+git+https://github.com/django-tastypie/django-tastypie@master
 enum34
 kombu
-lxml
 mechanize
 mimeparse
 netaddr

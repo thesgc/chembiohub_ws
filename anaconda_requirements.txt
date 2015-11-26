@@ -17,8 +17,9 @@ libffi=3.0.13=0
 libpng=1.5.13=1
 libsodium=0.4.5=0
 libtiff=4.0.2=1
-libxml2=2.9.0=0
+libxml2=2.9.2=0
 libxslt=1.1.28=0
+lxml=3.4.4=py27_0
 markupsafe=0.23=py27_0
 networkx=1.9.1=py27_0
 pillow=2.5.1=py27_0
