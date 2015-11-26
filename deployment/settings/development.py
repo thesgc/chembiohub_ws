@@ -93,7 +93,7 @@ ALLOWED_HOSTS =["testserver"]
 
 
 INSTALLED_APPS = (    'tastypie_spore_docs',        'devserver',
-) + INSTALLED_APPS + ('cbh_chembl_id_generator', )
+) + INSTALLED_APPS 
 
 
 DEVSERVER_MODULES = (
