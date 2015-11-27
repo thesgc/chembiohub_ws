@@ -8,6 +8,7 @@ biopython=1.66=np110py27_0
 cairo=1.12.18=0
 cython=0.21.1=py27_0
 dateutil=2.1=py27_2
+uwsgi=2.0.5.1=py27_0
 decorator=3.4.0=py27_0
 freetype=2.4.10=0
 ipython=2.3.1=py27_0
