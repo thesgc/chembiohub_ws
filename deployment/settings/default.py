@@ -22,7 +22,7 @@ DATABASES = {
         'NAME': '%s_db' % ENV_NAME, # Or path to database file if using sqlite3.
         'USER': get_username(), # Not used with sqlite3.
         'PASSWORD': '', # Not used witis oracle
-        'HOST': os.getenv("CONDA_ENV_PATH") + '/var/postgressocket/', # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': os.getenv("CONDA_ENV_PATH") + '/var/postgressocket', # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '', # Set to empty string for default. Not used with sqlite3.
     },
 }
