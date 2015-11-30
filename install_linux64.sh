@@ -28,19 +28,21 @@ RANDOM_PORT=${python generate_port.py}
 
 
 
-sudo echo "[program:$1_uwsgi]
+SUPERVISOR="[program:$1_uwsgi]
 command=$CONDA_ENV_PATH/bin/uwsgi --http :RANDOM_PORT --chmod-socket=664 --module=deployment.wsgi
 directory=${PWD}
 environment=PATH=$PATH
 user=$USER
 autorestart=true
-redirect_stderr=true" > /etc/supervisor/conf.d/$1_uwsgi_supervisor.conf
+redirect_stderr=true" 
+sudo echo $SUPERVISOR > /etc/supervisor/conf.d/$1_uwsgi_supervisor.conf
 
 
-sudo echo "[program:$1_postgresql]
+POSTGRES="[program:$1_postgresql]
 command=$CONDA_ENV_PATH/bin/postgres -D $CONDA_ENV_PATH/var/postgresdata -c listen_addresses='' -c unix_socket_directories=$CONDA_ENV_PATH/var/postgressocket
 user=$USER
-autorestart=true" > /etc/supervisor/conf.d/$1_uwsgi_supervisor.conf
+autorestart=true" 
+sudo echo $POSTGRES > /etc/supervisor/conf.d/$1_uwsgi_supervisor.conf
 
 sudo supervisorctl reread
 sudo supervisorctl reload
