@@ -8,11 +8,11 @@ biopython=1.66=np110py27_0
 cairo=1.12.18=0
 cython=0.21.1=py27_0
 dateutil=2.1=py27_2
-uwsgi=2.0.5.1=py27_0
 decorator=3.4.0=py27_0
 freetype=2.4.10=0
 ipython=2.3.1=py27_0
 jinja2=2.7.3=py27_1
+uwsgi=2.0.11.1=py27_0
 lcms=1.19=0
 libffi=3.0.13=0
 libpng=1.5.13=1
