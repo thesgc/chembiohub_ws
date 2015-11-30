@@ -17,7 +17,7 @@ framework.
 import os
 import sys
 import site
-os.environ.setdefault("DJANGO_SETTINGS_MODULE", "deployment.settings.default")
+os.environ.setdefault("DJANGO_SETTINGS_MODULE", "example_custom_deployment.settings.default")
 
 # This application object is used by any WSGI server configured to use this
 # file. This includes Django's development server, if the WSGI_APPLICATION
