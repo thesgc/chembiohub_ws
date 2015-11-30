@@ -1,21 +1,28 @@
 from .base import *
-DEBUG=True
-TEMPLATE_DEBUG = DEBUG
-
 import os
 import pwd
+
+DEBUG=True
+
+TEMPLATE_DEBUG = DEBUG
+
+BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+
 
 def get_username():
     return pwd.getpwuid( os.getuid() )[ 0 ]
 
+CONDA_ENV_PATH = os.getenv("CONDA_ENV_PATH")
+
+ENV_NAME = os.path.split(CONDA_ENV_PATH)[1]
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'chembiohub_db', # Or path to database file if using sqlite3.
+        'NAME': '%s_db' % ENV_NAME, # Or path to database file if using sqlite3.
         'USER': get_username(), # Not used with sqlite3.
         'PASSWORD': '', # Not used witis oracle
-        'HOST': '/home/chembiohub/postgressocket/', # Set to empty string for localhost. Not used with sqlite3.
+        'HOST': os.getenv("CONDA_ENV_PATH") + '/var/postgressocket/', # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '', # Set to empty string for default. Not used with sqlite3.
     },
 }
@@ -31,7 +38,7 @@ CACHES = {
     }
 }
 
-import os
+
 
 LOGGING = {
     'version': 1,
@@ -61,21 +68,22 @@ RQ_QUEUES = {
 
 
 
-SESSION_COOKIE_NAME = 'chembiohub_sessionid'
-CSRF_COOKIE_NAME = 'chembiohubcsrftoken'
-STATIC_ROOT = '/srv/chembiohub/chembiohub_ws/deployment/static'
-MEDIA_ROOT = '/home/chembiohub/media/'
+SESSION_COOKIE_NAME = '%s_sessionid' % ENV_NAME
+CSRF_COOKIE_NAME = '%s_csrftoken' % ENV_NAME
+
+STATIC_ROOT = '%s/deployment/static' % BASE_DIR
+MEDIA_ROOT = '%s/var/media/' % CONDA_ENV_PATH
 FLOWJS_PATH = MEDIA_ROOT + 'flow'
 
 
-LOGIN_REDIRECT_URL = '/chembiohub/#/projects/list'
-LOGIN_URL = '/chembiohub/login'
-LOGOUT_REDIRECT_URL = '/chembiohub/login'
-WEBSERVICES_NAME='chembiohub/api'
+LOGIN_REDIRECT_URL = '/%s/#/projects/list' % ENV_NAME
+LOGIN_URL = '/%s/login' %  ENV_NAME
+LOGOUT_REDIRECT_URL = '/%s/login' %  ENV_NAME
+WEBSERVICES_NAME='%s/api' %  ENV_NAME
 
-INCHI_BINARIES_LOCATION = {"1.02" :"/srv/chembiohub/INCHI-1-BIN/linux/64bit/inchi-1"}
+INCHI_BINARIES_LOCATION = {"1.02" :"%s/var/INCHI-1-BIN/linux/64bit/inchi-1" % CONDA_ENV_PATH}
 
-SESSION_CACHE_ALIAS= 'chembiohub'
+SESSION_CACHE_ALIAS= ENV_NAME
 CACHES = {
 "default": {
             "BACKEND": "django_redis.cache.RedisCache",
@@ -88,7 +96,7 @@ CACHES = {
 
 
 
-"chembiohub": {
+ENV_NAME: {
             "BACKEND": "django_redis.cache.RedisCache",
                     "LOCATION": "redis://127.0.0.1:6379/1",
                             "OPTIONS": {
@@ -97,18 +105,21 @@ CACHES = {
         }
 }
 
-ES_PREFIX = 'chembiohub'
+ES_PREFIX = ENV_NAME
 
 
  
-STATIC_URL = '/chembiohub/static/'
+STATIC_URL = '/%s/static/' % ENV_NAME
 
 STATICFILES_DIRS = (
-'/srv/chembiohub/chembiohub_ws/src/ng-chem/dist',
+'%s/chembiohub_ws/src/ng-chem/dist' % BASE_DIR,
 )
 #Add a template dir so that the html content of index.html can be brought in as a static template when in production so login is handled by Django - see base.py in cbh_chembl_ws_extension (Index() view)
 TEMPLATE_DIRS = (
-'/srv/chembiohub/chembiohub_ws/src/ng-chem',
+'%s/chembiohub_ws/src/ng-chem' % BASE_DIR,
 )
 
-
+try:
+    from .secret import *
+except ImportError:
+    print "No Secret settings, using default secret key which is insecure"
