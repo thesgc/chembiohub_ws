@@ -62,4 +62,4 @@ Next create a chembiohub user and switch to it
     git clone https://github.com/thesgc/chembiohub_ws
     cd chembiohub_ws
     git checkout conda
-    sh install_linux64.sh 0 # Zero is the directory this will be installed into
+    bash install_linux64.sh 0 Centos # Zero is the directory this will be installed into
