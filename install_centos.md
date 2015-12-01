@@ -48,8 +48,19 @@ First install redis, supervisor and elasticsearch and apache2
     yum install httpd
     sudo service httpd start
     sudo chkconfig httpd on
+    iptables -I INPUT -p tcp -m tcp --dport 80 -j ACCEPT
+    /sbin/service iptables save
 
-
+    printf "# This file controls the state of SELinux on the system.
+# SELINUX= can take one of these three values:
+#     enforcing - SELinux security policy is enforced.
+#     permissive - SELinux prints warnings instead of enforcing.
+#     disabled - No SELinux policy is loaded.
+SELINUX=disabled
+# SELINUXTYPE= can take one of these two values:
+#     targeted - Targeted processes are protected,
+#     mls - Multi Level Security protection.
+SELINUXTYPE=targeted" > /etc/selinux
 
 
 

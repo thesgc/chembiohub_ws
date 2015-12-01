@@ -46,28 +46,30 @@ printf "$POSTGRES" > /tmp/postgres
 
 sudo mv /tmp/postgres /etc/supervisor/conf.d/$1_postgres_supervisor.conf
 
-APACHE="<Directory $(pwd)/deployment/static/>
- Options Indexes FollowSymLinks
- AllowOverride None
- Require all granted
-</Directory>
+
+REDO APACHE
+# APACHE="<Directory $(pwd)/deployment/static/>
+#  Options Indexes FollowSymLinks
+#  AllowOverride None
+#  Require all granted
+# </Directory>
 
 
-<VirtualHost *:80>
+# <VirtualHost *:80>
 
-RewriteEngine On
-RewriteCond %{REQUEST_FILENAME} !-f
-RewriteRule ^/$1$ $1/ [L,R=301]
-RewriteRule ^/\$ $1/ [L,R=301]
-RewriteRule ^\$ $1/ [L,R=301]
-ProxyTimeout 300
-ProxyPassMatch ^/$1/((?!#|\s*\$|index\.html|api|admin|login|webauth|webauthlogout).*)$ !
-AliasMatch ^/$1/static/(.*)$ $(pwd)/chembiohub_ws/deployment/static/$1
-AliasMatch ^/$1/((?!#|\s*\$|index\.html).*)$ $(pwd)/chembiohub_ws/deployment/static/$1
-ProxyPass /$1/ http://127.0.0.1:9090/$1/
-ProxyPassReverse /$1/ http://127.0.0.1:9090/$1/
+# RewriteEngine On
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteRule ^/$1$ $1/ [L,R=301]
+# RewriteRule ^/\$ $1/ [L,R=301]
+# RewriteRule ^\$ $1/ [L,R=301]
+# ProxyTimeout 300
+# ProxyPassMatch ^/$1/((?!#|\s*\$|index\.html|api|admin|login|webauth|webauthlogout).*)\$ !
+# AliasMatch ^/$1/static/(.*)\$ $(pwd)/chembiohub_ws/deployment/static/\$1
+# AliasMatch ^/$1/((?!#|\s*\$|index\.html).*)$ $(pwd)/chembiohub_ws/deployment/static/\$1
+# ProxyPass /$1/ http://127.0.0.1:9090/$1/
+# ProxyPassReverse /$1/ http://127.0.0.1:9090/$1/
 
-</Virtualhost>" 
+# </Virtualhost>" 
 
 
 
