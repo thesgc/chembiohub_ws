@@ -6,7 +6,7 @@ DEBUG=True
 
 TEMPLATE_DEBUG = DEBUG
 
-BASE_DIR = os.path.dirname(os.path.dirname(__file__))
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
 
 def get_username():
@@ -116,7 +116,7 @@ STATICFILES_DIRS = (
 )
 #Add a template dir so that the html content of index.html can be brought in as a static template when in production so login is handled by Django - see base.py in cbh_chembl_ws_extension (Index() view)
 TEMPLATE_DIRS = (
-'%s/src/ng-chem' % BASE_DIR,
+'%s/src/ng-chem/' % BASE_DIR,
 )
 
 try:
