@@ -69,7 +69,7 @@ RQ_QUEUES = {
 
 
 SESSION_COOKIE_NAME = '%s_sessionid' % ENV_NAME
-CSRF_COOKIE_NAME = '%s_csrftoken' % ENV_NAME
+CSRF_COOKIE_NAME = '%scsrftoken' % ENV_NAME
 
 STATIC_ROOT = '%s/deployment/static' % BASE_DIR
 MEDIA_ROOT = '%s/var/media/' % CONDA_ENV_PATH
