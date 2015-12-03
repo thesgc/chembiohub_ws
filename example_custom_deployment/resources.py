@@ -25,7 +25,7 @@ class AlteredCompoundBatchResource(CBHCompoundBatchResource):
         fielderrors["stringdate"] = set([])
         fielderrors["number"] = set([])
         fielderrors["integer"] = set([])
-        uncurated_data = get_uncurated_fields_from_file(python_file_obj, fielderrors)
+        uncurated_data = get_uncurated_fields_from_file(python_file_obj, fielderrors)[0]
         for index, batch in enumerate(batch_list):
             #This assumes project is set up with exactly right custom fields
             batch.custom_fields = uncurated_data[index]
