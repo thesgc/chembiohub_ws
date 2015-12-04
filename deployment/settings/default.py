@@ -149,4 +149,3 @@ for app in INSTALLED_APPS:
             }
 
 
-print LOGGING
