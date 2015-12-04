@@ -6,6 +6,7 @@ from cbh_chembl_ws_extension.parser import get_uncurated_fields_from_file
 def add_external_ids_to_file_object(python_file_obj):
     """Save the contents of the sdf file to the extenal system and fill in the external ID field
     Write the upadted file object to disc"""
+    print "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
     pass
 
 def validate_file_object_externally(python_file_obj):
