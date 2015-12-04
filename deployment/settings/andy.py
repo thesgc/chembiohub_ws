@@ -31,7 +31,6 @@ CACHES = {
     }
 }
 
-import os
 
 LOGGING = {
     'version': 1,
@@ -120,3 +119,6 @@ LOGOUT_REDIRECT_URL = "login"
 
 SESSION_COOKIE_NAME = 'dev_sessionid'
 CSRF_COOKIE_NAME = 'devcsrftoken'
+
+DEBUG=True
+TEMPLATE_DEBUG=True
