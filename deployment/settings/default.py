@@ -125,7 +125,7 @@ LOGGING = {
     },
     'handlers': {
         'console': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
             },
@@ -137,11 +137,16 @@ LOGGING = {
             'level': 'INFO',
             'propagate': True,
             },
-        }
+        },
+        
     }
 
-if DEBUG:
-    # make all loggers use the console.
-    for logger in LOGGING['loggers']:
-        LOGGING['loggers'][logger]['level'] = 'DEBUG'
-        LOGGING['handlers']['console']['level'] = "DEBUG"
+for app in INSTALLED_APPS:
+    LOGGING["loggers"][app] = {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+            }
+
+
+print LOGGING
