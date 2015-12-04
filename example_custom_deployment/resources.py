@@ -1,3 +1,10 @@
+import logging
+
+# Get an instance of a logger
+logger = logging.getLogger(__name__)
+
+
+
 from cbh_chembl_ws_extension.compounds import CBHCompoundBatchResource
 from django.http import HttpRequest
 from cbh_chembl_ws_extension.parser import get_uncurated_fields_from_file
@@ -6,7 +13,10 @@ from cbh_chembl_ws_extension.parser import get_uncurated_fields_from_file
 def add_external_ids_to_file_object(python_file_obj):
     """Save the contents of the sdf file to the extenal system and fill in the external ID field
     Write the upadted file object to disc"""
-    print "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+    
+    logger.debug("test log")
+    logger.info("test 2 log")
+    logger.error("test 3 log")
     pass
 
 def validate_file_object_externally(python_file_obj):
