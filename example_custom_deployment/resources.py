@@ -6,6 +6,7 @@ from cbh_chembl_ws_extension.parser import get_uncurated_fields_from_file
 def add_external_ids_to_file_object(python_file_obj):
     """Save the contents of the sdf file to the extenal system and fill in the external ID field
     Write the upadted file object to disc"""
+    print "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
     pass
 
 def validate_file_object_externally(python_file_obj):
@@ -25,7 +26,7 @@ class AlteredCompoundBatchResource(CBHCompoundBatchResource):
         fielderrors["stringdate"] = set([])
         fielderrors["number"] = set([])
         fielderrors["integer"] = set([])
-        uncurated_data = get_uncurated_fields_from_file(python_file_obj, fielderrors)
+        uncurated_data = get_uncurated_fields_from_file(python_file_obj, fielderrors)[0]
         for index, batch in enumerate(batch_list):
             #This assumes project is set up with exactly right custom fields
             batch.custom_fields = uncurated_data[index]

@@ -40,22 +40,6 @@ CACHES = {
 
 
 
-# LOGGING = {
-#     'version': 1,
-#     'disable_existing_loggers': False,
-#     'handlers': {
-#         'console': {
-#             'level':'INFO',
-#             'class': 'logging.StreamHandler',
-#         },
-#     },
-#     'loggers': {
-#         'django': {
-#             'handlers': ['console'],
-#             'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-#         },
-#     },
-# }
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
@@ -120,6 +104,14 @@ TEMPLATE_DIRS = (
 '%s/src/ng-chem/' % BASE_DIR,
 )
 
+try:
+    from .secret import *
+except ImportError:
+    print "No Secret settings, using default secret key which is insecure"
+
+
+#Set to 'DEBUG' to view all SQL
+DEBUG_SQL = 'INFO'
 
 LOGGING = {
     'version': 1,
@@ -142,7 +134,7 @@ LOGGING = {
     'loggers': {
         'django': {
             'handlers': ['console'],
-            'level': 'INFO',
+            'level': DEBUG_SQL,
             'propagate': True,
             },
         },
