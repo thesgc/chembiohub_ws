@@ -21,26 +21,11 @@ DATABASES = {
 }
 
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
-    }
-}
-
 
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
 
-RQ_QUEUES = {
-    'default': {
-        'USE_REDIS_CACHE': 'default',
-    },
-}
 
 
 SESSION_COOKIE_NAME = 'chembiohub_sessionid'
@@ -78,6 +63,14 @@ CACHES = {
                                                 }
         }
 }
+
+
+RQ_QUEUES = {
+    'default': {
+        'USE_REDIS_CACHE': 'chembiohub',
+    },
+}
+
 
 ES_PREFIX = 'chembiohub'
 
