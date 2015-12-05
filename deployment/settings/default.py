@@ -28,15 +28,6 @@ DATABASES = {
 }
 
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
-    }
-}
 
 
 
@@ -80,6 +71,14 @@ ENV_NAME: {
                                                 }
         }
 }
+
+
+RQ_QUEUES = {      
+    'default': {       
+        'USE_REDIS_CACHE': ENV_NAME,      
+    },     
+}
+
 
 ES_PREFIX = ENV_NAME
 
