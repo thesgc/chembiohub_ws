@@ -10,3 +10,5 @@ CSRF_COOKIE_NAME = 'devcsrftoken'
 
 DEBUG=True
 TEMPLATE_DEBUG=True
+
+FULL_RESPONSE_LOGGING = False
