@@ -30,7 +30,7 @@ class CustomAuthBackend(object):
                     user.is_staff = True
                     user.is_superuser = True
 
-                
+                user.save()
                 g, created = Group.objects.get_or_create(name="Standard Permissions Group")
                 user.groups.add(g)
                 user.save()
