@@ -122,8 +122,6 @@ CSRF_COOKIE_NAME = 'devcsrftoken'
 
 DEBUG=True
 TEMPLATE_DEBUG=True
-<<<<<<< HEAD
-=======
+
 
 FULL_RESPONSE_LOGGING = False
->>>>>>> master
