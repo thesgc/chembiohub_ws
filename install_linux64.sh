@@ -2,6 +2,7 @@
 
 
 if ! hash conda 2>/dev/null; then
+    cd ~
     wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda2-2.4.0-Linux-x86_64.sh
     bash Anaconda2-2.4.0-Linux-x86_64.sh -b    
     rm Anaconda2-2.4.0-Linux-x86_64.sh
@@ -27,7 +28,7 @@ RANDOM_PORT=$(python generate_port.py)
 
 
 
-SUPERVISOR=$"[program:$1_uwsgi]
+SUPERVISOR="[program:$1_uwsgi]
 command=$CONDA_ENV_PATH/bin/uwsgi  --http  :$RANDOM_PORT  --chmod-socket=664  --module=deployment.wsgi
 directory=$(pwd)
 environment=PATH=$PATH,CONDA_ENV_PATH=$CONDA_ENV_PATH
@@ -38,7 +39,7 @@ printf "$SUPERVISOR" > /tmp/uwsgi
 sudo mv /tmp/uwsgi /etc/supervisor/conf.d/$1_uwsgi_supervisor.conf
 
 mkdir $CONDA_ENV_PATH/var/postgressocket
-POSTGRES=$"[program:$1_postgresql]
+POSTGRES="[program:$1_postgresql]
 command=$CONDA_ENV_PATH/bin/postgres  -D  $CONDA_ENV_PATH/var/postgresdata  -c  listen_addresses=''  -c  unix_socket_directories=$CONDA_ENV_PATH/var/postgressocket
 user=$USER
 autorestart=true" 
@@ -47,7 +48,7 @@ printf "$POSTGRES" > /tmp/postgres
 sudo mv /tmp/postgres /etc/supervisor/conf.d/$1_postgres_supervisor.conf
 
 
-REDO APACHE
+#REDO APACHE
 # APACHE="<Directory $(pwd)/deployment/static/>
 #  Options Indexes FollowSymLinks
 #  AllowOverride None
