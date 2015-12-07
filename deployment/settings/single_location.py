@@ -21,42 +21,10 @@ DATABASES = {
 }
 
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
-    }
-}
 
-
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-        },
-    },
-    'loggers': {
-        'django': {
-            'handlers': ['console'],
-            'level': os.getenv('DJANGO_LOG_LEVEL', 'INFO'),
-        },
-    },
-}
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"
-
-RQ_QUEUES = {
-    'default': {
-        'USE_REDIS_CACHE': 'default',
-    },
-}
-
 
 
 
@@ -96,6 +64,14 @@ CACHES = {
         }
 }
 
+
+RQ_QUEUES = {
+    'default': {
+        'USE_REDIS_CACHE': 'chembiohub',
+    },
+}
+
+
 ES_PREFIX = 'chembiohub'
 
 
@@ -110,18 +86,52 @@ TEMPLATE_DIRS = (
 '/srv/chembiohub/chembiohub_ws/src/ng-chem',
 )
 
+#Set to 'DEBUG' to view all SQL
+DEBUG_SQL = 'INFO'
+
+LOGGING = {
+    'version': 1,
+    'formatters': {
+        'verbose': {
+            'format': '%(levelname)s %(asctime)s %(module)s %(process)d %(thread)d %(message)s'
+        },
+        'simple': {
+            'format': '%(levelname)s %(message)s'
+        },
+    },
+    'handlers': {
+        # 'sentry': {
+        #      'level': 'ERROR',
+        #      'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+        #  },
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+            'formatter': 'simple'
+            },
+        },
+    
+    'loggers': {
+        'django': {
+            'handlers': ['console'],
+            'level': DEBUG_SQL,
+            'propagate': True,
+            },
+        },
+        
+    }
 
 
-WEBSERVICES_NAME='dev'
-LOGIN_REDIRECT_URL = "http://localhost:9000/#/projects/list"
-LOGOUT_REDIRECT_URL = "login"
+# Set your DSN value
+RAVEN_CONFIG = {
+     'dsn': 'http://799d9560a5a24a6abc5383e8a4435111:ebc6d747d1654709b812974757213e85@163.1.63.22/2',
+ }
+
+for app in INSTALLED_APPS:
+    LOGGING["loggers"][app] = {
+            'handlers': ['console'],
+            'level': 'DEBUG',
+            'propagate': True,
+            }
 
 
-SESSION_COOKIE_NAME = 'dev_sessionid'
-CSRF_COOKIE_NAME = 'devcsrftoken'
-
-DEBUG=True
-TEMPLATE_DEBUG=True
-
-
-FULL_RESPONSE_LOGGING = False
