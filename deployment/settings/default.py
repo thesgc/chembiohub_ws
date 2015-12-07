@@ -28,29 +28,6 @@ DATABASES = {
 }
 
 
-CACHES = {
-    "default": {
-        "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "redis://127.0.0.1:6379/1",
-        "OPTIONS": {
-            "CLIENT_CLASS": "django_redis.client.DefaultClient",
-        }
-    }
-}
-
-
-
-
-SESSION_ENGINE = "django.contrib.sessions.backends.cache"
-SESSION_CACHE_ALIAS = "default"
-
-RQ_QUEUES = {
-    'default': {
-        'USE_REDIS_CACHE': 'default',
-    },
-}
-
-
 
 
 SESSION_COOKIE_NAME = '%s_sessionid' % ENV_NAME
@@ -58,6 +35,9 @@ CSRF_COOKIE_NAME = '%scsrftoken' % ENV_NAME
 
 STATIC_ROOT = '%s/deployment/static' % BASE_DIR
 MEDIA_ROOT = '%s/var/media/' % CONDA_ENV_PATH
+
+
+
 FLOWJS_PATH = MEDIA_ROOT + 'flow'
 
 
@@ -90,7 +70,16 @@ ENV_NAME: {
         }
 }
 
+
+RQ_QUEUES = {      
+    'default': {       
+        'USE_REDIS_CACHE': ENV_NAME,      
+    },     
+}
+
+
 ES_PREFIX = ENV_NAME
+
 
 
  
@@ -103,11 +92,6 @@ STATICFILES_DIRS = (
 TEMPLATE_DIRS = (
 '%s/src/ng-chem/' % BASE_DIR,
 )
-
-try:
-    from .secret import *
-except ImportError:
-    print "No Secret settings, using default secret key which is insecure"
 
 
 #Set to 'DEBUG' to view all SQL
@@ -124,6 +108,10 @@ LOGGING = {
         },
     },
     'handlers': {
+        # 'sentry': {
+        #      'level': 'ERROR',
+        #      'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
+        #  },
         'console': {
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
@@ -140,6 +128,12 @@ LOGGING = {
         },
         
     }
+
+
+# Set your DSN value
+RAVEN_CONFIG = {
+     'dsn': 'http://799d9560a5a24a6abc5383e8a4435111:ebc6d747d1654709b812974757213e85@163.1.63.22/2',
+ }
 
 for app in INSTALLED_APPS:
     LOGGING["loggers"][app] = {
