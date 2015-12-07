@@ -3,7 +3,8 @@ import logging
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
-
+import subprocess
+from pprint import pprint
 
 from cbh_chembl_ws_extension.compounds import CBHCompoundBatchResource
 from django.http import HttpRequest
@@ -17,13 +18,28 @@ def add_external_ids_to_file_object(python_file_obj):
     logger.debug("test log")
     logger.info("test 2 log")
     logger.error("test 3 log")
+
+    logger.info(vars(python_file_obj))
+
+    cmd_args = ['/usr/icm-3.8-4/icm64', '/home/chembiohub/scarab/ChemRegScarabPlugin.icm', '-a', 'sdf='+python_file_obj.path, 'runmode=GEN']
+
+    subprocess.call(cmd_args)
+
+    python_file_obj.path = python_file_obj.path + '_out'
+
     pass
 
 def validate_file_object_externally(python_file_obj):
     """E.G. take the sdf file and set a status field to say whether it is in the external system
     Write the upadted file object to disc"""
-    pass
+    logger.info('Hello World')
+    logger.info(vars(python_file_obj))
 
+    cmd_args = ['/usr/icm-3.8-4/icm64', '/home/chembiohub/scarab/src/helpers/ChemRegHelper/ChemRegScarabPlugin.icm', '-a', 'sdf='+python_file_obj.name, 'runmode=GEN']
+
+    subprocess.call(cmd_args)
+
+    #python_file_obj.name = python_file_obj.name + '_out'
 
 class AlteredCompoundBatchResource(CBHCompoundBatchResource):
 
@@ -31,6 +47,11 @@ class AlteredCompoundBatchResource(CBHCompoundBatchResource):
     def alter_batch_data_after_save(self, batch_list, python_file_obj):
         """Take the original sdf file and run an external process with it such that new data can be written across 
         after save of the data into ChemBioHub"""
+        cmd_args = ['/usr/icm-3.8-4/icm64', '/home/chembiohub/scarab/src/helpers/ChemRegHelper/ChemRegScarabPlugin.icm', '-a', 'sdf='+python_file_obj.name, 'runmode=INSERT']
+
+        subprocess.call(cmd_args)
+
+
         add_external_ids_to_file_object(python_file_obj)
         fielderrors = {}
         fielderrors["stringdate"] = set([])
