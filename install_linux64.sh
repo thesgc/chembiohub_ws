@@ -47,6 +47,7 @@ printf "$POSTGRES" > /tmp/postgres
 sudo mv /tmp/postgres /etc/supervisor/conf.d/$ENV_NAME_postgres_supervisor.conf
 
 
+
 #REDO APACHE
 EXCLAM='!'
 APACHE="<Directory $(pwd)/deployment/static/>
@@ -66,10 +67,8 @@ ProxyTimeout 300
 ProxyPassMatch ^/$ENV_NAME/((?$EXCLAM#|\s*\$|index\.html|api|admin|login|webauth|webauthlogout).*)\$ $EXCLAM
 AliasMatch ^/$ENV_NAME/static/(.*)\$ $(pwd)/chembiohub_ws/deployment/static/$ENV_NAME
 AliasMatch ^/$ENV_NAME/((?$EXCLAM#|\s*\$|index\.html).*)\$ $(pwd)/chembiohub_ws/deployment/static/$ENV_NAME
-ProxyPass /$ENV_NAME/ http://127.0.0.1:9090/$ENV_NAME/
-ProxyPassReverse /$ENV_NAME/ http://127.0.0.1:9090/$ENV_NAME/
-
-"
+ProxyPass /$ENV_NAME/ http://127.0.0.1:$RANDOM_PORT/$ENV_NAME/
+ProxyPassReverse /$ENV_NAME/ http://127.0.0.1:$RANDOM_PORT/$ENV_NAME/"
 
 
 

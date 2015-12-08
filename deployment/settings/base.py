@@ -201,13 +201,6 @@ INSTALLED_APPS = (
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
 
-
-# # Add raven to the list of installed apps
-# INSTALLED_APPS = INSTALLED_APPS + (
-#     # ...
-#     'raven.contrib.django.raven_compat',
-# )
-
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
