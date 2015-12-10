@@ -27,7 +27,7 @@ git submodule foreach git pull
 RANDOM_PORT=$(python generate_port.py)
 
 
-SUPERVISOR="[program:$ENV_NAME_uwsgi]
+SUPERVISOR="[program:${ENV_NAME}_uwsgi]
 command=$CONDA_ENV_PATH/bin/uwsgi  --http  :$RANDOM_PORT  --chmod-socket=664  --module=deployment.wsgi
 directory=$(pwd)
 environment=PATH=$PATH,CONDA_ENV_PATH=$CONDA_ENV_PATH
@@ -35,14 +35,16 @@ user=$USER
 autorestart=true
 redirect_stderr=true" 
 printf "$SUPERVISOR" > /tmp/uwsgi
-sudo mv /tmp/uwsgi /etc/supervisor/conf.d/$ENV_NAME_uwsgi_supervisor.conf
 
 mkdir $CONDA_ENV_PATH/var/postgressocket
-POSTGRES="[program:$ENV_NAME_postgresql]
+POSTGRES="[program:${ENV_NAME}_postgresql]
 command=$CONDA_ENV_PATH/bin/postgres  -D  $CONDA_ENV_PATH/var/postgresdata  -c  listen_addresses=''  -c  unix_socket_directories=$CONDA_ENV_PATH/var/postgressocket
 user=$USER
 autorestart=true" 
 printf "$POSTGRES" > /tmp/postgres
+
+
+sudo mv /tmp/uwsgi /etc/supervisor/conf.d/$ENV_NAME_uwsgi_supervisor.conf
 
 sudo mv /tmp/postgres /etc/supervisor/conf.d/$ENV_NAME_postgres_supervisor.conf
 
@@ -64,9 +66,9 @@ RewriteRule ^/$ENV_NAME\$ $ENV_NAME/ [L,R=301]
 RewriteRule ^/\$ $ENV_NAME/ [L,R=301]
 RewriteRule ^\$ $ENV_NAME/ [L,R=301]
 ProxyTimeout 300
-ProxyPassMatch ^/$ENV_NAME/((?$EXCLAM#|\s*\$|index\.html|api|admin|login|webauth|webauthlogout).*)\$ $EXCLAM
+ProxyPassMatch ^/$ENV_NAME/((?${EXCLAM}#|\s*\$|index\.html|api|admin|login|webauth|webauthlogout).*)\$ $EXCLAM
 AliasMatch ^/$ENV_NAME/static/(.*)\$ $(pwd)/chembiohub_ws/deployment/static/$ENV_NAME
-AliasMatch ^/$ENV_NAME/((?$EXCLAM#|\s*\$|index\.html).*)\$ $(pwd)/chembiohub_ws/deployment/static/$ENV_NAME
+AliasMatch ^/$ENV_NAME/((?${EXCLAM}#|\s*\$|index\.html).*)\$ $(pwd)/chembiohub_ws/deployment/static/$ENV_NAME
 ProxyPass /$ENV_NAME/ http://127.0.0.1:$RANDOM_PORT/$ENV_NAME/
 ProxyPassReverse /$ENV_NAME/ http://127.0.0.1:$RANDOM_PORT/$ENV_NAME/"
 

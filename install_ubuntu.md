@@ -1,3 +1,5 @@
+#!/bin/bash
+
 :'Installing ChemBio Hub with Conda
 
 Step 1:
@@ -34,14 +36,5 @@ Configure the packages'
 
 Run the install script in your home directory where the first argument is the web folder to install in'
 
-   cd ~
    bash install_linux64.sh 0 Ubuntu
 
-:'Step 6
-
-Now set up apache, as the sudoable user:'
-
-    sudo ln -s /srv/chembiohub/chembiohub_ws/deployment/conf/apache.conf /etc/apache2/sites-available/chembiohub.conf
-    sudo a2dissite 000-default
-    sudo a2ensite chembiohub
-    sudo service apache2 reload

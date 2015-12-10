@@ -6,7 +6,7 @@ notifications:
 email: false
 # Setup anaconda
 before_install:
-- bash scripts/as_sudoable_user.sh
+- bash install_ubuntu.md
 
 # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
 - sudo rm -rf /dev/shm
