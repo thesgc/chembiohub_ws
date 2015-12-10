@@ -14,11 +14,11 @@ if ! hash conda 2>/dev/null; then
      conda config --add channels https://conda.anaconda.org/clyde_fare
 fi
 
-conda create -q --file anaconda_requirements.txt -n $ENV_NAME
+conda create -q -y --file anaconda_requirements.txt -n $ENV_NAME
 
 source activate $ENV_NAME
 
-pip install -r pip_requirements.txt
+pip install -r -q pip_requirements.txt
 
 git submodule init 
 git submodule update
