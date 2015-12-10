@@ -98,6 +98,8 @@ if [ "$2" == "Centos" ]; then
 fi
 
 initdb -D $CONDA_ENV_PATH/var/postgresdata
+$CONDA_ENV_PATH/bin/postgres  -D  $CONDA_ENV_PATH/var/postgresdata  -c  listen_addresses=''  -c  unix_socket_directories=$CONDA_ENV_PATH/var/postgressocket &
+sleep 5
 createdb -h $CONDA_ENV_PATH/var/postgressocket/ $ENV_NAME_db
 psql  -h $CONDA_ENV_PATH/var/postgressocket -c "create extension hstore;create extension rdkit;" $ENV_NAME_db
 
