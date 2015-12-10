@@ -36,5 +36,8 @@ Configure the packages'
 
 Run the install script in your home directory where the first argument is the web folder to install in'
 
+if [$USER -ne "vagrant"]: then
    bash install_linux64.sh 0 Ubuntu
-
+else: then
+   bash install_linux64.sh dev Ubuntu
+fi

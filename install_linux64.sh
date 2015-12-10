@@ -108,3 +108,11 @@ python manage.py reindex_compounds
 python manage.py reindex_datapoint_classifications
 python manage.py createsuperuser
 python manage.py collectstatic
+
+
+
+cd $CONDA_ENV_PATH/var
+wget http://www.iupac.org/fileadmin/user_upload/publications/e-resources/inchi/1.03/INCHI-1-BIN.zip
+unzip INCHI-1-BIN.zip
+gunzip INCHI-1-BIN/linux/64bit/inchi-1.gz
+chmod +x INCHI-1-BIN/linux/64bit/inchi-1
