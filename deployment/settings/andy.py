@@ -19,7 +19,7 @@ DATABASES = {
         'PORT': '', # Set to empty string for default. Not used with sqlite3.
     },
 }
-
+ENV_NAME = "dev"
 
 CACHES = {
     "default": {
@@ -30,8 +30,8 @@ CACHES = {
         }
     }
 }
-EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
-EMAIL_FILE_PATH = '/tmp/app-messages' # change this to a proper location
+# EMAIL_BACKEND = 'django.core.mail.backends.filebased.EmailBackend'
+# EMAIL_FILE_PATH = '/tmp/app-messages' # change this to a proper location
 
 LOGGING = {
     'version': 1,
@@ -48,6 +48,15 @@ LOGGING = {
         },
     },
 }
+
+
+EMAIL_HOST = 'smtp.ox.ac.uk'
+
+
+# The email address to send on behalf of
+SERVER_EMAIL = 'andrew.stretton@sgc.ox.ac.uk'
+
+
 
 SESSION_ENGINE = "django.contrib.sessions.backends.cache"
 SESSION_CACHE_ALIAS = "default"

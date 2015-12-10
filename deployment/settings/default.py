@@ -86,6 +86,8 @@ ES_PREFIX = ENV_NAME
 STATIC_URL = '/%s/static/' % ENV_NAME
 
 STATICFILES_DIRS = (
+'%s/src/ng-chem' % BASE_DIR,
+
 '%s/src/ng-chem/dist' % BASE_DIR,
 )
 #Add a template dir so that the html content of index.html can be brought in as a static template when in production so login is handled by Django - see base.py in cbh_chembl_ws_extension (Index() view)
