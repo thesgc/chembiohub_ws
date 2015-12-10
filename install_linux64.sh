@@ -1,6 +1,6 @@
 #!/bin/bash
 ENV_NAME=$1
-
+OLD_PATH="$PATH"
 if ! hash conda 2>/dev/null; then
     
     wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda2-2.4.0-Linux-x86_64.sh 
@@ -8,7 +8,8 @@ if ! hash conda 2>/dev/null; then
     rm Anaconda2-2.4.0-Linux-x86_64.sh
      echo "export PATH=$HOME/anaconda2/bin/:\$PATH" >> ~/.bashrc
      #source ~/.bashrc
-     export PATH=$HOME/anaconda2/bin/:\$PATH
+
+     export PATH=$HOME/anaconda2/bin/:$PATH
      conda config --add channels https://conda.anaconda.org/jeprescottroy
      conda config --add channels https://conda.anaconda.org/rdkit
      conda config --add channels https://conda.anaconda.org/clyde_fare
@@ -16,7 +17,10 @@ fi
 
 conda create -q -y --file anaconda_requirements.txt -n $ENV_NAME
 
-source activate $ENV_NAME
+#source activate $ENV_NAME
+
+export CONDA_ENV_PATH=$HOME/anaconda2/envs/$ENV_NAME
+export PATH=$CONDA_ENV_PATH/bin:$OLD_PATH
 
 pip install -r -q pip_requirements.txt
 
@@ -24,6 +28,9 @@ git submodule init
 git submodule update
 git submodule foreach git checkout master 
 git submodule foreach git pull
+
+
+
 
 RANDOM_PORT=$(python generate_port.py)
 
