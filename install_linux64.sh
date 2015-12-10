@@ -14,7 +14,7 @@ if ! hash conda 2>/dev/null; then
      conda config --add channels https://conda.anaconda.org/clyde_fare
 fi
 
-conda create --file anaconda_requirements.txt -n $ENV_NAME
+conda create -q --file anaconda_requirements.txt -n $ENV_NAME
 
 source activate $ENV_NAME
 
