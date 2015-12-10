@@ -22,7 +22,7 @@ conda create -q -y --file anaconda_requirements.txt -n $ENV_NAME
 export CONDA_ENV_PATH=$HOME/anaconda2/envs/$ENV_NAME
 export PATH=$CONDA_ENV_PATH/bin:$OLD_PATH
 
-pip install -r -q pip_requirements.txt
+pip install -r pip_requirements.txt
 
 git submodule init 
 git submodule update
