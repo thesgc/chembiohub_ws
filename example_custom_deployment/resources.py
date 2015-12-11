@@ -44,7 +44,7 @@ def validate_file_object_externally(python_file_obj):
 class AlteredCompoundBatchResource(CBHCompoundBatchResource):
 
 
-    def alter_batch_data_after_save(self, batch_list, python_file_obj):
+    def alter_batch_data_after_save(self, batch_list, python_file_obj, request):
         """Take the original sdf file and run an external process with it such that new data can be written across 
         after save of the data into ChemBioHub"""
         cmd_args = ['/usr/icm-3.8-4/icm64', '/home/chembiohub/scarab/src/helpers/ChemRegHelper/ChemRegScarabPlugin.icm', '-a', 'sdf='+python_file_obj.name, 'runmode=INSERT']
@@ -64,6 +64,6 @@ class AlteredCompoundBatchResource(CBHCompoundBatchResource):
             batch.save()
 
 
-    def preprocess_sdf_file(self, python_file_obj):
+    def preprocess_sdf_file(self, python_file_obj, request):
         """Hook to preprocess an sdf file - assumes that the file will be written to disc"""
         validate_file_object_externally(python_file_obj)
