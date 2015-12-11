@@ -21,16 +21,49 @@ This will download the vagrant box from our internet location and you can then l
 
     vagrant ssh
   
-You should now see the prompt to show that the  virtualenv is enabled. Addtionally, openbabel python libraries are on the classpath.
+You should now see the prompt to show that the  virtualenv is enabled. 
+
+
+To get the front end dependencies run:
+
+   cd ~/chembiohub_ws/src/ng-chem
+   npm install && bower install
+
+In order to migrate the database to the latest version run:
+
+    cd ~/chembiohub_ws/
+    python manage.py migrate && python manage.py collectstatic
+
+To run the back end server run
+
 
     cd ~/chembiohub_ws/
     python manage.py runserver 0.0.0.0:8000
 
-You will now have the server running inside the vagrant box.
+You will now have the server running inside the vagrant box. 
 
-In order to take advantage of live reload on the front end then we use grunt serve for development.
+Next, open another terminal window and run
 
-On your local box open a second terminal window and change directory to the ng-chem repository
+   vagrant ssh
+   cd  ~/chembiohub_ws/src/ng-chem
+   grunt serve
+
+You can then access the login page via
+
+
+    http://localhost:9000/dev/login
+
+The username and password are both
+
+   vagrant
+
+
+
+For a production installation please get in touch and we will help you get apache or nginx configured, guides are coming soon.
+
+
+
+Alternatively to run the grunt on your local box open a second terminal window and change directory to the ng-chem repository
     cd src/ng-chem
 
 Install the bower dependencies using the following for an ubuntu machine
@@ -39,7 +72,6 @@ Install the bower dependencies using the following for an ubuntu machine
   sudo apt-get install -y nodejs-legacy
   sudo apt-get install -y ruby gem ruby-dev
   sudo gem install compass
-
   sudo npm install -g bower grunt-cli coffee-script
 
 You can then run

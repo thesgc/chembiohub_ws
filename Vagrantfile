@@ -10,7 +10,7 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # please see the online documentation at vagrantup.com.
 
   # Every Vagrant virtual environment requires a box to build off of.
-  config.vm.box = "ubuntu/trusty64-juju"
+  config.vm.box = "https://chembiohub.ox.ac.uk/package.box"
 
   config.vm.network "forwarded_port", guest: 8000, host: 8000, auto_correct: true
 
