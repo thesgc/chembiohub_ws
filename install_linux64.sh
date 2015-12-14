@@ -103,11 +103,11 @@ sleep 5
 createdb -h $CONDA_ENV_PATH/var/postgressocket/ ${ENV_NAME}_db
 psql  -h $CONDA_ENV_PATH/var/postgressocket -c "create extension hstore;create extension rdkit;" ${ENV_NAME}_db
 
-python manage.py migrate
-python manage.py reindex_compounds
-python manage.py reindex_datapoint_classifications
-python manage.py createsuperuser
-python manage.py collectstatic
+    python manage.py migrate
+    python manage.py reindex_compounds
+    python manage.py reindex_datapoint_classifications
+    python manage.py createsuperuser
+    python manage.py collectstatic
 
 
 
