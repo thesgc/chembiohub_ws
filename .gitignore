@@ -63,3 +63,4 @@ deployment/settings/stagingsecret.py
 deployment/settings/secret.py
 deployment/static/
 *.xls*
+server_configs.py
