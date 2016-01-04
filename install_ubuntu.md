@@ -11,6 +11,7 @@ Create a virtual machine - Ubuntu 14.04 64 bit server and a folder for the app t
 
 Install elasticsearch'
 
+    sudo apt-get install software-properties-common
     wget https://gist.githubusercontent.com/ricardo-rossi/8265589463915837429d/raw/c4a4d1b1cbbbeeecdf90cb496914e50ce2120e2b/ElasticSearch.sh
     sudo sh ElasticSearch.sh 1.7
     sudo update-rc.d elasticsearch defaults
@@ -38,6 +39,13 @@ Run the install script in your home directory where the first argument is the we
 
 if [$USER -ne "vagrant"]: then
    bash install_linux64.sh 0 Ubuntu
+else if [$RD_BASE = "/home/chembl/rdkit"]: then
+   sudo mkdir /srv/chembiohub
+   sudo chown -R vagrant /srv/chembiohub
+   cd /srv/chembiohub
+   git clone  --recursive  git@github.com:thesgc/chembiohub_ws.git
+   cd chembiohub_ws
+   bash install_linux64.sh chembiohub Ubuntu
 else: then
    bash install_linux64.sh dev Ubuntu
 fi
