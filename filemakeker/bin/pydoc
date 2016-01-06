@@ -1,5 +1,0 @@
-#!/srv/chembiohub/chembiohub_ws/filemakeker/bin/python
-
-import pydoc
-if __name__ == '__main__':
-    pydoc.cli()
