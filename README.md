@@ -27,7 +27,7 @@ You should now see the prompt to show that the  virtualenv is enabled.
 To get the front end dependencies run:
 
    cd ~/chembiohub_ws/src/ng-chem
-   npm install && bower install
+   sudo npm install && bower install
 
 In order to migrate the database to the latest version run:
 
