@@ -9,6 +9,8 @@ All relevant code is in the /src/ directory as sub repositories
 
 These are installed in your local anaconda install as shown in  [install anaconda](install_anaconda.rst) but this has been done for you on the vagrant install.
 
+Current install instructions do not work on Windows but work on Mac and Linux.
+
 In order to get started using vagrant then run to get all the subrepos:
 
     git clone  --recursive  git@github.com:thesgc/chembiohub_ws.git
@@ -26,8 +28,8 @@ You should now see the prompt to show that the  virtualenv is enabled.
 
 To get the front end dependencies run:
 
-   cd ~/chembiohub_ws/src/ng-chem
-   sudo npm install && bower install
+    cd ~/chembiohub_ws/src/ng-chem
+    sudo npm install && bower install
 
 In order to migrate the database to the latest version run:
 
@@ -36,7 +38,6 @@ In order to migrate the database to the latest version run:
 
 To run the back end server run
 
-
     cd ~/chembiohub_ws/
     python manage.py runserver 0.0.0.0:8000
 
@@ -44,18 +45,17 @@ You will now have the server running inside the vagrant box.
 
 Next, open another terminal window and run
 
-   vagrant ssh
-   cd  ~/chembiohub_ws/src/ng-chem
-   grunt serve
+    vagrant ssh
+    cd  ~/chembiohub_ws/src/ng-chem
+    grunt serve
 
 You can then access the login page via
-
 
     http://localhost:9000/dev/login
 
 The username and password are both
 
-   vagrant
+    vagrant
 
 
 
@@ -64,29 +64,32 @@ For a production installation please get in touch and we will help you get apach
 
 
 Alternatively to run the grunt on your local box open a second terminal window and change directory to the ng-chem repository
+
     cd src/ng-chem
 
 Install the bower dependencies using the following for an ubuntu machine
-   sudo apt-get install -y nodejs
-  sudo apt-get install -y npm
-  sudo apt-get install -y nodejs-legacy
-  sudo apt-get install -y ruby gem ruby-dev
-  sudo gem install compass
-  sudo npm install -g bower grunt-cli coffee-script
+
+    sudo apt-get install -y nodejs
+    sudo apt-get install -y npm
+    sudo apt-get install -y nodejs-legacy
+    sudo apt-get install -y ruby gem ruby-dev
+    sudo gem install compass
+    sudo npm install -g bower grunt-cli coffee-script
 
 You can then run
-   npm install
-   bower install
+
+    npm install
+    bower install
 
 You can then run the server using
 
-   grunt serve
+    grunt serve
    
 This will allow the server to run locally with live reload on port 9000
 
 In order to create a superuser run:
 
-   python manage.py createsuperuser
+    python manage.py createsuperuser
    
 in the vagrant propmt
 
@@ -95,7 +98,9 @@ Log in to the site by going to the login URL at:
     http://localhost:9000/dev/login
 
 Add a project for your new user by going to the admin URL at
+
     localhost:8000/dev/admin
+    
 Next add a custom field config for the project
 
     
