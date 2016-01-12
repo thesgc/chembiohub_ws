@@ -70,17 +70,17 @@ RQ_QUEUES = {
 
 
 
-SESSION_COOKIE_NAME = 'chembiohub_sessionid'
-CSRF_COOKIE_NAME = 'chembiohubcsrftoken'
+SESSION_COOKIE_NAME = 'dev_sessionid'
+CSRF_COOKIE_NAME = 'devcsrftoken'
 STATIC_ROOT = '/srv/chembiohub/chembiohub_ws/deployment/static'
 MEDIA_ROOT = '/home/chembiohub/media/'
 FLOWJS_PATH = MEDIA_ROOT + 'flow'
 
 
 LOGIN_REDIRECT_URL = '/chembiohub/#/projects/list'
-LOGIN_URL = '/chembiohub/login'
-LOGOUT_REDIRECT_URL = '/chembiohub/login'
-WEBSERVICES_NAME='chembiohub/api'
+LOGIN_URL = '/dev/login'
+LOGOUT_REDIRECT_URL = '/dev/login'
+WEBSERVICES_NAME='dev/api'
 
 INCHI_BINARIES_LOCATION = {"1.02" :"/srv/chembiohub/INCHI-1-BIN/linux/64bit/inchi-1"}
 
