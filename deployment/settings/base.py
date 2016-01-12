@@ -195,6 +195,7 @@ INSTALLED_APPS = (
   'cbh_chembl_id_generator',
   'solo',
     "django_rq",
+    "ckeditor",
 
    )
 
@@ -220,4 +221,12 @@ OPEN_BABEL_EXECUTABLE = "/home/chembiohub/openbabel-2.3.2/build/bin/babel"
 ALLOWED_INCLUDE_ROOTS = ("/home/vagrant/",'/var/www/chembiohub_ws/')
 
 ALLOWED_HOSTS = [ "staging.chembiohub.ox.ac.uk", "chembiohub.ox.ac.uk"]
+
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 200,
+        'width': 200,
+    },
+}
 
