@@ -28,7 +28,9 @@ conda create -q -y --file anaconda_requirements.txt -n $ENV_NAME
 export CONDA_ENV_PATH=$(conda info | grep "envs dir" | cut -c 25-)/$ENV_NAME
 export PATH=$CONDA_ENV_PATH/bin:$OLD_PATH
 printf ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>conda"
+printf "\n"
 printf $CONDA_ENV_PATH
+printf "\n"
 printf $PATH
 
 pip install -r pip_requirements.txt
@@ -70,7 +72,7 @@ python manage.py reindex_compounds
 python manage.py reindex_datapoint_classifications
 
 
-if [ "$USER" ne "travis" ]; then
+if [ "$USER" -ne "travis" ]; then
     python manage.py createsuperuser
     python manage.py collectstatic
 
@@ -126,7 +128,7 @@ autorestart=true"
 fi
 
 
-if [ "$2" == "Ubuntu" ]; then
+if [ "$2" -eq "Ubuntu" ]; then
     sudo service supervisor restart
     printf "$APACHE" > /tmp/apache
     sudo mv /tmp/apache /etc/apache2/sites-available/${ENV_NAME}_chembiohub.conf
@@ -134,7 +136,7 @@ if [ "$2" == "Ubuntu" ]; then
     sudo service apache2 reload
 fi
 
-if [ "$2" == "Centos" ]; then
+if [ "$2" -eq "Centos" ]; then
     sudo service supervisord restart
     printf "$APACHE" > /etc/httpd/conf.d/$ENV_NAME_chembiohub.conf
     sudo /etc/init.d/httpd graceful
