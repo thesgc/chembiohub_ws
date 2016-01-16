@@ -26,11 +26,7 @@ conda create -q -y --file anaconda_requirements.txt -n $ENV_NAME
 
 #source activate $ENV_NAME
 
-condap=$(conda info | grep  root)
-IFS=' ' read -a myarray <<< "$condap"
-
-
-export CONDA_ENV_PATH=${myarray[3]}/envs/$ENV_NAME
+export CONDA_ENV_PATH=${conda info | grep default | cut -c 25-}
 export PATH=$CONDA_ENV_PATH/bin:$OLD_PATH
 
 
