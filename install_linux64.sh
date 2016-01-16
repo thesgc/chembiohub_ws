@@ -3,8 +3,7 @@ ENV_NAME=$1
 OLD_PATH="$PATH"
 
 
-if [ -x "$(command -v conda)" ]
-then
+
     wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda2-2.4.0-Linux-x86_64.sh 
     if [ $RD_BASE = "/home/chembl/rdkit" ]
     then
@@ -20,7 +19,7 @@ then
      conda config --add channels https://conda.anaconda.org/jeprescottroy
      conda config --add channels https://conda.anaconda.org/rdkit
      conda config --add channels https://conda.anaconda.org/clyde_fare
-fi
+
 
 conda create -q -y --file anaconda_requirements.txt -n $ENV_NAME
 
