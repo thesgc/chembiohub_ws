@@ -1,4 +1,4 @@
-language: c
+language: java
 #- 3.3
 notifications:
 email: false
