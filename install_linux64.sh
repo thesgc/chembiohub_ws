@@ -1,4 +1,7 @@
 #!/bin/bash
+
+set -e
+
 ENV_NAME=$1
 OLD_PATH="$PATH"
 
