@@ -4,13 +4,15 @@ notifications:
 email: false
 # Setup anaconda
 before_install:
+
+install:
+
 - bash install_ubuntu.md
 
 # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
 - sudo rm -rf /dev/shm
 - sudo ln -s /run/shm /dev/shm
 # Install packages
-install:
 
 script:
 - python generate_port.py
