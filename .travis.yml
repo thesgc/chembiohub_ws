@@ -16,19 +16,3 @@ install:
 
 script:
 - python generate_port.py
-
-# - conda install --yes python=$TRAVIS_PYTHON_VERSION pip pandas numexpr Cython pytables matplotlib pillow lxml
-# # Coverage packages are on my binstar channel
-# # - conda install --yes -c dan_blanchard python-coveralls nose-cov
-# - pip install -r requirements/test.txt
-# - conda create --yes -m -n chembiocrunch pip pandas numexpr Cython pytables matplotlib pillow lxml
-# - source activate chembiocrunch
-# - pip install -r requirements/test.txt
-# Run test
-# script:
-# -
-# - nosetests --with-cov --cov YOUR_PACKAGE_NAME_HERE --cov-config .coveragerc --logging-level=INFO
-# Calculate coverage
-# after_success:
-# - coveralls --config_file .coveragerc
-#Thanks to https://gist.github.com/dan-blanchard/7045057
