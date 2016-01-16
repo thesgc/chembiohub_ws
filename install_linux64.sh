@@ -38,16 +38,16 @@ git submodule update
 git submodule foreach git checkout master 
 git submodule foreach git pull
 
-
+FOLDER=$(pwd)
 
 cd $CONDA_ENV_PATH/var
-wget http://www.iupac.org/fileadmin/user_upload/publications/e-resources/inchi/1.03/INCHI-1-BIN.zip
+wget http://www.iupac.org/fileadmin/user_upload/publications/e-resources/inchi/1.03/INCHI-1-BIN.zip 
 unzip INCHI-1-BIN.zip
 gunzip INCHI-1-BIN/linux/64bit/inchi-1.gz
 chmod +x INCHI-1-BIN/linux/64bit/inchi-1
 
 
-
+cd $FOLDER
 
 mkdir -p $CONDA_ENV_PATH/var/postgressocket
 initdb -D $CONDA_ENV_PATH/var/postgresdata
