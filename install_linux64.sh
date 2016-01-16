@@ -28,7 +28,9 @@ conda create -q -y --file anaconda_requirements.txt -n $ENV_NAME
 
 export CONDA_ENV_PATH=$(conda info | grep "envs dir" | cut -c 25-)/$ENV_NAME
 export PATH=$CONDA_ENV_PATH/bin:$OLD_PATH
-
+printf ">>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>conda"
+printf $CONDA_ENV_PATH
+printf $PATH
 
 pip install -r pip_requirements.txt
 
