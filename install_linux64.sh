@@ -3,10 +3,10 @@ ENV_NAME=$1
 OLD_PATH="$PATH"
 
 
-if [-x "$(command -v conda)"]
+if [ -x "$(command -v conda)" ]
 then
     wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda2-2.4.0-Linux-x86_64.sh 
-    if [$RD_BASE = "/home/chembl/rdkit"]
+    if [ $RD_BASE = "/home/chembl/rdkit" ]
     then
         bash Anaconda2-2.4.0-Linux-x86_64.sh -b -p /srv/chembiohub/anaconda2
     else
@@ -71,7 +71,7 @@ python manage.py reindex_compounds
 python manage.py reindex_datapoint_classifications
 
 
-if ["$USER" ne "travis"]; then
+if [ "$USER" ne "travis" ]; then
     python manage.py createsuperuser
     python manage.py collectstatic
 
