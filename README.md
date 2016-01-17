@@ -54,7 +54,6 @@ The username and password are both
     vagrant
 
 
-
 For a production installation please get in touch and we will help you get apache or nginx configured, guides are coming soon.
 
 
