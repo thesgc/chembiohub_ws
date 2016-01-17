@@ -24,6 +24,7 @@ DATABASES = {
         'PASSWORD': '', # Not used witis oracle
         'HOST': os.getenv("CONDA_ENV_PATH") + '/var/postgressocket', # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '', # Set to empty string for default. Not used with sqlite3.
+        'TEST_NAME' : 'tester_cbh_chembl'
     },
 }
 
