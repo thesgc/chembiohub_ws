@@ -19,7 +19,7 @@ This will download the vagrant box from our internet location and you can then l
 
     vagrant ssh
   
-You should now see the prompt to show that the  virtualenv is enabled. 
+You should now see the prompt to show that the  virtualenv is enabled and you are logged on to the vagrant box. 
 
 
 To get the front end dependencies run:
