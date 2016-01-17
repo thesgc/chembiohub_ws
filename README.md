@@ -57,7 +57,6 @@ The username and password are both
 For a production installation please get in touch and we will help you get apache or nginx configured, guides are coming soon.
 
 
-
 Alternatively to run the grunt on your local box open a second terminal window and change directory to the ng-chem repository
 
     cd src/ng-chem
