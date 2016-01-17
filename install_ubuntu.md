@@ -37,15 +37,17 @@ Configure the packages'
 
 Run the install script in your home directory where the first argument is the web folder to install in'
 
-    if [$USER -ne "vagrant"]: then
+    if [ $USER -ne "vagrant" ]
+    then
        bash install_linux64.sh 0 Ubuntu
-    elif [$RD_BASE = "/home/chembl/rdkit"]: then
+    elif [ $RD_BASE = "/home/chembl/rdkit" ]
+    then
        sudo mkdir /srv/chembiohub
        sudo chown -R vagrant /srv/chembiohub
        cd /srv/chembiohub
        git clone  --recursive  git@github.com:thesgc/chembiohub_ws.git
        cd chembiohub_ws
        bash install_linux64.sh chembiohub Ubuntu
-    else: then
+    else
        bash install_linux64.sh dev Ubuntu
     fi

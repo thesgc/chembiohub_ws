@@ -1,13 +1,9 @@
 chembiohub_ws
 =============
 
-A django project holder for the chembiohub web services project, submodules will be used for the app projects which are in concurrent development.
-
-The concept of the project is to extend chembl_core_model and chembl_webservices to provide additional functionality. This will then be exposed in a separate angularjs app.
+The main holder project for ChemBio Hub Platform including back end web services, database and front end code all as separate submodules
 
 All relevant code is in the /src/ directory as sub repositories
-
-These are installed in your local anaconda install as shown in  [install anaconda](install_anaconda.rst) but this has been done for you on the vagrant install.
 
 Current install instructions do not work on Windows but work on Mac and Linux.
 
@@ -23,7 +19,7 @@ This will download the vagrant box from our internet location and you can then l
 
     vagrant ssh
   
-You should now see the prompt to show that the  virtualenv is enabled. 
+You should now see the prompt to show that the  virtualenv is enabled and you are logged on to the vagrant box. 
 
 
 To get the front end dependencies run:
@@ -113,6 +109,6 @@ Other project permissions can be edited on a per-user or per group basis
 
 
 
-All of these are in development mode only, for a production install you will need to set up an appropriate settings file and follow the instructions in [install anaconda](install_anaconda.rst) 
+All of these are in development mode only, for a production install you will need to set up an appropriate settings file and follow the instructions in [install ubuntu](install_ubuntu.md) or [install centos](install_centos.md).
 
 

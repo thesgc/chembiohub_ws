@@ -8,7 +8,6 @@ TEMPLATE_DEBUG = DEBUG
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
-
 def get_username():
     return pwd.getpwuid( os.getuid() )[ 0 ]
 
@@ -24,11 +23,9 @@ DATABASES = {
         'PASSWORD': '', # Not used witis oracle
         'HOST': os.getenv("CONDA_ENV_PATH") + '/var/postgressocket', # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '', # Set to empty string for default. Not used with sqlite3.
+        'TEST_NAME' : 'dev_db'
     },
 }
-
-
-
 
 SESSION_COOKIE_NAME = '%s_sessionid' % ENV_NAME
 CSRF_COOKIE_NAME = '%scsrftoken' % ENV_NAME
