@@ -63,7 +63,6 @@ SELINUX=disabled
 SELINUXTYPE=targeted" > /etc/selinux
 
 
-
 Next create a chembiohub user and switch to it
 
     sudo adduser chembiohub
