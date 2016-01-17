@@ -15,4 +15,5 @@ install:
 # Install packages
 
 script:
-- python generate_port.py
+- cd src/cbh_datastore_ws/cbh_datastore_ws
+- behave
