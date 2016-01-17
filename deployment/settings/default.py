@@ -8,7 +8,6 @@ TEMPLATE_DEBUG = DEBUG
 
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
-
 def get_username():
     return pwd.getpwuid( os.getuid() )[ 0 ]
 
