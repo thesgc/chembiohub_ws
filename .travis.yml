@@ -15,7 +15,8 @@ install:
 # Install packages
 
 script:
-- export PATH=$HOME/anaconda2/bin/:$PATH
+- export PROJECT_HOME=$(pwd)
+- export PATH=$PROJECT_HOME:$HOME/anaconda2/bin/:$PATH
 - source activate dev
 - cd src/cbh_datastore_ws/cbh_datastore_ws
 - export DJANGO_SETTINGS_MODULE="deployment.settings.default"
