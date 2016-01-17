@@ -27,9 +27,6 @@ DATABASES = {
     },
 }
 
-
-
-
 SESSION_COOKIE_NAME = '%s_sessionid' % ENV_NAME
 CSRF_COOKIE_NAME = '%scsrftoken' % ENV_NAME
 
