@@ -41,6 +41,8 @@ def deploy():
         with cd(env.directory):
             sudo("git pull origin master", user=env.user_running_chembiohub)
             sudo("git submodule foreach git pull origin master", user=env.user_running_chembiohub)
+            sudo("conda install -y --file anaconda_requirements.txt" , user=env.user_running_chembiohub)
+            sudo("pip install -r pip_requirements.txt", user=env.user_running_chembiohub)
             sudo("python manage.py migrate", user=env.user_running_chembiohub)
 
         with cd(env.directory + "/src/ng-chem"):
