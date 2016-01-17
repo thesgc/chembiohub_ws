@@ -109,6 +109,6 @@ Other project permissions can be edited on a per-user or per group basis
 
 
 
-All of these are in development mode only, for a production install you will need to set up an appropriate settings file and follow the instructions in [install anaconda](install_anaconda.rst) 
+All of these are in development mode only, for a production install you will need to set up an appropriate settings file and follow the instructions in [install ubuntu](insal_ubuntu.md) 
 
 
