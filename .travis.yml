@@ -18,5 +18,5 @@ script:
 - export PATH=$HOME/anaconda2/bin/:$PATH
 - source activate dev
 - cd src/cbh_datastore_ws/cbh_datastore_ws
-- export DJANGO_SETTINGS_MODULE = "deployment.settings.default"
+- export DJANGO_SETTINGS_MODULE="deployment.settings.default"
 - behave
