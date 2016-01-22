@@ -253,29 +253,46 @@ CONDA_ENV_PATH = os.getenv("CONDA_ENV_PATH")
 host = CONDA_ENV_PATH + "/var/postgressocket"
 database_path = CONDA_ENV_PATH + "/var/"
 
+
+class TClient(TestApiClient):
+
+    def get_content_type(self, short_format):
+        """
+        Given a short name (such as ``json`` or ``xml``), returns the full
+        content-type for it (``application/json`` or ``application/xml`` in
+        this case).
+        """
+        print (short_format)
+        return self.serializer.content_types.get(short_format, 'json')
+
 def before_all(context):
     from cbh_datastore_ws.features.steps.datastore_realdata import create_realdata, project
     from subprocess import Popen, PIPE, call
-    process = Popen(['git', 'log', '--format="%H"', '-n', '1'], stdout=PIPE)
+    process = Popen(['python', 'manage.py', 'migrate', '--list'], stdout=PIPE)
     commit_based_filename, error = process.communicate()
-    commit_based_filename = database_path + str(commit_based_filename[1:-2])
+
+    import hashlib
+    h = hashlib.md5(commit_based_filename.encode())
+    commit_based_filename = h.hexdigest()
+    
+    commit_based_filename = database_path + commit_based_filename
     context.commit_based_filename = commit_based_filename
     print(commit_based_filename)
-
     
-    call(
-        "dropdb dev_db --if-exists -h %s" % host , shell=True)
-    call(
-        "createdb dev_db -h %s" % host, shell=True)
+    if not os.path.isfile(commit_based_filename):
+        call(
+            "dropdb dev_db --if-exists -h %s" % host , shell=True)
+        call(
+            "createdb dev_db -h %s" % host, shell=True)
 
-    call('psql -h %s -c "create extension hstore;create extension rdkit;" dev_db' % host, shell=True)
+        call('psql -h %s -c "create extension hstore;create extension rdkit;" dev_db' % host, shell=True)
 
-    call(
-        "python manage.py migrate", shell=True)   
-    call(
-        "pg_dump dev_db -Fc -h %s > %s" % (host, commit_based_filename) , shell=True)    
-        
-    pass
+        call(
+            "python manage.py migrate", shell=True)   
+        call(
+            "pg_dump dev_db -Fc -h %s > %s" % (host, commit_based_filename) , shell=True)    
+            
+        pass
     # Even though DJANGO_SETTINGS_MODULE is set, this may still be
     # necessary. Or it may be simple CYA insurance.
 
@@ -321,7 +338,7 @@ def before_scenario(context, scenario):
     from django.test.simple import DjangoTestSuiteRunner
     context.runner = DjangoTestSuiteRunner(interactive=False)
 
-    context.api_client = TestApiClient()
+    context.api_client = TClient()
     context.test_case = Tester()
 
     from cbh_chembl_model_extension.models import CBHCompoundBatch
@@ -330,10 +347,10 @@ def before_scenario(context, scenario):
     from django.contrib.auth.models import User, Group
     context.dfc =None
     context.response = None
-    context.user = User.objects.create(username="testuser")
+    context.user ,created  = User.objects.get_or_create(username="testuser")
     context.user.set_password("testuser")
     context.user.save()
-    context.superuser = User.objects.create(username="superuser")
+    context.superuser ,created = User.objects.get_or_create(username="superuser")
     context.superuser.set_password("superuser")
     context.superuser.is_superuser = True
     context.superuser.is_staff = True
@@ -358,8 +375,11 @@ def after_scenario(context, scenario):
 def after_all(context):
     # from cbh_datastore_model.models import DataPointClassificationPermission, DataPointClassification
     from cbh_datastore_ws.resources import reindex_datapoint_classifications
+    from django.contrib.auth.models import User, Group
 
     reindex_datapoint_classifications()
+    context.superuser, created  = User.objects.get_or_create(username="superuser")
+    context.superuser.set_password("superuser")
     # context.api_client.client.logout()
     from django import db
     db.close_connection()

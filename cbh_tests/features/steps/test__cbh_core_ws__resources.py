@@ -5,6 +5,15 @@ from cbh_datastore_model.models import DataPoint, DataPointClassification, DataP
 from django.db import IntegrityError
 from django.contrib.auth.models import User
 
+
+@then("I can list the users on the system")
+def users(context):
+    from django.conf import settings
+    resp = context.api_client.client.get("/" +settings.WEBSERVICES_NAME + "/users/")
+    context.test_case.assertHttpOK(resp)
+
+
+
 @given("testuser")
 def step(context):
     pass
@@ -13,3 +22,13 @@ def step(context):
 @when("I log in testuser")
 def logintestuser(context):
     context.api_client.client.login(username="testuser", password="testuser")
+
+
+
+@then("I can see the skinning configuration")
+def skinning(context):
+    from django.conf import settings
+    resp = context.api_client.client.get("/" +settings.WEBSERVICES_NAME + "/cbh_skinning/")
+    context.test_case.assertHttpOK(resp)
+
+    
