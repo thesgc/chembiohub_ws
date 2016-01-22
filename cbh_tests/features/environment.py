@@ -259,20 +259,21 @@ def before_all(context):
     process = Popen(['git', 'log', '--format="%H"', '-n', '1'], stdout=PIPE)
     commit_based_filename, error = process.communicate()
     commit_based_filename = database_path + str(commit_based_filename[1:-2])
+    context.commit_based_filename = commit_based_filename
     print(commit_based_filename)
 
-    if not os.path.isfile(commit_based_filename):
-        call(
-            "dropdb dev_db --if-exists -h %s" % host , shell=True)
-        call(
-            "createdb dev_db -h %s" % host, shell=True)
+    
+    call(
+        "dropdb dev_db --if-exists -h %s" % host , shell=True)
+    call(
+        "createdb dev_db -h %s" % host, shell=True)
 
-        call('psql -h %s -c "create extension hstore;create extension rdkit;" dev_db' % host, shell=True)
+    call('psql -h %s -c "create extension hstore;create extension rdkit;" dev_db' % host, shell=True)
 
-        call(
-            "python manage.py migrate", shell=True)   
-        call(
-            "pg_dump dev_db -Fc -h %s > %s" % (host, commit_based_filename) , shell=True)    
+    call(
+        "python manage.py migrate", shell=True)   
+    call(
+        "pg_dump dev_db -Fc -h %s > %s" % (host, commit_based_filename) , shell=True)    
         
     pass
     # Even though DJANGO_SETTINGS_MODULE is set, this may still be
@@ -308,7 +309,7 @@ def before_scenario(context, scenario):
     call('psql -h %s -c "create extension hstore;create extension rdkit;" dev_db' % host, shell=True)
 
     call(
-        "pg_restore -Fc -h %s -d dev_db < /tmp/mydevdb.dump" % host, shell=True)
+        "pg_restore -Fc -h %s -d dev_db < %s" % (host, context.commit_based_filename), shell=True)
 
     django.setup()
     from cbh_datastore_ws.elasticsearch_client import delete_main_index
