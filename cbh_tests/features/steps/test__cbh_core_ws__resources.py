@@ -23,12 +23,14 @@ def step(context):
 def logintestuser(context):
     context.api_client.client.login(username="testuser", password="testuser")
 
-
+@given("I log out")
+def logout(context):
+    context.api_client.client.logout()
 
 @then("I can see the skinning configuration")
 def skinning(context):
     from django.conf import settings
-    resp = context.api_client.client.get("/" +settings.WEBSERVICES_NAME + "/cbh_skinning/")
+    resp = context.api_client.get("/" +settings.WEBSERVICES_NAME + "/cbh_skinning/")
     context.test_case.assertHttpOK(resp)
 
     

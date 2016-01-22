@@ -11,11 +11,27 @@ def projects(context):
     from django.conf import settings
     resp = context.api_client.client.get("/" + settings.WEBSERVICES_NAME + "/cbh_projects/")
     context.test_case.assertHttpOK(resp)
+    context.projects_on_system = json.loads(resp.content)["objects"]
+
+
+@when("I patch the updated first project in the list back to the system")
+def project_patch(context):
+    from django.conf import settings
+    resp = context.api_client.patch(context.projects_on_system[0]["resource_uri"], data=context.projects_on_system[0])
+    context.updated_project_response = resp
+
+
+@then("project update response is accepted")
+def accepted(context):
+    context.test_case.assertHttpAccepted(context.updated_project_response)
 
 
 
 
 
+@given("I take the first project in the list and change the name")
+def project_name_change(context):
+    context.projects_on_system[0]["name"] = "Foo"
 
 
 @when("I POST a project to cbh_projects")
@@ -74,3 +90,11 @@ def add_proj_perms(context):
     perm = Permission.objects.get_by_natural_key(codename="add_project", app_label="cbh_core_model", model="project")
     context.user.user_permissions.add(perm)
     context.user.save()
+
+@then("the project update response is unauthorized")
+def proj_update_unauthorized(context):
+    context.test_case.assertHttpUnauthorized(context.updated_project_response)
+
+@then("the project is created not as unauthorized")
+def proj_unauthorized(context):
+    context.test_case.assertHttpUnauthorized(context.project_response)
