@@ -38,11 +38,13 @@ def test_make_editor(context):
     p = Project.objects.get(pk=context.projects_on_system[0]["id"])
     context.test_case.assertFalse(context.user.has_perm("cbh_core_model.%d%seditor" % (context.projects_on_system[0]["id"],  PERMISSION_CODENAME_SEPARATOR  )))
     context.user = p.make_editor(context.user)
+    #Need to re fetch the user from the database - see  https://docs.djangoproject.com/en/1.8/topics/auth/default/#permission-caching
     context.user = User.objects.get(pk=context.user.pk)
     context.test_case.assertTrue(context.user.has_perm("cbh_core_model.%d%seditor" % (context.projects_on_system[0]["id"],  PERMISSION_CODENAME_SEPARATOR  )))
 
 @given("I remove all of the testusers permissions")
 def remove_perms(context):
     context.user.user_permissions.clear()
-    context.user.save()
+    #Need to re fetch the user from the database - see  https://docs.djangoproject.com/en/1.8/topics/auth/default/#permission-caching
+    context.user = User.objects.get(pk=context.user.pk)
 
