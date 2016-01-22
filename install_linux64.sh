@@ -70,12 +70,13 @@ unset LD_LIBRARY_PATH
 unset PYTHONPATH
 unset RDBASE
 
+if [ "$USER" -ne "travis" ]; then
+
 python manage.py migrate
 python manage.py reindex_compounds
 python manage.py reindex_datapoint_classifications
 
 
-if [ "$USER" -ne "travis" ]; then
     python manage.py createsuperuser
     python manage.py collectstatic
 
