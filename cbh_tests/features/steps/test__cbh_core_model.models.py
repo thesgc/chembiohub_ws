@@ -18,6 +18,12 @@ def test_sync_permissions_name_change(context):
 
 
 
+@then(u'the project key has changed')
+def step_impl(context):
+    projdata = json.loads(context.updated_project_response.content)
+    context.test_case.assertEqual(projdata["project_key"], "foo")
+
+
 
 
 @then("the custom field config name matches the new name of the project")
@@ -58,3 +64,19 @@ def remove_perms(context):
 
 
 
+# @given("I create new custom field configs and data form configs based on the data given")
+# def create_realdata(context):
+#     from cbh_core_model.models import Project, CustomFieldConfig, PinnedCustomField, ProjectType, DataType, DataFormConfig
+#     from cbh_datastore_model.models import DataPoint, DataPointClassification, DataPointClassificationPermission
+#     setup = OrderedDict(
+#         [("l0", {"dtype": "Project", }),
+#          ("l1", {"dtype": "Sub-project", }),
+#          ("l2", {"dtype": "Assay"}),
+#          ("l3", {"dtype": "Activity"}), ]
+#     )
+
+
+
+
+
+    

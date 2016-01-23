@@ -21,11 +21,6 @@ def project_patch(context):
     context.updated_project_response = resp
 
 
-@then(u'the project name has changed')
-def step_impl(context):
-    context.test_case.assertEqual(context.projects_on_system[0]["name"], "Foo")
-
-
 
 @then("project update response is accepted")
 def accepted(context):
@@ -33,15 +28,19 @@ def accepted(context):
 
 
 
-@then("the name has changed and there is one project in the list")
+@then("the name has changed to Foo and there is one project in the list")
 def name_changed(context):
     context.test_case.assertEqual(len(context.projects_on_system), 1)
-    context.test_case.assertEqual(context.projects_on_system["0"]["name"], "Foo")
+    context.test_case.assertEqual(context.projects_on_system[0]["name"], "Foo")
+
+
+@given("I take the first project in the list and change the name to be equal to the second one")
+def project_name_change_for_conflict(context):
+    context.projects_on_system[0]["name"] = context.projects_on_system[1]["name"]
 
 
 
-
-@given("I take the first project in the list and change the name")
+@given("I take the first project in the list and change the name to Foo")
 def project_name_change(context):
     context.projects_on_system[0]["name"] = "Foo"
 
@@ -66,7 +65,7 @@ def project_types(context):
     context.project_types = json_content["objects"]
 
 
-@given("I create a project JSON by adding one of these project types and some custom fields and a name")
+@given("I create a project JSON by adding one of these project types and some custom fields and Bar as a name")
 def build_project_json(context):
     context.project_json = {
         "project_type": context.project_types[0],
@@ -77,11 +76,31 @@ def build_project_json(context):
                     "open_or_restricted": "open",
                     "name": "Test Field"
                 }],
-                "name": "Test Project 2__config"
+                "name": "Bar__config"
             },
-            "name": "Test Project 2"
+            "name": "Bar"
         }
     print (context.project_json )
+
+
+
+@given("I create a project JSON by adding one of these project types and some custom fields and Foo as a name")
+def build_project_json(context):
+    context.project_json = {
+        "project_type": context.project_types[0],
+            "custom_field_config": {
+                "project_data_fields": [{
+                    "required": False,
+                    "field_type": "char",
+                    "open_or_restricted": "open",
+                    "name": "Test Field"
+                }],
+                "name": "Foo_config"
+            },
+            "name": "Foo"
+        }
+    print (context.project_json )
+
 
 
 
@@ -116,4 +135,4 @@ def proj_unauthorized(context):
 
 @then("the project update response is conflict")
 def proj_conflict(context):
-    context.test_case.assertHttpUnauthorized(context.updated_project_response)
+    context.test_case.assertHttpConflict(context.updated_project_response)

@@ -21,3 +21,15 @@ def step_impl(context):
         data["data_form_configs"][0]["last_level"], "l0")
     context.test_case.assertEquals(len(data["data_form_configs"][0][
                                    "permitted_children"]), 1)
+
+
+
+@given(u'I also add 2 data form configs to that project')
+def step_impl(context):
+    raise NotImplementedError(u'STEP: Given I also add 2 data form configs to that project')
+
+@when(u'I POST a project to cbh_projects_with_forms')
+def step_impl(context):
+    raise NotImplementedError(u'STEP: When I POST a project to cbh_projects_with_forms')
+
+
