@@ -14,5 +14,5 @@ Feature: AssayReg data overview
         Then I can list the projects on the system
         Given I take the first project in the list and I link it to my data form config via admin ui
         When I get my single project via the data form config API as in assayreg data overview
-        Then there is a nest of data form configs down to l3
+ #       Then there is a nest of data form configs down to l3
 
