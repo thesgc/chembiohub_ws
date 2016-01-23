@@ -73,6 +73,9 @@ unset RDBASE
 if [ "$USER" -ne "travis" ]; then
 
 python manage.py migrate
+python manage.py loaddata datatypes.json
+python manage.py loaddata projecttypes.json
+
 python manage.py reindex_compounds
 python manage.py reindex_datapoint_classifications
 

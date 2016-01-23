@@ -44,4 +44,4 @@ def data_form_config_admin(context):
     p = Project.objects.get(pk=context.projects_on_system[0]["id"])
     p.data_form_config = context.dfc
     p.save()
-    print (p.__dict__)
+

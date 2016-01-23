@@ -6,6 +6,14 @@ threading._DummyThread._Thread__stop = lambda x: 42
 TASTYPIE_ALLOW_MISSING_SLASH = True
 TASTYPIE_CANNED_ERROR = "An internal server error occurred. Please contact ChEMBL help."
 
+
+DEFAULT_ASSAYREG_DATA_TYPES = [
+  {"name": "Assay"},
+  {"name": "Activity"},
+  {"name": "Sub-Project"},
+  {"name": "Project"},
+]
+
 ID_PREFIX = "UOX"
 SESSION_COOKIE_HTTPONLY = False
 SESSION_SAVE_EVERY_REQUEST = True

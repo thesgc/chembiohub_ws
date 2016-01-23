@@ -55,14 +55,20 @@ def project_create(context):
     print(resp.content)
 
 
-@then("I can list the projects types on the system and there are 3")
-def project_types(context):
-    from django.conf import settings
-    resp = context.api_client.client.get("/" + settings.WEBSERVICES_NAME + "/cbh_project_types/")
-    context.test_case.assertHttpOK(resp)
-    json_content = json.loads(resp.content)
-    context.test_case.assertEqual(len(json_content["objects"]), 3)
-    context.project_types = json_content["objects"]
+@given("I create a project as before")
+def step(context):
+    context.execute_steps(u"""
+        Given I have loaded the fixtures for project types and data types
+        Given testuser
+        Given testuser has the cbh_core_model.add_project permission
+        When I log in testuser
+        Then I can list the projects types on the system and there are 3
+        Given I create a project JSON by adding one of these project types and some custom fields and Bar as a name
+        When I POST a project to cbh_projects
+        Then the project is created
+        Then I can list the projects on the system
+        """)
+
 
 
 @given("I create a project JSON by adding one of these project types and some custom fields and Bar as a name")
