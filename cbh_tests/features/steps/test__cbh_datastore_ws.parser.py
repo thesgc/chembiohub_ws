@@ -35,6 +35,6 @@ def create_realdata(context):
         setup[level]["cfc"].save()
     df_args = {level: setup[level]["cfc"] for level in setup.keys()}
     df_args["created_by"] = context.user
-
+    df_args["human_added"] = True
     context.dfc = DataFormConfig.objects.create(**df_args)
     context.test_case.assertEqual(context.dfc.l4_id, None)

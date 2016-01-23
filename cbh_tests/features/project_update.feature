@@ -12,25 +12,9 @@ Feature: User can update projects with appropriate permissions
         Given I take the first project in the list and change the name
         When I patch the updated first project in the list back to the system
         Then project update response is accepted
-
-
-    Scenario: Names of the permissions and custom field configs of a project are changed after name change
-        Given testuser
-        Given testuser has the cbh_core_model.add_project permission
-        When I log in testuser
-        Then I can list the projects types on the system and there are 3
-        Given I create a project JSON by adding one of these project types and some custom fields and a name
-        When I POST a project to cbh_projects
-        Then the project is created
         Then I can list the projects on the system
-        Given I take the first project in the list and change the name
-        When I patch the updated first project in the list back to the system
-        Then project update response is accepted
-        Then the project permission name matches the new name of the project
-        Then the custom field config name matches the new name of the project
+        Then the project name has changed
 
-
- #   Scenario: Project cannot be renamed to something that is already on the system
 
 
 

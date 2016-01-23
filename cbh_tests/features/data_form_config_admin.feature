@@ -1,7 +1,16 @@
-Feature: AssayReg data overview
+Feature: The data form config admin creates a hierarchy of data form config objects
+
+    Scenario: A data form config, when saved in the admin interface is turned into a hierarchy
+        Given testuser has the cbh_core_model.add_project permission
+        When I log in testuser
+        Given I create new custom field configs and data form configs based on the data given
+        When I save the data form config via the admin ui
+        Then All ancestor data form configs are present
 
 
-    Scenario: A data form config can be linked to a project and then retrieved as a nested JSON
+        
+
+    Scenario: A data form config, when saved in the admin interface is turned into a hierarchy
         Given testuser has the cbh_core_model.add_project permission
         When I log in testuser
         Then I can list the projects types on the system and there are 3
@@ -13,6 +22,5 @@ Feature: AssayReg data overview
         Then All ancestor data form configs are present 
         Then I can list the projects on the system
         Given I take the first project in the list and I link it to my data form config via admin ui
-        When I get my single project via the data form config API as in assayreg data overview
-        Then there is a nest of data form configs down to l3
 
+        

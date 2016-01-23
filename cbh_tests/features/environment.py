@@ -383,3 +383,11 @@ def after_all(context):
     # context.api_client.client.logout()
     from django import db
     db.close_connection()
+
+    from subprocess import Popen, PIPE, call
+
+
+    call(
+        "dropdb dev_db --if-exists -h %s" % host , shell=True)
+
+    before_scenario(context, None)

@@ -21,10 +21,22 @@ def project_patch(context):
     context.updated_project_response = resp
 
 
+@then(u'the project name has changed')
+def step_impl(context):
+    context.test_case.assertEqual(context.projects_on_system[0]["name"], "Foo")
+
+
+
 @then("project update response is accepted")
 def accepted(context):
     context.test_case.assertHttpAccepted(context.updated_project_response)
 
+
+
+@then("the name has changed and there is one project in the list")
+def name_changed(context):
+    context.test_case.assertEqual(len(context.projects_on_system), 1)
+    context.test_case.assertEqual(context.projects_on_system["0"]["name"], "Foo")
 
 
 
@@ -41,6 +53,7 @@ def project_create(context):
 
     resp = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/cbh_projects/", format='json', data=context.project_json)
     context.project_response = resp
+    print(resp.content)
 
 
 @then("I can list the projects types on the system and there are 3")
@@ -68,6 +81,7 @@ def build_project_json(context):
             },
             "name": "Test Project 2"
         }
+    print (context.project_json )
 
 
 
@@ -98,3 +112,8 @@ def proj_update_unauthorized(context):
 @then("the project is created not as unauthorized")
 def proj_unauthorized(context):
     context.test_case.assertHttpUnauthorized(context.project_response)
+
+
+@then("the project update response is conflict")
+def proj_conflict(context):
+    context.test_case.assertHttpUnauthorized(context.updated_project_response)
