@@ -27,3 +27,14 @@ Feature: AssayReg data overview
         Given I create a datapoint classification as before
         When I list the nested datapoint classifications in the project
         Then the nested classification response is as expected and the resource URI is ready
+
+
+    Scenario: I add a second data point classification as a child of the first
+        Given I create a datapoint classification as before
+        When I list the nested datapoint classifications in the project
+        And I add a child datapoint classification to the l0 one
+        And I list the nested datapoint classifications in the project 
+        Then the l1 data point classification is a child of the l0
+
+
+

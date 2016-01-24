@@ -203,7 +203,6 @@ INSTALLED_APPS = (
   'cbh_chembl_id_generator',
   'solo',
     "django_rq",
-    "ckeditor",
 
    )
 

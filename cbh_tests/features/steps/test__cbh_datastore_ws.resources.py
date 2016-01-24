@@ -48,9 +48,32 @@ def step(context):
 
 @then(u'the nested classification response is as expected and the resource URI is ready')
 def step_impl(context):
+
     context.test_case.assertHttpOK(context.cbh_datapoint_classifications_nested)
 
 
+@when(u'I add a child datapoint classification to the l0 one')
+def step_impl(context):
+    from django.conf import settings
+    nested = json.loads(context.cbh_datapoint_classifications_nested.content)
+    l0_dpc_id = nested["objects"][0]["id"] 
+    data = { 
+            "l0_permitted_projects" : nested["objects"][0]["l0_permitted_projects"],
+            "parent_id": l0_dpc_id   , 
+            "l0": nested["objects"][0]["l0"]["resource_uri"], 
+            "data_form_config": context.l1_uri , 
+            "l1":{ "custom_field_config" : context.l1_cfc_uri , "project_data" : {"bbb": ""}  }
+        }
+    resp = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/datastore/cbh_datapoint_classifications" , data=data)
+    context.l1_dpc_resp = resp
+
+
+
+@then(u'the l1 data point classification is a child of the l0')
+def step_impl(context):
+    from django.conf import settings
+    nested = json.loads(context.cbh_datapoint_classifications_nested.content)
+    context.test_case.assertEquals(nested["objects"][0]["children"][0]["l1"]["custom_field_config"], context.l1_cfc_uri )
 
 
 
@@ -66,7 +89,7 @@ def step_impl(context):
             for newdfc in data["data_form_configs"]:
                 if perm_child == newdfc["resource_uri"]:
                     context.test_case.assertEquals(newdfc["last_level"], "l1")
-
+                    context.l1_cfc_uri = newdfc["l1"]["resource_uri"]
                     l1_perm = newdfc["permitted_children"][0]
                     for new2dfc in data["data_form_configs"]:
                         if l1_perm == new2dfc["resource_uri"]:
@@ -78,7 +101,7 @@ def step_impl(context):
                                 if l2_perm == new3dfc["resource_uri"]:
                                     context.test_case.assertEquals(new3dfc["last_level"], "l3")
                                     context.test_case.assertEquals(len(new3dfc["permitted_children"]),0)
-                context.test_case.assertFalse(new3dfc["last_level"] == "l4")
+                context.test_case.assertFalse(newdfc["last_level"] == "l4")
 
 
 
