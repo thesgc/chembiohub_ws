@@ -42,6 +42,6 @@ def ancestor_data_form_configs(context):
 @given("I take the first project in the list and I link it to my data form config via admin ui")
 def data_form_config_admin(context):
     p = Project.objects.get(pk=context.projects_on_system[0]["id"])
-    p.data_form_config = context.dfc
+    p.enabled_forms.add(context.dfc)
     p.save()
-
+    

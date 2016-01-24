@@ -5,12 +5,7 @@ from cbh_datastore_model.models import DataPoint, DataPointClassification, DataP
 from django.db import IntegrityError
 from django.contrib.auth.models import User, Permission
 
-@when(u'I get my single project via the data form config API as in assayreg data overview')
-def test_cbh_projects_with_forms_get(context):
-    from django.conf import settings
-    resp = context.api_client.get("/" + settings.WEBSERVICES_NAME + "/datastore/cbh_projects_with_forms/?project_key=" + context.projects_on_system[0]["project_key"])
-    context.project_with_forms = resp
-    context.test_case.assertHttpOK(resp)
+
 
 
 @given(u'I set up a project and data form config as before')
@@ -23,14 +18,105 @@ def step(context):
         """)
 
 
-@then(u'there is a nest of data form configs down to l3')
+
+
+
+@when(u'I list the projects with forms')
+def step_impl(context):
+
+    from django.conf import settings
+    resp = context.api_client.get("/" + settings.WEBSERVICES_NAME + "/datastore/cbh_projects_with_forms/?project_key=" + context.projects_on_system[0]["project_key"])
+    context.project_with_forms = resp
+    context.test_case.assertHttpOK(resp)
+
+
+@given("I create a datapoint classification as before")
+def step(context):
+    context.execute_steps(u'''
+                Given I make a request to projects with forms as before
+        When I add data to the l0 data point classification template 
+        And I POST it to the data point classification resource
+        Then the l0 data point classification is created for my project
+
+        ''')
+
+@when("I list the nested datapoint classifications in the project")
+def step(context):
+    from django.conf import settings
+    resp = context.api_client.get("/" + settings.WEBSERVICES_NAME + "/datastore/cbh_datapoint_classifications_nested/?project_key=" + context.projects_on_system[0]["project_key"])
+    context.cbh_datapoint_classifications_nested = resp
+
+@then(u'the nested classification response is as expected and the resource URI is ready')
+def step_impl(context):
+    context.test_case.assertHttpOK(context.cbh_datapoint_classifications_nested)
+
+
+
+
+
+@then(u'the first project in the list has the expected data form config')
 def step_impl(context):
     data = json.loads(context.project_with_forms.content)["objects"][0]
-    print (data)
-    context.test_case.assertEquals(
-        data["data_form_configs"][0]["last_level"], "l0")
-    context.test_case.assertEquals(len(data["data_form_configs"][0][
-                                   "permitted_children"]), 1)
+
+    for dfc in data["data_form_configs"]:
+        if dfc["last_level"] == "l0":
+
+            perm_child = dfc["permitted_children"][0]
+            context.l1_uri = perm_child
+            for newdfc in data["data_form_configs"]:
+                if perm_child == newdfc["resource_uri"]:
+                    context.test_case.assertEquals(newdfc["last_level"], "l1")
+
+                    l1_perm = newdfc["permitted_children"][0]
+                    for new2dfc in data["data_form_configs"]:
+                        if l1_perm == new2dfc["resource_uri"]:
+                            context.l2_uri = l1_perm
+                            context.test_case.assertEquals(new2dfc["last_level"], "l2")
+                            l2_perm = new2dfc["permitted_children"][0]
+                            for new3dfc in data["data_form_configs"]:
+                                context.l3_uri = l2_perm
+                                if l2_perm == new3dfc["resource_uri"]:
+                                    context.test_case.assertEquals(new3dfc["last_level"], "l3")
+                                    context.test_case.assertEquals(len(new3dfc["permitted_children"]),0)
+                context.test_case.assertFalse(new3dfc["last_level"] == "l4")
+
+
+
+
+@when(u'I add data to the l0 data point classification template')
+def step_impl(context):
+    data = json.loads(context.project_with_forms.content)["objects"][0]
+    for dfc in data["data_form_configs"]:
+        if dfc["last_level"] == "l0":
+            print(dfc)
+            context.dpc_template = dfc["template_data_point_classification"]
+    context.dpc_template["l0"]["project_data"] = {"TEST": "stuff"}
+    print("dpc tempate")
+    print(context.dpc_template)
+
+
+
+@when(u'I POST it to the data point classification resource')
+def step_impl(context):
+    from django.conf import settings
+    resp = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/datastore/cbh_datapoint_classifications" , data=context.dpc_template)
+    context.l0_resp = resp
+
+@then(u'the l0 data point classification is created for my project')
+def step_impl(context):
+    context.test_case.assertHttpCreated(context.l0_resp)
+
+
+
+
+@given(u'I make a request to projects with forms as before')
+def step(context):
+    context.execute_steps(u'''
+        Given I set up a project and data form config as before
+        When I list the projects with forms
+        Then the first project in the list has the expected data form config
+        ''')
+
 
 
 @given("I have created a data form config and a project as before and I list the projects")
