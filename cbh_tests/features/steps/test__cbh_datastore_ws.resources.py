@@ -13,6 +13,16 @@ def test_cbh_projects_with_forms_get(context):
     context.test_case.assertHttpOK(resp)
 
 
+@given(u'I set up a project and data form config as before')
+def step(context):
+    context.execute_steps(u"""
+        Given I have created a data form config and a project as before and I list the projects
+        and I take the first project in the list and I link it to my data form config via admin ui
+        When I save the data form config via the admin ui
+        Then All ancestor data form configs are present
+        """)
+
+
 @then(u'there is a nest of data form configs down to l3')
 def step_impl(context):
     data = json.loads(context.project_with_forms.content)["objects"][0]
