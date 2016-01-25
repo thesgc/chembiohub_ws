@@ -43,7 +43,6 @@ from tastypie.test import ResourceTestCase
 from django.conf import settings
 from django.test import TestCase
 from django.test.client import FakePayload, Client
-from django.utils.encoding import force_text
 
 from tastypie.serializers import Serializer
 
@@ -210,6 +209,8 @@ class Tester(unittest.TestCase):
         """
         self.assertHttpOK(resp)
         self.assertTrue(resp['Content-Type'].startswith('application/json'))
+        from django.utils.encoding import force_text
+
         self.assertValidJSON(force_text(resp.content))
 
     def assertValidXMLResponse(self, resp):
@@ -222,6 +223,8 @@ class Tester(unittest.TestCase):
         """
         self.assertHttpOK(resp)
         self.assertTrue(resp['Content-Type'].startswith('application/xml'))
+        from django.utils.encoding import force_text
+
         self.assertValidXML(force_text(resp.content))
 
     def assertValidYAMLResponse(self, resp):
@@ -234,6 +237,8 @@ class Tester(unittest.TestCase):
         """
         self.assertHttpOK(resp)
         self.assertTrue(resp['Content-Type'].startswith('text/yaml'))
+        from django.utils.encoding import force_text
+
         self.assertValidYAML(force_text(resp.content))
 
     def assertValidPlistResponse(self, resp):
@@ -246,6 +251,8 @@ class Tester(unittest.TestCase):
         """
         self.assertHttpOK(resp)
         self.assertTrue(resp['Content-Type'].startswith('application/x-plist'))
+        from django.utils.encoding import force_text
+
         self.assertValidPlist(force_text(resp.content))
 
 import os
@@ -266,7 +273,7 @@ class TClient(TestApiClient):
         return self.serializer.content_types.get(short_format, 'json')
 
 def before_all(context):
-    from cbh_datastore_ws.features.steps.datastore_realdata import create_realdata, project
+
     from subprocess import Popen, PIPE, call
     process = Popen(['python', 'manage.py', 'migrate', '--list'], stdout=PIPE)
     commit_based_filename, error = process.communicate()
@@ -278,7 +285,7 @@ def before_all(context):
     commit_based_filename = database_path + commit_based_filename
     context.commit_based_filename = commit_based_filename
     print(commit_based_filename)
-    
+    context.has_run_some_scenarios = False
     if not os.path.isfile(commit_based_filename):
         call(
             "dropdb dev_db --if-exists -h %s" % host , shell=True)
@@ -316,6 +323,7 @@ def before_all(context):
 def before_scenario(context, scenario):
     # Set up the scenario test environment
     from subprocess import Popen, PIPE, call
+    context.has_run_some_scenarios = True
 
 
     call(
@@ -373,21 +381,18 @@ def after_scenario(context, scenario):
 
 
 def after_all(context):
-    # from cbh_datastore_model.models import DataPointClassificationPermission, DataPointClassification
-    from cbh_datastore_ws.resources import reindex_datapoint_classifications
-    from django.contrib.auth.models import User, Group
-
-    reindex_datapoint_classifications()
-    context.superuser, created  = User.objects.get_or_create(username="superuser")
-    context.superuser.set_password("superuser")
-    # context.api_client.client.logout()
     from django import db
     db.close_connection()
-
     from subprocess import Popen, PIPE, call
 
-
-    call(
-        "dropdb dev_db --if-exists -h %s" % host , shell=True)
-
+        #We can't import resources unless django.setup has been called
     before_scenario(context, None)
+    from cbh_datastore_ws.resources import reindex_datapoint_classifications
+    reindex_datapoint_classifications()
+    from django.core.management import call_command
+    
+    call_command("loaddata", "datatypes.json")
+    call_command("loaddata", "projecttypes.json")
+    call_command("loaddata", "project_setup.json")
+
+

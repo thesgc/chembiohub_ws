@@ -220,7 +220,9 @@ def step_impl(context):
                     "field_type": "char",
                     "open_or_restricted": "open",
                     "name": "Test Field"
-                }],
+                },
+
+                ],
                 "name": "Sub-Project"
             },
             {
@@ -229,7 +231,14 @@ def step_impl(context):
                     "field_type": "char",
                     "open_or_restricted": "open",
                     "name": "Test Field"
-                }],
+                },
+                {
+                    "required": False,
+                    "field_type": "object",
+                    "open_or_restricted": "open",
+                    "name": "Test File"
+                }
+                ],
                 "name": "Assay"
             },
             {

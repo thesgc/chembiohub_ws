@@ -7,12 +7,7 @@ TASTYPIE_ALLOW_MISSING_SLASH = True
 TASTYPIE_CANNED_ERROR = "An internal server error occurred. Please contact ChEMBL help."
 
 
-DEFAULT_ASSAYREG_DATA_TYPES = [
-  {"name": "Assay"},
-  {"name": "Activity"},
-  {"name": "Sub-Project"},
-  {"name": "Project"},
-]
+
 
 ID_PREFIX = "UOX"
 SESSION_COOKIE_HTTPONLY = False
@@ -177,11 +172,11 @@ TEMPLATE_DIRS = (
 
 
 INSTALLED_APPS = (
-        'tastypie',
+      'django.contrib.auth',
+
 
        "django_hstore",
 
-    'django.contrib.auth',
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.sites',
@@ -193,9 +188,10 @@ INSTALLED_APPS = (
    'chembl_core_db',
    'chembl_core_model',
   'chembl_business_model', 
+         'cbh_core_ws',
+
        'flowjs',
        'cbh_core_model',
-       'cbh_core_ws',
        'cbh_datastore_model',
        'cbh_datastore_ws',
   'cbh_chembl_model_extension',    
@@ -203,6 +199,8 @@ INSTALLED_APPS = (
   'cbh_chembl_id_generator',
   'solo',
     "django_rq",
+            'tastypie',
+
 
    )
 
