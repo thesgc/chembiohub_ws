@@ -157,7 +157,7 @@ def run_steps(context):
             Then The data form config is created
 
              Given testuser has the cbh_core_model.add_project permission
-            Then I can list the projects types on the system and there are 3
+            Then I can list the projects types on the system and there are 4
             Given I create a project JSON by adding one of these project types and some custom fields and Bar as a name
             When I POST a project to cbh_projects
             Then the project is created

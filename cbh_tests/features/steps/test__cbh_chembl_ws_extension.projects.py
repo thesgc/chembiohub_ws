@@ -62,12 +62,39 @@ def step(context):
         Given testuser
         Given testuser has the cbh_core_model.add_project permission
         When I log in testuser
-        Then I can list the projects types on the system and there are 3
+        Then I can list the projects types on the system and there are 4
         Given I create a project JSON by adding one of these project types and some custom fields and Bar as a name
         When I POST a project to cbh_projects
         Then the project is created
         Then I can list the projects on the system
         """)
+
+
+
+
+@given("I create a project JSON by adding the saved search project type and the static custom field config schema for saved searches")
+def build_project_json(context):
+    for pType in context.project_types:
+        if pType["name"] == "Saved Search":
+            context.project_json = {
+                "project_type": pType,
+                    "custom_field_config": {
+                        "project_data_fields": [{
+                            "required": False,
+                            "field_type": "char",
+                            "open_or_restricted": "open",
+                            "name": "Alias"
+                        },
+                        {
+                            "required": False,
+                            "field_type": "char",
+                            "open_or_restricted": "open",
+                            "name": "URL"
+                        }],
+                        "name": "A name set by the front end"
+                    },
+                    "name": "A name set by the front end"
+                }
 
 
 
