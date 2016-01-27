@@ -10,6 +10,8 @@ Feature: A user can save a search and owns it, organisations can also own a save
         When I POST a project to cbh_projects
         Then the project is created
         Given A URL to redirect the user to and a GET request URL and an alias and description for my saved search
+        and I add the blinded batch id as EMPTY_STRING
+        and I add the project key
         When I send the search by POST request
         Then The saved search response is created
 
