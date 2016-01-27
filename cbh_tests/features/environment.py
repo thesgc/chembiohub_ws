@@ -288,12 +288,11 @@ def before_all(context):
     context.has_run_some_scenarios = False
     if not os.path.isfile(commit_based_filename):
         call(
+            'psql -h %s -c "create extension if not exists hstore;create extension if not exists rdkit;" template1' % host , shell=True)
+        call(
             "dropdb dev_db --if-exists -h %s" % host , shell=True)
         call(
-            "createdb dev_db -h %s" % host, shell=True)
-
-        call('psql -h %s -c "create extension hstore;create extension rdkit;" dev_db' % host, shell=True)
-
+            "createdb dev_db -h %s -T template1" % host, shell=True)
         call(
             "python manage.py migrate", shell=True)   
         call(
@@ -319,7 +318,7 @@ def before_all(context):
     # # Project.objects.all().delete()
     # call_command("loaddata", "/home/vagrant/chembiohub_ws/src/cbh_datastore_ws/cbh_datastore_ws/features/fixtures/newtestfixture.json")
 
-
+import time
 def before_scenario(context, scenario):
     # Set up the scenario test environment
     from subprocess import Popen, PIPE, call
@@ -327,11 +326,9 @@ def before_scenario(context, scenario):
 
 
     call(
-        "dropdb dev_db --if-exists -h %s" % host , shell=True)
+            "dropdb dev_db --if-exists -h %s" % host , shell=True)
     call(
-        "createdb dev_db -h %s" % host, shell=True)
-
-    call('psql -h %s -c "create extension hstore;create extension rdkit;" dev_db' % host, shell=True)
+            "createdb dev_db -h %s -T template1" % host, shell=True)
 
     call(
         "pg_restore -Fc -h %s -d dev_db < %s" % (host, context.commit_based_filename), shell=True)
@@ -342,6 +339,10 @@ def before_scenario(context, scenario):
 
     from cbh_chembl_ws_extension.elasticsearch_client import delete_index, get_main_index_name
     delete_index(get_main_index_name())
+    from django.core.management import call_command
+    #must index the data
+    call_command("reindex_compounds")
+
 
     from django.test.simple import DjangoTestSuiteRunner
     context.runner = DjangoTestSuiteRunner(interactive=False)
@@ -368,6 +369,7 @@ def before_scenario(context, scenario):
     context.dclient.login(username="testuser", password="testuser")
     
     context.runner.setup_test_environment()
+    time.sleep(5)
 
 def after_scenario(context, scenario):
     # Tear down the scenario test environment.
