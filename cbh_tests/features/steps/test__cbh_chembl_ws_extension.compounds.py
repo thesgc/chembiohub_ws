@@ -85,6 +85,7 @@ def proj_create(context):
     context.test_case.assertHttpCreated(context.saved_search_response)
 
 
+
 @given(u'I add the blinded batch id as EMPTY_STRING')
 def step_impl(context):
     project_json = json.loads(context.project_response.content)
@@ -120,3 +121,85 @@ def step_impl(context):
         """)
 
         
+@given(u'I have a compound batch with no structure')
+def step_impl(context):
+    project_json = json.loads(context.project_response.content)
+    context.post_data = {
+        "project": project_json["resource_uri"],
+        "customFields" : {"test": "My test field"
+                         },
+        "uncuratedFields":{},
+        "warnings" :{}, 
+        "properties" :{}, 
+        "errors" :{}
+    }
+
+
+@given(u'I add the blinded batch id to my compound POST data as EMPTY_STRING')
+def step_impl(context):
+    project_json = json.loads(context.project_response.content)
+    context.post_data["blinded_batch_id"] =  "EMPTY_STRING"
+
+
+
+
+@when(u'I submit the compound by POST request')
+def step_impl(context):
+    from django.conf import settings
+    resp = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches/", format='json', data=context.post_data)
+    context.compound_response = resp
+
+
+@then(u'a compound batch is created')
+def step_impl(context):
+    context.test_case.assertHttpCreated(context.compound_response)
+
+
+@given(u'I add the project key to the compound data')
+def step_impl(context):
+    project_json = json.loads(context.project_response.content)
+    context.post_data["project_key"] =  project_json["project_key"]
+
+
+
+
+
+@when(u'I reindex the compound')
+def step_impl(context):
+    from django.conf import settings
+    comp = json.loads(context.compound_response.content)
+    resp = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/cbh_saved_search/reindex_compound/", format='json', data={"id": comp["id"]})
+    context.compound_index_response = resp
+
+
+@then(u'the blinded batch ID is generated')
+def step_impl(context):
+    from django.conf import settings
+    comp = json.loads(context.compound_response.content)
+    context.test_case.assertTrue(comp["blindedBatchId"].startswith(settings.ID_PREFIX))
+
+
+
+@given('I add a valid molfile to my compound data')
+def step(context):
+    context.post_data["ctab"] = """
+
+
+  8  8  0  0  0  0            999 V2000
+    0.0000    1.0000    0.0000 C   0  0  0  0  0  0
+    0.8660    0.5000    0.0000 C   0  0  0  0  0  0
+    0.8660   -0.5000    0.0000 C   0  0  0  0  0  0
+    0.0000   -1.0000    0.0000 C   0  0  0  0  0  0
+   -0.8660   -0.5000    0.0000 C   0  0  0  0  0  0
+   -0.8660    0.5000    0.0000 C   0  0  0  0  0  0
+    0.0000    2.0000    0.0000 O   0  0  0  0  0  0
+    0.0000   -2.0000    0.0000 O   0  0  0  0  0  0
+  1  21  0     0  0
+  2  32  0     0  0
+  3  41  0     0  0
+  4  51  0     0  0
+  5  62  0     0  0
+  6  11  0     0  0
+  1  72  0     0  0
+  4  82  0     0  0
+M  END"""
