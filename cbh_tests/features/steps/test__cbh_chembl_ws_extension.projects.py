@@ -45,6 +45,7 @@ def project_name_change(context):
     context.projects_on_system[0]["name"] = "Foo"
 
 
+
 @when("I POST a project to cbh_projects")
 def project_create(context):
     from django.conf import settings
@@ -100,8 +101,12 @@ def build_project_json(context):
 
 @given("I create a project JSON by adding one of these project types and some custom fields and Bar as a name")
 def build_project_json(context):
+    non_saved_search_project_type = ""
+    for ptype in context.project_types:
+        if not ptype["saved_search_project_type"]:
+            non_saved_search_project_type = ptype
     context.project_json = {
-        "project_type": context.project_types[0],
+        "project_type": non_saved_search_project_type,
             "custom_field_config": {
                 "project_data_fields": [{
                     "required": False,

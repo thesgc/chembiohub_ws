@@ -14,6 +14,23 @@ def step_impl(context):
     resp = context.api_client.get("/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches/get_list_elasticsearch/", format='json')
     context.batches_response = resp
 
+@then(u'the created compound batch has a uox id in the chemblId field')
+def step_impl(context):
+    from django.conf import settings
+    data = json.loads(context.batches_response.content)["objects"]
+    context.test_case.assertEquals(len(data), 1)
+    print(data)
+    context.test_case.assertTrue(data[0]["chemblId"].startswith(settings.ID_PREFIX))
+
+
+@then("the created compound batch has a multipleBatchId")
+def step(context):
+    data = json.loads(context.batches_response.content)["objects"]
+    context.test_case.assertEquals(len(data), 1)
+    context.test_case.assertEquals(data[0]["multipleBatchId"], 1)
+
+
+
 
 @then(u'the get list elasticsearch response is OK')
 def step_impl(context):
@@ -69,7 +86,6 @@ def step_impl(context):
         "uncuratedFields":{},
         "warnings" :{}, "properties" :{},  "errors" :{}
     }
-
 
 
 @when(u'I send the search by POST request')
@@ -135,11 +151,64 @@ def step_impl(context):
     }
 
 
+@given(u'I set the type of the request to sketch')
+def step(context):
+    context.post_data["type"] = "sketch"
+
+
+
 @given(u'I add the blinded batch id to my compound POST data as EMPTY_STRING')
 def step_impl(context):
     project_json = json.loads(context.project_response.content)
     context.post_data["blinded_batch_id"] =  "EMPTY_STRING"
 
+
+
+
+@when(u'I submit the compound to POST validate drawn')
+def step_impl(context):
+    from django.conf import settings
+    resp = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches/validate_drawn/", format='json', data=context.post_data)
+    context.val_response = resp
+
+@then(u'the response from post validate drawn is accepted')
+def step_impl(context):
+    context.test_case.assertHttpAccepted(context.val_response )
+    print (context.val_response)
+    context.valdata = json.loads(context.val_response.content)
+
+
+
+
+
+@when(u'I take the response from post validate drawn and post it to multi batch save')
+def step_impl(context):
+    from django.conf import settings
+    resp = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches/multi_batch_save/", format='json', data=context.valdata )
+    context.multibatch_response = resp
+
+
+@given(u"A compound batch is created from a drawing as before")
+def step_impl(context):
+    context.execute_steps(u"""
+        Given I create a project as before
+        When I refresh the user object
+        Given I have a compound batch with no structure
+        and I add a valid molfile to my compound data and call it sketch
+        and I add the project key to the compound data
+        and I set the type of the request to sketch
+        and I set the state to validate
+        When I submit the compound to POST validate drawn
+        then the response from post validate drawn is accepted
+        when I take the response from post validate drawn and post it to multi batch save
+        then the response from multi batch save is created
+        """)
+
+
+@then(u'the response from multi batch save is created')
+def step_impl(context):
+    context.test_case.assertHttpCreated(context.multibatch_response)
+    print (context.multibatch_response.content)
 
 
 
@@ -161,6 +230,12 @@ def step_impl(context):
     context.post_data["project_key"] =  project_json["project_key"]
 
 
+@given(u'I set the state to validate')
+def step_impl(context):
+    project_json = json.loads(context.project_response.content)
+    context.post_data["validate"] =  "validate"
+
+
 
 
 
@@ -180,9 +255,9 @@ def step_impl(context):
 
 
 
-@given('I add a valid molfile to my compound data')
+@given('I add a valid molfile to my compound data and call it sketch')
 def step(context):
-    context.post_data["ctab"] = """
+    context.post_data["sketch"] = """
 
 
   8  8  0  0  0  0            999 V2000
