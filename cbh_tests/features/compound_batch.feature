@@ -41,4 +41,16 @@ Feature: A user can save a compound with and without a structure and can clone a
         Then the created compound batch has a multipleBatchId
 
 
+    Scenario: I can request a single compound batch via the get detail api
+        Given I create a compound batch from a drawing as before
+        When I request the compound batch with ID 1 from the get_detail api
+        Then the batch response is OK
+
+
+
+
+
+
+
+
 

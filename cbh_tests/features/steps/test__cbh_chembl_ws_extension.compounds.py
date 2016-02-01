@@ -6,6 +6,31 @@ from django.db import IntegrityError
 from django.contrib.auth.models import User
 
 
+@given(u'I create a compound batch from a drawing as before')
+def step_impl(context):
+    context.execute_steps(u"""
+        Given I create a project as before
+        When I refresh the user object
+        Given I have a compound batch with no structure
+        and I add a valid molfile to my compound data and call it sketch
+        and I add the project key to the compound data
+        and I set the type of the request to sketch
+        and I set the state to validate
+        When I submit the compound to POST validate drawn
+        then the response from post validate drawn is accepted
+        when I take the response from post validate drawn and post it to multi batch save
+        then the response from multi batch save is created""")
+
+
+@when(u'I request the compound batch with ID 1 from the get_detail api')
+def step_impl(context):
+    from django.conf import settings
+    resp = context.api_client.get("/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches/1" , format='json')
+    context.batch_response = resp
+
+@then(u'the batch response is OK')
+def step_impl(context):
+    context.test_case.assertHttpOK(context.batch_response)
 
 
 @when(u'I list compound batches in the system with get_list_elasticsearch')
