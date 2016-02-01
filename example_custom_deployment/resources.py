@@ -47,14 +47,16 @@ class AlteredCompoundBatchResource(CBHCompoundBatchResource):
 
 
 
-    def after_save_and_index_hook(self, request, multi_batch_id):
+    def after_save_and_index_hook(self, request, multi_batch_id, project_key):
         newrequest = copy(request)
         newrequest.GET = request.GET.copy()
         newrequest.GET["format"] = "xlsx"
         newrequest.GET["multiple_batch_id"] = multi_batch_id
         newrequest.GET["offset"] = 0
         newrequest.GET["limit"] = 10000
+        newrequest.GET["project__project_key__in"] = project_key
         file_resp = super(AlteredCompoundBatchResource, self).get_list_elasticsearch(newrequest)
+
 
         with open('/tmp/temp.xlsx', 'wb') as f:
             f.write(file_resp._container[0])
