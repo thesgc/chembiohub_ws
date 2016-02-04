@@ -62,5 +62,9 @@ bower_components/
 deployment/settings/stagingsecret.py
 deployment/settings/secret.py
 deployment/static/
+
 *.xls*
+!cbh_tests/
+!cbh_tests/fixtures/
+!cbh_tests/fixtures/*.xlsx
 server_configs.py
