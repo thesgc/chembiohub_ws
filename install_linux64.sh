@@ -8,7 +8,8 @@ ENV_NAME=$1
 OLD_PATH="$PATH"
 
 
-if [ "$CONDATEST" -ne "1" ] then
+if [ "$CONDATEST" -ne "1" ]
+then
     wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda2-2.4.0-Linux-x86_64.sh 
     if [ "$RD_BASE" -eq "/home/chembl/rdkit" ]
     then
@@ -168,7 +169,8 @@ createdb -h $CONDA_ENV_PATH/var/postgressocket/ ${ENV_NAME}_db -T template1
 fi
 
 
-if [ "$2" -eq "Ubuntu" ]; then
+if [ "$2" -eq "Ubuntu" ]
+ then
     sudo service supervisor restart
     printf "$APACHE" > /tmp/apache
     sudo mv /tmp/apache /etc/apache2/sites-available/${ENV_NAME}_chembiohub.conf
@@ -176,7 +178,8 @@ if [ "$2" -eq "Ubuntu" ]; then
     sudo service apache2 reload
 fi
 
-if [ "$2" -eq "Centos" ]; then
+if [ "$2" -eq "Centos" ]
+then
     sudo service supervisord restart
     printf "$APACHE" > /etc/httpd/conf.d/$ENV_NAME_chembiohub.conf
     sudo /etc/init.d/httpd graceful
