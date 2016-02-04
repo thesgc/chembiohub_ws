@@ -5,10 +5,10 @@ set -e
 ENV_NAME=$1
 OLD_PATH="$PATH"
 
-
-
+CONDATEST=$(type conda | grep -c conda)
+if [ "$CONDATEST" -ne "1" ] then
     wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda2-2.4.0-Linux-x86_64.sh 
-    if [ $RD_BASE -eq "/home/chembl/rdkit" ]
+    if [ "$RD_BASE" -eq "/home/chembl/rdkit" ]
     then
         bash Anaconda2-2.4.0-Linux-x86_64.sh -b -p /srv/chembiohub/anaconda2
     else
@@ -22,7 +22,7 @@ OLD_PATH="$PATH"
      conda config --add channels https://conda.anaconda.org/jeprescottroy
      conda config --add channels https://conda.anaconda.org/rdkit
      conda config --add channels https://conda.anaconda.org/clyde_fare
-
+fi
 
 conda create -q -y --file anaconda_requirements.txt -n $ENV_NAME
 
@@ -56,11 +56,7 @@ cd $FOLDER
 
 mkdir -p $CONDA_ENV_PATH/var/postgressocket
 initdb -D $CONDA_ENV_PATH/var/postgresdata
-$CONDA_ENV_PATH/bin/postgres  -D  $CONDA_ENV_PATH/var/postgresdata  -c  listen_addresses=''  -c  unix_socket_directories=$CONDA_ENV_PATH/var/postgressocket &
-sleep 5
-psql  -h $CONDA_ENV_PATH/var/postgressocket -c "create extension if not exists hstore;create extension if not exists  rdkit;" template1
 
-createdb -h $CONDA_ENV_PATH/var/postgressocket/ ${ENV_NAME}_db -T template1
 
 
 
@@ -72,17 +68,6 @@ unset PYTHONPATH
 unset RDBASE
 
 if [ "$USER" -ne "travis" ]; then
-
-python manage.py migrate
-python manage.py loaddata datatypes.json
-python manage.py loaddata projecttypes.json
-
-python manage.py reindex_compounds
-python manage.py reindex_datapoint_classifications
-
-
-    python manage.py createsuperuser
-    python manage.py collectstatic
 
 
     RANDOM_PORT=$(python generate_port.py)
@@ -110,6 +95,36 @@ autorestart=true"
 
 
 
+
+if [ "$2" -eq "Ubuntu" ]; then
+    sudo service supervisor restart
+
+fi
+
+if [ "$2" -eq "Centos" ]; then
+    sudo service supervisord restart
+
+fi
+
+psql  -h $CONDA_ENV_PATH/var/postgressocket -c "create extension if not exists hstore;create extension if not exists  rdkit;" template1
+
+createdb -h $CONDA_ENV_PATH/var/postgressocket/ ${ENV_NAME}_db -T template1
+
+
+
+python manage.py migrate
+python manage.py loaddata datatypes.json
+python manage.py loaddata projecttypes.json
+
+python manage.py reindex_compounds
+python manage.py reindex_datapoint_classifications
+
+
+    python manage.py createsuperuser
+    python manage.py collectstatic
+
+
+
     #REDO APACHE
     EXCLAM='!'
     APACHE="<Directory $(pwd)/deployment/static/>
@@ -133,6 +148,18 @@ autorestart=true"
     ProxyPassReverse /$ENV_NAME/ http://127.0.0.1:$RANDOM_PORT/$ENV_NAME/"
 
 
+else
+
+    $CONDA_ENV_PATH/bin/postgres  -D  $CONDA_ENV_PATH/var/postgresdata  -c  listen_addresses=''  -c  unix_socket_directories=$CONDA_ENV_PATH/var/postgressocket &
+
+
+sleep 5
+psql  -h $CONDA_ENV_PATH/var/postgressocket -c "create extension if not exists hstore;create extension if not exists  rdkit;" template1
+
+createdb -h $CONDA_ENV_PATH/var/postgressocket/ ${ENV_NAME}_db -T template1
+
+
+
 fi
 
 
@@ -149,3 +176,4 @@ if [ "$2" -eq "Centos" ]; then
     printf "$APACHE" > /etc/httpd/conf.d/$ENV_NAME_chembiohub.conf
     sudo /etc/init.d/httpd graceful
 fi
+
