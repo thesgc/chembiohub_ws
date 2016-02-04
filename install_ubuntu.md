@@ -38,7 +38,7 @@ Configure the packages'
 
 Run the install script in your home directory where the first argument is the web folder to install in'
 
-    if [ $USER -ne "vagrant" ]
+    if [ "$USER" -ne "vagrant" ]
     then
        bash install_linux64.sh 0 Ubuntu
     elif [ $RD_BASE = "/home/chembl/rdkit" ]

@@ -17,7 +17,7 @@ django-grappelli==2.7.2
 django-hstore==1.3.8
 django-picklefield
 django-solo
-git+https://github.com/django-tastypie/django-tastypie.git#egg=master
+git+https://github.com/django-tastypie/django-tastypie.git#egg=0fabc0c522a174e2627bf85d749428b2933fd287
 enum34
 kombu
 mechanize

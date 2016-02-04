@@ -67,7 +67,8 @@ unset LD_LIBRARY_PATH
 unset PYTHONPATH
 unset RDBASE
 
-if [ "$USER" -ne "travis" ]; then
+if [ "$USER" -ne "travis" ]
+ then
 
 
     RANDOM_PORT=$(python generate_port.py)
@@ -96,12 +97,14 @@ autorestart=true"
 
 
 
-if [ "$2" -eq "Ubuntu" ]; then
+if [ "$2" -eq "Ubuntu" ]
+ then
     sudo service supervisor restart
 
 fi
 
-if [ "$2" -eq "Centos" ]; then
+if [ "$2" -eq "Centos" ]
+ then
     sudo service supervisord restart
 
 fi
