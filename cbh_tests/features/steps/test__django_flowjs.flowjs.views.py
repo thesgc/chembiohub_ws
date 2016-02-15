@@ -20,6 +20,24 @@ def step(context):
 
 
 
+@given("I upload a spreadsheet to flowfiles")
+def step(context):
+    with open("src/cbh_datastore_ws/cbh_datastore_ws/features/fixtures/sample_data.xlsx") as f:
+        resp = context.dclient.post("/dev/api/flow/upload/", {"file": f, "flowChunkNumber": 1, 
+            "flowChunkSize": 22222222, 
+            "flowCurrentChunkSize": 137227,
+            "flowTotalSize": 137227,
+            "flowFilename": "newtest.xlsx",
+            "flowIdentifier": "137227-newtestxlsx",
+            "flowRelativePath": "newtest.xlsx",
+            "flowTotalChunks": 1})
+    resp = context.api_client.get("/dev/api/datastore/cbh_flowfiles/137227-newtestxlsx", 
+        format="json", 
+        follow=True)
+
+
+
+
 @when("I GET the file object via the URI from the (made up) session ID")
 def step(context):
     from django.conf import settings
