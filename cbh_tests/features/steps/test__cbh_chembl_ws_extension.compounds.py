@@ -6,6 +6,17 @@ from django.db import IntegrityError
 from django.contrib.auth.models import User
 
 
+
+
+
+
+
+
+
+
+
+
+
 @given(u'I create a compound batch from a drawing as before')
 def step_impl(context):
     context.execute_steps(u"""
@@ -90,10 +101,6 @@ def step_impl(context):
     saved_search_json = json.loads(context.saved_search_response.content)
     resp = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/cbh_saved_search/reindex_compound/", format='json', data={"id": saved_search_json["id"]})
     context.saved_search_index_resp = resp
-
-@when(u'I refresh the user object')
-def step(context):
-    context.user = User.objects.get(pk=context.user.pk)
 
 
 @then(u'The saved search index response is OK')
@@ -303,3 +310,39 @@ def step(context):
   1  72  0     0  0
   4  82  0     0  0
 M  END"""
+
+
+
+
+
+
+@then(u'the response from post validate files is accepted')
+def step_impl(context):
+    context.test_case.assertHttpAccepted(context.val_response )
+    print (context.val_response)
+    context.valdata = json.loads(context.val_response.content)
+
+
+
+
+
+
+
+
+#File upload stuff
+
+
+@when("I validate the compounds file")
+def step(context):
+    project_key = json.loads(context.project_response.content )["project_key"]
+    validate_file_data = {"file_name": context.current_file_name,
+    "multiplebatch":None,
+    "type":"file",
+    "fileextension":context.current_file_extension,
+    "projectKey": project_key,
+    "struccol":"",
+    "state":"validate"}
+    from django.conf import settings
+    context.val_response = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches/validate_files/", 
+        format='json', 
+        data=validate_file_data)

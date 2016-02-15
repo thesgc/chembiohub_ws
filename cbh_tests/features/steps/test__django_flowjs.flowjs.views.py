@@ -1,7 +1,8 @@
 from behave import given, when, then
 import json
-
+import time
 from django.db import IntegrityError
+import shortuuid
 
 @given("I upload a file to django flowjs")
 def step(context):
@@ -20,23 +21,31 @@ def step(context):
 
 
 
-@given("I upload a spreadsheet to flowfiles")
-def step(context):
-    with open("src/cbh_datastore_ws/cbh_datastore_ws/features/fixtures/sample_data.xlsx") as f:
-        resp = context.dclient.post("/dev/api/flow/upload/", {"file": f, "flowChunkNumber": 1, 
+@when("I upload {filename} to flowfiles")
+def step(context, filename):
+    from django.conf import settings
+    context.current_uuid = shortuuid.uuid()
+    with open("cbh_tests/fixtures/%s" % filename) as f:
+        context.flowfilepostresp = context.api_client.client.post("/" + settings.WEBSERVICES_NAME + "/flow/upload/",  {"file": f, "flowChunkNumber": 1, 
             "flowChunkSize": 22222222, 
             "flowCurrentChunkSize": 137227,
             "flowTotalSize": 137227,
-            "flowFilename": "newtest.xlsx",
-            "flowIdentifier": "137227-newtestxlsx",
-            "flowRelativePath": "newtest.xlsx",
+            "flowFilename": filename,
+            "flowIdentifier": context.current_uuid,
+            "flowRelativePath": filename,
             "flowTotalChunks": 1})
-    resp = context.api_client.get("/dev/api/datastore/cbh_flowfiles/137227-newtestxlsx", 
-        format="json", 
-        follow=True)
+    #Filename is the second part of the response after session id
+    context.current_file_name = context.flowfilepostresp.content.split("-", 1)[1]
+    context.current_file_extension = filename.split(".")[-1]
 
-
-
+@then("The flow file response contains the identifier I gave the file")
+def step(context):
+    data = context.flowfilepostresp.content.split("-")
+    ff = data[len(data) - 1]
+    context.test_case.assertEqual(ff, context.current_uuid)
+    # resp = context.api_client.get("/dev/api/datastore/cbh_flowfiles/%s" % context.current_uuid, 
+    #     format="json", 
+    #     follow=True)
 
 @when("I GET the file object via the URI from the (made up) session ID")
 def step(context):
