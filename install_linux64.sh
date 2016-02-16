@@ -98,11 +98,11 @@ autorestart=true"
 
 
 
-if [ $2 -eq "Ubuntu" ]
- then
+#if [ $2 -eq "Ubuntu" ]
+ #then
     #sudo service supervisor restart
 
-fi
+#fi
 
 if [ $2 -eq "Centos" ]
  then
