@@ -64,8 +64,6 @@ initdb -D $CONDA_ENV_PATH/var/postgresdata
 
 
 
-
-
 unset LD_LIBRARY_PATH
 unset PYTHONPATH
 unset RDBASE
@@ -100,17 +98,20 @@ autorestart=true"
 
 
 
-if [ "$2" -eq "Ubuntu" ]
+if [ $2 -eq "Ubuntu" ]
  then
-    sudo service supervisor restart
+    #sudo service supervisor restart
 
 fi
 
-if [ "$2" -eq "Centos" ]
+if [ $2 -eq "Centos" ]
  then
     sudo service supervisord restart
 
 fi
+#Start postgres in foreground
+    $CONDA_ENV_PATH/bin/postgres  -D  $CONDA_ENV_PATH/var/postgresdata  -c  listen_addresses=''  -c  unix_socket_directories=$CONDA_ENV_PATH/var/postgressocket &
+sleep 5
 
 psql  -h $CONDA_ENV_PATH/var/postgressocket -c "create extension if not exists hstore;create extension if not exists  rdkit;" template1
 
@@ -169,7 +170,7 @@ createdb -h $CONDA_ENV_PATH/var/postgressocket/ ${ENV_NAME}_db -T template1
 fi
 
 
-if [ "$2" -eq "Ubuntu" ]
+if [ $2 -eq "Ubuntu" ]
  then
     sudo service supervisor restart
     printf "$APACHE" > /tmp/apache
@@ -178,7 +179,7 @@ if [ "$2" -eq "Ubuntu" ]
     sudo service apache2 reload
 fi
 
-if [ "$2" -eq "Centos" ]
+if [ $2 -eq "Centos" ]
 then
     sudo service supervisord restart
     printf "$APACHE" > /etc/httpd/conf.d/$ENV_NAME_chembiohub.conf
