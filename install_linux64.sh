@@ -6,6 +6,7 @@ set -e
 
 ENV_NAME=$1
 OLD_PATH="$PATH"
+OPERATING_SYSTEM=$2
 
 
 if [ "$CONDATEST" -ne "1" ]
@@ -104,7 +105,7 @@ autorestart=true"
 
 #fi
 
-if [ $2 -eq "Centos" ]
+if [ "$OPERATING_SYSTEM" -eq "Centos" ]
  then
     sudo service supervisord restart
 
@@ -115,24 +116,11 @@ sleep 5
 
 psql  -h $CONDA_ENV_PATH/var/postgressocket -c "create extension if not exists hstore;create extension if not exists  rdkit;" template1
 
+
+
 createdb -h $CONDA_ENV_PATH/var/postgressocket/ ${ENV_NAME}_db -T template1
 
-
-
-python manage.py migrate
-python manage.py loaddata datatypes.json
-python manage.py loaddata projecttypes.json
-
-python manage.py reindex_compounds
-python manage.py reindex_datapoint_classifications
-
-
-    python manage.py createsuperuser
-    python manage.py collectstatic
-
-
-
-    #REDO APACHE
+  #REDO APACHE
     EXCLAM='!'
     APACHE="<Directory $(pwd)/deployment/static/>
      Options Indexes FollowSymLinks
@@ -154,6 +142,22 @@ python manage.py reindex_datapoint_classifications
     ProxyPass /$ENV_NAME/ http://127.0.0.1:$RANDOM_PORT/$ENV_NAME/
     ProxyPassReverse /$ENV_NAME/ http://127.0.0.1:$RANDOM_PORT/$ENV_NAME/"
 
+if [ "$USER" -ne "ubuntu" ]
+ then
+python manage.py migrate
+python manage.py loaddata datatypes.json
+python manage.py loaddata projecttypes.json
+
+python manage.py reindex_compounds
+python manage.py reindex_datapoint_classifications
+
+
+    python manage.py createsuperuser
+    python manage.py collectstatic
+fi
+
+
+  
 
 else
 
@@ -170,7 +174,7 @@ createdb -h $CONDA_ENV_PATH/var/postgressocket/ ${ENV_NAME}_db -T template1
 fi
 
 
-if [ $2 -eq "Ubuntu" ]
+if [ "$OPERATING_SYSTEM" -eq "Ubuntu" ]
  then
     sudo service supervisor restart
     printf "$APACHE" > /tmp/apache
@@ -179,10 +183,9 @@ if [ $2 -eq "Ubuntu" ]
     sudo service apache2 reload
 fi
 
-if [ $2 -eq "Centos" ]
+if [  "$OPERATING_SYSTEM"  -eq "Centos" ]
 then
     sudo service supervisord restart
     printf "$APACHE" > /etc/httpd/conf.d/$ENV_NAME_chembiohub.conf
     sudo /etc/init.d/httpd graceful
 fi
-
