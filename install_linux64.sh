@@ -110,15 +110,6 @@ if [ "$OPERATING_SYSTEM" -eq "Centos" ]
     sudo service supervisord restart
 
 fi
-#Start postgres in foreground
-    $CONDA_ENV_PATH/bin/postgres  -D  $CONDA_ENV_PATH/var/postgresdata  -c  listen_addresses=''  -c  unix_socket_directories=$CONDA_ENV_PATH/var/postgressocket &
-sleep 5
-
-psql  -h $CONDA_ENV_PATH/var/postgressocket -c "create extension if not exists hstore;create extension if not exists  rdkit;" template1
-
-
-
-createdb -h $CONDA_ENV_PATH/var/postgressocket/ ${ENV_NAME}_db -T template1
 
   #REDO APACHE
     EXCLAM='!'
@@ -144,6 +135,17 @@ createdb -h $CONDA_ENV_PATH/var/postgressocket/ ${ENV_NAME}_db -T template1
 
 if [ "$USER" -ne "ubuntu" ]
  then
+ 
+ #Start postgres in foreground
+    $CONDA_ENV_PATH/bin/postgres  -D  $CONDA_ENV_PATH/var/postgresdata  -c  listen_addresses=''  -c  unix_socket_directories=$CONDA_ENV_PATH/var/postgressocket &
+sleep 5
+
+psql  -h $CONDA_ENV_PATH/var/postgressocket -c "create extension if not exists hstore;create extension if not exists  rdkit;" template1
+
+
+
+createdb -h $CONDA_ENV_PATH/var/postgressocket/ ${ENV_NAME}_db -T template1
+
 python manage.py migrate
 python manage.py loaddata datatypes.json
 python manage.py loaddata projecttypes.json
