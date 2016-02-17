@@ -4,15 +4,15 @@ CONDATEST=$(type conda | grep -c conda)
 
 set -e
 
-ENV_NAME=$1
+export ENV_NAME=$1
 OLD_PATH="$PATH"
 OPERATING_SYSTEM=$2
 
 
-if [ "$CONDATEST" -ne "1" ]
+if [ "$CONDATEST" != "1" ]
 then
     wget https://3230d63b5fc54e62148e-c95ac804525aac4b6dba79b00b39d1d3.ssl.cf1.rackcdn.com/Anaconda2-2.4.0-Linux-x86_64.sh 
-    if [ "$RD_BASE" -eq "/home/chembl/rdkit" ]
+    if [ "$RD_BASE" == "/home/chembl/rdkit" ]
     then
         bash Anaconda2-2.4.0-Linux-x86_64.sh -b -p /srv/chembiohub/anaconda2
     else
@@ -69,7 +69,7 @@ unset LD_LIBRARY_PATH
 unset PYTHONPATH
 unset RDBASE
 
-if [ "$USER" -ne "travis" ]
+if [ "$USER" != "travis" ]
  then
 
 
@@ -126,13 +126,13 @@ autorestart=true"
 fi
 
 
-#if [ $2 -eq "Ubuntu" ]
+#if [ $2 == "Ubuntu" ]
  #then
     #sudo service supervisor restart
 
 #fi
 
-if [ "$OPERATING_SYSTEM" -eq "Centos" ]
+if [ "$OPERATING_SYSTEM" == "Centos" ]
  then
     sudo service supervisord restart
 
@@ -140,35 +140,10 @@ fi
 
 
 
-if [ "$USER" -ne "ubuntu" ]
- then
- 
- #Start postgres in foreground
-    $CONDA_ENV_PATH/bin/postgres  -D  $CONDA_ENV_PATH/var/postgresdata  -c  listen_addresses=''  -c  unix_socket_directories=$CONDA_ENV_PATH/var/postgressocket &
-sleep 5
-
-psql  -h $CONDA_ENV_PATH/var/postgressocket -c "create extension if not exists hstore;create extension if not exists  rdkit;" template1
-
-
-
-createdb -h $CONDA_ENV_PATH/var/postgressocket/ ${ENV_NAME}_db -T template1
-
-python manage.py migrate
-python manage.py loaddata datatypes.json
-python manage.py loaddata projecttypes.json
-
-python manage.py reindex_compounds
-python manage.py reindex_datapoint_classifications
-
-
-    python manage.py createsuperuser
-    python manage.py collectstatic
-fi
-
 
   
 
-if [ "$USER" -eq "travis"]
+if [ "$USER" == "travis"]
     then
 
     $CONDA_ENV_PATH/bin/postgres  -D  $CONDA_ENV_PATH/var/postgresdata  -c  listen_addresses=''  -c  unix_socket_directories=$CONDA_ENV_PATH/var/postgressocket &
@@ -184,7 +159,7 @@ createdb -h $CONDA_ENV_PATH/var/postgressocket/ ${ENV_NAME}_db -T template1
 fi
 
 
-if [ "$OPERATING_SYSTEM" -eq "Ubuntu" ]
+if [ "$OPERATING_SYSTEM" == "Ubuntu" ]
  then
     sudo service supervisor restart
     printf "$APACHE" > /tmp/apache
@@ -193,7 +168,10 @@ if [ "$OPERATING_SYSTEM" -eq "Ubuntu" ]
     sudo service apache2 reload
 fi
 
-if [  "$OPERATING_SYSTEM"  -eq "Centos" ]
+
+
+
+if [  "$OPERATING_SYSTEM"  == "Centos" ]
 then
     sudo service supervisord restart
     printf "$APACHE" > /etc/httpd/conf.d/$ENV_NAME_chembiohub.conf
