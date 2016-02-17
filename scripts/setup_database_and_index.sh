@@ -10,8 +10,8 @@ export CONDA_ENV_PATH=/home/$USER/anaconda2/envs/$ENV_NAME
 export PATH=$CONDA_ENV_PATH/bin:$OLD_PATH
 
 
-createdb -h $CONDA_ENV_PATH/var/postgressocket/ ${ENV_NAME}_db -T template1
 psql  -h $CONDA_ENV_PATH/var/postgressocket -c "create extension if not exists hstore;create extension if not exists  rdkit;" template1
+createdb -h $CONDA_ENV_PATH/var/postgressocket/ ${ENV_NAME}_db -T template1
 
 python generate_secret_settings.py > deployment/settings/secret.py
 python manage.py migrate
