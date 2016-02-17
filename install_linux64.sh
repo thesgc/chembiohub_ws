@@ -96,24 +96,12 @@ autorestart=true"
 
     sudo mv /tmp/postgres "/etc/supervisor/conf.d/${ENV_NAME}_postgres_supervisor.conf"
 
-
-
-
-#if [ $2 -eq "Ubuntu" ]
- #then
-    #sudo service supervisor restart
-
-#fi
-
-if [ "$OPERATING_SYSTEM" -eq "Centos" ]
- then
-    sudo service supervisord restart
-
-fi
-
   #REDO APACHE
     EXCLAM='!'
-    APACHE="<Directory $(pwd)/deployment/static/>
+    APACHE="<VirtualHost *:80>
+
+
+    <Directory $(pwd)/deployment/static/>
      Options Indexes FollowSymLinks
      AllowOverride None
      Require all granted
@@ -131,7 +119,26 @@ fi
     AliasMatch ^/$ENV_NAME/static/(.*)\$ $(pwd)/deployment/static/\$1
     AliasMatch ^/$ENV_NAME/((?${EXCLAM}#|\s*\$|index\.html).*)\$ $(pwd)/deployment/static/\$1
     ProxyPass /$ENV_NAME/ http://127.0.0.1:$RANDOM_PORT/$ENV_NAME/
-    ProxyPassReverse /$ENV_NAME/ http://127.0.0.1:$RANDOM_PORT/$ENV_NAME/"
+    ProxyPassReverse /$ENV_NAME/ http://127.0.0.1:$RANDOM_PORT/$ENV_NAME/
+
+    </VirtualHost>"
+
+fi
+
+
+#if [ $2 -eq "Ubuntu" ]
+ #then
+    #sudo service supervisor restart
+
+#fi
+
+if [ "$OPERATING_SYSTEM" -eq "Centos" ]
+ then
+    sudo service supervisord restart
+
+fi
+
+
 
 if [ "$USER" -ne "ubuntu" ]
  then
@@ -161,7 +168,8 @@ fi
 
   
 
-else
+if [ "$USER" -eq "travis"]
+    then
 
     $CONDA_ENV_PATH/bin/postgres  -D  $CONDA_ENV_PATH/var/postgresdata  -c  listen_addresses=''  -c  unix_socket_directories=$CONDA_ENV_PATH/var/postgressocket &
 
