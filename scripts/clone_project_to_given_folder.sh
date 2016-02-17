@@ -1,5 +1,6 @@
 set -e
 FOLDER="$1"
+echo "$FOLDER"
 sudo mkdir -p "$FOLDER"
 sudo chown -R ubuntu "$FOLDER"
 cd "$FOLDER"
