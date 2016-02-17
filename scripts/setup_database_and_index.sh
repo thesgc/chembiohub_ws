@@ -1,6 +1,9 @@
 
  #Start postgres in foreground
+export ENV_NAME="$1"
+source activate "$ENV_NAME"
 
+cd "$2"
 
 psql  -h $CONDA_ENV_PATH/var/postgressocket -c "create extension if not exists hstore;create extension if not exists  rdkit;" template1
 

@@ -143,7 +143,7 @@ fi
 
   
 
-if [ "$USER" == "travis"]
+if [ "$USER" == "travis" ]
     then
 
     $CONDA_ENV_PATH/bin/postgres  -D  $CONDA_ENV_PATH/var/postgresdata  -c  listen_addresses=''  -c  unix_socket_directories=$CONDA_ENV_PATH/var/postgressocket &
@@ -154,11 +154,7 @@ psql  -h $CONDA_ENV_PATH/var/postgressocket -c "create extension if not exists h
 
 createdb -h $CONDA_ENV_PATH/var/postgressocket/ ${ENV_NAME}_db -T template1
 
-
-
-fi
-
-
+else
 if [ "$OPERATING_SYSTEM" == "Ubuntu" ]
  then
     sudo service supervisor restart
@@ -177,3 +173,11 @@ then
     printf "$APACHE" > /etc/httpd/conf.d/$ENV_NAME_chembiohub.conf
     sudo /etc/init.d/httpd graceful
 fi
+
+
+
+
+
+fi
+
+
