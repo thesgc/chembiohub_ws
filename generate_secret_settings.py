@@ -25,5 +25,5 @@ def get_secret_key():
     return get_random_string(50, chars)
 
 
-print("SECRET_KEY=%S" % get_secret_key())
+print("SECRET_KEY=%s" % get_secret_key())
 
