@@ -21,9 +21,9 @@ def get_secret_key():
  
     Taken from the Django project.
     """
-    chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*(-_=+)'
+    chars = 'abcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*-_=+'
     return get_random_string(50, chars)
 
 
-print(get_secret_key())
+print("SECRET_KEY=%S" % get_secret_key())
 
