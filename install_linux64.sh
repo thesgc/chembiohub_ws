@@ -98,19 +98,15 @@ autorestart=true"
 
   #REDO APACHE
     EXCLAM='!'
+
     APACHE="<VirtualHost *:80>
-
-
     <Directory $(pwd)/deployment/static/>
      Options Indexes FollowSymLinks
      AllowOverride None
      Require all granted
     </Directory>
 
-
-
     RewriteEngine On
-    RewriteCond %{REQUEST_FILENAME} !-f
     RewriteRule ^/$ENV_NAME\$ $ENV_NAME/ [L,R=301]
     RewriteRule ^/\$ $ENV_NAME/ [L,R=301]
     RewriteRule ^\$ $ENV_NAME/ [L,R=301]
