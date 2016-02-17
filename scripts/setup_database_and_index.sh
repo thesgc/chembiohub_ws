@@ -17,5 +17,5 @@ python manage.py loaddata datatypes.json
 python manage.py loaddata projecttypes.json
 python manage.py reindex_compounds
 python manage.py reindex_datapoint_classifications
-python manage.py collectstatic
+python manage.py collectstatic --noinput
 echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'pass')" | python manage.py shell
