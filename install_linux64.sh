@@ -157,6 +157,7 @@ if [ "$OPERATING_SYSTEM" == "Ubuntu" ]
     printf "$APACHE" > /tmp/apache
     sudo mv /tmp/apache /etc/apache2/sites-available/${ENV_NAME}_chembiohub.conf
     sudo a2ensite ${ENV_NAME}_chembiohub.conf
+    sudo  a2dissite 000-default
     sudo service apache2 reload
 fi
 
