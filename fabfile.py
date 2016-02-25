@@ -48,5 +48,5 @@ def deploy():
         with cd(env.directory + "/src/ng-chem"):
             sudo("bower install", user=env.user_running_chembiohub)
         with cd(env.directory):
-            sudo("python manage.py collectstatic", user=env.user_running_chembiohub)
+            sudo("python manage.py collectstatic --noinput", user=env.user_running_chembiohub)
         sudo("supervisorctl reload")
