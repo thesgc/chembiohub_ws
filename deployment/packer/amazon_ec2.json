@@ -1,0 +1,101 @@
+{
+  "provisioners": [
+    {
+      "type": "shell",
+      "execute_command": "bash '{{.Path}}'",
+      "override": {
+        "amazon-ebs": {
+          "scripts": [
+            "clone.sh",
+            "dependencies.sh",
+            "python_dependencies.sh",
+            "db_and_index.sh"
+          ]
+        },
+        "virtualbox-iso": {
+          "execute_command": "echo 'vagrant'|sudo -S bash '{{.Path}}'",
+          "scripts": [
+            "clone.sh",
+            "dependencies.sh",
+            "python_dependencies.sh",
+            "db_and_index.sh"
+          ]
+        }
+      }
+    }
+  ],
+
+  "post-processors": [
+    {
+      "type": "compress"
+    },
+    {
+      "type": "vagrant",
+      "only": ["virtualbox-iso"],
+      "override": {
+        "virtualbox": {
+          "output": "ubuntu-14-04-x64-virtualbox.box"
+        }
+      }
+    }
+  ],
+
+  "variables": {
+  
+  },
+
+  "builders": [{
+    "type": "amazon-ebs",
+    "access_key": "{{env `AWS_ACCESS_KEY`}}",
+    "secret_key": "{{env `AWS_SECRET_KEY`}}",
+    "region": "us-east-1",
+    "source_ami": "ami-20d3fc4a",
+    "instance_type": "t2.micro",
+    "ssh_username": "ubuntu",
+    "ami_name": "packer-example {{timestamp}}"
+  },
+  {
+      "type": "virtualbox-iso",
+      "boot_command": [
+        "<esc><wait>",
+        "<esc><wait>",
+        "<enter><wait>",
+        "/install/vmlinuz<wait>",
+        " auto<wait>",
+        " console-setup/ask_detect=false<wait>",
+        " console-setup/layoutcode=gb<wait>",
+        " console-setup/modelcode=pc105<wait>",
+        " debian-installer=en_GB<wait>",
+        " fb=false<wait>",
+        " initrd=/install/initrd.gz<wait>",
+        " kbd-chooser/method=gb<wait>",
+        " keyboard-configuration/layout=GB<wait>",
+        " keyboard-configuration/variant=GB<wait>",
+        " locale=en_GB<wait>",
+        " netcfg/get_hostname=ubuntu-1404<wait>",
+        " netcfg/get_domain=vagrantup.com<wait>",
+        " noapic<wait>",
+        " preseed/url=http://{{ .HTTPIP }}:{{ .HTTPPort }}/preseed.cfg<wait>",
+        " -- <wait>",
+        "<enter><wait>"
+      ],
+      "boot_wait": "10s",
+      "disk_size": 40960,
+      "guest_os_type": "Ubuntu_64",
+      "http_directory": "http",
+      "iso_checksum": "9e5fecc94b3925bededed0fdca1bd417",
+      "iso_checksum_type": "md5",
+      "iso_url": "http://releases.ubuntu.com/14.04/ubuntu-14.04.3-server-amd64.iso",
+      "ssh_username": "vagrant",
+      "ssh_password": "vagrant",
+      "ssh_port": 22,
+      "ssh_pty" : "true",
+      "ssh_wait_timeout": "10000s",
+      "shutdown_command": "echo 'shutdown -P now' > /tmp/shutdown.sh; echo 'vagrant'|sudo -S sh '/tmp/shutdown.sh'",
+      "vboxmanage": [
+        [ "modifyvm", "{{.Name}}", "--memory", "512" ],
+        [ "modifyvm", "{{.Name}}", "--cpus", "1" ]
+      ]
+    }
+  ]
+}
