@@ -34,7 +34,8 @@ deployment/packer/packer_cache/
 # Installer logs
 pip-log.txt
 pip-delete-this-directory.txt
-
+cbh_chem_api/
+cbh_core_api/
 # Unit test / coverage reports
 htmlcov/
 .tox/
