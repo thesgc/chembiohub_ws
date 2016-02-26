@@ -6,7 +6,7 @@ OLD_PATH="$PATH"
 
 #source activate $ENV_NAME
 
-export CONDA_ENV_PATH=/home/$USER/anaconda2/envs/$ENV_NAME
+export CONDA_ENV_PATH=/home/$2/anaconda2/envs/$ENV_NAME
 export PATH=$CONDA_ENV_PATH/bin:$OLD_PATH
 
 

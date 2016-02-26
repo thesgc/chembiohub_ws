@@ -15,10 +15,10 @@
         "virtualbox-iso": {
           "execute_command": "echo 'vagrant'|sudo -S bash '{{.Path}}'",
           "scripts": [
-            "clone.sh",
+            "clone_vagrant.sh",
             "dependencies.sh",
-            "python_dependencies.sh",
-            "db_and_index.sh"
+            "python_dependencies_vagrant.sh",
+            "db_and_index_vagrant.sh"
           ]
         }
       }
