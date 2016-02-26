@@ -68,6 +68,12 @@ initdb -D $CONDA_ENV_PATH/var/postgresdata
 unset LD_LIBRARY_PATH
 unset PYTHONPATH
 unset RDBASE
+USERSUB=$USER
+
+if [ "$USER" == "root" ]
+    then
+    USERSUB="vagrant"
+fi
 
 if [ "$USER" != "travis" ]
  then
@@ -80,14 +86,14 @@ if [ "$USER" != "travis" ]
 command=$CONDA_ENV_PATH/bin/uwsgi  --http  :$RANDOM_PORT  --chmod-socket=664  --module=deployment.wsgi
 directory=$(pwd)
 environment=PATH=$PATH,CONDA_ENV_PATH=$CONDA_ENV_PATH
-user=$USER
+user=$USERSUB
 autorestart=true
 redirect_stderr=true" 
     printf "$SUPERVISOR" > /tmp/uwsgi
 
     POSTGRES="[program:${ENV_NAME}_postgresql]
 command=$CONDA_ENV_PATH/bin/postgres  -D  $CONDA_ENV_PATH/var/postgresdata  -c  listen_addresses=''  -c  unix_socket_directories=$CONDA_ENV_PATH/var/postgressocket
-user=$USER
+user=$USERSUB
 autorestart=true" 
     printf "$POSTGRES" > /tmp/postgres
 
