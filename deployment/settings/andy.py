@@ -1,5 +1,6 @@
 from .default import *
 
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 INSTALLED_APPS = (
       'django.contrib.auth',

@@ -1,7 +1,7 @@
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
-
+deployment/packer/output-virtualbox-iso/
 # C extensions
 *.so
 *gunicorn.sh

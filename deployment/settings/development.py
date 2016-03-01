@@ -1,7 +1,7 @@
 from .base import *
 
 
-
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
