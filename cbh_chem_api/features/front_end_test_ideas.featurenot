@@ -1,0 +1,18 @@
+Feature: Disable links for viewer only projects
+
+	Scenario: User has only view rights to a project
+		Given a User
+		and a valid project exists proja
+        and I have viewer rights for proja
+		When I log in frontend
+		I am redirected to the project list view
+		The project list contains disabled links to the edit functionality
+
+
+	Scenario: User has only view rights to a project
+		Given a User
+		and a valid project exists proja
+        and I have editor rights for proja
+		When I log in frontend
+		I am redirected to the project list view
+		The project list contains links to the edit functionality

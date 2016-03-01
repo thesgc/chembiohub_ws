@@ -1,0 +1,64 @@
+{% extends "cbh_chem_api/cbh_template.html" %}
+{% block content %}
+<label>{% if logout %}Logged out, log in again below
+             {% endif %}</label>
+        <!--If the Oxford webauth login is enabled then show tabs - can be used for other logins too-->
+        {% if webauth_login %}
+<ul class="nav nav-tabs ">
+  <li class="active" ><a data-toggle="tab" href="#oxford">Oxford Login</a></li>
+  <li ><a data-toggle="tab"  href="#external">External Collaborator Login</a></li>
+
+</ul>
+           {% endif %}
+
+ <div class="{% if webauth_login %}tab-content{% endif %}">
+          {% if webauth_login %}
+        <div id="oxford" class="mt tab-pane fade in active">
+
+<p>If you have University of Oxford single sign-on access &nbsp;&nbsp;&nbsp;
+<a role="button" href="webauth" value="Sign in with WebAuth" class="btn btn-primary btn-lg mt" >Click here to sign in with WebAuth</a></p>
+
+<p>If you wish to sign out of University Webauth &nbsp;&nbsp;&nbsp;
+<a role="button" href="//webauth.ox.ac.uk/logout" value="Sign out of WebAuth" class="btn btn-danger btn-lg mt" >Click here to sign out of WebAuth entirely</a></p>
+
+    </div>
+      {% endif %}
+
+    <div id="external" class="{% if webauth_login %}tab-pane fade{% endif %}">
+      
+
+<form class="form-horizontal mt" method="post">
+            
+{% csrf_token %}
+          <fieldset><div id="div_id_username" class="form-group"><label for="id_username" class="control-label  requiredField">
+                      Username<span class="asteriskField">*</span></label><div class="controls "><input class="textinput textInput form-control" id="id_username" maxlength="254" name="username" type="text"> </div></div>
+                      <div id="div_id_password" class="form-group"><label for="id_password" class="control-label  requiredField">
+                      Password<span class="asteriskField">*</span></label><div class="controls "><input class="textinput textInput form-control" id="id_password" name="password" type="password"> </div></div>
+                  </fieldset>
+                      <div class="form-actions"><input type="submit" name="save" value="Sign in" class="btn btn-primary" id="submit-id-save"> </div>
+                      
+  {% if form.errors %}
+  <p>Forgotten your password? Reset it using
+    <a href="{% url 'password_reset' %}"> this link</a></p>
+    {% for field in form %}
+        {% for error in field.errors %}
+            <div class="alert alert-error">
+                <strong>{{ error|escape }}</strong>
+            </div>
+        {% endfor %}
+    {% endfor %}
+    {% for error in form.non_field_errors %}
+        <div class="alert alert-error">
+            <strong>{{ error|escape }}</strong>
+        </div>
+    {% endfor %}
+{% endif %}
+      </form>
+
+  </div>
+</div>
+
+
+
+
+{% endblock %}

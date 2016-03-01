@@ -1,0 +1,17 @@
+<p>Hi {{user.first_name}} {{user.last_name}}</p>
+
+
+<p>You have been previously logged on to use the University of Oxford ChemBio Hub platform. {{extra.invite.created_by.data.first_name }} {{extra.invite.created_by.data.last_name }} would like you to log on again and look at the following projects {% for project in extra.invite.projects_selected %} "{{project.name}}"{% if  not forloop.last %}, {% endif %}{% endfor %}.</p>
+
+<p>You can now access these projects at the usual address:
+<br>
+{{extra.hostname}}{{ extra.login_url }}</p>
+
+<p>If you would like to reset your password you can do it via this link:<br>
+<a href="{{extra.hostname}}{% url 'password_reset_confirm' uidb64=uid token=token %}">{{extra.hostname}}{% url 'password_reset_confirm' uidb64=uid token=token %}</a>
+
+<p>If you think you have been invited to use this system in error, or have any problems registering, please contact the ChemBio Hub  team - <a href="mailto:info@chembiohub.ox.ac.uk">info@chembiohub.ox.ac.uk</a>. We are also happy to answer any other questions you may have about the ChemBio Hub platform.</p>
+
+<p>Thanks
+<br>
+ChemBio Hub Team</p>

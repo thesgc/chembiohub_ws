@@ -1,0 +1,18 @@
+<p>Hi {{user.first_name}} {{user.last_name}}</p>
+
+<p>You have been invited to use the University of Oxford ChemBio Hub platform by {{extra.invite.created_by.data.first_name}} {{extra.invite.created_by.data.last_name}}. They have requested you have access to the following projects: {% for project in extra.invite.projects_selected %} "{{project.name}}"{% if  not forloop.last %}, {% endif %}{% endfor %}.</p>
+
+<p>To go ahead and confirm your registration as a user on these projects, please click the link below:<br>
+<a href="{{extra.hostname}}{% url 'password_reset_confirm' uidb64=uid token=token %}">{{extra.hostname}}{% url 'password_reset_confirm' uidb64=uid token=token %}</a>
+</p>
+<p>You will be asked to create a password for your account. Your username will be your email address ({{ user.get_username }}
+). You can then log into the system using this link:<br>
+
+{{extra.hostname}}{{ extra.login_url }}</p>
+
+<p>If you think you have been invited to use this system in error, or have any problems registering, please contact the ChemBio Hub  team - <a href="mailto:info@chembiohub.ox.ac.uk">info@chembiohub.ox.ac.uk</a>. We are also happy to answer any other questions you may have about the ChemBio Hub platform.</p>
+<p>
+Thanks,
+<br>
+ChemBio Hub Team
+</p>
