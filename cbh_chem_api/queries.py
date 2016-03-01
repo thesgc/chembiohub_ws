@@ -39,3 +39,4 @@ class CBHQueryField(Resource):
 
 
 class CBHSearch(Resource):
+    query_fields = fields.ToManyField(CBHQueryField, full=True)

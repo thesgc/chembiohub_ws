@@ -126,19 +126,17 @@ def parse_pandas_record(headers, obj, destination_field, row, fielderrors, heade
 
 
 def get_uncurated_fields_from_file(correct_file, fielderrors):
-    data = correct_file.file.read()
+    data = correct_file.file.read().decode('string-escape').decode("utf-8", "ignore")
     data = data.replace("\r\n", "\n").replace("\r", "\n")
     ctabs = data.split("$$$$")
     uncurated = []
     for ctab in ctabs:
-        pns = re.findall(r'> *<(.+)>',ctab);
-        pns2 = re.findall(r'> *<.+> *\S*\n(.+)\n',ctab);
-            
+        pns = re.findall(r'> *<(.+)> *\S*\n+(.+)\n+',ctab)
         blinded_uncurated_fields = {}
-        for idx, hdr in enumerate(pns):
-            value = pns2[idx]
-            blinded_uncurated_fields[hdr] = unicode(value)
-            test_specific_parse_errors(hdr,value, fielderrors)
+        for key, value in pns:
+            blinded_uncurated_fields[key] = value
+            test_specific_parse_errors(key,value, fielderrors)
+
         uncurated.append(blinded_uncurated_fields)
     return (uncurated, ctabs)
 
