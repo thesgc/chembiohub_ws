@@ -50,3 +50,5 @@ def deploy():
         with cd(env.directory):
             sudo("python manage.py collectstatic --noinput", user=env.user_running_chembiohub)
         sudo("supervisorctl reload")
+        with cd(env.directory):
+            sudo("python manage.py log_all_users_out", user=env.user_running_chembiohub)

@@ -11,7 +11,7 @@ TASTYPIE_CANNED_ERROR = "An internal server error occurred. Please contact ChEMB
 
 ID_PREFIX = "UOX"
 SESSION_COOKIE_HTTPONLY = False
-#SESSION_SAVE_EVERY_REQUEST = True
+SESSION_SAVE_EVERY_REQUEST = True
 OPEN_SOURCE = True
 LOGIN_REDIRECT_URL = '/r/#/projects/list'
 LOGOUT_REDIRECT_URL = "login"

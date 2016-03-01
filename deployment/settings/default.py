@@ -34,7 +34,6 @@ STATIC_ROOT = '%s/deployment/static' % BASE_DIR
 MEDIA_ROOT = '%s/var/media/' % CONDA_ENV_PATH
 
 
-
 FLOWJS_PATH = MEDIA_ROOT + 'flow'
 
 
