@@ -40,3 +40,5 @@ post_save.connect(
     sync_permissions, sender=ChemregProject, dispatch_uid="proj_perms2")
 
 admin.site.register(ChemregProject, ProjectAdmin)
+
+

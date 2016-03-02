@@ -3,6 +3,7 @@ from django.conf.urls import patterns, url, include
 from cbh_core_api.resources import Login, Logout
 from django.conf import settings
 from flowjs import urls as flow
+from cbh_core_api import flowjs_urls as cbh_flow
 from django.contrib import admin
 from django.contrib.auth.views import password_change, password_change_done, password_reset, password_reset_done, password_reset_complete, password_reset_confirm
 
@@ -67,6 +68,8 @@ urlpatterns = patterns('',
                        # adding this to allow configured upload URL within
                        # django-flowjs
                        url(r'^%s/flow/' % api_name, include(flow)),
+                       #we can deprecate the urls from flow when the time is right
+                       #url(r'^%s/flowv2/' % api_name, include(cbh_flow)),
                        url(r'^%s/admin/' % api_name, include(admin.site.urls)),
                        url(r'^grappelli/', include('grappelli.urls')),
                        url(r'^%s/$' % api_name.split("/")
