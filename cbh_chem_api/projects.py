@@ -365,7 +365,6 @@ class ChemregProjectResource(UserHydrate, ModelResource):
 
 
 
-
     def get_object_list(self, request):
         return super(ChemregProjectResource,
                      self).get_object_list(request).prefetch_related(Prefetch('project_type'
