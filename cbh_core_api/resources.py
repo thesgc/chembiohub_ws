@@ -528,7 +528,8 @@ class ProjectTypeResource(ModelResource):
         default_format = 'application/json'
         authentication = SessionAuthentication()
         filtering = {
-            "saved_search_project_type": ALL
+            "saved_search_project_type": ALL,
+            "plate_map_project_type": ALL
         }
 
 class CustomFieldConfigResource(ModelResource):

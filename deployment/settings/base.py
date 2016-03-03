@@ -346,17 +346,25 @@ TABULAR_DATA_SETTINGS = {
         "end": []
     },
     "export" : {
-                "start" :["structure","uuid", "project_name"],
-                "end" : ["created_by" ,"timestamp" , "batch_id" , "upload_id"]
+        "start" :["structure","uuid", "project_name"],
+        "end" : ["created_by" ,"timestamp" , "batch_id" , "upload_id"]
                 },
     "search_page": {
-                "start" :["structure","uuid", "project_name"],
-                "end" : ["created_by" ,"timestamp" , "batch_id" , "upload_id"]
+        "start" :["structure","uuid", "project_name"],
+        "end" : ["created_by" ,"timestamp" , "batch_id" , "upload_id"]
                 },
     "add_page" : {
-                "start" :["structure", "row", "upload_info","upload_action","standardInchiKey"],
-                "end" : []
+        "start" :["structure", "row", "upload_info","upload_action","standardInchiKey"],
+        "end" : []
                 },
+    "indexing" : {
+        "start" :["uuid", "project_name", "archived",],
+        "end" : ["created_by" ,"timestamp" , "batch_id" , "upload_id"]
+    },
+    "indexing_temp" : {
+        "start" :[ "row", "upload_info","upload_action","standardInchiKey", ],
+        "end" : ["created_by" ,"timestamp" , "batch_id" , "upload_id"]
+    },
     "schema": {
             "archived" : {
             "noSort": True,
