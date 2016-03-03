@@ -839,7 +839,7 @@ class CoreProjectResource(ModelResource):
 #FlowFile relocation
 import os
 import datetime
-from cbh_core_model.models import FLOWJS_PATH, FLOWJS_EXPIRATION_DAYS
+from cbh_core_api.flowjs_settings import FLOWJS_PATH, FLOWJS_EXPIRATION_DAYS
 
 
 def chunk_upload_to(instance, filename):
