@@ -29,7 +29,6 @@ from cbh_core_model.models import Invitation
 from cbh_core_api.authorization import ProjectListAuthorization, InviteAuthorization, viewer_projects, ProjectPermissionAuthorization
 from tastypie.authentication import SessionAuthentication
 from tastypie.paginator import Paginator
-from cbh_core_api.serializers import CustomFieldsSerializer
 
 from django.db.models import Prefetch
 
@@ -532,21 +531,6 @@ class ProjectTypeResource(ModelResource):
             "plate_map_project_type": ALL
         }
 
-class CustomFieldConfigResource(ModelResource):
-
-    '''Resource for Custom Field Config '''
-    class Meta:
-        always_return_data = True
-        queryset = CustomFieldConfig.objects.all()
-        resource_name = 'cbh_custom_field_configs'
-        #authorization = ProjectListAuthorization()
-        include_resource_uri = True
-        allowed_methods = ['get', 'post', 'put']
-        default_format = 'application/json'
-        authentication = SessionAuthentication()
-        filtering = {
-            "name": ALL_WITH_RELATIONS
-        }
 
 
 class DataTypeResource(ModelResource):
@@ -789,53 +773,6 @@ class UserResource(ModelResource):
             return False
         return True
 
-class CoreProjectResource(ModelResource):
-    project_type = fields.ForeignKey(
-        ProjectTypeResource, 'project_type', blank=False, null=False, full=True)
-    custom_field_config = fields.ForeignKey(
-        CustomFieldConfigResource, 'custom_field_config', blank=False, null=True, full=True)
-
-    class Meta:
-        queryset = Project.objects.all()
-        authentication = SessionAuthentication()
-        paginator_class = Paginator
-        allowed_methods = ['get']
-        resource_name = 'cbh_projects'
-        authorization = ProjectListAuthorization()
-        include_resource_uri = True
-        default_format = 'application/json'
-        #serializer = Serializer()
-        serializer = CustomFieldsSerializer()
-        filtering = {
-
-            "project_key": ALL_WITH_RELATIONS,
-        }
-
-    def get_object_list(self, request):
-        return super(CoreProjectResource, self).get_object_list(request).prefetch_related(Prefetch("project_type")).order_by('-modified')
-
-    def alter_list_data_to_serialize(self, request, bundle):
-        '''Here we append a list of tags to the data of the GET request if the
-        search fields are required'''
-        userres = UserResource()
-        userbundle = userres.build_bundle(obj=request.user, request=request)
-        userbundle = userres.full_dehydrate(userbundle)
-        bundle['user'] = userbundle.data
-
-    def create_response(self, request, data, response_class=HttpResponse, **response_kwargs):
-        """
-        Extracts the common "which-format/serialize/return-response" cycle.
-        Mostly a useful shortcut/hook.
-        """
-
-        desired_format = self.determine_format(request)
-        serialized = self.serialize(request, data, desired_format)
-        rc = response_class(content=serialized, content_type=build_content_type(
-            desired_format), **response_kwargs)
-
-        if(desired_format == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'):
-            rc['Content-Disposition'] = 'attachment; filename=project_data_explanation.xlsx'
-        return rc
 
 #FlowFile relocation
 import os

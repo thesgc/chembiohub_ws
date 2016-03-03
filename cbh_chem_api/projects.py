@@ -19,8 +19,7 @@ import copy
 import time
 from django.core.urlresolvers import reverse
 from django.db.models import Prefetch
-from cbh_core_api.resources import ProjectTypeResource, \
-    CustomFieldConfigResource, UserHydrate
+from cbh_core_api.resources import ProjectTypeResource, UserHydrate
 from django.contrib.auth.models import User
 import six
 from tastypie.serializers import Serializer

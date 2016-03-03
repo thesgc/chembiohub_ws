@@ -9,6 +9,7 @@ import numpy as np
 
 from tastypie.exceptions import ImmediateHttpResponse, BadRequest
 import json
+from django.conf import settings
 
 def get_field_name_from_key(key):
     return key.replace(u"__space__", u" ")
@@ -25,6 +26,8 @@ class CustomFieldXLSSerializer(Serializer):
     content_types = {'json': 'application/json',
                      'jsonp': 'text/javascript',
                      'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}
+
+
 
 
     def to_xlsx(self, data, options=None):
@@ -122,8 +125,7 @@ class CustomFieldXLSSerializer(Serializer):
         return output.getvalue()
 
 
-class CustomFieldsSerializer(CustomFieldXLSSerializer):
-    pass
+
 
 
 

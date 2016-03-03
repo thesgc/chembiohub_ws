@@ -18,7 +18,6 @@ from django.http import HttpResponse
 
 
 
-
 class CompoundPropertiesResource(ModelResource):
     class Meta:
         queryset = CompoundProperties.objects.all()
@@ -40,7 +39,7 @@ class BaseCBHCompoundBatchResource(ModelResource):
         ChemregProjectResource, 'project', blank=False, null=False)
     creator = SimpleResourceURIField(UserResource, 'created_by_id', null=True, readonly=True)
     projectfull = fields.ForeignKey(
-         NoCustomFieldsChemregProjectResource, 'project', blank=False, null=False, full=True, readonly=True)
+         ChemregProjectResource, 'project', blank=False, null=False, full=True, readonly=True)
     related_molregno = fields.ForeignKey(MoleculeDictionaryResource, 'related_molregno',  null=True, readonly=True, full=True)
     uncurated_fields = CBHNoSerializedDictField('uncurated_fields')
     warnings = CBHNoSerializedDictField('warnings')
@@ -63,44 +62,20 @@ class BaseCBHCompoundBatchResource(ModelResource):
 
 class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
 
-    def fix_data_types_for_index(self, value):
-        """Elasticsearch will not index dictionaries"""
-        if not value:
-            return "__EMPTY"
-        if isinstance(value, basestring):
-            return value
-        if type(value) is dict:
-            return json.dumps(value)
-        if type(value) is list:
-            return [self.fix_data_types_for_index(v) for v in value]
-        return unicode(value)
+    def reformat_project_data_fields_as_table_schema(self, table_schema_type, project_data_fields_json):
+        """Takes the standard output from project data fields and reformats it for use in table formats 
+        by including static schemas from the application settings - these include the fields that should be listed before and after the given field"""
+        if table_schema_type not in settings.TABULAR_DATA_SETTINGS:
+            raise Exception("Trying to reformat for a format that is not configured in TABULAR_DATA_SETTINGS")
+        start_items = settings.TABULAR_DATA_SETTINGS[table_schema_type]["start"]
+        end_items = settings.TABULAR_DATA_SETTINGS[table_schema_type]["end"]
+        start_schema = [settings.TABULAR_DATA_SETTINGS["schema"][start] for start in start_items]
+        middle_table_schema = [field["edit_form"]["form"][0] for field in project_data_fields_json]
+        end_schema = [settings.TABULAR_DATA_SETTINGS["schema"][end] for end in end_items]
 
-    def yield_indexed_fields(self, bundle):
-        for field in bundle.data["custom_field_config_full"]["project_data_fields"]:
-            field_value = bundle.data["custom_fields"].get(field["name"], None)
-            yield {"name": field["name"], "value": self.fix_data_types_for_index(field_value)}
+        return start_schema + middle_table_schema + end_schema
 
-    def alter_list_data_to_serialize(self, request, data):
-        """Here we get a cached copy of the custom field config and use it to ensure each field is properly indexed"""
-        custom_fields_to_retrieve = set()
-        for bun in data[self._meta.collection_name]:
-            custom_fields_to_retrieve.add(bun.obj.project.custom_field_config_id)
-        cfcr = ChemRegCustomFieldConfigResource()
-
-        bundles = [
-            cfcr.full_dehydrate(cfcr.build_bundle(obj=obj, request=request), for_list=True)
-            for obj in cfcr.Meta.queryset.filter(id__in=custom_fields_to_retrieve)
-        ]
-
-        simple_dicts = [cfcr.Meta.serializer.to_simple(bun, {}) for bun in bundles]
-
-
-        cfc_lookup = { cfc["resource_uri"] : cfc for cfc in simple_dicts }
-        for bun in data[self._meta.collection_name]:
-            elasticsearch_client.prepare_dataset_for_indexing
-            bun.data["custom_field_config_full"] = cfc_lookup[bun.data["projectfull"].data["custom_field_config"]]
-            bun.data["indexed_fields"] = list(self.yield_indexed_fields(bun))
-            del bun.data["custom_field_config_full"]
+    
 
 
 
@@ -113,22 +88,24 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
 
         for page in range(1, paginator.num_pages +1):
             bs = paginator.page(page).object_list
+            #retrieve some objects as json
             bundles = [
                 self.full_dehydrate(self.build_bundle(obj=obj, request=request), for_list=True)
                 for obj in bs
             ]
-            self.alter_list_data_to_serialize(request, {"objects" : bundles} )
+
+            #retrieve schemas which tell the elasticsearch request which fields to index for each object (we avoid deserializing a single custom field config more than once)
+            #Now make the schema list parallel to the batches list
             batch_dicts = [self.Meta.serializer.to_simple(bun, {}) for bun in bundles]
 
-            # reindex compound data
-            from pprint import pprint
-            pprint(batch_dicts)
+            project_data_field_sets = [batch_dict["projectfull"]["custom_field_config"].pop("project_data_fields") for batch_dict in batch_dicts]
+
+            schemas = [self.reformat_project_data_fields_as_table_schema( "indexing", pdfs) for pdfs in project_data_field_sets]
+            for batch in batch_dicts:
+                batch["projectfull"]["custom_field_config"] = batch["projectfull"]["custom_field_config"]["resource_uri"]
             index_name = elasticsearch_client.get_main_index_name()
-            es_reindex = elasticsearch_client.create_temporary_index(
-                batch_dicts, request, index_name)
-            if es_reindex.get("errors"):
-                print "ERRORS"
-                print json.dumps(es_reindex)
+            batch_dicts = elasticsearch_client.index_dataset(index_name, batch_dicts, schemas)
+            
             # here you can do what you want with the row
             
             print "done page %d of %d" % (page ,paginator.num_pages)

@@ -237,12 +237,28 @@ CKEDITOR_CONFIGS = {
 
 
 
+CBH_QUERY_TYPES = [
+            {'name': 'Contains Keyword or phrase', 'value': 'phrase', 'required_fields': ['phrase']},
+             {'name': 'Equals any in this list', 'value': 'any_of' , 'required_fields': ['any_of']},
+             {'name': 'Starts with', 'value': 'starts_with' , 'required_fields': ['starts_with']},
+             {'name': 'Ends with', 'value': 'ends_with' , 'required_fields': ['ends_with']},
+             {'name': 'Between', 'value': 'between' , 'required_fields': ['greater_than', 'less_than']},
+             {'name': 'Greater than', 'value': 'greater_than' , 'required_fields': ['greater_than']},
+             {'name': 'Less than', 'value': 'less_than', 'required_fields': ['greater_than', 'less_than']}
+          ]
+
+CBH_QUERY_ALWAYS_REQUIRED = ["column_path", "sort_direction", "query_type"]
+
 CBH_QUERY_SCHEMA = {
+    "column_path" : {
+        "type": "string"
+    },
     "sort_direction" : {
         "type": "string"
     },
     "query_type": {
-        "type": "string"
+        "type": "string",
+        "enum" : [qt["name"] for qt in CBH_QUERY_TYPES]
     },
     "phrase" : {
             'type': 'string',
@@ -271,6 +287,8 @@ CBH_QUERY_SCHEMA = {
 
 }
 
+
+
 CBH_QUERY_FORM = [
     {
           "key" : "sort_direction",
@@ -285,15 +303,7 @@ CBH_QUERY_FORM = [
     {
           "key" : "query_type",
           "type": "select",
-          "titleMap": [
-            [{'name': 'Contains Keyword or phrase', 'value': 'phrase'},
-             {'name': 'Equals any in this list', 'value': 'any_of'},
-             {'name': 'Starts with', 'value': 'starts_with'},
-             {'name': 'Ends with', 'value': 'ends_with'},
-             {'name': 'Between', 'value': 'between'},
-             {'name': 'Greater than', 'value': 'greater_than'},
-             {'name': 'Less than', 'value': 'less_than'}]
-          ],
+          "titleMap": CBH_QUERY_TYPES,
           "htmlClass": "col-sm-3"
     },
     {
@@ -463,3 +473,66 @@ TABULAR_DATA_SETTINGS = {
         }
     }
 }
+
+ELASTICSEARCH_INDEX_MAPPING = {
+        "settings": {
+            "index.store.type": "niofs",
+            "analysis" : {
+                    "analyzer" : {
+                        "default_index" : {
+                            "tokenizer" : "whitespace",
+                            "filter" : [
+                                "lowercase"
+                            ],
+                            "char_filter" : [
+                                "html_strip"
+                            ]
+                        }
+                    }
+                },
+        },
+        "mappings": {
+            "_default_": {
+                "_all": {"enabled": False},
+                "date_detection": False,
+                
+                "properties":{
+                    "indexed_fields" :{
+                        "type": "nested",
+                        "properties" : {
+                                "name": {
+                                    "type": "string", 
+                                    "index": "not_analyzed"
+                                },
+                                "field_path": {
+                                    "type": "string", 
+                                    "index": "not_analyzed"
+                                },
+                                "value":  
+                                      {
+                                        "type": "string", 
+                                        "store": "no", 
+                                        "index_options": "positions", 
+                                        "index": "analyzed", 
+                                        "omit_norms": True, 
+                                        "analyzer" : "default_index",
+                                        "fields": {
+                                            "raw": {"type": "string", "store": "no", "index": "not_analyzed", "ignore_above": 256}
+                                        }
+                                    }
+                            }
+                        }
+                },
+             "dynamic_templates": [{
+                    "ignored_fields": {
+                        "match": "*",
+                        "match_mapping_type": "string",
+                        "mapping": {
+                            "type": "string", "store": "no", "include_in_all": False, "index" : "no"
+                        }
+                    }
+                }]
+                
+            }
+        }
+    }
