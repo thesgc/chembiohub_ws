@@ -4,7 +4,7 @@ from django.http import HttpRequest
 class Command(BaseCommand):
 
     def handle(self, *args, **options):
-        from cbh_chem_api.compounds import CBHCompoundBatchResource
+        from cbh_chem_api.new_compounds import IndexingCBHCompoundBatchResource
 
-        cbr = CBHCompoundBatchResource()
+        cbr = IndexingCBHCompoundBatchResource()
         cbr.reindex_elasticsearch(HttpRequest())

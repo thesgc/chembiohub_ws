@@ -115,28 +115,9 @@ class CBHCompoundBatchResource(ModelResource):
                         ('multiple_batch_id', 'Upload ID')
 
                       ]
-
-        csv_fieldnames = [('chembl_id', 'UOX ID'),
-                          ('pref_name', 'Preferred Name'),
-                          ('max_phase', 'Known Drug'),
-                          ('compoundproperties.med_chem_friendly',
-                           'MedChem Friendly'),
-                          ('compoundproperties.ro3_pass', 'passesRuleOfThree'),
-                          ('compoundproperties.full_molformula',
-                           'Mol Formula'),
-                          ('compoundstructures.canonical_smiles', 'SMILES'),
-                          ('compoundstructures.standard_inchi_key',
-                           'Std InChiKey'),
-                          ('compoundproperties.num_ro5_violations',
-                           'Rule of 5 violations'),
-                          ('compoundproperties.rtb', 'Rotatable Bonds'),
-                          ('compoundproperties.mw_freebase', 'Mol Weight'),
-                          ('project.name', 'Project'),
-                        ('multiple_batch_id', 'Upload ID')
-
-                          ]
+                         
         fields_to_keep = {
-                            'Project': 'Project',
+                          'Project': 'Project',
                             'chemblId': 'UOx ID',
                           'id': 'Batch ID',
                           'canonical_smiles': 'SMILES',
@@ -1389,8 +1370,7 @@ class CBHCompoundBatchResource(ModelResource):
                                             0], last_name=bundle.obj.created_by.split[" "][1])
                 except:
                     user = None
-        mynames = [ "uncurated_fields","editable_by",
-                   "warnings", "properties", "custom_fields", "errors"]
+        mynames = [ "uncurated_fields", "warnings", "properties", "custom_fields",]
         for name in mynames:
             bundle.data[name] = json.loads(bundle.data[name])
             

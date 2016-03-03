@@ -85,7 +85,7 @@ from django.contrib.auth.models import Permission
 import re
 from django_hstore import hstore
 
-class CBHDictField(fields.ApiField):
+class CBHNoSerializedDictField(fields.ApiField):
     """
     A dictionary field.
     """
@@ -93,11 +93,22 @@ class CBHDictField(fields.ApiField):
     help_text = "A dictionary of data. Ex: {'price': 26.73, 'name': 'Daniel'}"
 
     def convert(self, value):
-        try:
-            return dict(value)
-        except ValueError:
-            return hstore.SerializedDictionaryField()._deserialize_dict(value)
-        
+        data = dict(value)
+        for key, v in data.iteritems():
+            if isinstance(v, basestring):
+                if v.startswith("[") and v.endswith("]"):
+                    try:
+                        data[k] = json.loads(v)
+                        continue
+                    except:
+                        pass
+                if v.startswith("{") and v.endswith("}"):
+                    try:
+                        data[k] = json.loads(v)
+                        continue
+                    except:
+                        pass
+        return data
 
 
 
@@ -427,6 +438,10 @@ def build_content_type(format, encoding='utf-8'):
 class SkinningResource(ModelResource):
 
     '''URL resourcing for pulling out sitewide skinning config '''
+    tabular_data_settings = fields.DictField()
+    query_schema = fields.DictField()
+    query_form = fields.DictField()
+
     class Meta:
         always_return_data = True
         queryset = SkinningConfig.objects.all()
@@ -436,6 +451,15 @@ class SkinningResource(ModelResource):
         allowed_methods = ['get', 'post', 'put']
         default_format = 'application/json'
         authentication = SessionAuthentication()
+
+    def dehydrate_tabular_data_settings(self, bundle):
+        return settings.TABULAR_DATA_SETTINGS
+
+    def dehydrate_query_schema(self, bundle):
+        return settings.CBH_QUERY_SCHEMA
+
+    def dehydrate_query_form(self, bundle):
+        return settings.CBH_QUERY_FORM
 
 
 

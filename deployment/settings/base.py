@@ -235,3 +235,223 @@ CKEDITOR_CONFIGS = {
     },
 }
 
+
+
+CBH_QUERY_SCHEMA = {
+    "sort_direction" : {
+        "type": "string"
+    },
+    "query_type": {
+        "type": "string"
+    },
+    "phrase" : {
+            'type': 'string',
+        },
+    "any_of" : {
+            'type': 'array',
+            "items": {
+              "type": "string"
+            }
+        },
+    "equals" : {
+        'type': 'string'
+    },
+    "starts_with" : {
+        'type': 'string'
+    },
+    "ends_with" : {
+        'type': 'string'
+    },
+    "greater_than" : {
+        'type': 'string'
+    },
+    "less_than" : {
+        'type': 'string'
+    },
+
+}
+
+CBH_QUERY_FORM = [
+    {
+          "key" : "sort_direction",
+          "type": "select",
+          "titleMap": [
+             {'name': 'None', 'value': None },
+             {'name': '1-100 .. A-Z', 'value': 'asc'},
+             {'name': 'Z-A .. 100-0', 'value': 'desc'},
+          ],
+          "htmlClass": "col-sm-3"
+    },
+    {
+          "key" : "query_type",
+          "type": "select",
+          "titleMap": [
+            [{'name': 'Contains Keyword or phrase', 'value': 'phrase'},
+             {'name': 'Equals any in this list', 'value': 'any_of'},
+             {'name': 'Starts with', 'value': 'starts_with'},
+             {'name': 'Ends with', 'value': 'ends_with'},
+             {'name': 'Between', 'value': 'between'},
+             {'name': 'Greater than', 'value': 'greater_than'},
+             {'name': 'Less than', 'value': 'less_than'}]
+          ],
+          "htmlClass": "col-sm-3"
+    },
+    {
+        'title': 'Keyword or phrase',
+        'key': 'phrase',
+        'condition': 'model.query_type=="phrase"',
+        "htmlClass": "col-sm-3"
+
+    },
+    {
+        'key': 'any_of',
+        'title': 'Search a list of exact values',
+        'placeholder': 'Search multiple values',
+        'feedback': False,
+        'condition': 'model.query_type=="any_of"',
+        "htmlClass": "col-sm-3"
+    },
+    {
+        'key': 'equals',
+        'condition': 'model.query_type=="equals"',
+          "htmlClass": "col-sm-3"
+    },
+    {
+        'key': 'starts_with',
+        'condition': 'model.query_type=="starts_with"',
+          "htmlClass": "col-sm-3"
+    },
+    {
+        'key': 'ends_with',
+        'condition': 'model.query_type=="ends_with"',
+          "htmlClass": "col-sm-3"
+    },
+    {
+        'key': 'greater_than',
+        'condition': 'model.query_type=="greater_than" || model.query_type=="between"',
+          "htmlClass": "col-sm-3"
+    },
+     {
+        'key': 'less_than',
+        'condition': 'model.query_type=="less_than" || model.query_type=="between"',
+        "htmlClass": "col-sm-3"
+    },
+]
+
+
+
+TABULAR_DATA_SETTINGS = { 
+    "seach_page_edit_mode": {
+        "start": ["archived", "clone", "structure","uuid", "project_name"],
+        "end": []
+    },
+    "export" : {
+                "start" :["structure","uuid", "project_name"],
+                "end" : ["created_by" ,"timestamp" , "batch_id" , "upload_id"]
+                },
+    "search_page": {
+                "start" :["structure","uuid", "project_name"],
+                "end" : ["created_by" ,"timestamp" , "batch_id" , "upload_id"]
+                },
+    "add_page" : {
+                "start" :["structure", "row", "upload_info","upload_action","standardInchiKey"],
+                "end" : []
+                },
+    "schema": {
+            "archived" : {
+            "noSort": True,
+            "knownBy": "Archive/Restore",
+            "data": "properties.archived",
+            "renderer": "archivedRenderer",
+            "readOnly": True,
+            "className": "htCenter htMiddle ",
+        },
+        "clone": {
+            "noSort": True,
+            "knownBy": "Clone/Add Structure",
+            "data": "",
+            "renderer": "cloneRenderer",
+            "readOnly": True,
+            "className": "htCenter htMiddle ",
+        },
+        "structure" : {
+            "noSort": True,
+            "knownBy": "Structure",
+            "data": "image",
+            "renderer": "coverRenderer",
+            "readOnly": True,
+            "className": "htCenter htMiddle "
+        },
+        "row" : {
+            "sortOrder": "none",
+            "knownBy": "Row",
+            "data": "id",
+            "readOnly": True,
+            "className": "htCenter htMiddle "
+        }, 
+        "upload_info" : {
+            "noSort": True,
+            "readOnly": True,
+            "knownBy": "Info",
+            "data": "originalSmiles",
+            "renderer": "infoRenderer"
+        }, 
+        "upload_action" : {
+            "sortOrder": "none",
+            "knownBy": "Action",
+            "data": "properties.action",
+            "type": "dropdown",
+            "source": ["New Batch", "Ignore"],
+            "className": "htCenter htMiddle "
+        }, 
+        "standardInchiKey" : {
+            "sortOrder": "none",
+            "knownBy": "Inchi Key",
+            "data": "standardInchiKey",
+            "readonly": True,
+            "renderer": "linkRenderer"
+        },
+        "uuid" : {
+            "noSort": True,
+            "knownBy": "UOx ID",
+            "data": "chemblId",
+            "renderer": "modalLinkRenderer",
+            "readOnly": True,
+            "className": " htCenter htMiddle ",
+        },
+        "project_name": {
+            "knownBy": "Project",
+            "data": "projectfull.name",
+            "readOnly": True,
+            "className": "htCenter htMiddle ",
+            "renderer": "projectRenderer",
+        },
+        "created_by" : {
+            "noSort": True,
+            "knownBy": "Added By",
+            "data": "createdBy",
+            "readOnly": True,
+            "className": "htCenter htMiddle ",
+        }, 
+        "timestamp" : {
+            "noSort": True,
+            "knownBy": "Date",
+            "data": "timestamp",
+            "readOnly": True,
+            "className": "htCenter htMiddle ",
+        }, 
+        "batch_id" : {
+            "knownBy": "Batch ID",
+            "data": "id",
+            "readOnly": True,
+            "className": "htCenter htMiddle ",
+        }, 
+        "upload_id" :{
+            "noSort": True,
+            "knownBy": "Upload ID",
+            "data": "multipleBatchId",
+            "readOnly": True,
+            "className": "htCenter htMiddle ",
+        }
+    }
+}

@@ -8,7 +8,7 @@ from django.contrib.auth.views import password_change, password_change_done, pas
 
 
 from tastypie.api import Api
-
+from cbh_chem_api.new_compounds import *
 from cbh_chem_api.compounds import *
 from cbh_chem_api.projects import *
 
@@ -40,7 +40,6 @@ api.register(SkinningResource())
 api.register(CBHPluginResource())
 api.register(InvitationResource())
 api.register(ProjectPermissionResource())
-
 admin.autodiscover()
 
 
