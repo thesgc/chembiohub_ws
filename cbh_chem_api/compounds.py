@@ -898,7 +898,7 @@ class CBHCompoundBatchResource(ModelResource):
             self.authorized_create_detail(
                 self.get_object_list(bundle.request), bundle)
         smilesdata = bundle.data.get("smilesdata", "")
-        objects = smilesdata.splitlines(True)
+        objects = [smi.strip() for smi in smilesdata.splitlines(True)]
         batches = []
         # first assume smiles
         allmols = [(obj, Chem.MolFromSmiles(str(obj))) for obj in objects]
