@@ -18,12 +18,12 @@ import json
 import copy
 import time
 from django.core.urlresolvers import reverse
-from cbh_core_api.serializers import CustomFieldsSerializer
 from django.db.models import Prefetch
 from cbh_core_api.resources import ProjectTypeResource, \
     CustomFieldConfigResource, UserHydrate
 from django.contrib.auth.models import User
 import six
+from tastypie.serializers import Serializer
 
 def build_content_type(format, encoding='utf-8'):
     """
@@ -43,6 +43,7 @@ class ChemRegDataPointProjectFieldResource(ModelResource):
         null=True, blank=False,  help_text=None)
     edit_schema = fields.DictField(
         null=True, blank=False,  help_text=None)
+
  
     class Meta:
         queryset = PinnedCustomField.objects.all()
@@ -229,7 +230,6 @@ class ChemRegCustomFieldConfigResource(UserHydrate, ModelResource):
         include_resource_uri = True
         default_format = 'application/json'
         serializer = CustomFieldXLSSerializer()
-        # serializer = Serializer()
         filtering = {"id": ALL}
         allowed_methods = ['get', 'post', 'put', 'patch']
         description = {'api_dispatch_detail' : '''
@@ -239,24 +239,9 @@ data_type: A string to describe what "sort" of data this is (fields will general
 project_data_fields:
 The fields that are in this particular custom field config:
     Provides information about the data types present in the flexible schema of the datapoint table
-    For each field a set of attributes are returned:
 
-    hide_form/schema - an angular schema form element that can be used to hide this column from view
-    edit_form /schema - an angular schema form element that can be used to edit this field 
 
-    assuming it is edited as part of a larger data form classification object
-    - To change the key of the json schema then change the get_namespace method
 
-    filter_form/schema - an angular schema form element that can be used to hide this filter this field
-    
-    exclude_form /schema an angular schema form element that can be used to hide this exclude values from this field
-   
-    sort_form /schema an angular schema form element that can be used to hide this exclude values from this field
-   
-   Things still to be implemented:
-
-    actions form - would be used for mapping functions etc
-    autocomplete urls
         ''',
 
                        'api_dispatch_list' : '''
@@ -266,24 +251,7 @@ data_type: A string to describe what "sort" of data this is (fields will general
 project_data_fields:
 The fields that are in this particular custom field config:
     Provides information about the data types present in the flexible schema of the datapoint table
-    For each field a set of attributes are returned:
-
-    hide_form/schema - an angular schema form element that can be used to hide this column from view
-    edit_form /schema - an angular schema form element that can be used to edit this field 
-
-    assuming it is edited as part of a larger data form classification object
-    - To change the key of the json schema then change the get_namespace method
-
-    filter_form/schema - an angular schema form element that can be used to hide this filter this field
-    
-    exclude_form /schema an angular schema form element that can be used to hide this exclude values from this field
-   
-    sort_form /schema an angular schema form element that can be used to hide this exclude values from this field
-   
-   Things still to be implemented:
-
-    actions form - would be used for mapping functions etc
-    autocomplete urls
+ 
         '''
                        }
 
@@ -294,7 +262,6 @@ The fields that are in this particular custom field config:
             if hasattr(item, 'obj'):
                 item.obj.position = index
         return bundle
-
 
     def get_schema(self, request, **kwargs):
         """
@@ -324,6 +291,8 @@ The fields that are in this particular custom field config:
 
 
 
+
+
 class ChemregProjectResource(UserHydrate, ModelResource):
 
     project_type = fields.ForeignKey(
@@ -346,7 +315,7 @@ class ChemregProjectResource(UserHydrate, ModelResource):
         authorization = ProjectListAuthorization()
         include_resource_uri = True
         default_format = 'application/json'
-        serializer = CustomFieldsSerializer()
+        serializer = Serializer()
         filtering = {
             'project_key': ALL_WITH_RELATIONS,
             'project_type': ALL_WITH_RELATIONS,

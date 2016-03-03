@@ -26,6 +26,7 @@ class CustomFieldXLSSerializer(Serializer):
                      'jsonp': 'text/javascript',
                      'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}
 
+
     def to_xlsx(self, data, options=None):
         try:
             if data.data.get("traceback", False):
@@ -125,118 +126,4 @@ class CustomFieldsSerializer(CustomFieldXLSSerializer):
     pass
 
 
-class ResultsExportXLSSerializer(Serializer):
 
-    ''' COde for preparing an Excel summary of the results from a particular search query '''
-    formats = ['json', 'jsonp', 'xlsx']
-    content_types = {'json': 'application/json',
-                     'jsonp': 'text/javascript',
-                     'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}
-
-    def to_xlsx(self, data, options=None):
-
-        output = cStringIO.StringIO()
-
-        exp_json = self.to_simple(data, {})
-
-        if exp_json.get("traceback", False):
-            raise ImmediateHttpResponse(json.dumps(exp_json))
-        cleaned_data = []
-
-        chembl_data = []
-
-        col_titles = {}
-
-        # do your stuff here
-        # maybe just get all the l3 data out? group by their l2 uri, so the
-        # columns might match up?
-        for result, val in exp_json.iteritems():
-
-            if(result == 'hits'):
-                for k, v in val.iteritems():
-                    if (k == 'hits'):
-                        for item in v:
-
-                            src = item['_source']['l3']['project_data']
-                            for sk, sv in src.iteritems():
-                                readable_sk = get_field_name_from_key(sk)
-                                col_titles[sk] = readable_sk
-                            srcl2 = item['_source']['l2']['project_data']
-                            srcl1 = item['_source']['l1']['project_data']
-                            srcl0 = item['_source']['l0']['project_data']
-                            # print(srcl2['Title'])
-
-                            src['l2'] = srcl2.get('Title', None)
-                            src['l1'] = srcl1.get('Title', None)
-                            src['l0'] = srcl0.get('Title', None)
-
-                            col_titles['l2'] = "Assay"
-                            col_titles['l1'] = "Study"
-                            col_titles['l0'] = "Project"
-
-                            cleaned_data.append(src)
-
-                            # now chembl data!
-                            if(item['_source']['l3'].get('chembl', None)):
-                                csrc = item['_source']['l3']['chembl']
-                                # are the chembl fields stored in that format?
-                                # for sk, sv in csrc.iteritems():
-                                #readable_sk = get_field_name_from_key(sk)
-                                #col_titles[sk] = readable_sk
-
-                                chembl_data.append(csrc)
-
-        # for k, v in l3.iteritems():
-        #    k = get_field_name_from_key(k)
-
-        #df = pd.DataFrame(exp_json, columns=['name', 'field_type', 'description', 'allowed_values'])
-        df = pd.DataFrame(cleaned_data)
-
-        # human readable titles
-        # now doing human readable titles via get_field_name_from_key
-        df.rename(columns=col_titles, inplace=True)
-
-        # deal with empty fields
-        df.fillna('', inplace=True)
-
-        # autosize column widths setup
-        widths = []
-        for col in df.columns.tolist():
-            col = str(col)
-            titlewidth = len(col)
-            try:
-                w = df[col].astype(unicode).str.len().max()
-                if w > titlewidth:
-                    widths.append(int(w*1.2))
-                else:
-                    widths.append(int(titlewidth * 1.2))
-            except:
-                widths.append(int(titlewidth * 1.2))
-
-        writer = pd.ExcelWriter('temp.xlsx', engine='xlsxwriter')
-        writer.book.filename = output
-        #df2 = pd.DataFrame(data=np.zeros((0,len(exp_json))), columns=[field["name"] for field in exp_json])
-        #df2.to_excel(writer, sheet_name='Sheet1', index=False)
-
-        df.to_excel(writer, sheet_name='Sheet1', index=False)
-
-        if chembl_data:
-            cdf = pd.DataFrame(chembl_data)
-            cdf.fillna('', inplace=True)
-            cdf.to_excel(writer, sheet_name='Sheet2', index=False)
-
-        workbook = writer.book
-        format = workbook.add_format()
-        # worksheet = writer.sheets['Sheet2']
-
-        worksheet = writer.sheets['Sheet1']
-
-        # auto adjust column widths
-        for index, width in enumerate(widths):
-            if width > 150:
-                width = 150
-            elif width < 15:
-                width = 15
-            worksheet.set_column(index, index, width)
-        writer.save()
-        return output.getvalue()

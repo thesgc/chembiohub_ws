@@ -11,9 +11,13 @@ from tastypie.authorization import Authorization
 from tastypie import fields
 from cbh_chem_api.projects import ChemregProjectResource, ChemRegCustomFieldConfigResource, NoCustomFieldsChemregProjectResource
 from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate, CBHNoSerializedDictField
-from cbh_chem_api import elasticsearch_client_new as elasticsearch_client
+from cbh_utils import elasticsearch_client
 import json 
 from django.http import HttpResponse
+
+
+
+
 
 class CompoundPropertiesResource(ModelResource):
     class Meta:
@@ -56,6 +60,7 @@ class BaseCBHCompoundBatchResource(ModelResource):
 
 
 
+
 class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
 
     def fix_data_types_for_index(self, value):
@@ -86,11 +91,13 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
             cfcr.full_dehydrate(cfcr.build_bundle(obj=obj, request=request), for_list=True)
             for obj in cfcr.Meta.queryset.filter(id__in=custom_fields_to_retrieve)
         ]
+
         simple_dicts = [cfcr.Meta.serializer.to_simple(bun, {}) for bun in bundles]
-        
+
 
         cfc_lookup = { cfc["resource_uri"] : cfc for cfc in simple_dicts }
         for bun in data[self._meta.collection_name]:
+            elasticsearch_client.prepare_dataset_for_indexing
             bun.data["custom_field_config_full"] = cfc_lookup[bun.data["projectfull"].data["custom_field_config"]]
             bun.data["indexed_fields"] = list(self.yield_indexed_fields(bun))
             del bun.data["custom_field_config_full"]
@@ -112,6 +119,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
             ]
             self.alter_list_data_to_serialize(request, {"objects" : bundles} )
             batch_dicts = [self.Meta.serializer.to_simple(bun, {}) for bun in bundles]
+
             # reindex compound data
             from pprint import pprint
             pprint(batch_dicts)
