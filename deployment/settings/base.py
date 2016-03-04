@@ -493,6 +493,7 @@ ELASTICSEARCH_INDEX_MAPPING = {
         },
         "mappings": {
             "_default_": {
+                "dynamic": False,
                 "_all": {"enabled": False},
                 "date_detection": False,
                 

@@ -16,8 +16,6 @@ import json
 from django.http import HttpResponse
 
 
-
-
 class CompoundPropertiesResource(ModelResource):
     class Meta:
         queryset = CompoundProperties.objects.all()
@@ -29,9 +27,6 @@ class MoleculeDictionaryResource(ModelResource):
     class Meta:
         queryset = MoleculeDictionary.objects.all()
         fields = ["compoundproperties"]
-
-
-
 
 
 class BaseCBHCompoundBatchResource(ModelResource):
@@ -54,12 +49,6 @@ class BaseCBHCompoundBatchResource(ModelResource):
 
 
 
-
-
-
-
-
-
 class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
 
     def reformat_project_data_fields_as_table_schema(self, table_schema_type, project_data_fields_json):
@@ -76,9 +65,6 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         return start_schema + middle_table_schema + end_schema
 
     
-
-
-
     def reindex_elasticsearch(self, request, **kwargs):
         desired_format = self.determine_format(request)
         batches = self.get_object_list(request)
