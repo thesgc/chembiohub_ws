@@ -14,6 +14,7 @@ from cbh_chem_api.compounds import *
 from cbh_chem_api.projects import *
 
 from cbh_core_api.resources import *
+from cbh_core_api.views import *
 from django.conf import settings
 DEFAULT_API_NAME = 'chemblws'
 
@@ -41,6 +42,8 @@ api.register(SkinningResource())
 api.register(CBHPluginResource())
 api.register(InvitationResource())
 api.register(ProjectPermissionResource())
+api.register(CBHFlowFileResource())
+api.register(CBHFlowFileDownloadResource())
 admin.autodiscover()
 
 
@@ -68,7 +71,7 @@ urlpatterns = patterns('',
                        # django-flowjs
                        url(r'^%s/flow/' % api_name, include(flow)),
                        #we can deprecate the urls from flow when the time is right
-                       #url(r'^%s/flowv2/' % api_name, include(cbh_flow)),
+                       url(r'^%s/flowv2/' % api_name, include(cbh_flow)),
                        url(r'^%s/admin/' % api_name, include(admin.site.urls)),
                        url(r'^grappelli/', include('grappelli.urls')),
                        url(r'^%s/$' % api_name.split("/")

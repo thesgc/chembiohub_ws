@@ -141,7 +141,7 @@ admin.site.register(DataFormConfig, DataFormConfigAdmin)
 admin.site.register(PinnedCustomField, PinnedCustomFieldAdmin)
 
 #FlowFile relocation
-from cbh_core_model.models import FlowFile, FlowFileChunk
+from cbh_core_model.models import CBHFlowFile as FlowFile, CBHFlowFileChunk as FlowFileChunk
 
 
 class FlowFileChunkInline(admin.TabularInline):

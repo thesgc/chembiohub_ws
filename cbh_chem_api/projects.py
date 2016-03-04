@@ -3,6 +3,7 @@
 from tastypie.resources import ModelResource, ALL_WITH_RELATIONS, ALL
 from django.conf import settings
 from django.conf.urls import url
+from django.middleware import csrf
 from django.http import HttpResponse
 from tastypie.http import  HttpConflict
 from tastypie import fields
@@ -896,6 +897,19 @@ class ChemregProjectResource(UserHydrate, ModelResource):
             searchfields = set([])
             searchfield_items = []
             bundle['searchform'] = self.get_searchform(bundle, )
+        for bund in bundle[self._meta.collection_name]:
+            #print("bund")
+            #print(bund)
+            for field in bund.data['custom_field_config'].data['project_data_fields']:
+                if field.data['field_type'] == field.obj.FILE_ATTACHMENT:
+                    field.data['edit_form']['form'][0]['uploadOptions']['modal']['flow']['init'] = { 'target': reverse('flowv2_upload', 
+                                                                                                            kwargs={'project_id': bund.data['id'],
+                                                                                                                    }), 
+                                                                                                     'headers': {
+                                                                                                                  'X-CSRFToken': csrf.get_token(request)
+                                                                                                                } 
+                                                                                                            }
+                #print(field.data['edit_form']['form'][0])
         return bundle
 
 
