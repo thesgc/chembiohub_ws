@@ -56,6 +56,7 @@ from cbh_chem_api.parser import parse_pandas_record, parse_sdf_record, apply_jso
 # from tastypie.utils.mime import build_content_type
 from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate
 import time
+from new_compounds import index_batches_in_new_index
 
 def build_content_type(format, encoding='utf-8'):
     """
@@ -571,6 +572,7 @@ class CBHCompoundBatchResource(ModelResource):
                 batch.multi_batch_id = id
                 bundle.data["saved"] += 1
                 to_be_saved.append(batch.obj)
+            index_batches_in_new_index(to_be_saved)
         if(mb.uploaded_file):
             if(mb.uploaded_file.extension == ".sdf"):
                 newreq = copy.copy(request)
@@ -593,6 +595,7 @@ class CBHCompoundBatchResource(ModelResource):
         return self.create_response(request, bundle, response_class=http.HttpCreated)
 
     def after_save_and_index_hook(self, request, multi_batch_id, project_key):
+
         pass
 
     def alter_batch_data_after_save(self, batch_list, python_file_object,request, multi_batch):
@@ -1332,6 +1335,7 @@ class CBHCompoundBatchResource(ModelResource):
         Extracts the common "which-format/serialize/return-response" cycle.
         Mostly a useful shortcut/hook.
         """
+        
         desired_format = self.determine_format(request)
         serialized = self.serialize(
             request, data, desired_format, options=self.Meta.ordrered_ftk)

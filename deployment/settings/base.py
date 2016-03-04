@@ -478,6 +478,63 @@ ELASTICSEARCH_INDEX_MAPPING = {
         "settings": {
             "index.store.type": "niofs",
             "analysis" : {
+                    "char_filter" : {
+                        "zeropad1":{
+                            "type":"pattern_replace",
+                            "pattern":"(^[1-9])($|.[0-9]+$)", 
+                            "replacement":"0000000000$1$2"
+                        },
+                        "zeropad2":{
+                            "type":"pattern_replace",
+                            "pattern":"(^[1-9][0-9])($|.[0-9]+$)",
+                            "replacement":"000000000$1$2"
+                        },
+                        "zeropad3":{
+                            "type":"pattern_replace",
+                            "pattern":"(^[1-9][0-9][0-9])($|.[0-9]+$)",
+                            "replacement":"00000000$1$2"
+                        },
+                        "zeropad4":{
+                            "type":"pattern_replace",
+                            "pattern":"(^[1-9][0-9][0-9][0-9])($|.[0-9]+$)",
+                            "replacement":"0000000$1$2"
+                        },
+                        "zeropad5":{
+                            "type":"pattern_replace",
+                            "pattern":"(^[1-9][0-9][0-9][0-9][0-9])($|.[0-9]+$)",
+                            "replacement":"000000$1$2"
+                        },
+                        "zeropad6":{
+                            "type":"pattern_replace",
+                            "pattern":"(^[1-9][0-9][0-9][0-9][0-9][0-9])($|.[0-9]+$)",
+                            "replacement":"00000$1$2"
+                        },
+                        "zeropad7":{
+                            "type":"pattern_replace",
+                            "pattern":"(^[1-9][0-9][0-9][0-9][0-9][0-9][0-9])($|.[0-9]+$)",
+                            "replacement":"0000$1$2"
+                        },
+                        "zeropad8":{
+                            "type":"pattern_replace",
+                            "pattern":"(^[1-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9])($|.[0-9]+$)",
+                            "replacement":"000$1$2"
+                        },
+                        "zeropad9":{
+                            "type":"pattern_replace",
+                            "pattern":"(^[1-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9])($|.[0-9]+$)",
+                            "replacement":"00$1$2"
+                        },
+                        "zeropad10":{
+                            "type":"pattern_replace",
+                            "pattern":"(^[1-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9])($|.[0-9]+$)",
+                            "replacement":"0$1$2"
+                        },
+                        "special_char_space_out" :{ # put spaces around special characters so they can still be indexed
+                            "type":"pattern_replace",
+                            "pattern":"([()\[\].,\-\+])",
+                            "replacement":" $1 "
+                        }
+                    },
                     "analyzer" : {
                         "default_index" : {
                             "tokenizer" : "whitespace",
@@ -485,18 +542,26 @@ ELASTICSEARCH_INDEX_MAPPING = {
                                 "lowercase"
                             ],
                             "char_filter" : [
-                                "html_strip"
+                                "html_strip", "special_char_space_out"
+                            ]
+                        },
+                        "sortable" : {
+                            "tokenizer" : "keyword",
+                            "filter" : [
+                                "lowercase"
+                            ],
+                            "char_filter" : [
+                                "zeropad1", "zeropad2", "zeropad3", "zeropad4", "zeropad5", "zeropad6", "zeropad7", "zeropad8", "zeropad9", "zeropad10"
                             ]
                         }
                     }
                 },
         },
         "mappings": {
-            "_default_": {
+            "newbatches": {
                 "dynamic": False,
                 "_all": {"enabled": False},
                 "date_detection": False,
-                
                 "properties":{
                     "indexed_fields" :{
                         "type": "nested",
@@ -518,7 +583,7 @@ ELASTICSEARCH_INDEX_MAPPING = {
                                         "omit_norms": True, 
                                         "analyzer" : "default_index",
                                         "fields": {
-                                            "raw": {"type": "string", "store": "no", "index": "not_analyzed", "ignore_above": 256}
+                                            "raw": {"analyzer": "sortable" ,"type": "string", "store": "no", "index": "analyzed", "ignore_above": 256}
                                         }
                                     }
                             }

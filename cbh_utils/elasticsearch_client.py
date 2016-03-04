@@ -60,7 +60,7 @@ def create_index(batches, index_name):
     es = elasticsearch.Elasticsearch()
     t = time.time()
 
-    es.indices.create(
+    print es.indices.create(
         index_name,
         body=settings.ELASTICSEARCH_INDEX_MAPPING,
         ignore=400)
@@ -72,7 +72,7 @@ def create_index(batches, index_name):
                 "index":
                 {
                     "_index": index_name,
-                    "_type": "batches"
+                    "_type": "newbatches"
                 }
             }
             if item.get("id", None):
@@ -80,7 +80,9 @@ def create_index(batches, index_name):
             bulk_items.append(batch_doc)
             bulk_items.append(item)
         # Data is not refreshed!
-        return es.bulk(body=bulk_items, refresh=True)
+        data = es.bulk(body=bulk_items, refresh=True)
+        print data
+        return data
     return {}
 
 def get_schema_for_query_type(query_type):
@@ -138,13 +140,28 @@ def build_es_request(queries):
                     }
                 }
         elif query["query_type"] == 'any_of': 
-            new_query = {
-                    "terms" :
-                    { 
-                        "field": "indexed_fields.value.raw" , 
-                        "query" : query["any_of"] 
+            #We are using a custom char filter but a keyword tokenizer on this field
+            #This means that numbers are indexed as their zero-padded equivalents so that they can be sorted in a logical order
+            #In order that we can search for a number and have the query also passed through the same filter
+             #We need the match query not a terms query
+             #The terms query equivalent is shown below. This would work in all cases except 
+             #when you are looking for a number.
+             #Because the keyword tokenizer does not split up fields into words the match query will always match an exact match just like the terms query does
+            # new_query = {
+            #         "terms" :
+            #         { 
+            #             "indexed_fields.value.raw": query["any_of"] 
+            #         }
+            #     }
+
+            new_query = {                  
+                "bool":
+                    {
+                        "should" : [
+                            {"match" : {"indexed_fields.value.raw" : text }} for text in query["any_of"] 
+                        ]
                     }
-                }
+            }
 
         # elif query["query_type"] == 'starts_with':
 

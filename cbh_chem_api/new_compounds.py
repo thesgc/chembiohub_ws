@@ -2,7 +2,7 @@ from chembl_business_model.models.compounds import CompoundProperties, MoleculeD
 from cbh_chembl_model_extension.models import CBHCompoundBatch
 from tastypie.resources import ALL
 from tastypie.resources import ALL_WITH_RELATIONS
-from tastypie.resources import ModelResource
+from tastypie.resources import ModelResource, Resource
 from tastypie.serializers import Serializer
 from django.conf import settings
 from django.conf.urls import *
@@ -13,7 +13,7 @@ from cbh_chem_api.projects import ChemregProjectResource, ChemRegCustomFieldConf
 from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate, CBHNoSerializedDictField
 from cbh_utils import elasticsearch_client
 import json 
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpRequest
 
 
 class CompoundPropertiesResource(ModelResource):
@@ -48,6 +48,14 @@ class BaseCBHCompoundBatchResource(ModelResource):
         serializer = Serializer()
 
 
+class CBHCompoundBatchSearchResource(Resource):
+
+    pass
+
+    class Meta:
+        resource_name = "cbh_compound_batches_search"
+
+
 
 class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
 
@@ -64,7 +72,27 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
 
         return start_schema + middle_table_schema + end_schema
 
-    
+    def index_batch_list(self, request, batch_list):
+
+            #retrieve some objects as json
+        bundles = [
+            self.full_dehydrate(self.build_bundle(obj=obj, request=request), for_list=True)
+            for obj in batch_list
+        ]
+
+        #retrieve schemas which tell the elasticsearch request which fields to index for each object (we avoid deserializing a single custom field config more than once)
+        #Now make the schema list parallel to the batches list
+        batch_dicts = [self.Meta.serializer.to_simple(bun, {}) for bun in bundles]
+
+        project_data_field_sets = [batch_dict["projectfull"]["custom_field_config"].pop("project_data_fields") for batch_dict in batch_dicts]
+
+        schemas = [self.reformat_project_data_fields_as_table_schema( "indexing", pdfs) for pdfs in project_data_field_sets]
+        for batch in batch_dicts:
+            batch["projectfull"]["custom_field_config"] = batch["projectfull"]["custom_field_config"]["resource_uri"]
+        index_name = elasticsearch_client.get_main_index_name()
+        batch_dicts = elasticsearch_client.index_dataset(index_name, batch_dicts, schemas)
+            
+
     def reindex_elasticsearch(self, request, **kwargs):
         desired_format = self.determine_format(request)
         batches = self.get_object_list(request)
@@ -74,23 +102,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
 
         for page in range(1, paginator.num_pages +1):
             bs = paginator.page(page).object_list
-            #retrieve some objects as json
-            bundles = [
-                self.full_dehydrate(self.build_bundle(obj=obj, request=request), for_list=True)
-                for obj in bs
-            ]
-
-            #retrieve schemas which tell the elasticsearch request which fields to index for each object (we avoid deserializing a single custom field config more than once)
-            #Now make the schema list parallel to the batches list
-            batch_dicts = [self.Meta.serializer.to_simple(bun, {}) for bun in bundles]
-
-            project_data_field_sets = [batch_dict["projectfull"]["custom_field_config"].pop("project_data_fields") for batch_dict in batch_dicts]
-
-            schemas = [self.reformat_project_data_fields_as_table_schema( "indexing", pdfs) for pdfs in project_data_field_sets]
-            for batch in batch_dicts:
-                batch["projectfull"]["custom_field_config"] = batch["projectfull"]["custom_field_config"]["resource_uri"]
-            index_name = elasticsearch_client.get_main_index_name()
-            batch_dicts = elasticsearch_client.index_dataset(index_name, batch_dicts, schemas)
+            self.index_batch_list(request, bs)
             
             # here you can do what you want with the row
             
@@ -103,7 +115,9 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         pass
 
 
-
-
+def index_batches_in_new_index(batches):
+    """Temporary function to index all the data"""
+    request = HttpRequest()
+    IndexingCBHCompoundBatchResource().index_batch_list(request, batches)
 
 
