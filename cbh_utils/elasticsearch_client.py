@@ -218,10 +218,16 @@ def build_es_request(queries):
     return base_query
 
 
-def get_list_data_elasticsearch(queries, index):
+def get_list_data_elasticsearch(queries, index, offset=0, limit=10):
     es = elasticsearch.Elasticsearch()
     validate_elasticsearch_queries(queries)
-    
-    es_request = build_es_request(queries)
+    if len(queries) > 0:
+        es_request = build_es_request(queries)
+    else:
+        es_request = {"query" : {"match_all": {}}}
+    es_request["from"] = offset
+    es_request["size"] = limit
 
-    print es.search(index, body=es_request)
+    data = es.search(index, body=es_request)
+
+    return data

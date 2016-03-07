@@ -9,8 +9,7 @@ from django.conf.urls import *
 from django.core.exceptions import ObjectDoesNotExist
 from tastypie.authorization import Authorization
 from tastypie import fields
-from cbh_chem_api.projects import ChemregProjectResource, ChemRegCustomFieldConfigResource, NoCustomFieldsChemregProjectResource
-from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate, CBHNoSerializedDictField
+from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate, CBHNoSerializedDictField,  ChemregProjectResource, ChemRegCustomFieldConfigResource, NoCustomFieldsChemregProjectResource
 from cbh_utils import elasticsearch_client
 import json 
 from django.http import HttpResponse, HttpRequest
@@ -50,7 +49,25 @@ class BaseCBHCompoundBatchResource(ModelResource):
 
 class CBHCompoundBatchSearchResource(Resource):
 
-    pass
+    def get_list(self, request, **kwargs):
+        """
+        Returns a serialized list of resources.
+        Calls ``obj_get_list`` to provide the data, then handles that result
+        set and serializes it.
+        Should return a HttpResponse (200 OK).
+        """
+        # TODO: Uncached for now. Invalidation that works for everyone may be
+        #       impossible.
+        base_bundle = self.build_bundle(request=request)
+        queries = json.loads(request.GET.get("encoded_queries"), "[]")
+        limit = request.GET.get("limit", 10)
+        offset = request.GET.get("offset", 0)
+        index = elasticsearch_client.get_main_index_name()
+        data = elasticsearch_client.get_list_data_elasticsearch(queries,index, offset=offset, limit=limit )
+        serializable = {"objects": hit["_source"] for hit in data["hits"]["hits"]}
+        bundledata = self.alter_list_data_to_serialize(request, bundledata)
+        return self.create_response(request, bundledata) 
+
 
     class Meta:
         resource_name = "cbh_compound_batches_search"

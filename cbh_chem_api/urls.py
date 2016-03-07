@@ -9,7 +9,7 @@ from django.contrib.auth.views import password_change, password_change_done, pas
 
 
 from tastypie.api import Api
-from cbh_chem_api.new_compounds import *
+from cbh_chem_api.resources import *
 from cbh_chem_api.compounds import *
 from cbh_chem_api.projects import *
 
@@ -44,6 +44,8 @@ api.register(InvitationResource())
 api.register(ProjectPermissionResource())
 api.register(CBHFlowFileResource())
 api.register(CBHFlowFileDownloadResource())
+api.register(CBHCompoundBatchSearchResource())
+api.register(ChemGlobalFieldsConfigResource())
 admin.autodiscover()
 
 

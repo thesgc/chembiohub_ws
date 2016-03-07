@@ -56,7 +56,7 @@ from cbh_chem_api.parser import parse_pandas_record, parse_sdf_record, apply_jso
 # from tastypie.utils.mime import build_content_type
 from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate
 import time
-from new_compounds import index_batches_in_new_index
+from cbh_chem_api.resources import index_batches_in_new_index
 
 def build_content_type(format, encoding='utf-8'):
     """
