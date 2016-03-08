@@ -245,14 +245,14 @@ CBH_QUERY_TYPES = [
         #     'name': 'Equals any in this list',
         #     'value': 'any_of',
         # },
-        {
-            'name': 'Starts with',
-            'value': 'starts_with',
-        },
-        {
-            'name': 'Ends with',
-            'value': 'ends_with',
-        },
+        # {
+        #     'name': 'Starts with',
+        #     'value': 'starts_with',
+        # },
+        # {
+        #     'name': 'Ends with',
+        #     'value': 'ends_with',
+        # },
         {
             'name': 'Between',
             'value': 'between',
@@ -264,6 +264,14 @@ CBH_QUERY_TYPES = [
         {
             'name': 'Less than',
             'value': 'less_than',
+        },
+        {
+            'name': 'Field is blank',
+            'value': 'blanks',
+        },
+        {
+            'name': 'Field not blank',
+            'value': 'nonblanks',
         }
     ]
 
@@ -274,210 +282,283 @@ CBH_SORT_DIRECTIONS = [{'name': 'No Sort', 'value': "No Sort" },
 CBH_HIDE_SHOW = [{'name' : 'Show Column', 'value': 'show'},
                 {'name' : 'Hide Column', 'value': 'hide'},]
 
-CBH_QUERY_SCHEMA = {
-    "type": "object",
-    "properties": {
-        "sort_direction" : {
-            "type": "string",
-            "default": "No Sort",
-            "enum" : [sd["value"] for sd in CBH_SORT_DIRECTIONS],
+CBH_SORT_SCHEMAFORM = {
+    "default" :{
+        "form" : [
+                    {
+                          "key" : "sort_direction",
+                          "title": "Sort direction",
+                          "type": "select",
+                          "titleMap": CBH_SORT_DIRECTIONS,
+                          "htmlClass": "col-sm-12",
+                          "type": "radiobuttons",
+                          "onChange": "sortChanged(modelValue,form)",
+                          "disableSuccessState":True,
+                          "feedback": False,
+                    },            
+
+                ],
+
+        "schema": {
+            "type": "object",
+            "properties": {
+                "field_path" :{
+                  "type" : "string",
+                  "default" : ""
+                },
+                "sort_direction" : {
+                    "type": "string",
+                    "default": "No Sort",
+                    "enum" : [sd["value"] for sd in CBH_SORT_DIRECTIONS],
+                    },
+              
             },
-        "query_type": {
-            "type": "string",
-            "enum" : [qt["value"] for qt in CBH_QUERY_TYPES],
-            "default": "phrase"
-        },
-        "hide" : {
-            'type': 'string',
-            "enum" : [h["value"] for h in CBH_HIDE_SHOW],
-            "title": "Hide / show Column",
-            "default": "show"
-        },
-        "phrase" : {
-                'type': 'string',
-                "default": ""
-        },
-        "any_of" : {
-                'type': 'array',
-                "items": {
-                  "type": "string",
-                  "title" : " ",
-                   "disableSuccessState":True,
-          "feedback": False,
-          "required": True,
-          "default": ""
-                }
-        },
-        "equals" : {
-            'type': 'string',
-            'title' : 'Exactly equal to',
-            "default": ""
-        },
-        "starts_with" : {
-            'type': 'string',
-            'title' : 'Starts with',
-            "default": ""
-        },
-        "ends_with" : {
-            'type': 'string',
-            'title' : 'Ends with',
-            "default": ""
-        },
-        "greater_than" : {
-            'type': 'string',
-            'title' : 'Greater than',
-            "default": ""
-        },
-        "less_than" : {
-            'type': 'string',
-            'title' : 'Less than',
-            "default": ""
-        },
-    },
-    "required" : [ "sort_direction", "query_type", "phrase", "any_of", "equals", "starts_with", "ends_with", "greater_than", "less_than"]
+            "required" : [ "sort_direction"]
+        }
+    }
 }
 
 
+CBH_HIDE_SCHEMAFORM = {
+    "default" :{
+        "form" : [
+                    
+                    {
+                          "key" : "hide",
+                          "type": "select",
+                          "titleMap": CBH_HIDE_SHOW,
+                          "type": "radiobuttons",
+                          "htmlClass": "col-sm-12",
+                          "onChange": "hideChanged(modelValue,form)",
+                          "disableSuccessState":True,
+                          "feedback": False,
+                    },
+                   
 
-CBH_QUERY_FORM = [
-    {
-          "key" : "sort_direction",
-          "title": "Sort direction",
-          "type": "select",
-          "titleMap": CBH_SORT_DIRECTIONS,
-          "htmlClass": "col-sm-4",
-          "type": "radiobuttons",
-          "onChange": "sortChanged(modelValue,form)",
-          "disableSuccessState":True,
-          "feedback": False,
-    },
-    {
-          "key" : "query_type",
-          "title": "Filter type",
-          "type": "select",
-          "titleMap": CBH_QUERY_TYPES,
-          "type": "radiobuttons",
-          "htmlClass": "col-sm-8",
-          "onChange": "updated(modelValue,form)",
-          "disableSuccessState":True,
-          "feedback": False,
-    },
-    {
-          "key" : "hide",
-          "type": "select",
-          "titleMap": CBH_HIDE_SHOW,
-          "type": "radiobuttons",
-          "htmlClass": "col-sm-4",
-          "onChange": "hideChanged(modelValue,form)",
-          "disableSuccessState":True,
-          "feedback": False,
-    },
-    {
-        'title': 'Keyword or phrase',
-        'key': 'phrase',
-        'condition': 'model.query_type=="phrase"',
-        "htmlClass": "col-sm-4",
-        "onChange": "updated(modelValue,form)",
-          "disableSuccessState":True,
-          "feedback": False,
+                ],
 
-    },
-    # {
-    #     'key': 'any_of',
-    #     'title': 'Boolean (AND/OR) query',
-    #     'placeholder': 'Search multiple values',
-    #     'feedback': False,
-    #     'condition': 'model.query_type=="any_of"',
-    #     "htmlClass": "col-sm-3",
-    #     "onChange": "updated(modelValue,form)",
-    #       "disableSuccessState":True,
-    #       "feedback": False,
+        "schema": {
+            "type": "object",
+            "properties": {
+                
+                "hide" : {
+                    'type': 'string',
+                    "enum" : [h["value"] for h in CBH_HIDE_SHOW],
+                    "title": "Hide / show Column",
+                    "default": "show"
+                },
+               
+            },
+            "required" : [ ]
+        }
+    }
+}
+        
 
-    # },
-    # {
-    #     'key': 'equals',
-    #     'condition': 'model.query_type=="equals"',
-    #       "htmlClass": "col-sm-3",
-    #       "onChange": "updated(modelValue,form)",
-    #       "disableSuccessState":True,
-    #       "feedback": False,
-    # },
-    {
-        'key': 'starts_with',
-        'condition': 'model.query_type=="starts_with"',
-          "htmlClass": "col-sm-4",
-          "onChange": "updated(modelValue,form)",
-          "disableSuccessState":True,
-          "feedback": False,
-    },
-    {
-        'key': 'ends_with',
-        'condition': 'model.query_type=="ends_with"',
-          "htmlClass": "col-sm-4",
-          "onChange": "updated(modelValue,form)",
-          "disableSuccessState":True,
-          "feedback": False,
-    },
-    {
-        'key': 'greater_than',
-        'condition': 'model.query_type=="greater_than" || model.query_type=="between"',
-          "htmlClass": "col-sm-4",
-          "onChange": "updated(modelValue,form)",
-          "disableSuccessState":True,
-          "feedback": False,
-    },
-    {
-        'key': 'less_than',
-        'condition': 'model.query_type=="less_than" || model.query_type=="between"',
-        "htmlClass": "col-sm-4",
-        "onChange": "updated(modelValue,form)",
-          "disableSuccessState":True,
-          "feedback": False,
-    },
 
-]
+
+
+
+CBH_QUERY_SCHEMAFORM = {
+    "default" :{
+        "form" : [
+                    
+                    {
+                          "key" : "query_type",
+                          "title": "Filter type",
+                          "type": "select",
+                          "titleMap": CBH_QUERY_TYPES,
+                          "type": "radiobuttons",
+                          "htmlClass": "col-sm-12",
+                          "onChange": "queryTypeChanged(modelValue,form)",
+                          "disableSuccessState":True,
+                          "feedback": False,
+                    },
+                    
+                    {
+                        'title': 'Keyword or phrase',
+                        'key': 'phrase',
+                        'condition': 'model.query_type=="phrase"',
+                        "htmlClass": "col-sm-6",
+                        "onChange": "updated(modelValue,form)",
+                          "disableSuccessState":True,
+                          "feedback": False,
+
+                    },
+                    # {
+                    #     'key': 'any_of',
+                    #     'title': 'Boolean (AND/OR) query',
+                    #     'placeholder': 'Search multiple values',
+                    #     'feedback': False,
+                    #     'condition': 'model.query_type=="any_of"',
+                    #     "htmlClass": "col-sm-3",
+                    #     "onChange": "updated(modelValue,form)",
+                    #       "disableSuccessState":True,
+                    #       "feedback": False,
+
+                    # },
+                    # {
+                    #     'key': 'equals',
+                    #     'condition': 'model.query_type=="equals"',
+                    #       "htmlClass": "col-sm-3",
+                    #       "onChange": "updated(modelValue,form)",
+                    #       "disableSuccessState":True,
+                    #       "feedback": False,
+                    # },
+                    # {
+                    #     'key': 'starts_with',
+                    #     'condition': 'model.query_type=="starts_with"',
+                    #       "htmlClass": "col-sm-6",
+                    #       "onChange": "updated(modelValue,form)",
+                    #       "disableSuccessState":True,
+                    #       "feedback": False,
+                    # },
+                    # {
+                    #     'key': 'ends_with',
+                    #     'condition': 'model.query_type=="ends_with"',
+                    #       "htmlClass": "col-sm-6",
+                    #       "onChange": "updated(modelValue,form)",
+                    #       "disableSuccessState":True,
+                    #       "feedback": False,
+                    # },
+                    {
+                        'key': 'greater_than',
+                        'condition': 'model.query_type=="greater_than" || model.query_type=="between"',
+                          "htmlClass": "col-sm-6",
+                          "onChange": "updated(modelValue,form)",
+                          "disableSuccessState":True,
+                          "feedback": False,
+                    },
+                    {
+                        'key': 'less_than',
+                        'condition': 'model.query_type=="less_than" || model.query_type=="between"',
+                        "htmlClass": "col-sm-6",
+                        "onChange": "updated(modelValue,form)",
+                          "disableSuccessState":True,
+                          "feedback": False,
+                    }, 
+                     {
+                        'key': 'field_path',
+                        'condition': 'model.field_path==""',
+                        "htmlClass": "col-sm-12",
+                        "description" : "This field should not show - set the field key in the background",
+                          "disableSuccessState":True,
+                          "feedback": False,
+                    }, 
+                    
+
+                ],
+
+        "schema": {
+            "type": "object",
+            "properties": {
+                "field_path" :{
+                  "type" : "string",
+                  "default" : ""
+                },
+                "sort_direction" : {
+                    "type": "string",
+                    "default": "No Sort",
+                    "enum" : [sd["value"] for sd in CBH_SORT_DIRECTIONS],
+                    },
+                "query_type": {
+                    "type": "string",
+                    "enum" : [qt["value"] for qt in CBH_QUERY_TYPES],
+                    "default": "phrase"
+                },
+                "phrase" : {
+                        'type': 'string',
+                        "default": ""
+                },
+                "any_of" : {
+                        'type': 'array',
+                        "items": {
+                          "type": "string",
+                          "title" : " ",
+                           "disableSuccessState":True,
+                  "feedback": False,
+                  "required": True,
+                  "default": ""
+                        }
+                },
+                "equals" : {
+                    'type': 'string',
+                    'title' : 'Exactly equal to',
+                    "default": ""
+                },
+                "starts_with" : {
+                    'type': 'string',
+                    'title' : 'Starts with',
+                    "default": ""
+                },
+                "ends_with" : {
+                    'type': 'string',
+                    'title' : 'Ends with',
+                    "default": ""
+                },
+                "greater_than" : {
+                    'type': 'string',
+                    'title' : 'Greater than',
+                    "default": ""
+                },
+                "less_than" : {
+                    'type': 'string',
+                    'title' : 'Less than',
+                    "default": ""
+                },
+            },
+            "required" : [ "sort_direction", "query_type", "phrase", "any_of", "equals", "starts_with", "ends_with", "greater_than", "less_than"]
+        }
+    }
+}
+        
+
+
+
 
 
 
 TABULAR_DATA_SETTINGS = { 
     "seach_page_edit_mode": {
-        "start": ["archived", "clone", "structure","uuid", "project_name"],
+        "start": ["properties.archived", "clone", "image","uuid", "projectfull.name"],
         "end": []
     },
     "export" : {
-        "start" :["structure","uuid", "project_name"],
-        "end" : ["created_by" ,"timestamp" , "batch_id" , "upload_id"]
+        "start" :["image","uuid", "projectfull.name"],
+        "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
                 },
     "search_page": {
-        "start" :["structure","uuid", "project_name"],
-        "end" : ["created_by" ,"timestamp" , "batch_id" , "upload_id"]
+        "start" :["image","uuid", "projectfull.name"],
+        "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
                 },
     "add_page" : {
-        "start" :["structure", "row", "upload_info","upload_action","standardInchiKey"],
+        "start" :["image", "id", "originalSmiles","properties.action","standardInchiKey"],
         "end" : []
                 },
     "indexing" : {
-        "start" :["uuid", "project_name", "archived",],
-        "end" : ["created_by" ,"timestamp" , "batch_id" , "upload_id"]
+        "start" :["uuid", "projectfull.name", "properties.archived",],
+        "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
     },
     "indexing_temp" : {
-        "start" :[ "row", "upload_info","upload_action","standardInchiKey", ],
-        "end" : ["created_by" ,"timestamp" , "batch_id" , "upload_id"]
+        "start" :[ "row", "originalSmiles","properties.action","standardInchiKey", ],
+        "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
     },
     "schema": {
         "properties.archived" : {
             "noSort": True,
             "knownBy": "Archive/Restore",
             "data": "properties.archived",
-            "renderer": "archivedRenderer",
+            "searchFormType" : "pick_from_list",
+            "renderer_named": "archivedRenderer",
             "readOnly": True,
             "className": "htCenter htMiddle ",
         },
         "clone": {
             "noSort": True,
             "knownBy": "Clone/Add Structure",
-            "data": "",
-            "renderer": "cloneRenderer",
+            "data": "clone",
+            "searchFormType" : None,
+            "renderer_named": "cloneRenderer",
             "readOnly": True,
             "className": "htCenter htMiddle ",
         },
@@ -485,7 +566,8 @@ TABULAR_DATA_SETTINGS = {
             "noSort": True,
             "knownBy": "Structure",
             "data": "image",
-            "renderer": "coverRenderer",
+            "searchFormType" : "chemical",
+            "renderer_named": "coverRenderer",
             "readOnly": True,
             "className": "htCenter htMiddle "
         },
@@ -493,20 +575,23 @@ TABULAR_DATA_SETTINGS = {
             "sortOrder": "none",
             "knownBy": "Row",
             "data": "id",
+            "searchFormType" : "pick_from_list",
             "readOnly": True,
             "className": "htCenter htMiddle "
         }, 
-        "upload_info" : {
+        "originalSmiles" : {
             "noSort": True,
             "readOnly": True,
             "knownBy": "Info",
+            "searchFormType" : "upload_info",
             "data": "originalSmiles",
-            "renderer": "infoRenderer"
+            "renderer_named": "infoRenderer"
         }, 
         "properties.action" : {
             "sortOrder": "none",
             "knownBy": "Action",
             "data": "properties.action",
+            "searchFormType" : "pick_from_list",
             "type": "dropdown",
             "source": ["New Batch", "Ignore"],
             "className": "htCenter htMiddle "
@@ -515,28 +600,32 @@ TABULAR_DATA_SETTINGS = {
             "sortOrder": "none",
             "knownBy": "Inchi Key",
             "data": "standardInchiKey",
+            "searchFormType" : "pick_from_list",
             "readonly": True,
-            "renderer": "linkRenderer"
+            "renderer_named": "linkRenderer"
         },
         "uuid" : {
             "noSort": True,
             "knownBy": "UOx ID",
-            "data": "chemblId",
-            "renderer": "modalLinkRenderer",
+            "data": "uuid",
+            "searchFormType" : "pick_from_list",
+            "renderer_named": "modalLinkRenderer",
             "readOnly": True,
             "className": " htCenter htMiddle ",
         },
         "projectfull.name": {
             "knownBy": "Project",
             "data": "projectfull.name",
+            "searchFormType" : "default",
             "readOnly": True,
             "className": "htCenter htMiddle ",
-            "renderer": "projectRenderer",
+            "renderer_named": "projectRenderer",
         },
         "created_by" : {
             "noSort": True,
             "knownBy": "Added By",
-            "data": "createdBy",
+            "data": "created_by",
+            "searchFormType" : "pick_from_list",
             "readOnly": True,
             "className": "htCenter htMiddle ",
         }, 
@@ -544,19 +633,15 @@ TABULAR_DATA_SETTINGS = {
             "noSort": True,
             "knownBy": "Date",
             "data": "timestamp",
+            "searchFormType" : "date_range",
             "readOnly": True,
             "className": "htCenter htMiddle ",
         }, 
-        "batch_id" : {
-            "knownBy": "Batch ID",
-            "data": "id",
-            "readOnly": True,
-            "className": "htCenter htMiddle ",
-        }, 
-        "upload_id" :{
+        "multiple_batch_id" :{
             "noSort": True,
             "knownBy": "Upload ID",
-            "data": "multipleBatchId",
+            "data": "multiple_batch_id",
+            "searchFormType" : "pick_from_list",
             "readOnly": True,
             "className": "htCenter htMiddle ",
         }

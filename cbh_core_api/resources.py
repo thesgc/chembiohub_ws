@@ -478,6 +478,522 @@ class ChemregProjectResource(UserHydrate, ModelResource):
                      self).get_object_list(request).prefetch_related(Prefetch('custom_field_config'
                                                                               ))
 
+#To be deprecated
+    def get_searchform(self, bundle):
+        '''Note that the form here was expected to have the UOx id as the first item
+           PB edit - we are now looking it up by key in front end - UOX position no longer needs to be fixed'''
+        ur = UserResource()
+        uri = ur.get_resource_uri()
+        return {
+            'cf_form': [{
+                'htmlClass': 'col-sm-10',
+                'key': 'search_custom_fields__kv_any',
+                'disableSuccessState': True,
+                'feedback': False,
+                'options': {'refreshDelay': 0,
+                            'async': {'url': reverse('api_get_elasticsearch_autocomplete',
+                                                     kwargs={'resource_name': 'cbh_compound_batches',
+                                                             'api_name': settings.WEBSERVICES_NAME})}},
+            }],
+            'cf_schema': {'required': [], 'type': 'object',
+                          'properties': {'search_custom_fields__kv_any': {
+                              'type': 'array',
+                              'format': 'uiselect',
+                              'items': [],
+                              'placeholder': 'Filter project data',
+                              'title': 'Project data values:',
+                          }}},
+            #add a simple form for the save search interface to allow uiselect of projects and groups
+            'savesearch_form': [
+                # {
+                #     'key': 'project__project_key__in',
+                #     'placeholder': 'Select project',
+                #     'htmlClass': 'col-xs-12',
+                #     'feedback': False,
+                #     #'description': 'Search for projects in order to limit the choice of fields on show. Select a single project if you want to edit data.',
+                #     'disableSuccessState': True,
+                #     #'validationMessage': {'default': 'Please select a project if you wish to edit data.'}
+                # },
+                {
+                    'key': 'alias',
+                    'placeholder': 'e.g. My Saved Search',
+                    'htmlClass': 'col-xs-12',
+                    'validationMessage': 'Please add an alias for this search',
+                },
+            ],
+            'savesearch_schema': {
+                          
+                          'type': 'object',
+                          'properties': {
+                                'alias': {
+                                    'title': 'Save search as...',
+                                    'type': 'string',
+                                },
+                            },
+                            'required': ['alias'], 
+                        },
+            'simple_form': [
+
+                {
+                    'key': 'creator_uri',
+                    'htmlClass': 'col-md-4 col-xs-6',
+                    'placeholder': 'Select users to search',
+                    'feedback': False,
+
+
+                },
+                {
+                    'key': 'project__project_key__in',
+                    'placeholder': 'Select projects to search',
+                    'htmlClass': 'col-md-4 col-xs-6',
+                    'feedback': False,
+                    'description': 'Search for projects in order to limit the choice of fields on show. Select a single project if you want to edit data.',
+                    'disableSuccessState': True,
+                    'validationMessage': {'default': 'Please select a project if you wish to edit data.'}
+                },
+                {
+                    'htmlClass': 'col-md-4 col-xs-6',
+                    'key': 'search_custom_fields__kv_any',
+                    'disableSuccessState': True,
+                    'help': 'Searching using this filter will bring back results that match an OR pattern within the same data category, with AND across data categories, i.e. results which contain this item within category a OR that item within category a AND that item within category b.',
+                    'feedback': False,
+                    'options': {'refreshDelay': 0,
+                                'async': {'url': reverse('api_get_list_elasticsearch',
+                                                         kwargs={'resource_name': 'cbh_compound_batches',
+                                                                 'api_name': settings.WEBSERVICES_NAME})},
+                                
+                                },
+                },
+            ],
+            'simple_schema': {
+                          'required': [], 'type': 'object',
+                          'properties': {
+                                'search_custom_fields__kv_any': {
+                                  'type': 'array',
+                                  'format': 'uiselect',
+                                  'items': [],
+                                  'placeholder': 'Filter project data',
+                                  'title': 'Project data values:',
+                                },
+                                'creator_uri': {
+                                    'type': 'array',
+                                    'format': 'uiselect',
+                                       'title': 'Compound batch created by',
+                                        'type': 'array',
+                                        'format': 'uiselect',
+                                        'htmlClass': 'col-md-6 col-xs-6',
+                                        'placeholder': 'Search user who created the batch',
+                                        'options': {'searchDescriptions': False},
+                                        'items':  sorted([
+                                            {'label': user.first_name + " " + user.last_name , "value" : uri + '/' + str(user.id) } if user.first_name  else {'label': user.username , "value" : uri + '/' + str(user.id) }
+                                            for user in User.objects.exclude(pk=-1)
+                                        ], key=lambda k: k['label'].lower())
+                                },
+                                'project__project_key__in': {
+                                    'title': 'Project',
+                                    'type': 'array',
+                                    'format': 'uiselect',
+                                    'items': [{'label': p.obj.name,
+                                               'value': p.obj.project_key} for p in
+                                              bundle['objects']],
+                                },
+                          }},
+            
+            'form': [
+                {
+                    'key': 'related_molregno__chembl__chembl_id__in',
+                    'title': '%s ID' % settings.ID_PREFIX,
+                    'placeholder': 'Search multiple IDs',
+                    'feedback': False,
+                        'htmlClass': 'col-md-6 col-xs-6',
+
+                    'options': {'refreshDelay': 0,
+                                'async': {'url': reverse('api_get_elasticsearch_ids',
+                                                         kwargs={'resource_name': 'cbh_compound_batches',
+                                                                 'api_name': settings.WEBSERVICES_NAME})}},
+                },
+                {
+                    'key': 'multiple_batch_id',
+                    'htmlClass': 'col-md-6 col-xs-6',
+                    'disableSuccessState': True,
+                    'feedback': False,
+                },
+                {
+                    'key': 'dateStart',
+                    'type': 'datepicker',
+                    'minDate': '2004-01-01',
+                    'htmlClass': 'col-md-6 col-xs-6',
+                    'disableSuccessState': True,
+                    'feedback': False,
+                    'pickadate': {
+                        'selectYears': True,
+                        'selectMonths': True
+                        },
+                },
+                {
+                    'key': 'dateEnd',
+                    'type': 'datepicker',
+                    'minDate': '2004-01-01',
+                        'htmlClass': 'col-md-6 col-xs-6',
+                    'disableSuccessState': True,
+                    'feedback': False,
+                    'pickadate': {'selectYears': True,
+                                  'selectMonths': True},
+                }, 
+                {
+                    'htmlClass': 'col-md-6 col-xs-6',
+                    'disableSuccessState': True,
+                    'feedback': False,
+                    'key': 'functional_group',
+
+                },
+                {
+                    'key': 'smiles',
+                    'placeholder': 'Search SMILES or SMARTS string',
+                    'append': 'today',
+                    'feedback': False,
+                    'htmlClass': 'col-md-6 col-xs-6',
+                    'disableSuccessState': True,
+                },
+                {
+                    'key': 'substruc',
+                    'style': {'selected': 'btn-success',
+                              'unselected': 'btn-default'},
+                        'htmlClass': 'col-md-6 col-xs-6',
+                    'type': 'radiobuttons',
+                    'disableSuccessState': True,
+                    'feedback': False,
+                    'titleMap': [{'value': 'with_substructure',
+                                  'name': 'Substructure'},
+                                 {'value': 'flexmatch',
+                                  'name': 'Exact Match'}],
+                },
+                {
+                    'key': 'archived',
+                    'style': {'selected': 'btn-success',
+                              'unselected': 'btn-default'},
+                        'htmlClass': 'col-md-6 col-xs-6',
+                    'type': 'radiobuttons',
+                    'disableSuccessState': True,
+                    'feedback': False,
+                    'titleMap': [
+                        {'value': 'false',
+                                  'name': 'Normal mode'},
+                        {'value': 'true',
+                                  'name': 'Archive mode'},]
+                                 
+                },
+            ],
+            'schema': {'required': [], 'type': 'object', 'properties': {
+                'related_molregno__chembl__chembl_id__in': {
+                    'type': 'array',
+                    'format': 'uiselect',
+                    
+                },
+
+          
+                
+                'multiple_batch_id': {'title': 'Upload ID',
+                                      'type': 'string'},
+
+                'functional_group': {
+                    'title': 'Functional Group',
+                    'type': 'string',
+                    'format': 'uiselect',
+                    'placeholder': 'Search chemical groups',
+                    'options': {'searchDescriptions': False},
+                    'default': '',
+                    'copyValueTo': 'smiles',
+                    'items': [{'label': 'None', 'value': ''}] + sorted([
+                        {'label': 'Alkyl Carbon', 'value': '[CX4]'},
+                        {'label': 'Allenic Carbon',
+                         'value': '[$([CX2](=C)=C)]'},
+                        {'label': 'Vinylic Carbon',
+                         'value': '[$([CX3]=[CX3])]'},
+                        {'label': 'Acetylenic Carbon',
+                         'value': '[$([CX2]#C)]'},
+                        {'label': 'Arene', 'value': 'c'},
+                        {'label': 'Carbonyl group. Low specificity',
+                         'value': '[CX3]=[OX1]'},
+                        {'label': 'Carbonyl group',
+                         'value': '[$([CX3]=[OX1]),$([CX3+]-[OX1-])]'},
+                        {'label': 'Carbonyl with Carbon',
+                         'value': '[CX3](=[OX1])C'},
+                        {'label': 'Carbonyl with Nitrogen.',
+                         'value': '[OX1]=CN'},
+                        {'label': 'Carbonyl with Oxygen.',
+                         'value': '[CX3](=[OX1])O'},
+                        {'label': 'Acyl Halide',
+                         'value': '[CX3](=[OX1])[F,Cl,Br,I]'},
+                        {'label': 'Aldehyde', 'value': '[CX3H1](=O)[#6]'
+                         },
+                        {'label': 'Anhydride',
+                         'value': '[CX3](=[OX1])[OX2][CX3](=[OX1])'},
+                        {'label': 'Amide',
+                         'value': '[NX3][CX3](=[OX1])[#6]'},
+                        {'label': 'Amidinium',
+                         'value': '[NX3][CX3]=[NX3+]'},
+                        {'label': 'Carbamate.',
+                         'value': '[NX3,NX4+][CX3](=[OX1])[OX2,OX1-]'},
+                        {'label': 'Carbamic ester',
+                         'value': '[NX3][CX3](=[OX1])[OX2H0]'},
+                        {'label': 'Carbamic acid.',
+                         'value': '[NX3,NX4+][CX3](=[OX1])[OX2H,OX1-]'
+                         },
+                        {'label': 'Carboxylate Ion.',
+                         'value': '[CX3](=O)[O-]'},
+                        {'label': 'Carbonic Acid or Carbonic Ester',
+                         'value': '[CX3](=[OX1])(O)O'},
+                        {'label': 'Carbonic Acid or Carbonic Acid-Ester', 'value': '[CX3](=[OX1])([OX2])[OX2H,OX1H0-1]'
+                         },
+                        {'label': 'Carbonic Ester (carbonic acid diester)',
+                         'value': 'C[OX2][CX3](=[OX1])[OX2]C'},
+                        {'label': 'Carboxylic acid',
+                         'value': '[CX3](=O)[OX2H1]'},
+                        {'label': 'Carboxylic acid or conjugate base.',
+                         'value': '[CX3](=O)[OX1H0-,OX2H1]'},
+                        {'label': 'Cyanamide',
+                         'value': '[NX3][CX2]#[NX1]'},
+                        {'label': 'Ester Also hits anhydrides',
+                         'value': '[#6][CX3](=O)[OX2H0][#6]'},
+                        {'label': 'Ketone', 'value': '[#6][CX3](=O)[#6]'
+                         },
+                        {'label': 'Ether', 'value': '[OD2]([#6])[#6]'},
+                        {'label': 'Hydrogen Atom', 'value': '[H]'},
+                        {'label': 'Not a Hydrogen Atom',
+                         'value': '[!#1]'},
+                        {'label': 'Proton', 'value': '[H+]'},
+                        {'label': 'Mono-Hydrogenated Cation',
+                         'value': '[+H]'},
+                        {'label': 'Not Mono-Hydrogenated',
+                         'value': '[!H] or [!H1]'},
+                        {'label': 'Primary or secondary amine, not amide.',
+                            'value': '[NX3;H2,H1;!$(NC=O)]'},
+                        {'label': 'Enamine', 'value': '[NX3][CX3]=[CX3]'
+                         },
+                        {'label': 'Primary amine, not amide.',
+                         'value': "[NX3;H2;!$(NC=[!#6]);!$(NC#[!#6])][#6] Not amide (C not double bonded to a hetero-atom), not ammonium ion (N must be 3-connected), not ammonia (N's H-count can't be 3), not cyanamide (C not triple bonded to a hetero-atom)"
+                         },
+                        {'label': 'Two primary or secondary amines',
+                         'value': '[NX3;H2,H1;!$(NC=O)].[NX3;H2,H1;!$(NC=O)]'
+                         },
+                        {'label': 'Enamine or Aniline Nitrogen',
+                         'value': '[NX3][$(C=C),$(cc)]'},
+                        {'label': 'Azide group.',
+                         'value': '[$(*-[NX2-]-[NX2+]#[NX1]),$(*-[NX2]=[NX2+]=[NX1-])]'
+                         },
+                        {'label': 'Azide ion.',
+                         'value': '[$([NX1-]=[NX2+]=[NX1-]),$([NX1]#[NX2+]-[NX1-2])]'
+                         },
+                        {'label': 'Nitrogen.', 'value': '[#7]'},
+                        {'label': 'Azo Nitrogen. Low specificity.',
+                         'value': '[NX2]=N'},
+                        {'label': 'Azo Nitrogen.diazene',
+                         'value': '[NX2]=[NX2]'},
+                        {'label': 'Azoxy Nitrogen.',
+                         'value': '[$([NX2]=[NX3+]([O-])[#6]),$([NX2]=[NX3+0](=[O])[#6])]'
+                         },
+                        {'label': 'Diazo Nitrogen',
+                         'value': '[$([#6]=[N+]=[N-]),$([#6-]-[N+]#[N])]'
+                         },
+                        {'label': 'Azole.',
+                         'value': '[$([nr5]:[nr5,or5,sr5]),$([nr5]:[cr5]:[nr5,or5,sr5])]'
+                         },
+                        {'label': 'Hydrazine H2NNH2',
+                         'value': '[NX3][NX3]'},
+                        {'label': 'Hydrazone C=NNH2',
+                         'value': '[NX3][NX2]=[*]'},
+                        {'label': 'Substituted imine',
+                         'value': '[CX3;$([C]([#6])[#6]),$([CH][#6])]=[NX2][#6]'
+                         },
+                        {'label': 'Substituted or un-substituted imine',
+                         'value': '[$([CX3]([#6])[#6]),$([CX3H][#6])]=[$([NX2][#6]),$([NX2H])]'
+                         },
+                        {'label': 'Iminium', 'value': '[NX3+]=[CX3]'},
+                        {'label': 'Unsubstituted dicarboximide',
+                         'value': '[CX3](=[OX1])[NX3H][CX3](=[OX1])'},
+                        {'label': 'Substituted dicarboximide',
+                         'value': '[CX3](=[OX1])[NX3H0]([#6])[CX3](=[OX1])'
+                         },
+                        {'label': 'Dicarboxdiimide',
+                         'value': '[CX3](=[OX1])[NX3H0]([NX3H0]([CX3](=[OX1]))[CX3](=[OX1]))[CX3](=[OX1])'
+                         },
+                        {'label': 'Nitrate group',
+                         'value': '[$([NX3](=[OX1])(=[OX1])O),$([NX3+]([OX1-])(=[OX1])O)]'
+                         },
+                        {'label': 'Nitrate Anion',
+                         'value': '[$([OX1]=[NX3](=[OX1])[OX1-]),$([OX1]=[NX3+]([OX1-])[OX1-])]'
+                         },
+                        {'label': 'Nitrile', 'value': '[NX1]#[CX2]'},
+                        {'label': 'Isonitrile', 'value': '[CX1-]#[NX2+]'
+                         },
+                        {'label': 'Nitro group.',
+                         'value': '[$([NX3](=O)=O),$([NX3+](=O)[O-])][!#8] Hits both forms.'
+                         },
+                        {'label': 'Two Nitro groups',
+                         'value': '[$([NX3](=O)=O),$([NX3+](=O)[O-])][!#8].[$([NX3](=O)=O),$([NX3+](=O)[O-])][!#8]'
+                         },
+                        {'label': 'Nitroso-group',
+                         'value': '[NX2]=[OX1]'},
+                        {'label': 'N-Oxide',
+                         'value': '[$([#7+][OX1-]),$([#7v5]=[OX1]);!$([#7](~[O])~[O]);!$([#7]=[#7])]'
+                         },
+                        {'label': 'Hydroxyl', 'value': '[OX2H]'},
+                        {'label': 'Hydroxyl in Alcohol',
+                         'value': '[#6][OX2H]'},
+                        {'label': 'Hydroxyl in Carboxylic Acid',
+                         'value': '[OX2H][CX3]=[OX1]'},
+                        {'label': 'Hydroxyl in H-O-P-',
+                         'value': '[OX2H]P'},
+                        {'label': 'Enol', 'value': '[OX2H][#6X3]=[#6]'
+                         },
+                        {'label': 'Phenol', 'value': '[OX2H][cX3]:[c]'
+                         },
+                        {'label': 'Enol or Phenol',
+                         'value': '[OX2H][$(C=C),$(cc)]'},
+                        {'label': 'Hydroxyl_acidic',
+                         'value': '[$([OH]-*=[!#6])]'},
+                        {'label': 'Peroxide groups.',
+                         'value': '[OX2,OX1-][OX2,OX1-]'},
+                        {'label': 'Phosphoric_acid groups.',
+                         'value': '[$(P(=[OX1])([$([OX2H]),$([OX1-]),$([OX2]P)])([$([OX2H]),$([OX1-]),$([OX2]P)])[$([OX2H]),$([OX1-]),$([OX2]P)]),$([P+]([OX1-])([$([OX2H]),$([OX1-]),$([OX2]P)])([$([OX2H]),$([OX1-]),$([OX2]P)])[$([OX2H]),$([OX1-]),$([OX2]P)])]'
+                         },
+                        {'label': 'Phosphoric_ester groups.',
+                         'value': '[$(P(=[OX1])([OX2][#6])([$([OX2H]),$([OX1-]),$([OX2][#6])])[$([OX2H]),$([OX1-]),$([OX2][#6]),$([OX2]P)]),$([P+]([OX1-])([OX2][#6])([$([OX2H]),$([OX1-]),$([OX2][#6])])[$([OX2H]),$([OX1-]),$([OX2][#6]),$([OX2]P)])]'
+                         },
+                        {'label': 'Carbo-Thiocarboxylate',
+                         'value': '[S-][CX3](=S)[#6]'},
+                        {'label': 'Carbo-Thioester',
+                         'value': 'S([#6])[CX3](=O)[#6]'},
+                        {'label': 'Thio analog of carbonyl',
+                         'value': '[#6X3](=[SX1])([!N])[!N]'},
+                        {'label': 'Thiol, Sulfide or Disulfide Sulfur',
+                         'value': '[SX2]'},
+                        {'label': 'Thiol', 'value': '[#16X2H]'},
+                        {'label': 'Sulfur with at-least one hydrogen.',
+                         'value': '[#16!H0]'},
+                        {'label': 'Thioamide',
+                         'value': '[NX3][CX3]=[SX1]'},
+                        {'label': 'Sulfide', 'value': '[#16X2H0]'},
+                        {'label': 'Mono-sulfide',
+                         'value': '[#16X2H0][!#16]'},
+                        {'label': 'Di-sulfide',
+                         'value': '[#16X2H0][#16X2H0]'},
+                        {'label': 'Two Sulfides',
+                         'value': '[#16X2H0][!#16].[#16X2H0][!#16]'},
+                        {'label': 'Sulfinate',
+                         'value': '[$([#16X3](=[OX1])[OX2H0]),$([#16X3+]([OX1-])[OX2H0])]'
+                         },
+                        {'label': 'Sulfinic Acid',
+                         'value': '[$([#16X3](=[OX1])[OX2H,OX1H0-]),$([#16X3+]([OX1-])[OX2H,OX1H0-])]'
+                         },
+                        {'label': 'Sulfone. Low specificity.',
+                         'value': '[$([#16X4](=[OX1])=[OX1]),$([#16X4+2]([OX1-])[OX1-])]'
+                         },
+                        {'label': 'Sulfone. High specificity.',
+                         'value': '[$([#16X4](=[OX1])(=[OX1])([#6])[#6]),$([#16X4+2]([OX1-])([OX1-])([#6])[#6])]'
+                         },
+                        {'label': 'Sulfonic acid. High specificity.',
+                         'value': '[$([#16X4](=[OX1])(=[OX1])([#6])[OX2H,OX1H0-]),$([#16X4+2]([OX1-])([OX1-])([#6])[OX2H,OX1H0-])]'
+                         },
+                        {'label': 'Sulfonate',
+                         'value': '[$([#16X4](=[OX1])(=[OX1])([#6])[OX2H0]),$([#16X4+2]([OX1-])([OX1-])([#6])[OX2H0])]'
+                         },
+                        {'label': 'Sulfonamide.',
+                         'value': '[$([#16X4]([NX3])(=[OX1])(=[OX1])[#6]),$([#16X4+2]([NX3])([OX1-])([OX1-])[#6])]'
+                         },
+                        {'label': 'Carbo-azosulfone',
+                         'value': '[SX4](C)(C)(=O)=N'},
+                        {'label': 'Sulfonamide',
+                         'value': '[$([SX4](=[OX1])(=[OX1])([!O])[NX3]),$([SX4+2]([OX1-])([OX1-])([!O])[NX3])]'
+                         },
+                        {'label': 'Sulfoxide Low specificity.',
+                         'value': '[$([#16X3]=[OX1]),$([#16X3+][OX1-])]'
+                         },
+                        {'label': 'Sulfoxide High specificity',
+                         'value': '[$([#16X3](=[OX1])([#6])[#6]),$([#16X3+]([OX1-])([#6])[#6])]'
+                         },
+                        {'label': 'Sulfate',
+                         'value': '[$([#16X4](=[OX1])(=[OX1])([OX2H,OX1H0-])[OX2][#6]),$([#16X4+2]([OX1-])([OX1-])([OX2H,OX1H0-])[OX2][#6])]'
+                         },
+                        {'label': 'Sulfuric acid ester (sulfate ester) Low specificity.',
+                         'value': '[$([SX4](=O)(=O)(O)O),$([SX4+2]([O-])([O-])(O)O)]'
+                         },
+                        {'label': 'Sulfuric Acid Diester.',
+                         'value': '[$([#16X4](=[OX1])(=[OX1])([OX2][#6])[OX2][#6]),$([#16X4](=[OX1])(=[OX1])([OX2][#6])[OX2][#6])]'
+                         },
+                        {'label': 'Sulfamate.',
+                         'value': '[$([#16X4]([NX3])(=[OX1])(=[OX1])[OX2][#6]),$([#16X4+2]([NX3])([OX1-])([OX1-])[OX2][#6])]'
+                         },
+                        {'label': 'Sulfamic Acid.',
+                         'value': '[$([#16X4]([NX3])(=[OX1])(=[OX1])[OX2H,OX1H0-]),$([#16X4+2]([NX3])([OX1-])([OX1-])[OX2H,OX1H0-])]'
+                         },
+                        {'label': 'Sulfenic acid.',
+                         'value': '[#16X2][OX2H,OX1H0-]'},
+                        {'label': 'Sulfenate.',
+                         'value': '[#16X2][OX2H0]'},
+                        {'label': 'Any carbon attached to any halogen',
+                         'value': '[#6][F,Cl,Br,I]'},
+                        {'label': 'Halogen', 'value': '[F,Cl,Br,I]'},
+                        {'label': 'Sulfide', 'value': '[#16X2H0]'},
+                        {'label': 'Mono-sulfide',
+                         'value': '[#16X2H0][!#16]'},
+                        {'label': 'Di-sulfide',
+                         'value': '[#16X2H0][#16X2H0]'},
+                        {'label': 'Hydrogen-bond acceptor',
+                         'value': '[!$([#6,F,Cl,Br,I,o,s,nX3,#7v5,#15v5,#16v4,#16v6,*+1,*+2,*+3])]'
+                         },
+                        {'label': 'Hydrogen-bond donor.',
+                         'value': '[!$([#6,H0,-,-2,-3])]'},
+                    ], key=lambda k: k['label']),
+                },
+                'dateStart': {
+                    'title': 'Added after',
+                    'type': 'string',
+                    'format': 'date',
+                    'style': {'margin-right': '30px;'},
+                },
+                'dateEnd': {'title': 'Added before', 'type': 'string',
+                            'format': 'date'},
+                'smiles': {'title': 'SMILES or SMARTS',
+                           'type': 'string'},
+                'substruc': {
+                    'title': 'Structural search type',
+                    'type': 'string',
+                    'enum': ['with_substructure', 'flexmatch'],
+                    'default': 'with_substructure',
+                },
+                'search_custom_fields__kv_any': {
+                    'type': 'array',
+                    'format': 'uiselect',
+                    'items': [],
+                    'placeholder': 'Choose column and value...',
+                    'title': 'Filter by project data values:',
+                },
+                'archived': {
+                    'title': 'Enable/disable archive mode',
+                    'type': 'string',
+                    'enum': ['true', 'false'],
+                    'default': 'false',
+                },
+
+            }},
+        }
+
+    def alter_list_data_to_serialize(self, request, bundle):
+        '''Here we append a list of tags to the data of the GET request if the
+        search fields are required'''
+
+        userres = UserResource()
+        userbundle = userres.build_bundle(obj=request.user,
+                                          request=request)
+        userbundle = userres.full_dehydrate(userbundle)
+        bundle['user'] = userbundle.data
+        self._meta.authorization.alter_project_data_for_permissions(bundle, request)
+
+        
+        return bundle
+
 
 
     def alter_list_data_to_serialize(self, request, bundle):
@@ -499,10 +1015,14 @@ class ChemregProjectResource(UserHydrate, ModelResource):
                                                                                                             kwargs={'project_id': bund.data['id'],
                                                                                                                     }), 
                                                                                                      'headers': {
-                                                                                                                  'X-CSRFToken': csrf.get_token(request)
+                                                                                                        'X-CSRFToken': csrf.get_token(request)
                                                                                                                 } 
                                                                                                             }
-                #print(field.data['edit_form']['form'][0])
+        
+        if request.GET.get('schemaform', None):
+            searchfields = set([])
+            searchfield_items = []
+            bundle['searchform'] = self.get_searchform(bundle, )
         return bundle
 
 
@@ -899,7 +1419,7 @@ class ChemGlobalFieldsConfigResource(ModelResource):
     """"""
     data = fields.CharField()
     knownBy = fields.CharField(attribute="name")
-    renderer = fields.CharField(default="selectRendererPerRow")
+    renderer_named = fields.CharField(default="customFieldRenderer")
     className = fields.CharField(default="htCenter htMiddle ") 
     projects = fields.ToManyField("cbh_core_api.resources.NoCustomFieldsChemregProjectResource", attribute=lambda bundle: bundle.obj.custom_field_config.project)
 
@@ -927,7 +1447,7 @@ class ChemGlobalFieldsConfigResource(ModelResource):
                 current_projects = schema[bund.data["data"]]["projects"] 
                 new_projects = bund.data["projects"]
                 #Get specific forms for things using these items in javascript
-                schema[bund.data["data"]]["projects"] = set(current_projects + new_projects)
+                schema[bund.data["data"]]["projects"] = list(set(current_projects + new_projects))
 
 
 
@@ -969,9 +1489,13 @@ class SkinningResource(ModelResource):
 
     '''URL resourcing for pulling out sitewide skinning config '''
     tabular_data_schema = fields.DictField()
-    query_schema = fields.DictField()
-    query_form = fields.DictField()
-
+    query_schemaform = fields.DictField()
+    sort_schemaform = fields.DictField()
+    hide_schemaform = fields.DictField()
+    filters_applied = fields.ListField(default=[])
+    current_query = fields.ListField(default=[])
+    sorts = fields.ListField(default=[])
+    hides = fields.ListField(default=[])
 
     class Meta:
         always_return_data = True
@@ -988,13 +1512,15 @@ class SkinningResource(ModelResource):
         data = json.loads(fields_res.get_list(bundle.request).content)
         return data
 
-        
 
-    def dehydrate_query_schema(self, bundle):
-        return settings.CBH_QUERY_SCHEMA
+    def dehydrate_query_schemaform(self, bundle):
+        return settings.CBH_QUERY_SCHEMAFORM
 
-    def dehydrate_query_form(self, bundle):
-        return settings.CBH_QUERY_FORM
+    def dehydrate_hide_schemaform(self, bundle):
+        return settings.CBH_HIDE_SCHEMAFORM
+
+    def dehydrate_sort_schemaform(self, bundle):
+        return settings.CBH_SORT_SCHEMAFORM
 
 
 

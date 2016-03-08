@@ -8,7 +8,6 @@ except AttributeError:
     ES_PREFIX = "dev"
 ES_MAIN_INDEX_NAME = "chemreg_chemical_index_v2"
 from jsonpointer import resolve_pointer
-from jsonschema import validate
 
 def get_main_index_name():
     return "%s__%s" % (ES_PREFIX, ES_MAIN_INDEX_NAME)
@@ -17,9 +16,13 @@ def get_main_index_name():
 def fix_data_types_for_index( value):
     """Elasticsearch will not index dictionaries"""
     if not value:
-        return "__EMPTY"
+
+        return None
     if isinstance(value, basestring):
-        return value
+        if value.strip():
+            return value
+        else:
+            return None
     if type(value) is dict:
         return json.dumps(value)
     if type(value) is list:
@@ -35,7 +38,10 @@ def build_indexed_fields(document, schema):
         slashed_json_pointer = "/%s" % field["data"].replace(".", "/")
         raw_value = resolve_pointer(document,slashed_json_pointer, default=None)
         value = fix_data_types_for_index(raw_value)
-        document["indexed_fields"].append({"name" : field["knownBy"], "value": value, "field_path": field["data"] })
+        if value:
+            #We do not add an index for any blank, empty or non existant field, that way
+            #we can be sure that the blanks filter will pick up all of the true blank fields
+            document["indexed_fields"].append({"name" : field["knownBy"], "value": value, "field_path": field["data"] })
 
 def build_all_indexed_fields(batch_dicts, schema_list):
     assert(len(batch_dicts) == len(schema_list))
@@ -85,24 +91,6 @@ def create_index(batches, index_name):
         return data
     return {}
 
-def get_schema_for_query_type(query_type):
-    if not query_type:
-        raise Exception("Query Type must not be null, cannot continue")
-    schema = None
-    for qt in settings.CBH_QUERY_TYPES:
-        if qt["value"] == query_type:
-            required_fields = settings.CBH_QUERY_ALWAYS_REQUIRED + qt["required_fields"]
-            print required_fields
-            schema = { req :settings.CBH_QUERY_SCHEMA[req] for req in required_fields}
-    if not query_type:
-        raise Exception("Query Type must be in available query types, cannot continue")
-    return schema
-
-def validate_elasticsearch_queries(queries):
-    for query in queries:
-        qt = query.get("query_type", None)
-        schema = get_schema_for_query_type(qt)
-        validate(query, schema)
 
 
 def get_template_nested_must_clause(field_path, field_query):
@@ -198,10 +186,32 @@ def build_es_request(queries):
                     }
                 }
 
+
+
         if new_query:
             q = get_template_nested_must_clause(query["field_path"], new_query)
             print q
             must_clauses.append(q)
+        else:
+            new_query =  {
+                    "nested" : {
+                            "path" : "indexed_fields",
+                            "query" : {
+                                "term" : {
+                                    "indexed_fields.field_path" : query["field_path"]
+                                }
+                            }
+                        }
+                    } 
+            if query["query_type"] ==  'blanks':
+                must_clauses.append({
+                    "bool" : {
+                            "must_not" : [new_query]
+                        }
+                    })
+            elif query["query_type"] ==  'nonblanks':
+                must_clauses.append(new_query)
+        
 
     base_query = {  
                     "query":{
@@ -220,7 +230,6 @@ def build_es_request(queries):
 
 def get_list_data_elasticsearch(queries, index, offset=0, limit=10):
     es = elasticsearch.Elasticsearch()
-    validate_elasticsearch_queries(queries)
     if len(queries) > 0:
         es_request = build_es_request(queries)
     else:
