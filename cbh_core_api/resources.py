@@ -600,6 +600,14 @@ class ChemregProjectResource(UserHydrate, ModelResource):
                           }},
             
             'form': [
+                # {
+                #     'key': 'newmol',
+                #     'placeholder': 'Sketch a molecule',
+                #     'htmlClass': 'col-xs-12',
+                #     'feedback': False,
+                #     'disableSuccessState': True,
+
+                # },
                 {
                     'key': 'related_molregno__chembl__chembl_id__in',
                     'title': '%s ID' % settings.ID_PREFIX,
@@ -685,6 +693,13 @@ class ChemregProjectResource(UserHydrate, ModelResource):
                 },
             ],
             'schema': {'required': [], 'type': 'object', 'properties': {
+                
+                # 'newmol': {
+                #     'type': 'string',
+                #     'format': 'chemdoodle',
+                #     'default': ""
+                    
+                # },
                 'related_molregno__chembl__chembl_id__in': {
                     'type': 'array',
                     'format': 'uiselect',
