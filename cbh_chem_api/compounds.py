@@ -32,7 +32,7 @@ try:
 except AttributeError:
     WS_DEBUG = False
 from cbh_core_api.authorization import ProjectAuthorization
-from cbh_chem_api.projects import ChemregProjectResource, ChemRegCustomFieldConfigResource, NoCustomFieldsChemregProjectResource
+from cbh_core_api.resources import ChemregProjectResource, ChemRegCustomFieldConfigResource, NoCustomFieldsChemregProjectResource
 from cbh_chem_api.serializers import CBHCompoundBatchSerializer, CBHCompoundBatchElasticSearchSerializer, get_key_from_field_name
 from tastypie.utils import dict_strip_unicode_keys
 from tastypie.serializers import Serializer
