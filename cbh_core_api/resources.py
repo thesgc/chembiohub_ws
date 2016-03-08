@@ -1509,8 +1509,8 @@ class SkinningResource(ModelResource):
     hide_schemaform = fields.DictField()
     filters_applied = fields.ListField(default=[])
     current_query = fields.ListField(default=[])
-    sorts = fields.ListField(default=[])
-    hides = fields.ListField(default=[])
+    sorts_applied = fields.ListField(default=[])
+    hides_applied = fields.ListField(default=[])
 
     class Meta:
         always_return_data = True

@@ -437,14 +437,7 @@ CBH_QUERY_SCHEMAFORM = {
                           "disableSuccessState":True,
                           "feedback": False,
                     }, 
-                     {
-                        'key': 'field_path',
-                        'condition': 'model.field_path==""',
-                        "htmlClass": "col-sm-12",
-                        "description" : "This field should not show - set the field key in the background",
-                          "disableSuccessState":True,
-                          "feedback": False,
-                    }, 
+
                     
 
                 ],
