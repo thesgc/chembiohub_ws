@@ -61,10 +61,11 @@ class CBHCompoundBatchSearchResource(Resource):
         base_bundle = self.build_bundle(request=request)
 
         queries = json.loads(request.GET.get("encoded_query", "[]"))
+        sorts = json.loads(request.GET.get("encoded_sorts", "[]"))
         limit = request.GET.get("limit", 10)
         offset = request.GET.get("offset", 0)
         index = elasticsearch_client.get_main_index_name()
-        data = elasticsearch_client.get_list_data_elasticsearch(queries,index, offset=offset, limit=limit )
+        data = elasticsearch_client.get_list_data_elasticsearch(queries,index,sorts=sorts, offset=offset, limit=limit )
         bundledata = {"objects": 
                         [hit["_source"] for hit in data["hits"]["hits"]],
                         "meta" : {"totalCount" : data["hits"]["total"]}

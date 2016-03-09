@@ -276,8 +276,8 @@ CBH_QUERY_TYPES = [
     ]
 
 CBH_SORT_DIRECTIONS = [{'name': 'No Sort', 'value': "No Sort" },
-             {'name': '1-100 .. A-Z', 'value': 'asc'},
-             {'name': 'Z-A .. 100-0', 'value': 'desc'},]
+             {'name': 'A-Z .. 1-100', 'value': 'asc'},
+             {'name': '100-0 .. Z-A', 'value': 'desc'},]
 
 CBH_HIDE_SHOW = [{'name' : 'Show Column', 'value': 'show'},
                 {'name' : 'Hide Column & Close', 'value': 'hide'},]
@@ -663,56 +663,6 @@ ELASTICSEARCH_INDEX_MAPPING = {
             "index.store.type": "niofs",
             "analysis" : {
                     "char_filter" : {
-                        "zeropad1":{
-                            "type":"pattern_replace",
-                            "pattern":"(^[1-9])($|.[0-9]+$)", 
-                            "replacement":"0000000000$1$2"
-                        },
-                        "zeropad2":{
-                            "type":"pattern_replace",
-                            "pattern":"(^[1-9][0-9])($|.[0-9]+$)",
-                            "replacement":"000000000$1$2"
-                        },
-                        "zeropad3":{
-                            "type":"pattern_replace",
-                            "pattern":"(^[1-9][0-9][0-9])($|.[0-9]+$)",
-                            "replacement":"00000000$1$2"
-                        },
-                        "zeropad4":{
-                            "type":"pattern_replace",
-                            "pattern":"(^[1-9][0-9][0-9][0-9])($|.[0-9]+$)",
-                            "replacement":"0000000$1$2"
-                        },
-                        "zeropad5":{
-                            "type":"pattern_replace",
-                            "pattern":"(^[1-9][0-9][0-9][0-9][0-9])($|.[0-9]+$)",
-                            "replacement":"000000$1$2"
-                        },
-                        "zeropad6":{
-                            "type":"pattern_replace",
-                            "pattern":"(^[1-9][0-9][0-9][0-9][0-9][0-9])($|.[0-9]+$)",
-                            "replacement":"00000$1$2"
-                        },
-                        "zeropad7":{
-                            "type":"pattern_replace",
-                            "pattern":"(^[1-9][0-9][0-9][0-9][0-9][0-9][0-9])($|.[0-9]+$)",
-                            "replacement":"0000$1$2"
-                        },
-                        "zeropad8":{
-                            "type":"pattern_replace",
-                            "pattern":"(^[1-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9])($|.[0-9]+$)",
-                            "replacement":"000$1$2"
-                        },
-                        "zeropad9":{
-                            "type":"pattern_replace",
-                            "pattern":"(^[1-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9])($|.[0-9]+$)",
-                            "replacement":"00$1$2"
-                        },
-                        "zeropad10":{
-                            "type":"pattern_replace",
-                            "pattern":"(^[1-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9])($|.[0-9]+$)",
-                            "replacement":"0$1$2"
-                        },
                         "special_char_space_out" :{ # put spaces around special characters so they can still be indexed
                             "type":"pattern_replace",
                             "pattern":"([()\[\].,\-\+])",
@@ -727,15 +677,6 @@ ELASTICSEARCH_INDEX_MAPPING = {
                             ],
                             "char_filter" : [
                                 "html_strip", "special_char_space_out"
-                            ]
-                        },
-                        "sortable" : {
-                            "tokenizer" : "keyword",
-                            "filter" : [
-                                "lowercase"
-                            ],
-                            "char_filter" : [
-                                "zeropad1", "zeropad2", "zeropad3", "zeropad4", "zeropad5", "zeropad6", "zeropad7", "zeropad8", "zeropad9", "zeropad10"
                             ]
                         }
                     }
@@ -758,6 +699,7 @@ ELASTICSEARCH_INDEX_MAPPING = {
                                     "type": "string", 
                                     "index": "not_analyzed"
                                 },
+                          
                                 "value":  
                                       {
                                         "type": "string", 
@@ -767,7 +709,7 @@ ELASTICSEARCH_INDEX_MAPPING = {
                                         "omit_norms": True, 
                                         "analyzer" : "default_index",
                                         "fields": {
-                                            "raw": {"analyzer": "sortable" ,"type": "string", "store": "no", "index": "analyzed", "ignore_above": 256}
+                                            "raw": {"type": "string", "store": "no", "index": "not_analyzed", "ignore_above": 256}
                                         }
                                     }
                             }

@@ -213,27 +213,47 @@ def build_es_request(queries):
                 must_clauses.append(new_query)
         
 
-    base_query = {  
+    
+            
+    return must_clauses
+
+
+def build_sorts(sorts):
+    """This script (written in groovy) picks out 
+    the field value in elasticsearch and spits it 
+    out as a zero padded string if it is either an integer or a float"""
+    elasticsearch_sorts = [
+        {
+            "_script":{"script":"tmp = ''; for(item in _source.indexed_fields){if(item.field_path==field_path){tmp=item.value}}; if(tmp.isInteger()){tmp = String.format('%014d',tmp.toInteger());};  else if(tmp.isFloat()){def (value1, value2) = tmp.tokenize('.'); tmp = String.format('%014d',value1.toInteger()) + '.' + value2 }; return tmp",
+            "params" : {"field_path" : sort["field_path"]},
+            "type" : "string", "order" : sort["sort_direction"]}
+        }
+        for sort in sorts
+    ]
+    return elasticsearch_sorts
+
+
+
+def get_list_data_elasticsearch(queries, index, sorts=[], offset=0, limit=10):
+    es = elasticsearch.Elasticsearch()
+    if len(queries) > 0:
+        es_request = {  
                     "query":{
                         
                         "bool" : {
                             "must" : [    
-                                   must_clauses
+                                   build_es_request(queries)
                             ]
                         }
-                    }
+                    },
+                    "sort" : build_sorts(sorts)
                 }
-            
         
-    return base_query
-
-
-def get_list_data_elasticsearch(queries, index, offset=0, limit=10):
-    es = elasticsearch.Elasticsearch()
-    if len(queries) > 0:
-        es_request = build_es_request(queries)
     else:
-        es_request = {"query" : {"match_all": {}}}
+        es_request = {
+                        "query" : {"match_all": {}},
+                        "sort" : build_sorts(sorts)
+                    }
     es_request["from"] = offset
     es_request["size"] = limit
 
