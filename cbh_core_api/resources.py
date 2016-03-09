@@ -1422,6 +1422,7 @@ class ChemGlobalFieldsConfigResource(ModelResource):
     renderer_named = fields.CharField(default="customFieldRenderer")
     className = fields.CharField(default="htCenter htMiddle ") 
     projects = fields.ToManyField("cbh_core_api.resources.NoCustomFieldsChemregProjectResource", attribute=lambda bundle: bundle.obj.custom_field_config.project)
+    readOnly = fields.BooleanField(default=True)
 
     def dehydrate_data(self, bundle):
         return "custom_fields.%s" % bundle.obj.name
@@ -1492,11 +1493,15 @@ class SkinningResource(ModelResource):
     query_schemaform = fields.DictField()
     sort_schemaform = fields.DictField()
     hide_schemaform = fields.DictField()
+
     filters_applied = fields.ListField(default=[])
-    current_query = fields.ListField(default=[])
     sorts_applied = fields.ListField(default=[])
     hides_applied = fields.ListField(default=[])
 
+    filters_objects = fields.ListField(default=[])
+    sort_objects = fields.ListField(default=[])
+    hide_objects = fields.ListField(default=[])
+    
     class Meta:
         always_return_data = True
         queryset = SkinningConfig.objects.all()

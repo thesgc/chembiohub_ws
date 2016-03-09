@@ -238,7 +238,7 @@ CKEDITOR_CONFIGS = {
 
 CBH_QUERY_TYPES = [
         {
-        'name': 'Contains Keyword or phrase',
+        'name': 'Keyword',
         'value': 'phrase',
         },
         # {
@@ -266,11 +266,11 @@ CBH_QUERY_TYPES = [
             'value': 'less_than',
         },
         {
-            'name': 'Field is blank',
+            'name': 'Blank',
             'value': 'blanks',
         },
         {
-            'name': 'Field not blank',
+            'name': 'Not blank',
             'value': 'nonblanks',
         }
     ]
@@ -280,7 +280,7 @@ CBH_SORT_DIRECTIONS = [{'name': 'No Sort', 'value': "No Sort" },
              {'name': 'Z-A .. 100-0', 'value': 'desc'},]
 
 CBH_HIDE_SHOW = [{'name' : 'Show Column', 'value': 'show'},
-                {'name' : 'Hide Column', 'value': 'hide'},]
+                {'name' : 'Hide Column & Close', 'value': 'hide'},]
 
 CBH_SORT_SCHEMAFORM = {
     "default" :{
@@ -369,10 +369,27 @@ CBH_QUERY_SCHEMAFORM = {
                           "type": "select",
                           "titleMap": CBH_QUERY_TYPES,
                           "type": "radiobuttons",
-                          "htmlClass": "col-sm-12",
+                          "htmlClass": "col-sm-9",
                           "onChange": "queryTypeChanged(modelValue,form)",
                           "disableSuccessState":True,
                           "feedback": False,
+                    },
+
+                    {
+                         "htmlClass": "col-sm-2",
+                          "type": 'button', 
+                          "style": 'btn-danger ', 
+                          "title": 'Clear Filters', 
+                          "onClick": "clearFilters()" 
+
+                    },
+                    {
+                         "htmlClass": "col-sm-1",
+                          "type": 'button', 
+                          "style": 'btn-primary ', 
+                          "title": 'Close', 
+                          "onClick": "closeMenu()" 
+
                     },
                     
                     {
