@@ -280,3 +280,10 @@ def get_list_data_elasticsearch(queries, index, sorts=[], textsearch="", offset=
     data = es.search(index, body=es_request)
 
     return data
+
+
+
+def get_detail_data_elasticsearch(index, id):
+    es = elasticsearch.Elasticsearch()
+    data = es.get(index=index, doc_type="newbatches", id=id)
+    return data["_source"]

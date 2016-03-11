@@ -49,6 +49,24 @@ class BaseCBHCompoundBatchResource(ModelResource):
 
 class CBHCompoundBatchSearchResource(Resource):
 
+    def get_detail(self, request, **kwargs):
+        """
+        Returns a single serialized resource.
+        Calls ``cached_obj_get/obj_get`` to provide the data, then handles that result
+        set and serializes it.
+        Should return a HttpResponse (200 OK).
+        """
+        basic_bundle = self.build_bundle(request=request)
+
+        kwargs = self.remove_api_resource_names(kwargs)
+        
+        index = elasticsearch_client.get_main_index_name()
+        data = elasticsearch_client.get_detail_data_elasticsearch(index, kwargs["pk"])   
+        
+        bundle = self.alter_detail_data_to_serialize(request, data)
+        return self.create_response(request, bundle)
+
+
     def get_list(self, request, **kwargs):
         """
         Returns a serialized list of resources.
