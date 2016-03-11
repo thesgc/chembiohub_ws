@@ -75,20 +75,19 @@ def create_index(batches, index_name):
     if len(batches) > 0:
         for item in batches:
             batch_doc = {
-                "index":
+                "update":
                 {
                     "_index": index_name,
                     "_type": "newbatches"
                 }
             }
             if item.get("id", None):
-                batch_doc["_id"] = str(item["id"])
+                batch_doc["update"]["_id"] = str(item["id"])
             bulk_items.append(batch_doc)
-            bulk_items.append(item)
+            bulk_items.append({"doc" : item, "doc_as_upsert" : True })
         # Data is not refreshed!
         data = es.bulk(body=bulk_items, refresh=True)
-        print data
-        return data
+
     return {}
 
 
@@ -114,8 +113,28 @@ def get_template_nested_must_clause(field_path, field_query):
     return template_must_clause
 
 
-def build_es_request(queries):
+def build_es_request(queries, textsearch=""):
     must_clauses = []
+
+    if textsearch:
+        subquery = {
+                    "nested" : {
+                            "path" : "indexed_fields",
+                            "query" : {
+                                
+                                    "multi_match" : { 
+                                        "type": "phrase_prefix", 
+                                        "fields": ["indexed_fields.value",] , 
+                                        "query" : textsearch 
+                                    }
+                                }
+                            }
+                        }
+                    
+        must_clauses.append(subquery)
+        print subquery
+
+
     for query in queries:
         new_query = None
         if query["query_type"] == 'phrase':
@@ -234,15 +253,16 @@ def build_sorts(sorts):
 
 
 
-def get_list_data_elasticsearch(queries, index, sorts=[], offset=0, limit=10):
+def get_list_data_elasticsearch(queries, index, sorts=[], textsearch="", offset=0, limit=10):
     es = elasticsearch.Elasticsearch()
-    if len(queries) > 0:
+
+    if len(queries or textsearch) > 0:
         es_request = {  
                     "query":{
                         
                         "bool" : {
                             "must" : [    
-                                   build_es_request(queries)
+                                   build_es_request(queries, textsearch=textsearch)
                             ]
                         }
                     },

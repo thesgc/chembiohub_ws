@@ -9,7 +9,7 @@ TASTYPIE_CANNED_ERROR = "An internal server error occurred. Please contact ChEMB
 
 
 
-ID_PREFIX = "UOX"
+ID_PREFIX = "CBH"
 SESSION_COOKIE_HTTPONLY = False
 SESSION_SAVE_EVERY_REQUEST = True
 OPEN_SOURCE = True
@@ -583,7 +583,7 @@ TABULAR_DATA_SETTINGS = {
         },
         "id" : {
             "sortOrder": "none",
-            "knownBy": "Row",
+            "knownBy": "Batch ID",
             "data": "id",
             "searchFormType" : "pick_from_list",
             "readOnly": True,
@@ -616,7 +616,7 @@ TABULAR_DATA_SETTINGS = {
         },
         "uuid" : {
             "noSort": True,
-            "knownBy": "UOx ID",
+            "knownBy": ID_PREFIX + "_ID",
             "data": "uuid",
             "searchFormType" : "pick_from_list",
             "renderer_named": "modalLinkRenderer",

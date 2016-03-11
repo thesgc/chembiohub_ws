@@ -62,10 +62,11 @@ class CBHCompoundBatchSearchResource(Resource):
 
         queries = json.loads(request.GET.get("encoded_query", "[]"))
         sorts = json.loads(request.GET.get("encoded_sorts", "[]"))
+        textsearch = request.GET.get("textsearch", "")
         limit = request.GET.get("limit", 10)
         offset = request.GET.get("offset", 0)
         index = elasticsearch_client.get_main_index_name()
-        data = elasticsearch_client.get_list_data_elasticsearch(queries,index,sorts=sorts, offset=offset, limit=limit )
+        data = elasticsearch_client.get_list_data_elasticsearch(queries,index,sorts=sorts, offset=offset, limit=limit, textsearch=textsearch )
         bundledata = {"objects": 
                         [hit["_source"] for hit in data["hits"]["hits"]],
                         "meta" : {"totalCount" : data["hits"]["total"]}
@@ -80,6 +81,23 @@ class CBHCompoundBatchSearchResource(Resource):
 
 
 class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
+    uuid = fields.CharField(default="")
+    timestamp = fields.CharField(default="")
+
+    def dehydrate_timestamp(self, bundle):
+        return str(bundle.obj.created)[0:10]
+
+    def dehydrate_uuid(self, bundle):
+        """This is either a blinded batch or a uuid"""
+        
+        if bundle.obj.related_molregno:
+            if bundle.obj.related_molregno.chembl:
+                if bundle.obj.related_molregno.chembl.chembl_id:
+                    return bundle.obj.related_molregno.chembl.chembl_id
+        if bundle.obj.blinded_batch_id.strip():
+            return bundle.obj.blinded_batch_id
+
+
 
     def reformat_project_data_fields_as_table_schema(self, table_schema_type, project_data_fields_json):
         """Takes the standard output from project data fields and reformats it for use in table formats 
@@ -95,8 +113,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         return start_schema + middle_table_schema + end_schema
 
     def index_batch_list(self, request, batch_list):
-
-            #retrieve some objects as json
+        #retrieve some objects as json
         bundles = [
             self.full_dehydrate(self.build_bundle(obj=obj, request=request), for_list=True)
             for obj in batch_list
@@ -105,9 +122,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         #retrieve schemas which tell the elasticsearch request which fields to index for each object (we avoid deserializing a single custom field config more than once)
         #Now make the schema list parallel to the batches list
         batch_dicts = [self.Meta.serializer.to_simple(bun, {}) for bun in bundles]
-
         project_data_field_sets = [batch_dict["projectfull"]["custom_field_config"].pop("project_data_fields") for batch_dict in batch_dicts]
-
         schemas = [self.reformat_project_data_fields_as_table_schema( "indexing", pdfs) for pdfs in project_data_field_sets]
         for batch in batch_dicts:
             batch["projectfull"]["custom_field_config"] = batch["projectfull"]["custom_field_config"]["resource_uri"]
