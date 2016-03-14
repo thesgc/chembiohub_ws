@@ -9,10 +9,12 @@ from django.conf.urls import *
 from django.core.exceptions import ObjectDoesNotExist
 from tastypie.authorization import Authorization
 from tastypie import fields
+from cbh_core_api.authorization import ProjectAuthorization
 from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate, CBHNoSerializedDictField,  ChemregProjectResource, ChemRegCustomFieldConfigResource, NoCustomFieldsChemregProjectResource
 from cbh_utils import elasticsearch_client
 import json 
 from django.http import HttpResponse, HttpRequest
+from tastypie.exceptions import Unauthorized, BadRequest
 
 
 class CompoundPropertiesResource(ModelResource):
@@ -41,6 +43,7 @@ class BaseCBHCompoundBatchResource(ModelResource):
     custom_fields = CBHNoSerializedDictField('custom_fields')
 
     class Meta:
+        authorization = ProjectAuthorization()
         queryset = CBHCompoundBatch.objects.all()
         resource_name = 'cbh_compound_batches'
         include_resource_uri = True
@@ -48,6 +51,11 @@ class BaseCBHCompoundBatchResource(ModelResource):
 
 
 class CBHCompoundBatchSearchResource(Resource):
+
+    class Meta:
+        resource_name = "cbh_compound_batches_search"
+        authorization = ProjectAuthorization()
+
 
     def get_detail(self, request, **kwargs):
         """
@@ -59,10 +67,16 @@ class CBHCompoundBatchSearchResource(Resource):
         basic_bundle = self.build_bundle(request=request)
 
         kwargs = self.remove_api_resource_names(kwargs)
+        allowed_pids = self._meta.authorization.project_ids(request)
+        concatenated_indices = elasticsearch_client.get_list_of_indicies(allowed_pids)
+        data = elasticsearch_client.get_detail_data_elasticsearch(concatenated_indices, kwargs["pk"])   
         
-        index = elasticsearch_client.get_main_index_name()
-        data = elasticsearch_client.get_detail_data_elasticsearch(index, kwargs["pk"])   
-        
+
+        requested_pid = data["projectfull"]["id"]
+
+        if requested_pid not in allowed_pids:
+            raise Unauthorized("No permissions for requested project") 
+
         bundle = self.alter_detail_data_to_serialize(request, data)
         return self.create_response(request, bundle)
 
@@ -77,14 +91,33 @@ class CBHCompoundBatchSearchResource(Resource):
         # TODO: Uncached for now. Invalidation that works for everyone may be
         #       impossible.
         base_bundle = self.build_bundle(request=request)
+        pids = request.GET.get("pids", "")
+        project_ids = []
+        if pids:
+
+            project_ids = [int(pid) for pid in pids.split(",")]
+        
+        allowed_pids = set(self._meta.authorization.project_ids(request))
+        
+        for requested_pid in project_ids:
+            if requested_pid not in allowed_pids:
+                raise Unauthorized("No permissions for requested project") 
+
+        if len(project_ids) == 0:
+            project_ids = allowed_pids
 
         queries = json.loads(request.GET.get("encoded_query", "[]"))
         sorts = json.loads(request.GET.get("encoded_sorts", "[]"))
         textsearch = request.GET.get("textsearch", "")
         limit = request.GET.get("limit", 10)
         offset = request.GET.get("offset", 0)
-        index = elasticsearch_client.get_main_index_name()
-        data = elasticsearch_client.get_list_data_elasticsearch(queries,index,sorts=sorts, offset=offset, limit=limit, textsearch=textsearch )
+        concatenated_indices = elasticsearch_client.get_list_of_indicies(project_ids)
+        data = elasticsearch_client.get_list_data_elasticsearch(queries,
+            concatenated_indices,
+            sorts=sorts, 
+            offset=offset, 
+            limit=limit, 
+            textsearch=textsearch,  )
         bundledata = {"objects": 
                         [hit["_source"] for hit in data["hits"]["hits"]],
                         "meta" : {"totalCount" : data["hits"]["total"]}
@@ -92,9 +125,6 @@ class CBHCompoundBatchSearchResource(Resource):
         bundledata = self.alter_list_data_to_serialize(request, bundledata)
         return self.create_response(request, bundledata) 
 
-
-    class Meta:
-        resource_name = "cbh_compound_batches_search"
 
 
 
@@ -142,10 +172,12 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         batch_dicts = [self.Meta.serializer.to_simple(bun, {}) for bun in bundles]
         project_data_field_sets = [batch_dict["projectfull"]["custom_field_config"].pop("project_data_fields") for batch_dict in batch_dicts]
         schemas = [self.reformat_project_data_fields_as_table_schema( "indexing", pdfs) for pdfs in project_data_field_sets]
+        index_names = []
         for batch in batch_dicts:
             batch["projectfull"]["custom_field_config"] = batch["projectfull"]["custom_field_config"]["resource_uri"]
-        index_name = elasticsearch_client.get_main_index_name()
-        batch_dicts = elasticsearch_client.index_dataset(index_name, batch_dicts, schemas)
+            index_name = elasticsearch_client.get_project_index_name(batch["projectfull"]["id"])
+            index_names.append(index_name)
+        batch_dicts = elasticsearch_client.index_dataset(batch_dicts, schemas, index_names)
             
 
     def reindex_elasticsearch(self, request, **kwargs):

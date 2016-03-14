@@ -1516,6 +1516,7 @@ class SkinningResource(ModelResource):
     filters_objects = fields.ListField(default=[])
     sort_objects = fields.ListField(default=[])
     hide_objects = fields.ListField(default=[])
+
     
     class Meta:
         always_return_data = True

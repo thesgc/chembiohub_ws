@@ -12,6 +12,14 @@ from jsonpointer import resolve_pointer
 def get_main_index_name():
     return "%s__%s" % (ES_PREFIX, ES_MAIN_INDEX_NAME)
 
+def get_project_index_name(project_id):
+    return "%s__%s__project__%d" % (ES_PREFIX, ES_MAIN_INDEX_NAME, project_id)
+
+def get_list_of_indicies(project_ids):
+    list_of_indices = [get_project_index_name(project_id) for project_id in project_ids]
+    return ",".join(list_of_indices)
+
+
 
 def fix_data_types_for_index( value):
     """Elasticsearch will not index dictionaries"""
@@ -51,10 +59,10 @@ def build_all_indexed_fields(batch_dicts, schema_list):
 
 
 
-def index_dataset(index_name, batch_dicts, schema_list):
+def index_dataset( batch_dicts, schema_list, index_names):
     build_all_indexed_fields(batch_dicts, schema_list)
     es_reindex = create_index(
-                batch_dicts, index_name)
+                batch_dicts, index_names)
     if es_reindex.get("errors"):
         print "ERRORS"
         print json.dumps(es_reindex)
@@ -62,22 +70,23 @@ def index_dataset(index_name, batch_dicts, schema_list):
 
 
 
-def create_index(batches, index_name):
+def create_index(batches, index_names):
     es = elasticsearch.Elasticsearch()
     t = time.time()
 
-    print es.indices.create(
+    for index_name in index_names:
+        es.indices.create(
         index_name,
         body=settings.ELASTICSEARCH_INDEX_MAPPING,
         ignore=400)
 
     bulk_items = []
     if len(batches) > 0:
-        for item in batches:
+        for counter, item in enumerate(batches):
             batch_doc = {
                 "update":
                 {
-                    "_index": index_name,
+                    "_index": index_names[counter],
                     "_type": "newbatches"
                 }
             }
@@ -266,18 +275,26 @@ def get_list_data_elasticsearch(queries, index, sorts=[], textsearch="", offset=
                             ]
                         }
                     },
-                    "sort" : build_sorts(sorts)
+                    "sort" : build_sorts(sorts),
+                    "_source" : {
+                        "include": [ "*" ],
+                        "exclude": [ "indexed_fields.*" , "bigimage" ]
+                    },
                 }
         
     else:
         es_request = {
                         "query" : {"match_all": {}},
-                        "sort" : build_sorts(sorts)
+                        "sort" : build_sorts(sorts),
+                        "_source" : {
+                            "include": [ "*" ],
+                            "exclude": [ "indexed_fields.*" , "bigimage" ]
+                        }
                     }
     es_request["from"] = offset
     es_request["size"] = limit
 
-    data = es.search(index, body=es_request)
+    data = es.search(index, body=es_request, ignore_unavailable=True)
 
     return data
 
@@ -285,5 +302,5 @@ def get_list_data_elasticsearch(queries, index, sorts=[], textsearch="", offset=
 
 def get_detail_data_elasticsearch(index, id):
     es = elasticsearch.Elasticsearch()
-    data = es.get(index=index, doc_type="newbatches", id=id)
+    data = es.get(index=index, doc_type="newbatches", id=id, ignore_unavailable=True)
     return data["_source"]
