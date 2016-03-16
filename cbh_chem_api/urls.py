@@ -45,6 +45,7 @@ api.register(CBHFlowFileResource())
 api.register(CBHFlowFileDownloadResource())
 api.register(CBHCompoundBatchSearchResource())
 api.register(ChemGlobalFieldsConfigResource())
+api.register(BaseCBHCompoundBatchResource())
 admin.autodiscover()
 
 

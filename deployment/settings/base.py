@@ -276,11 +276,11 @@ CBH_QUERY_TYPES = [
     ]
 
 CBH_SORT_DIRECTIONS = [{'name': 'No Sort', 'value': "No Sort" },
-             {'name': 'A-Z .. 1-100', 'value': 'asc'},
-             {'name': '100-0 .. Z-A', 'value': 'desc'},]
+             {'name': 'Asc', 'value': 'asc'},
+             {'name': 'Desc', 'value': 'desc'},]
 
-CBH_HIDE_SHOW = [{'name' : 'Show Column', 'value': 'show'},
-                {'name' : 'Hide Column & Close', 'value': 'hide'},]
+CBH_HIDE_SHOW = [{'name' : 'Show', 'value': 'show'},
+                {'name' : 'Hide & Close', 'value': 'hide'},]
 
 CBH_SORT_SCHEMAFORM = {
     "default" :{
@@ -537,8 +537,16 @@ TABULAR_DATA_SETTINGS = {
         "start" :["image","uuid", "projectfull.name"],
         "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
                 },
-    "search_page": {
-        "start" :["image","uuid", "projectfull.name"],
+    "cbh.restoreitems": {
+        "start" :["properties.archived", "image","uuid", "projectfull.name"],
+        "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
+                },
+    "cbh.archiveitems": {
+        "start" :["properties.archived", "image","uuid", "projectfull.name"],
+        "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
+                },
+    "cbh.searchv2": {
+        "start" :[ "clone", "image","uuid", "projectfull.name"],
         "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
                 },
     "add_page" : {
@@ -556,20 +564,20 @@ TABULAR_DATA_SETTINGS = {
     "schema": {
         "properties.archived" : {
             "noSort": True,
-            "knownBy": "Archive/Restore",
+            "knownBy": "Archive",
             "data": "properties.archived",
             "searchFormType" : "pick_from_list",
             "renderer_named": "archivedRenderer",
-            "readOnly": True,
+            "editable": True,
             "className": "htCenter htMiddle ",
         },
         "clone": {
             "noSort": True,
-            "knownBy": "Clone/Add Structure",
+            "knownBy": "Clone",
             "data": "clone",
             "searchFormType" : None,
             "renderer_named": "cloneRenderer",
-            "readOnly": True,
+            "editable": False,
             "className": "htCenter htMiddle ",
         },
         "image" : {
@@ -578,7 +586,7 @@ TABULAR_DATA_SETTINGS = {
             "data": "image",
             "searchFormType" : "chemical",
             "renderer_named": "coverRenderer",
-            "readOnly": True,
+            "editable": False,
             "className": "htCenter htMiddle "
         },
         "id" : {
@@ -586,12 +594,12 @@ TABULAR_DATA_SETTINGS = {
             "knownBy": "Batch ID",
             "data": "id",
             "searchFormType" : "pick_from_list",
-            "readOnly": True,
+            "editable": False,
             "className": "htCenter htMiddle "
         }, 
         "originalSmiles" : {
             "noSort": True,
-            "readOnly": True,
+            "editable": False,
             "knownBy": "Info",
             "searchFormType" : "upload_info",
             "data": "originalSmiles",
@@ -603,6 +611,7 @@ TABULAR_DATA_SETTINGS = {
             "data": "properties.action",
             "searchFormType" : "pick_from_list",
             "type": "dropdown",
+            "editable": True,
             "source": ["New Batch", "Ignore"],
             "className": "htCenter htMiddle "
         }, 
@@ -611,7 +620,7 @@ TABULAR_DATA_SETTINGS = {
             "knownBy": "Inchi Key",
             "data": "standardInchiKey",
             "searchFormType" : "pick_from_list",
-            "readonly": True,
+            "editable": False,
             "renderer_named": "linkRenderer"
         },
         "uuid" : {
@@ -620,14 +629,14 @@ TABULAR_DATA_SETTINGS = {
             "data": "uuid",
             "searchFormType" : "pick_from_list",
             "renderer_named": "modalLinkRenderer",
-            "readOnly": True,
+            "editable": False,
             "className": " htCenter htMiddle ",
         },
         "projectfull.name": {
             "knownBy": "Project",
             "data": "projectfull.name",
             "searchFormType" : "default",
-            "readOnly": True,
+            "editable": False,
             "className": "htCenter htMiddle ",
             "renderer_named": "projectRenderer",
         },
@@ -636,7 +645,7 @@ TABULAR_DATA_SETTINGS = {
             "knownBy": "Added By",
             "data": "created_by",
             "searchFormType" : "pick_from_list",
-            "readOnly": True,
+            "editable": False,
             "className": "htCenter htMiddle ",
         }, 
         "timestamp" : {
@@ -644,7 +653,7 @@ TABULAR_DATA_SETTINGS = {
             "knownBy": "Date",
             "data": "timestamp",
             "searchFormType" : "date_range",
-            "readOnly": True,
+            "editable": False,
             "className": "htCenter htMiddle ",
         }, 
         "multiple_batch_id" :{
@@ -652,7 +661,7 @@ TABULAR_DATA_SETTINGS = {
             "knownBy": "Upload ID",
             "data": "multiple_batch_id",
             "searchFormType" : "pick_from_list",
-            "readOnly": True,
+            "editable": False,
             "className": "htCenter htMiddle ",
         }
     }

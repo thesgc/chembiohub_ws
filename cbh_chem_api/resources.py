@@ -1,5 +1,5 @@
 from chembl_business_model.models.compounds import CompoundProperties, MoleculeDictionary
-from cbh_chembl_model_extension.models import CBHCompoundBatch
+from cbh_chembl_model_extension.models import CBHCompoundBatch, generate_uox_id
 from tastypie.resources import ALL
 from tastypie.resources import ALL_WITH_RELATIONS
 from tastypie.resources import ModelResource, Resource
@@ -14,7 +14,9 @@ from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHyd
 from cbh_utils import elasticsearch_client
 import json 
 from django.http import HttpResponse, HttpRequest
+from tastypie import http
 from tastypie.exceptions import Unauthorized, BadRequest
+from tastypie.utils.mime import determine_format, build_content_type
 
 
 class CompoundPropertiesResource(ModelResource):
@@ -24,10 +26,18 @@ class CompoundPropertiesResource(ModelResource):
 
 class MoleculeDictionaryResource(ModelResource):
     compoundproperties = fields.ForeignKey(CompoundPropertiesResource, 'compoundproperties',  null=True, readonly=True, full=True)
+    authorization = ProjectAuthorization()
+    project = fields.ForeignKey(
+        ChemregProjectResource, 'project', blank=False, null=False)
+
 
     class Meta:
         queryset = MoleculeDictionary.objects.all()
         fields = ["compoundproperties"]
+
+
+
+
 
 
 class BaseCBHCompoundBatchResource(ModelResource):
@@ -42,12 +52,47 @@ class BaseCBHCompoundBatchResource(ModelResource):
     properties = CBHNoSerializedDictField('properties')
     custom_fields = CBHNoSerializedDictField('custom_fields')
 
+    def create_response(self, request, data, response_class=HttpResponse, **response_kwargs):
+        """
+        Extracts the common "which-format/serialize/return-response" cycle.
+        Mostly a useful shortcut/hook.
+        """
+        desired_format = self.determine_format(request)
+        if response_class == http.HttpCreated or response_class == http.HttpAccepted:
+            batches = []
+            if data.data.get("objects"):
+                for b in data.data.get("objects"):
+                    batches.append(b.obj)
+            else:
+                batches.append(data.obj)
+            index_batches_in_new_index(batches)
+
+        serialized = self.serialize(request, data, desired_format)
+        return response_class(content=serialized, content_type=build_content_type(desired_format), **response_kwargs)
+
+
+
+    def hydrate_blinded_batch_id(self, bundle):
+        if bundle.data.get("blinded_batch_id", "") == u"EMPTY_ID":
+            uox_id = generate_uox_id()
+            bundle.data["blinded_batch_id"] = uox_id
+            bundle.obj.blinded_batch_id = uox_id
+        return bundle
+
+
+    def dehydrate_properties(self, bundle):
+        archived = bundle.obj.properties.get("archived", "false")
+        value = bundle.obj.properties
+        value["archived"] = archived
+        return value
+
     class Meta:
         authorization = ProjectAuthorization()
         queryset = CBHCompoundBatch.objects.all()
-        resource_name = 'cbh_compound_batches'
+        resource_name = 'cbh_compound_batches_v2'
         include_resource_uri = True
         serializer = Serializer()
+        always_return_data = True
 
 
 class CBHCompoundBatchSearchResource(Resource):
@@ -98,16 +143,26 @@ class CBHCompoundBatchSearchResource(Resource):
             project_ids = [int(pid) for pid in pids.split(",")]
         
         allowed_pids = set(self._meta.authorization.project_ids(request))
+
         
         for requested_pid in project_ids:
             if requested_pid not in allowed_pids:
                 raise Unauthorized("No permissions for requested project") 
 
+
+
         if len(project_ids) == 0:
             project_ids = allowed_pids
 
         queries = json.loads(request.GET.get("encoded_query", "[]"))
-        sorts = json.loads(request.GET.get("encoded_sorts", "[]"))
+
+        #Search for whether this item is archived or not ("archived is indexed as a string")
+        archived = request.GET.get("archived", "false")
+        queries.append({"query_type": "phrase", "field_path": "properties.archived", "phrase": archived})
+
+        sorts = json.loads(request.GET.get("encoded_sorts", '[]'))
+        if len(sorts) == 0:
+            sorts = [{"field_path":"id","sort_direction":"desc"}]
         textsearch = request.GET.get("textsearch", "")
         limit = request.GET.get("limit", 10)
         offset = request.GET.get("offset", 0)

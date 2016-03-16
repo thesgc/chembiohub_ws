@@ -1437,7 +1437,7 @@ class ChemGlobalFieldsConfigResource(ModelResource):
     renderer_named = fields.CharField(default="customFieldRenderer")
     className = fields.CharField(default="htCenter htMiddle ") 
     projects = fields.ToManyField("cbh_core_api.resources.NoCustomFieldsChemregProjectResource", attribute=lambda bundle: bundle.obj.custom_field_config.project)
-    readOnly = fields.BooleanField(default=True)
+    editable = fields.BooleanField(default=True)
 
     def dehydrate_data(self, bundle):
         return "custom_fields.%s" % bundle.obj.name
@@ -1594,7 +1594,7 @@ class ProjectTypeResource(ModelResource):
 
     def dehydrate_copy_action_name(self, bundle):
         if bundle.obj.show_compounds:
-            return "Clone / Add Structure"
+            return "Clone /<br/> Add Structure"
         else:
             return "Clone Item"
 
