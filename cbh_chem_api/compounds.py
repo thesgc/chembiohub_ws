@@ -52,7 +52,7 @@ from django.contrib.auth import get_user_model
 from rdkit.Chem.AllChem import Compute2DCoords
 from django.db.models import Prefetch
 import dateutil.parser
-from cbh_chem_api.parser import parse_pandas_record, parse_sdf_record, apply_json_patch, get_uncurated_fields_from_file
+from cbh_utils.parser import parse_pandas_record, parse_sdf_record, apply_json_patch, get_uncurated_fields_from_file
 # from tastypie.utils.mime import build_content_type
 from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate
 import time
@@ -1128,24 +1128,26 @@ class CBHCompoundBatchResource(ModelResource):
                 headers = list(df)
                 headers = [h.replace(".", "__") for h in headers]
                 df.columns = headers
-                for index, row in row_iterator:
-                    # Only automap on the first attempt at mapping the smiles
+                # Only automap on the first attempt at mapping the smiles
                     # column
-                    if not structure_col and not bundle.data.get("headers", None):
-                        max_score = 0
-                        for header in headers:
-                            # fuzzy matching for smiles - this should also
-                            # match things like "canonical_smiles"
-                            hdr = re.sub('[^0-9a-zA-Z]+', ' ', header)
-                            for h in hdr.split(" "):
-                                h = h.strip()
-                                if h:
-                                    score = fuzzymatch(
-                                        a="smiles", b=h.lower()).ratio()
-                                    if score > max_score and score > 0.9:
-                                        structure_col = header
-                                        max_score = score
-                                        automapped_structure = True
+                if not structure_col and not bundle.data.get("headers", None):
+                    max_score = 0
+                    for header in headers:
+                        # fuzzy matching for smiles - this should also
+                        # match things like "canonical_smiles"
+                        hdr = re.sub('[^0-9a-zA-Z]+', ' ', header)
+                        for h in hdr.split(" "):
+                            h = h.strip()
+                            if h:
+                                score = fuzzymatch(
+                                    a="smiles", b=h.lower()).ratio()
+                                if score > max_score and score > 0.9:
+                                    structure_col = header
+                                    max_score = score
+                                    automapped_structure = True
+                
+                for index, row in row_iterator:
+                    
                     if structure_col:
                         smiles_str = row[structure_col]
                         try:
@@ -1167,15 +1169,13 @@ class CBHCompoundBatchResource(ModelResource):
                     else:
                         b = CBHCompoundBatch.objects.blinded(
                             project=bundle.data["project"])
-                    if b:
-                        if dict(b.uncurated_fields) == {}:
+
+                    if dict(b.uncurated_fields) == {}:
                             # Only rebuild the uncurated fields if this has not
                             # been done before
-                            parse_pandas_record(
+                        parse_pandas_record(
                                 headers, b, "uncurated_fields", row, fielderrors, headerswithdata)
-                    else:
-                        errors.append(
-                            {"index": index+1, "message": "Invalid valency or other error parsing this identifier",  "SMILES": smiles_str})
+                   
                     batches.append(b)
                 headers = [hdr for hdr in headers if hdr in headerswithdata]
             else:

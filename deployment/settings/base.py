@@ -147,6 +147,8 @@ MIDDLEWARE_CLASSES = [
     #'cbh_core_ws.middleware.ResponseLoggingMiddleware',
 ]
 
+MAX_AUTOCOMPLETE_SIZE = 1000
+
 API_CACHE_ENABLE = False
 API_CACHE_LENGTH = 900
 # 'django.contrib.sessions.middleware.SessionMiddleware',
@@ -241,6 +243,8 @@ CBH_QUERY_TYPES = [
         'name': 'Keyword',
         'value': 'phrase',
         },
+        {'name': 'Pick From List',
+        'value' : 'pick_from_list'},
         # {
         #     'name': 'Equals any in this list',
         #     'value': 'any_of',
@@ -292,6 +296,10 @@ CBH_SORT_SCHEMAFORM = {
                           "titleMap": CBH_SORT_DIRECTIONS,
                           "htmlClass": "col-sm-12",
                           "type": "radiobuttons",
+                          "style": {
+                            "selected": "btn-success btn-sm",
+                            "unselected": "btn-default btn-sm"
+                          },
                           "onChange": "sortChanged(modelValue,form)",
                           "disableSuccessState":True,
                           "feedback": False,
@@ -332,6 +340,10 @@ CBH_HIDE_SCHEMAFORM = {
                           "onChange": "hideChanged(modelValue,form)",
                           "disableSuccessState":True,
                           "feedback": False,
+                          "style": {
+                            "selected": "btn-success btn-sm",
+                            "unselected": "btn-default btn-sm"
+                          },
                     },
                    
 
@@ -369,6 +381,10 @@ CBH_QUERY_SCHEMAFORM = {
                           "type": "select",
                           "titleMap": CBH_QUERY_TYPES,
                           "type": "radiobuttons",
+                          "style": {
+                            "selected": "btn-success btn-sm",
+                            "unselected": "btn-default btn-sm"
+                          },
                           "htmlClass": "col-sm-9",
                           "onChange": "queryTypeChanged(modelValue,form)",
                           "disableSuccessState":True,
@@ -454,6 +470,16 @@ CBH_QUERY_SCHEMAFORM = {
                           "disableSuccessState":True,
                           "feedback": False,
                     }, 
+                    { 
+                      'title' : 'Pick from list',
+                      'key' : 'pick_from_list',
+                      'condition' : 'model.query_type=="pick_from_list"', 
+                      "htmlClass": "col-sm-12",
+                      "onChange": "updated(modelValue,form)",
+                      "disableSuccessState":True,
+                      "feedback": False,
+                       "type" : "filtereddropdown",
+                      }
 
                     
 
@@ -465,6 +491,14 @@ CBH_QUERY_SCHEMAFORM = {
                 "field_path" :{
                   "type" : "string",
                   "default" : ""
+                },
+                "pick_from_list":{
+                  "type" : "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "default" : []
+
                 },
                 "sort_direction" : {
                     "type": "string",
@@ -667,6 +701,8 @@ TABULAR_DATA_SETTINGS = {
     }
 }
 
+ELASTICSEARCH_MAX_FIELD_LENGTH = 256
+
 ELASTICSEARCH_INDEX_MAPPING = {
         "settings": {
             "index.store.type": "niofs",
@@ -718,7 +754,7 @@ ELASTICSEARCH_INDEX_MAPPING = {
                                         "omit_norms": True, 
                                         "analyzer" : "default_index",
                                         "fields": {
-                                            "raw": {"type": "string", "store": "no", "index": "not_analyzed", "ignore_above": 256}
+                                            "raw": {"type": "string", "store": "no", "index": "not_analyzed", "ignore_above": ELASTICSEARCH_MAX_FIELD_LENGTH}
                                         }
                                     }
                             }

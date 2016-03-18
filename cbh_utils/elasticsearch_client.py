@@ -122,6 +122,17 @@ def get_template_nested_must_clause(field_path, field_query):
     return template_must_clause
 
 
+def build_phase_prefix_query(phrase):
+    return {
+                    "multi_match" :
+                    { 
+                        "type": "phrase_prefix", 
+                        "fields": ["indexed_fields.value",] , 
+                        "query" : phrase
+                    }
+                }
+
+
 def build_es_request(queries, textsearch=""):
     must_clauses = []
 
@@ -147,41 +158,18 @@ def build_es_request(queries, textsearch=""):
     for query in queries:
         new_query = None
         if query["query_type"] == 'phrase':
+            new_query = build_phase_prefix_query(query["phrase"])
+        
+        elif query["query_type"] == 'pick_from_list': 
+          
             new_query = {
-                    "multi_match" :
+                    "terms" :
                     { 
-                        "type": "phrase_prefix", 
-                        "fields": ["indexed_fields.value",] , 
-                        "query" : query["phrase"] 
+                        "indexed_fields.value.raw": query["pick_from_list"] 
                     }
                 }
-        elif query["query_type"] == 'any_of': 
-            #We are using a custom char filter but a keyword tokenizer on this field
-            #This means that numbers are indexed as their zero-padded equivalents so that they can be sorted in a logical order
-            #In order that we can search for a number and have the query also passed through the same filter
-             #We need the match query not a terms query
-             #The terms query equivalent is shown below. This would work in all cases except 
-             #when you are looking for a number.
-             #Because the keyword tokenizer does not split up fields into words the match query will always match an exact match just like the terms query does
-            # new_query = {
-            #         "terms" :
-            #         { 
-            #             "indexed_fields.value.raw": query["any_of"] 
-            #         }
-            #     }
 
-            new_query = {                  
-                "bool":
-                    {
-                        "should" : [
-                            {"match" : {"indexed_fields.value.raw" : text }} for text in query["any_of"] 
-                        ]
-                    }
-            }
-
-        # elif query["query_type"] == 'starts_with':
-
-        # elif query["query_type"] == 'ends_with':
+            
         elif query["query_type"] ==  'between':
             new_query = {
                     "range" :
@@ -244,6 +232,10 @@ def build_es_request(queries, textsearch=""):
     
             
     return must_clauses
+#Take the first 256 characters of the field and zero pad it if it is a string or float
+#We use the first 256 characters as this is what will be matched
+#In the pick from list query given that this is the max length of the raw field in elasticsearch
+ZERO_PAD_GROOVY_SCRIPT = "tmp = ''; for(item in _source.indexed_fields){if(item.field_path==field_path){tmp=item.value.take(" + str(settings.ELASTICSEARCH_MAX_FIELD_LENGTH) + ")}}; if(tmp.isInteger()){tmp = String.format('%014d',tmp.toInteger());};  else if(tmp.isFloat()){def (value1, value2) = tmp.tokenize('.'); tmp = String.format('%014d',value1.toInteger()) + '.' + value2 }; return tmp"
 
 
 def build_sorts(sorts):
@@ -252,7 +244,7 @@ def build_sorts(sorts):
     out as a zero padded string if it is either an integer or a float"""
     elasticsearch_sorts = [
         {
-            "_script":{"script":"tmp = ''; for(item in _source.indexed_fields){if(item.field_path==field_path){tmp=item.value}}; if(tmp.isInteger()){tmp = String.format('%014d',tmp.toInteger());};  else if(tmp.isFloat()){def (value1, value2) = tmp.tokenize('.'); tmp = String.format('%014d',value1.toInteger()) + '.' + value2 }; return tmp",
+            "_script":{"script": ZERO_PAD_GROOVY_SCRIPT,
             "params" : {"field_path" : sort["field_path"]},
             "type" : "string", "order" : sort["sort_direction"]}
         }
@@ -260,17 +252,64 @@ def build_sorts(sorts):
     ]
     return elasticsearch_sorts
 
+def get_nested_aggregation_for_field_path(autocomplete_field_path, autocomplete="", autocomplete_size=settings.MAX_AUTOCOMPLETE_SIZE):
+    """Based upon an input term and field_path, generate an aggregation to group by that field returning zero padded numbers to get the order right"""
+    base_agg = {
+                "field_path_terms" : {
+                    "terms" : {
+                        "script" : ZERO_PAD_GROOVY_SCRIPT,
+                        "params" : { "field_path" : autocomplete_field_path },
+                        "size" : autocomplete_size,
+                         "order" : { "_term" : "asc" }
+                    }
+                },
+                "unique_count": {"cardinality" : {
+                    "script" : ZERO_PAD_GROOVY_SCRIPT,
+                    "params" : { "field_path" : autocomplete_field_path },
+                }}
+            }
+
+    if autocomplete:
+        #If there is a search term, then, having applied a set of filters to the data (project, other search terms)
+        #We then try to apply a term filter to the data being aggregated for the search term being looked for
+        query = get_template_nested_must_clause(autocomplete_field_path, build_phase_prefix_query(autocomplete))
+    else:
+        query = { "match_all": {} }
+
+    base_agg = { 
+                "filtered_field_path":
+                        {
+                        "filter" : query,
+                        "aggs" : base_agg
+
+                        }
+                }
+                    
+  
+    return base_agg
 
 
-def get_list_data_elasticsearch(queries, index, sorts=[], textsearch="", offset=0, limit=10):
+def remove_existing_queries_for_agg(queries, autocomplete_field_path):
+    """We are trying to provide an aggregated autocomplete for a particular field
+    Therefore if a query has already been applied to that field, we need to remove that subquery"""
+    if autocomplete_field_path:
+        new_queries = []
+        for q in queries:
+            if q["field_path"] != autocomplete_field_path:
+                new_queries.append(q)
+        return new_queries
+    return queries
+
+
+def get_list_data_elasticsearch(queries, index, sorts=[], autocomplete="", autocomplete_field_path="", autocomplete_size=settings.MAX_AUTOCOMPLETE_SIZE, textsearch="", offset=0, limit=10):
     es = elasticsearch.Elasticsearch()
-
-    if len(queries or textsearch) > 0:
+    queries = remove_existing_queries_for_agg(queries, autocomplete_field_path)
+    if len(queries) > 0  or len(textsearch) > 0:
         es_request = {  
                     "query":{
                         
                         "bool" : {
-                            "must" : [    
+                            "filter" : [    
                                    build_es_request(queries, textsearch=textsearch)
                             ]
                         }
@@ -291,10 +330,23 @@ def get_list_data_elasticsearch(queries, index, sorts=[], textsearch="", offset=
                             "exclude": [ "indexed_fields.*" , "bigimage" ]
                         }
                     }
+    if autocomplete_field_path:
+        es_request["aggs"] = get_nested_aggregation_for_field_path(autocomplete_field_path, autocomplete=autocomplete, autocomplete_size=autocomplete_size)
     es_request["from"] = offset
     es_request["size"] = limit
 
     data = es.search(index, body=es_request, ignore_unavailable=True)
+
+    if autocomplete_field_path:
+        for bucket in data["aggregations"]["filtered_field_path"]["field_path_terms"]["buckets"]:
+            #Un zero pad the returned items
+            if bucket["key"].replace(".", "", 1).isdigit():
+                replace_up_to = 0
+                for index, char in enumerate(bucket["key"]):
+                    if char != "0":
+                        replace_up_to = index
+                bucket["key"] = bucket["key"][replace_up_to:]
+
 
     return data
 

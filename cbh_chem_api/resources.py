@@ -52,6 +52,7 @@ class BaseCBHCompoundBatchResource(ModelResource):
     properties = CBHNoSerializedDictField('properties')
     custom_fields = CBHNoSerializedDictField('custom_fields')
 
+
     def create_response(self, request, data, response_class=HttpResponse, **response_kwargs):
         """
         Extracts the common "which-format/serialize/return-response" cycle.
@@ -85,6 +86,11 @@ class BaseCBHCompoundBatchResource(ModelResource):
         value = bundle.obj.properties
         value["archived"] = archived
         return value
+
+
+
+
+
 
     class Meta:
         authorization = ProjectAuthorization()
@@ -167,17 +173,37 @@ class CBHCompoundBatchSearchResource(Resource):
         limit = request.GET.get("limit", 10)
         offset = request.GET.get("offset", 0)
         concatenated_indices = elasticsearch_client.get_list_of_indicies(project_ids)
+        autocomplete = request.GET.get("autocomplete", "")
+        autocomplete_field_path = request.GET.get("autocomplete_field_path", "")
+        autocomplete_size = request.GET.get("autocomplete_size", settings.MAX_AUTOCOMPLETE_SIZE)
+
         data = elasticsearch_client.get_list_data_elasticsearch(queries,
             concatenated_indices,
             sorts=sorts, 
             offset=offset, 
             limit=limit, 
-            textsearch=textsearch,  )
-        bundledata = {"objects": 
-                        [hit["_source"] for hit in data["hits"]["hits"]],
-                        "meta" : {"totalCount" : data["hits"]["total"]}
-                        }
-        bundledata = self.alter_list_data_to_serialize(request, bundledata)
+            textsearch=textsearch, 
+            autocomplete=autocomplete,
+            autocomplete_field_path=autocomplete_field_path,
+            autocomplete_size=autocomplete_size )
+
+        if autocomplete_field_path:
+            unique_agg_keys = set()
+            bucks = []
+            for buck in data["aggregations"]["filtered_field_path"]["field_path_terms"]["buckets"]:
+                if buck["key"] not in unique_agg_keys:
+                    #Something with the zero pad code sometimes gives dumplicates
+                    unique_agg_keys.add(buck["key"])
+                    bucks.append(buck)
+            bundledata = {"items" : bucks,
+                            "unique_count" : data["aggregations"]["filtered_field_path"]["unique_count"]["value"]}
+        else:
+            #This is just a standard request for data
+            bundledata = {"objects": 
+                            [hit["_source"] for hit in data["hits"]["hits"]],
+                            "meta" : {"totalCount" : data["hits"]["total"]}
+                            }
+            bundledata = self.alter_list_data_to_serialize(request, bundledata)
         return self.create_response(request, bundledata) 
 
 
