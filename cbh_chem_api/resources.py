@@ -41,6 +41,8 @@ class MoleculeDictionaryResource(ModelResource):
 
 
 class BaseCBHCompoundBatchResource(ModelResource):
+    uuid = fields.CharField(default="")
+    timestamp = fields.CharField(default="")
     project = fields.ForeignKey(
         ChemregProjectResource, 'project', blank=False, null=False)
     creator = SimpleResourceURIField(UserResource, 'created_by_id', null=True, readonly=True)
@@ -52,6 +54,19 @@ class BaseCBHCompoundBatchResource(ModelResource):
     properties = CBHNoSerializedDictField('properties')
     custom_fields = CBHNoSerializedDictField('custom_fields')
 
+
+    def dehydrate_timestamp(self, bundle):
+        return str(bundle.obj.created)[0:10]
+
+    def dehydrate_uuid(self, bundle):
+        """This is either a blinded batch or a uuid"""
+        
+        if bundle.obj.related_molregno:
+            if bundle.obj.related_molregno.chembl:
+                if bundle.obj.related_molregno.chembl.chembl_id:
+                    return bundle.obj.related_molregno.chembl.chembl_id
+        if bundle.obj.blinded_batch_id.strip():
+            return bundle.obj.blinded_batch_id
 
     def create_response(self, request, data, response_class=HttpResponse, **response_kwargs):
         """
@@ -87,28 +102,6 @@ class BaseCBHCompoundBatchResource(ModelResource):
         value["archived"] = archived
         return value
 
-
-
-
-
-
-    class Meta:
-        authorization = ProjectAuthorization()
-        queryset = CBHCompoundBatch.objects.all()
-        resource_name = 'cbh_compound_batches_v2'
-        include_resource_uri = True
-        serializer = Serializer()
-        always_return_data = True
-
-
-
-
-
-
-class CBHCompoundBatchSearchResource(BaseCBHCompoundBatchResource):
-
-    class Meta(BaseCBHCompoundBatchResource.Meta):
-        pass
 
 
     def get_detail(self, request, **kwargs):
@@ -199,11 +192,33 @@ class CBHCompoundBatchSearchResource(BaseCBHCompoundBatchResource):
             #This is just a standard request for data
             bundledata = {"objects": 
                             [hit["_source"] for hit in data["hits"]["hits"]],
-                            "meta" : {"totalCount" : data["hits"]["total"]}
+                            "meta" : {"total_count" : data["hits"]["total"]}
                             }
             bundledata = self.alter_list_data_to_serialize(request, bundledata)
         return self.create_response(request, bundledata) 
 
+
+
+    class Meta:
+        authorization = ProjectAuthorization()
+        queryset = CBHCompoundBatch.objects.all()
+        resource_name = 'cbh_compound_batches_v2'
+        include_resource_uri = True
+        serializer = Serializer()
+        always_return_data = True
+
+
+
+
+
+
+class CBHCompoundBatchSearchResource(BaseCBHCompoundBatchResource):
+
+    class Meta(BaseCBHCompoundBatchResource.Meta):
+        pass
+
+
+    
 
 
 
@@ -221,21 +236,7 @@ class CBHSavedSearchResource(CBHCompoundBatchSearchResource):
 
 
 class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
-    uuid = fields.CharField(default="")
-    timestamp = fields.CharField(default="")
 
-    def dehydrate_timestamp(self, bundle):
-        return str(bundle.obj.created)[0:10]
-
-    def dehydrate_uuid(self, bundle):
-        """This is either a blinded batch or a uuid"""
-        
-        if bundle.obj.related_molregno:
-            if bundle.obj.related_molregno.chembl:
-                if bundle.obj.related_molregno.chembl.chembl_id:
-                    return bundle.obj.related_molregno.chembl.chembl_id
-        if bundle.obj.blinded_batch_id.strip():
-            return bundle.obj.blinded_batch_id
 
 
 
