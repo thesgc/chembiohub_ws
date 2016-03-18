@@ -357,5 +357,13 @@ def unzeropad(input_string):
 
 def get_detail_data_elasticsearch(index, id):
     es = elasticsearch.Elasticsearch()
-    data = es.get(index=index, doc_type="newbatches", id=id, ignore_unavailable=True)
-    return data["_source"]
+    es_request = {
+                        "query" : {"term": {"_id" : id}},
+                        "_source" : {
+                            "include": [ "*" ],
+                            "exclude": [ "indexed_fields.*" ]
+                        }
+                    }
+    data = es.search(index, body=es_request, ignore_unavailable=True)
+
+    return data["hits"]["hits"][0]["_source"]
