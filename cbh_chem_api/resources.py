@@ -253,6 +253,25 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
 
         return start_schema + middle_table_schema + end_schema
 
+
+    def prepare_fields_for_index(self, batch_dicts):
+        """Fields are stored as strings in hstore so convert the list or object fields back from JSON"""
+        for bd in batch_dicts:
+            for field in bd["projectfull"]["custom_field_config"]["project_data_fields"]:
+                
+                if field["edit_schema"]["properties"][field["name"]]["type"] == "object":
+                    if bd["custom_fields"][field["name"]]:
+                        bd["custom_fields"][field["name"]] = json.loads(bd["custom_fields"][field["name"]])
+                    else:
+                        bd["custom_fields"][field["name"]] = field["edit_schema"]["properties"]["default"]
+                if field["edit_schema"]["properties"][field["name"]]["type"] == "array":
+                    if bd["custom_fields"][field["name"]]:
+                        bd["custom_fields"][field["name"]] = json.loads(bd["custom_fields"][field["name"]])
+                    else:
+                        bd["custom_fields"][field["name"]] = []
+        return batch_dicts
+
+
     def index_batch_list(self, request, batch_list):
         #retrieve some objects as json
         bundles = [
@@ -264,13 +283,17 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         #Now make the schema list parallel to the batches list
         batch_dicts = [self.Meta.serializer.to_simple(bun, {}) for bun in bundles]
 
+        batch_dicts = self.prepare_fields_for_index(batch_dicts)
+
         project_data_field_sets = [batch_dict["projectfull"]["custom_field_config"].pop("project_data_fields") for batch_dict in batch_dicts]
         schemas = [self.reformat_project_data_fields_as_table_schema( "indexing", pdfs) for pdfs in project_data_field_sets]
         index_names = []
+
         for batch in batch_dicts:
             batch["projectfull"]["custom_field_config"] = batch["projectfull"]["custom_field_config"]["resource_uri"]
             index_name = elasticsearch_client.get_project_index_name(batch["projectfull"]["id"])
             index_names.append(index_name)
+        
         batch_dicts = elasticsearch_client.index_dataset(batch_dicts, schemas, index_names)
             
 

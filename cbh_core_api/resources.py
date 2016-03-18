@@ -140,6 +140,9 @@ class ChemRegDataPointProjectFieldResource(ModelResource):
         null=True, blank=False,  help_text=None)
     edit_schema = fields.DictField(
         null=True, blank=False,  help_text=None)
+    view_form = fields.DictField(
+        null=True, blank=False, help_text=None
+        )
 
  
     class Meta:
@@ -287,6 +290,16 @@ autocomplete urls
         if bundle.request.GET.get("empty", False):
             return {}
         return {"properties": {bundle.obj.name: bundle.obj.field_values[0]}}
+
+    def dehydrate_view_form(self, bundle):
+        '''          '''
+        if bundle.request.GET.get("empty", False):
+            return {}
+        data = bundle.obj.field_values[2]
+        return {"form" : data}
+
+
+
 
 
     def authorized_update_detail(self, object_list, bundle):
@@ -1099,23 +1112,23 @@ class CBHNoSerializedDictField(fields.ApiField):
     dehydrated_type = 'dict'
     help_text = "A dictionary of data. Ex: {'price': 26.73, 'name': 'Daniel'}"
 
-    def convert(self, value):
+    # def convert(self, value):
        
-        data = dict(value)
-        for k, v in data.iteritems():
-            if isinstance(v, basestring):
-                if v:
-                    if v.startswith("[") and v.endswith("]"):
-                        try:
-                            data[k] = json.loads(v)
-                        except ValueError:
-                            pass
-                    if v[0] == u"{" and v[-1] == u"}":
-                        try:
-                            data[k] = json.loads(v)                        
-                        except ValueError:
-                            pass
-        return data
+    #     data = dict(value)
+    #     for k, v in data.iteritems():
+    #         if isinstance(v, basestring):
+    #             if v:
+    #                 if v.startswith("[") and v.endswith("]"):
+    #                     try:
+    #                         data[k] = json.loads(v)
+    #                     except ValueError:
+    #                         pass
+    #                 if v[0] == u"{" and v[-1] == u"}":
+    #                     try:
+    #                         data[k] = json.loads(v)                        
+    #                     except ValueError:
+    #                         pass
+    #     return data
 
 
 
