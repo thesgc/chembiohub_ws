@@ -346,8 +346,8 @@ def get_list_data_elasticsearch(queries, index, sorts=[], autocomplete="", autoc
     return data
 
 def unzeropad(input_string):
+    replace_up_to = 0
     if input_string.replace(".", "", 1).isdigit():
-        replace_up_to = 0
         for index, char in enumerate(input_string):
             if char != "0":
                 replace_up_to = index

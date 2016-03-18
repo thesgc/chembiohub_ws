@@ -101,11 +101,14 @@ class BaseCBHCompoundBatchResource(ModelResource):
         always_return_data = True
 
 
-class CBHCompoundBatchSearchResource(Resource):
 
-    class Meta:
-        resource_name = "cbh_compound_batches_search"
-        authorization = ProjectAuthorization()
+
+
+
+class CBHCompoundBatchSearchResource(BaseCBHCompoundBatchResource):
+
+    class Meta(BaseCBHCompoundBatchResource.Meta):
+        pass
 
 
     def get_detail(self, request, **kwargs):
@@ -200,6 +203,19 @@ class CBHCompoundBatchSearchResource(Resource):
                             }
             bundledata = self.alter_list_data_to_serialize(request, bundledata)
         return self.create_response(request, bundledata) 
+
+
+
+
+class CBHSavedSearchResource(CBHCompoundBatchSearchResource):
+    class Meta(CBHCompoundBatchSearchResource.Meta):
+        resource_name = 'cbh_saved_search'
+
+
+    def get_list(self, request, **kwargs):
+        return super(CBHSavedSearchResource, self).get_list(request, saved_search_projects_only=True)
+
+
 
 
 

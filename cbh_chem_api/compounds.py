@@ -1690,17 +1690,17 @@ def deepgetattr(obj, attr, ex):
     except:
         return ex
 
-class CBHSavedSearchResource(CBHCompoundBatchResource):
-    project = fields.ForeignKey(
-        ChemregProjectResource, 'project', blank=False, null=False)
+# class CBHSavedSearchResource(CBHCompoundBatchResource):
+#     project = fields.ForeignKey(
+#         ChemregProjectResource, 'project', blank=False, null=False)
 
-    class Meta(CBHCompoundBatchResource.Meta):
-        resource_name = 'cbh_saved_search'
-        es_index_name = "chemreg_chemical_index"
+#     class Meta(CBHCompoundBatchResource.Meta):
+#         resource_name = 'cbh_saved_search'
+#         es_index_name = "chemreg_chemical_index"
 
 
-    def get_list_elasticsearch(self, request, **kwargs):
-        return super(CBHSavedSearchResource, self).get_list_elasticsearch(request, saved_search_projects_only=True)
+#     def get_list_elasticsearch(self, request, **kwargs):
+#         return super(CBHSavedSearchResource, self).get_list_elasticsearch(request, saved_search_projects_only=True)
 
 
 

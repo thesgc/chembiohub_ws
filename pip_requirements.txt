@@ -38,7 +38,7 @@ XlsxWriter
 gunicorn
 django-redis
 django-rq
-elasticsearch
+elasticsearch==2.2.0
 jsonpatch
 inflection
 tastypie_spore_docs
