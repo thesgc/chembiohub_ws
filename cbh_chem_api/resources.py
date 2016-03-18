@@ -40,7 +40,7 @@ class MoleculeDictionaryResource(ModelResource):
 
 
 
-class BaseCBHCompoundBatchResource(ModelResource):
+class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
     uuid = fields.CharField(default="")
     timestamp = fields.CharField(default="")
     project = fields.ForeignKey(
@@ -202,7 +202,7 @@ class BaseCBHCompoundBatchResource(ModelResource):
     class Meta:
         authorization = ProjectAuthorization()
         queryset = CBHCompoundBatch.objects.all()
-        resource_name = 'cbh_compound_batches_v2'
+        
         include_resource_uri = True
         serializer = Serializer()
         always_return_data = True
@@ -212,18 +212,18 @@ class BaseCBHCompoundBatchResource(ModelResource):
 
 
 
-class CBHCompoundBatchSearchResource(BaseCBHCompoundBatchResource):
+class CBHCompoundBatchResource(BaseCBHCompoundBatchResource):
 
     class Meta(BaseCBHCompoundBatchResource.Meta):
-        pass
+        resource_name = 'cbh_compound_batches_v2'
 
 
     
 
 
 
-class CBHSavedSearchResource(CBHCompoundBatchSearchResource):
-    class Meta(CBHCompoundBatchSearchResource.Meta):
+class CBHSavedSearchResource(BaseCBHCompoundBatchResource):
+    class Meta(BaseCBHCompoundBatchResource.Meta):
         resource_name = 'cbh_saved_search'
 
 
@@ -263,6 +263,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         #retrieve schemas which tell the elasticsearch request which fields to index for each object (we avoid deserializing a single custom field config more than once)
         #Now make the schema list parallel to the batches list
         batch_dicts = [self.Meta.serializer.to_simple(bun, {}) for bun in bundles]
+
         project_data_field_sets = [batch_dict["projectfull"]["custom_field_config"].pop("project_data_fields") for batch_dict in batch_dicts]
         schemas = [self.reformat_project_data_fields_as_table_schema( "indexing", pdfs) for pdfs in project_data_field_sets]
         index_names = []

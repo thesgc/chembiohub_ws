@@ -275,9 +275,9 @@ autocomplete urls
         data["key"] = bundle.obj.name
         if bundle.obj.UISELECTTAG in bundle.obj.field_type:
             data['options'] = {'refreshDelay': 0,
-                                'async': {'url': "%s" % reverse('api_get_list_elasticsearch',
-                                                         kwargs={'resource_name': 'cbh_compound_batches',
-                                                                 'api_name': settings.WEBSERVICES_NAME})}
+                                # 'async': {'url': "%s" % reverse('api_get_list_elasticsearch',
+                                #                          kwargs={'resource_name': 'cbh_compound_batches',
+                                #                                  'api_name': settings.WEBSERVICES_NAME})}
                                 
                                 }
         return {"form": [data]}
@@ -491,9 +491,10 @@ class ChemregProjectResource(UserHydrate, ModelResource):
                 'disableSuccessState': True,
                 'feedback': False,
                 'options': {'refreshDelay': 0,
-                            'async': {'url': reverse('api_get_elasticsearch_autocomplete',
-                                                     kwargs={'resource_name': 'cbh_compound_batches',
-                                                             'api_name': settings.WEBSERVICES_NAME})}},
+                           # 'async': {'url': reverse('api_get_elasticsearch_autocomplete',
+                            #                         kwargs={'resource_name': 'cbh_compound_batches',
+                             #                                'api_name': settings.WEBSERVICES_NAME})}
+                        },
             }],
             'cf_schema': {'required': [], 'type': 'object',
                           'properties': {'search_custom_fields__kv_any': {
@@ -558,9 +559,9 @@ class ChemregProjectResource(UserHydrate, ModelResource):
                     'help': 'Searching using this filter will bring back results that match an OR pattern within the same data category, with AND across data categories, i.e. results which contain this item within category a OR that item within category a AND that item within category b.',
                     'feedback': False,
                     'options': {'refreshDelay': 0,
-                                'async': {'url': reverse('api_get_list_elasticsearch',
-                                                         kwargs={'resource_name': 'cbh_compound_batches',
-                                                                 'api_name': settings.WEBSERVICES_NAME})},
+                                # 'async': {'url': reverse('api_get_list_elasticsearch',
+                                #                          kwargs={'resource_name': 'cbh_compound_batches',
+                                #                                  'api_name': settings.WEBSERVICES_NAME})},
                                 
                                 },
                 },
@@ -616,9 +617,10 @@ class ChemregProjectResource(UserHydrate, ModelResource):
                         'htmlClass': 'col-md-6 col-xs-6',
 
                     'options': {'refreshDelay': 0,
-                                'async': {'url': reverse('api_get_elasticsearch_ids',
-                                                         kwargs={'resource_name': 'cbh_compound_batches',
-                                                                 'api_name': settings.WEBSERVICES_NAME})}},
+                                # 'async': {'url': reverse('api_get_elasticsearch_ids',
+                                #                          kwargs={'resource_name': 'cbh_compound_batches',
+                                #                                  'api_name': settings.WEBSERVICES_NAME})}
+                            },
                 },
                 {
                     'key': 'multiple_batch_id',
@@ -1098,21 +1100,21 @@ class CBHNoSerializedDictField(fields.ApiField):
     help_text = "A dictionary of data. Ex: {'price': 26.73, 'name': 'Daniel'}"
 
     def convert(self, value):
+       
         data = dict(value)
-        for key, v in data.iteritems():
+        for k, v in data.iteritems():
             if isinstance(v, basestring):
-                if v.startswith("[") and v.endswith("]"):
-                    try:
-                        data[k] = json.loads(v)
-                        continue
-                    except:
-                        pass
-                if v.startswith("{") and v.endswith("}"):
-                    try:
-                        data[k] = json.loads(v)
-                        continue
-                    except:
-                        pass
+                if v:
+                    if v.startswith("[") and v.endswith("]"):
+                        try:
+                            data[k] = json.loads(v)
+                        except ValueError:
+                            pass
+                    if v[0] == u"{" and v[-1] == u"}":
+                        try:
+                            data[k] = json.loads(v)                        
+                        except ValueError:
+                            pass
         return data
 
 

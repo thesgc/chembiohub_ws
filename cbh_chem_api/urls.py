@@ -28,7 +28,6 @@ from cbh_chembl_id_generator.resources import CBHPluginResource
 
 api = Api(api_name=api_name)
 api.register(ProjectTypeResource())
-api.register(CBHSavedSearchResource())
 
 api.register(CBHCompoundBatchResource())
 api.register(CBHCompoundMultipleBatchResource())
@@ -43,10 +42,9 @@ api.register(InvitationResource())
 api.register(ProjectPermissionResource())
 api.register(CBHFlowFileResource())
 api.register(CBHFlowFileDownloadResource())
-api.register(CBHCompoundBatchSearchResource())
 api.register(ChemGlobalFieldsConfigResource())
-api.register(BaseCBHCompoundBatchResource())
 admin.autodiscover()
+api.register(CBHSavedSearchResource())
 
 
 from django.contrib.auth.decorators import login_required
