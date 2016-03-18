@@ -340,17 +340,20 @@ def get_list_data_elasticsearch(queries, index, sorts=[], autocomplete="", autoc
     if autocomplete_field_path:
         for bucket in data["aggregations"]["filtered_field_path"]["field_path_terms"]["buckets"]:
             #Un zero pad the returned items
-            if bucket["key"].replace(".", "", 1).isdigit():
-                replace_up_to = 0
-                for index, char in enumerate(bucket["key"]):
-                    if char != "0":
-                        replace_up_to = index
-                bucket["key"] = bucket["key"][replace_up_to:]
+            bucket["key"] = unzeropad(bucket["key"])
 
 
     return data
 
-
+def unzeropad(input_string):
+    if input_string.replace(".", "", 1).isdigit():
+        replace_up_to = 0
+        for index, char in enumerate(input_string):
+            if char != "0":
+                replace_up_to = index
+                #found the first non zero so break
+                break 
+    return input_string[replace_up_to:]
 
 def get_detail_data_elasticsearch(index, id):
     es = elasticsearch.Elasticsearch()

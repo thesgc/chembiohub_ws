@@ -188,13 +188,8 @@ class CBHCompoundBatchSearchResource(Resource):
             autocomplete_size=autocomplete_size )
 
         if autocomplete_field_path:
-            unique_agg_keys = set()
-            bucks = []
-            for buck in data["aggregations"]["filtered_field_path"]["field_path_terms"]["buckets"]:
-                if buck["key"] not in unique_agg_keys:
-                    #Something with the zero pad code sometimes gives dumplicates
-                    unique_agg_keys.add(buck["key"])
-                    bucks.append(buck)
+            
+            bucks = data["aggregations"]["filtered_field_path"]["field_path_terms"]["buckets"]
             bundledata = {"items" : bucks,
                             "unique_count" : data["aggregations"]["filtered_field_path"]["unique_count"]["value"]}
         else:
