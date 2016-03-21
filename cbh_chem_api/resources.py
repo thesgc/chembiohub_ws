@@ -165,7 +165,7 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
                         knownBy = settings.TABULAR_DATA_SETTINGS["schema"].get(value,{}).get("knownBy", "")
                         if not knownBy:
                             knownBy = str(value.split(".")[-1])
-                        qrep["fieldn"] = knownBy
+                        qrep["fieldn"] = "".join([l for l in knownBy])
                 else:
                     qrep[key] = str(value)
 
