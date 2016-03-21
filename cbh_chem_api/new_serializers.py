@@ -128,7 +128,7 @@ class CBHCompoundBatchSerializer( Serializer):
                     
                     format = workbook.add_format()
                     format.set_text_wrap()
-                    format.set_align('vcenter')
+                    
                     format2 = workbook.add_format({'bold': False})
 
                     format2.set_align('vcenter')
