@@ -56,7 +56,6 @@ from cbh_utils.parser import parse_pandas_record, parse_sdf_record, apply_json_p
 # from tastypie.utils.mime import build_content_type
 from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate
 import time
-from django_q.tasks import async_iter, result
 from cbh_chem_api.tasks import process_batch_list
 
 def build_content_type(format, encoding='utf-8'):
@@ -543,7 +542,6 @@ class CBHCompoundUploadResource(ModelResource):
         
 
         processed = [process_batch_list(ds) for ds in datasets]
-        result_list = result(processed, wait=-1)
 
         # if(mb.uploaded_file):
         #     if(mb.uploaded_file.extension == ".sdf"):
