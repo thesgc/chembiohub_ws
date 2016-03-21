@@ -46,8 +46,8 @@ def fix_column_types(df, schema):
             df[field["knownBy"]] = df[field["knownBy"]].astype(float)
         if field.get("field_type", None) == "integer":
             df[field["knownBy"]] = df[field["knownBy"]].astype(int)
-        if field.get("field_type", None) == "date":
-            df[field["knownBy"]] = pd.to_datetime(df[field["knownBy"]], coerce=True)
+        # if field.get("field_type", None) == "date":
+        #     df[field["knownBy"]] = pd.to_datetime(df[field["knownBy"]], coerce=True)
 
 def add_images_or_other_objects(col, column_schema, worksheet, objects, format, writer):
     if column_schema.get("field_type", None) == "b64png":
@@ -91,7 +91,7 @@ class CBHCompoundBatchSerializer( Serializer):
         output = StringIO()
 
         project_records = self.to_simple(data, {})
-        writer = pd.ExcelWriter('temp.xlsx', engine='xlsxwriter' ,datetime_format='dd mmmm yyyy')
+        writer = pd.ExcelWriter('temp.xlsx', engine='xlsxwriter' , options={'encoding':'utf-8'})
         writer.book.filename = output
         if isinstance(data, dict):
             if data.get("traceback", False):
@@ -119,7 +119,7 @@ class CBHCompoundBatchSerializer( Serializer):
                     
 
                     df.fillna('', inplace=True)
-                    df = df[[col["knownBy"].encode("ascii", "ignore") for col in projectsheet["schema"]]]
+                    df = df[[col["knownBy"] for col in projectsheet["schema"]]]
                     if not empty:
                         fix_column_types(df, projectsheet["schema"])
 
@@ -128,15 +128,16 @@ class CBHCompoundBatchSerializer( Serializer):
                     
                     format = workbook.add_format()
                     format.set_text_wrap()
+                    format.set_font_name('Cantarell')
                     
                     format2 = workbook.add_format({'bold': False})
-
+                    format2.set_font_name('Cantarell')
                     format2.set_align('vcenter')
                     format2.set_align('center')
                     format2.set_bottom(2)
-                    worksheet.set_row(0, 30, None)
+                    worksheet.set_row(0, 30, format2)
                     for col, schem in enumerate(projectsheet["schema"]):
-                        worksheet.write(0,col, schem["knownBy"], format2)
+                        worksheet.write(0,col, schem["knownBy"] )
                     for col, column_schema in enumerate(projectsheet["schema"]):
                         add_images_or_other_objects(col, 
                                                         column_schema, 
