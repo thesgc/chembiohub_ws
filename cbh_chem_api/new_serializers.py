@@ -119,7 +119,7 @@ class CBHCompoundBatchSerializer( Serializer):
                     
 
                     df.fillna('', inplace=True)
-                    df = df[[col["knownBy"] for col in projectsheet["schema"]]]
+                    df = df[[col["knownBy"].encode("ascii", "ignore") for col in projectsheet["schema"]]]
                     if not empty:
                         fix_column_types(df, projectsheet["schema"])
 
@@ -129,13 +129,14 @@ class CBHCompoundBatchSerializer( Serializer):
                     format = workbook.add_format()
                     format.set_text_wrap()
                     format.set_align('vcenter')
-
                     format2 = workbook.add_format({'bold': False})
 
                     format2.set_align('vcenter')
-                    format2.set_bold(False)
-                    worksheet.set_row(0, 30, format2)
-                    
+                    format2.set_align('center')
+                    format2.set_bottom(2)
+                    worksheet.set_row(0, 30, None)
+                    for col, schem in enumerate(projectsheet["schema"]):
+                        worksheet.write(0,col, schem["knownBy"], format2)
                     for col, column_schema in enumerate(projectsheet["schema"]):
                         add_images_or_other_objects(col, 
                                                         column_schema, 
@@ -149,7 +150,7 @@ class CBHCompoundBatchSerializer( Serializer):
                             width = 150
                         elif width < 15:
                             width = 15
-                        worksheet.set_column(index, index, width)
+                        worksheet.set_column(index, index, width, format)
             writer.save()
         
             #workbook.close()
