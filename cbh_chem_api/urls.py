@@ -28,7 +28,7 @@ from cbh_chembl_id_generator.resources import CBHPluginResource
 
 api = Api(api_name=api_name)
 api.register(ProjectTypeResource())
-
+api.register(CBHCompoundUploadResource())
 api.register(CBHCompoundBatchResource())
 api.register(CBHCompoundMultipleBatchResource())
 api.register(CBHCompoundBatchUpload())

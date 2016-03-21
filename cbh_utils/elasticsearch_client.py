@@ -23,9 +23,15 @@ def get_list_of_indicies(project_ids):
 
 def fix_data_types_for_index( value):
     """Elasticsearch will not index dictionaries"""
-    if not value:
+    if value is None:
+        return None
+
+    if not str(value):
+        #pick up empty strings etc but not false
 
         return None
+    if str(value) == "True" or str(value) == "False":
+        return str(value).lower()
     if isinstance(value, basestring):
         if value.strip():
             return value
@@ -44,7 +50,9 @@ def build_indexed_fields(document, schema):
     document["indexed_fields"] = []
     for field in schema:
         slashed_json_pointer = "/%s" % field["data"].replace(".", "/")
+
         raw_value = resolve_pointer(document,slashed_json_pointer, default=None)
+        
         value = fix_data_types_for_index(raw_value)
         if value:
             #We do not add an index for any blank, empty or non existant field, that way
@@ -244,7 +252,7 @@ def build_sorts(sorts):
     out as a zero padded string if it is either an integer or a float"""
     elasticsearch_sorts = [
         {
-            "_script":{"script": ZERO_PAD_GROOVY_SCRIPT,
+            "_script":{"script": ZERO_PAD_GROOVY_SCRIPT + ".toLowerCase()",
             "params" : {"field_path" : sort["field_path"]},
             "type" : "string", "order" : sort["sort_direction"]}
         }

@@ -28,10 +28,17 @@ INSTALLED_APPS = (
   'cbh_chem_api',
   'cbh_chembl_id_generator',
   'solo',
-    "django_rq",
             'tastypie',
+    'django_q',
 
 
    )
+
+Q_CLUSTER = {
+    'name': 'DJRedis',
+    'workers': 12,
+    'timeout': 90,
+    'django_redis': 'default'
+}
 
 ROOT_URLCONF = 'deployment.urls_v2'

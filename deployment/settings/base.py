@@ -200,7 +200,6 @@ INSTALLED_APPS = (
   'cbh_chembl_ws_extension',
   'cbh_chembl_id_generator',
   'solo',
-    "django_rq",
             'tastypie',
 
 
@@ -245,18 +244,7 @@ CBH_QUERY_TYPES = [
         },
         {'name': 'Pick From List',
         'value' : 'pick_from_list'},
-        # {
-        #     'name': 'Equals any in this list',
-        #     'value': 'any_of',
-        # },
-        # {
-        #     'name': 'Starts with',
-        #     'value': 'starts_with',
-        # },
-        # {
-        #     'name': 'Ends with',
-        #     'value': 'ends_with',
-        # },
+
         {
             'name': 'Between',
             'value': 'between',
@@ -588,7 +576,7 @@ TABULAR_DATA_SETTINGS = {
         "end" : []
                 },
     "indexing" : {
-        "start" :["uuid", "projectfull.name", "properties.archived",],
+        "start" :["uuid", "projectfull.name", "properties.archived","projectfull.project_type.saved_search_project_type"],
         "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
     },
     "indexing_temp" : {
@@ -596,6 +584,15 @@ TABULAR_DATA_SETTINGS = {
         "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
     },
     "schema": {
+        "projectfull.project_type.saved_search_project_type" : {
+            "noSort": True,
+            "knownBy": "Is a saved search",
+            "data": "projectfull.project_type.saved_search_project_type",
+            "searchFormType" : "pick_from_list",
+            "renderer_named": "archivedRenderer",
+            "editable": True,
+            "className": "htCenter htMiddle ",
+        },
         "properties.archived" : {
             "noSort": True,
             "knownBy": "Archive",
@@ -621,15 +618,17 @@ TABULAR_DATA_SETTINGS = {
             "searchFormType" : "chemical",
             "renderer_named": "coverRenderer",
             "editable": False,
-            "className": "htCenter htMiddle "
+            "className": "htCenter htMiddle ",
+            "field_type": "b64png"
         },
         "id" : {
             "sortOrder": "none",
             "knownBy": "Batch ID",
             "data": "id",
+            "field_type"  : "integer",
             "searchFormType" : "pick_from_list",
             "editable": False,
-            "className": "htCenter htMiddle "
+            "className": "htCenter htMiddle " 
         }, 
         "originalSmiles" : {
             "noSort": True,
@@ -686,6 +685,7 @@ TABULAR_DATA_SETTINGS = {
             "noSort": True,
             "knownBy": "Date",
             "data": "timestamp",
+            "field_type"  : "date",
             "searchFormType" : "date_range",
             "editable": False,
             "className": "htCenter htMiddle ",
@@ -696,6 +696,7 @@ TABULAR_DATA_SETTINGS = {
             "data": "multiple_batch_id",
             "searchFormType" : "pick_from_list",
             "editable": False,
+            "field_type"  : "integer",
             "className": "htCenter htMiddle ",
         }
     }

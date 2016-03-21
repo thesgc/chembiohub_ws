@@ -271,10 +271,15 @@ class ProjectAuthorization(Authorization):
     def create_detail(self, object_list, bundle):
         self.login_checks(bundle.request, bundle.obj.__class__)
         pids = editor_projects(bundle.request.user)
-        if bundle.data["project"].get("pk", 0) in pids:
-            return True
-        else:
-            raise Unauthorized("not authroized for project")
+        id = None
+        if hasattr(bundle.data["project"], "id"):
+            if bundle.data["project"].id in pids:
+                return True
+        elif hasattr(bundle.data["project"], "get"):
+            if bundle.data["project"].get("pk", 0) in pids:
+                return True
+
+        raise Unauthorized("not authroized for project")
         # return self.base_checks(bundle.request, bundle.obj.__class__,
         # bundle.data, ["editor",])
 

@@ -341,7 +341,7 @@ def before_scenario(context, scenario):
     delete_index(get_main_index_name())
     from django.core.management import call_command
     #must index the data
-    call_command("reindex_compounds")
+    call_command("reindex_compounds_new")
 
 
     from django.test.simple import DjangoTestSuiteRunner
@@ -389,9 +389,9 @@ def after_all(context):
 
         #We can't import resources unless django.setup has been called
     before_scenario(context, None)
-    from cbh_datastore_ws.resources import reindex_datapoint_classifications
-    reindex_datapoint_classifications()
+    
     from django.core.management import call_command
+    call_command("reindex_compounds_new")
     
     call_command("loaddata", "datatypes.json")
     call_command("loaddata", "projecttypes.json")

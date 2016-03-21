@@ -1495,7 +1495,7 @@ class ChemGlobalFieldsConfigResource(ModelResource):
     def get_object_list(self, request):
         """Filter for the user's projects and sort by custom field config creation date"""
         pids = ProjectAuthorization().project_ids(request)
-        objects = super(ChemGlobalFieldsConfigResource, self).get_object_list(request).filter(custom_field_config__project__id__in=pids).order_by("-custom_field_config__created", "position").prefetch_related("custom_field_config__project")
+        objects = super(ChemGlobalFieldsConfigResource, self).get_object_list(request).filter(custom_field_config__project__id__in=pids, custom_field_config__project__project_type__saved_search_project_type=False).order_by("-custom_field_config__created", "position").prefetch_related("custom_field_config__project")
         return objects
 
 
