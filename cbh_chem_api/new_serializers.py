@@ -130,18 +130,12 @@ class CBHCompoundBatchSerializer( Serializer):
                     format.set_text_wrap()
                     format.set_align('vcenter')
 
-                    format2 = workbook.add_format()
-                    format2.set_text_wrap()
+                    format2 = workbook.add_format({'bold': False})
+
                     format2.set_align('vcenter')
                     format2.set_bold(False)
                     worksheet.set_row(0, 30, format2)
-                    writer.save()
-                    format2.set_bold(True)
-                    worksheet.set_row(0, 30, format2)
-                    writer.save()
-                    format2.set_bold(False)
-                    worksheet.set_row(0, 30, format2)
-                    writer.save()
+                    
                     for col, column_schema in enumerate(projectsheet["schema"]):
                         add_images_or_other_objects(col, 
                                                         column_schema, 
