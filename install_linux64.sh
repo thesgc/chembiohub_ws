@@ -88,7 +88,19 @@ directory=$(pwd)
 environment=PATH=$PATH,CONDA_ENV_PATH=$CONDA_ENV_PATH
 user=$USERSUB
 autorestart=true
-redirect_stderr=true" 
+redirect_stderr=true
+
+[program:${ENV_NAME}_qcluster]
+command=$CONDA_ENV_PATH/bin/python manage.py qcluster
+directory=$(pwd)
+environment=PATH=$PATH,CONDA_ENV_PATH=$CONDA_ENV_PATH
+user=$USERSUB
+autorestart=true
+redirect_stderr=true
+
+
+
+" 
     printf "$SUPERVISOR" > /tmp/uwsgi
 
     POSTGRES="[program:${ENV_NAME}_postgresql]

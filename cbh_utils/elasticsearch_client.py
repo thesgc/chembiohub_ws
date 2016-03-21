@@ -9,6 +9,9 @@ except AttributeError:
 ES_MAIN_INDEX_NAME = "chemreg_chemical_index_v2"
 from jsonpointer import resolve_pointer
 
+AGG_TERMS_SEPARATOR = "|||"
+
+
 def get_main_index_name():
     return "%s__%s" % (ES_PREFIX, ES_MAIN_INDEX_NAME)
 
@@ -265,7 +268,7 @@ def get_nested_aggregation_for_field_path(autocomplete_field_path, autocomplete=
     base_agg = {
                 "field_path_terms" : {
                     "terms" : {
-                        "script" : ZERO_PAD_GROOVY_SCRIPT,
+                        "script" : ZERO_PAD_GROOVY_SCRIPT + ".toLowerCase() + '" + AGG_TERMS_SEPARATOR + "' + tmp",
                         "params" : { "field_path" : autocomplete_field_path },
                         "size" : autocomplete_size,
                          "order" : { "_term" : "asc" }
@@ -348,10 +351,14 @@ def get_list_data_elasticsearch(queries, index, sorts=[], autocomplete="", autoc
     if autocomplete_field_path:
         for bucket in data["aggregations"]["filtered_field_path"]["field_path_terms"]["buckets"]:
             #Un zero pad the returned items
+            bucket["key"] = remove_terms_separator(bucket["key"])
             bucket["key"] = unzeropad(bucket["key"])
 
 
     return data
+
+def remove_terms_separator(input_string):
+    return input_string.split(AGG_TERMS_SEPARATOR)[1]
 
 def unzeropad(input_string):
     replace_up_to = 0

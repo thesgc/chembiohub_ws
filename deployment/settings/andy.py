@@ -38,7 +38,7 @@ Q_CLUSTER = {
     'name': 'DJRedis',
     'workers': 12,
     'timeout': 90,
-    'django_redis': 'default'
+    'django_redis': ENV_NAME
 }
 
 ROOT_URLCONF = 'deployment.urls_v2'
