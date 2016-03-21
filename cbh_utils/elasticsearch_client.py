@@ -29,12 +29,12 @@ def fix_data_types_for_index( value):
     if value is None:
         return None
 
-    if not str(value):
+    if not unicode(value):
         #pick up empty strings etc but not false
 
         return None
-    if str(value) == "True" or str(value) == "False":
-        return str(value).lower()
+    if unicode(value) == "True" or unicode(value) == "False":
+        return unicode(value).lower()
     if isinstance(value, basestring):
         if value.strip():
             return value
