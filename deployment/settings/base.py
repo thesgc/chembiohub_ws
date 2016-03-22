@@ -373,79 +373,32 @@ CBH_QUERY_SCHEMAFORM = {
                             "selected": "btn-success btn-sm",
                             "unselected": "btn-default btn-sm"
                           },
-                          "htmlClass": "col-sm-9",
+                          "htmlClass": "row",
                           "onChange": "queryTypeChanged(modelValue,form)",
                           "disableSuccessState":True,
                           "feedback": False,
                     },
-
+                    
                     {
-                         "htmlClass": "col-sm-2",
-                          "type": 'button', 
-                          "style": 'btn-danger ', 
-                          "title": 'Clear Filters', 
-                          "onClick": "clearFilters()" 
-
-                    },
-                    {
-                         "htmlClass": "col-sm-1",
-                          "type": 'button', 
-                          "style": 'btn-primary ', 
-                          "title": 'Close', 
-                          "onClick": "closeMenu()" 
-
-                    },
+                          "type": "section",
+                          "htmlClass": "row",
+                          "items": [
                     
                     {
                         'title': 'Keyword or phrase',
                         'key': 'phrase',
                         'condition': 'model.query_type=="phrase"',
-                        "htmlClass": "col-sm-6",
+                        "htmlClass": "col-sm-4",
                         "onChange": "updated(modelValue,form)",
                           "disableSuccessState":True,
                           "feedback": False,
 
                     },
-                    # {
-                    #     'key': 'any_of',
-                    #     'title': 'Boolean (AND/OR) query',
-                    #     'placeholder': 'Search multiple values',
-                    #     'feedback': False,
-                    #     'condition': 'model.query_type=="any_of"',
-                    #     "htmlClass": "col-sm-3",
-                    #     "onChange": "updated(modelValue,form)",
-                    #       "disableSuccessState":True,
-                    #       "feedback": False,
-
-                    # },
-                    # {
-                    #     'key': 'equals',
-                    #     'condition': 'model.query_type=="equals"',
-                    #       "htmlClass": "col-sm-3",
-                    #       "onChange": "updated(modelValue,form)",
-                    #       "disableSuccessState":True,
-                    #       "feedback": False,
-                    # },
-                    # {
-                    #     'key': 'starts_with',
-                    #     'condition': 'model.query_type=="starts_with"',
-                    #       "htmlClass": "col-sm-6",
-                    #       "onChange": "updated(modelValue,form)",
-                    #       "disableSuccessState":True,
-                    #       "feedback": False,
-                    # },
-                    # {
-                    #     'key': 'ends_with',
-                    #     'condition': 'model.query_type=="ends_with"',
-                    #       "htmlClass": "col-sm-6",
-                    #       "onChange": "updated(modelValue,form)",
-                    #       "disableSuccessState":True,
-                    #       "feedback": False,
-                    # },
+                   
                     {
                         'key': 'greater_than',
                         'condition': 'model.query_type=="greater_than" || model.query_type=="between"',
-                          "htmlClass": "col-sm-6",
+                          "htmlClass": "col-sm-4",
                           "onChange": "updated(modelValue,form)",
                           "disableSuccessState":True,
                           "feedback": False,
@@ -453,7 +406,7 @@ CBH_QUERY_SCHEMAFORM = {
                     {
                         'key': 'less_than',
                         'condition': 'model.query_type=="less_than" || model.query_type=="between"',
-                        "htmlClass": "col-sm-6",
+                        "htmlClass": "col-sm-4",
                         "onChange": "updated(modelValue,form)",
                           "disableSuccessState":True,
                           "feedback": False,
@@ -462,12 +415,38 @@ CBH_QUERY_SCHEMAFORM = {
                       'title' : 'Pick from list',
                       'key' : 'pick_from_list',
                       'condition' : 'model.query_type=="pick_from_list"', 
-                      "htmlClass": "col-sm-12",
+                      "htmlClass": "col-sm-6",
                       "onChange": "updated(modelValue,form)",
                       "disableSuccessState":True,
                       "feedback": False,
                        "type" : "filtereddropdown",
+                      },
+                      {
+                          "type": "section",
+                          "htmlClass": "row pull-right",
+                          "items": [
+
+                            {
+                                  "type": 'button', 
+                                  "htmlClass": "col-xs-6",
+                                  "style": 'btn-primary btn-block',
+                                  "title": 'Close', 
+                                  "onClick": "closeMenu()" 
+
+                            },
+                            {
+                                  "type": 'button', 
+                                  "htmlClass": "col-xs-6",
+                                  "style": 'btn-danger btn-block', 
+                                  "title": 'Clear', 
+                                  "onClick": "clearFilters()" 
+
+                            },
+                          ]
                       }
+                          
+                        ]},
+                        
 
                     
 
