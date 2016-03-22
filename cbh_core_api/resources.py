@@ -1468,8 +1468,8 @@ class ChemGlobalFieldsConfigResource(ModelResource):
             for proj_uri in bund.data["projects"]:
                 #We have set up the app so there is one field per project so here we are just
                 # ensuring we know the field type, everything else can be looked up from 
-                real_renderer_for_this_project = bund.obj.FIELD_TYPE_CHOICES[bund.obj.field_type]["data"]["renderer"]
-                bund.data["project_specific_schema"][proj_uri] = { "field_type" : bund.obj.field_type, "renderer" : real_renderer_for_this_project }
+                real_renderer_for_this_project = bund.obj.FIELD_TYPE_CHOICES[bund.obj.field_type]["data"]["renderer_named"]
+                bund.data["project_specific_schema"][proj_uri] = { "field_type" : bund.obj.field_type, "renderer_named" : real_renderer_for_this_project }
             if bund.data["data"] not in schema:
                 schema[bund.data["data"]] = bund.data
                 names_list.append(bund.data["data"])
