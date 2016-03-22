@@ -23,7 +23,6 @@ INSTALLED_APPS = (
 
        'flowjs',
        'cbh_core_model',
-       'cbh_datastore_model',
   'cbh_chembl_model_extension',    
   'cbh_chem_api',
   'cbh_chembl_id_generator',
