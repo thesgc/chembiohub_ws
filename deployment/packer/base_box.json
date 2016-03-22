@@ -1,23 +1,74 @@
 {
   "provisioners": [
+   {
+      "type": "shell",
+      "execute_command": "bash '{{.Path}}'",
+      "override": {
+        
+        "virtualbox-iso": {
+          "execute_command": "echo 'vagrant' | sudo -E -S sh '{{ .Path }}'",
+          "inline": [
+            "echo '%sudo    ALL=(ALL)  NOPASSWD:ALL' >> /etc/sudoers"
+          ]
+        }
+      }
+    },
     {
       "type": "shell",
       "execute_command": "bash '{{.Path}}'",
       "override": {
         "amazon-ebs": {
           "scripts": [
-            "clone.sh",
-            "dependencies.sh",
-            "python_dependencies.sh",
+            "clone.sh"
+            
+          ]
+        },
+        "virtualbox-iso": {
+          "execute_command": "bash '{{.Path}}'",
+          "scripts": [
+            "clone_vagrant.sh"
+           
+          ]
+        }
+      }
+    },
+    {
+      "type": "shell",
+      "execute_command": "bash '{{.Path}}'",
+      "scripts": [
+            "dependencies.sh"
+      ]
+      
+    },
+    {
+      "type": "shell",
+      "execute_command": "bash '{{.Path}}'",
+      "override": {
+        "amazon-ebs": {
+          "scripts": [
+            "python_dependencies.sh"
+          ]
+        },
+        "virtualbox-iso": {
+          "execute_command": "bash '{{.Path}}'",
+          "scripts": [
+            "python_dependencies_vagrant.sh"
+          ]
+        }
+      }
+    },
+    {
+      "type": "shell",
+      "execute_command": "bash '{{.Path}}'",
+      "override": {
+        "amazon-ebs": {
+          "scripts": [
             "db_and_index.sh"
           ]
         },
         "virtualbox-iso": {
-          "execute_command": "echo 'vagrant'|sudo -S bash '{{.Path}}'",
+          "execute_command": "bash '{{.Path}}'",
           "scripts": [
-            "clone_vagrant.sh",
-            "dependencies.sh",
-            "python_dependencies_vagrant.sh",
             "db_and_index_vagrant.sh"
           ]
         }

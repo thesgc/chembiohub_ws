@@ -5,6 +5,9 @@ deployment/packer/output-virtualbox-iso/
 # C extensions
 *.so
 *gunicorn.sh
+*.box
+*.ovf
+*.vmdk
 # Distribution / packaging
 .Python
 env/
@@ -25,6 +28,7 @@ charms/
 .installed.cfg
 *.egg
 deployment/packer/packer_cache/
+deployment/packer/packer_virtualbox-iso_virtualbox-iso
 # PyInstaller
 #  Usually these files are written by a python script from a template
 #  before PyInstaller builds the exe, so as to inject date/other infos into it.
