@@ -480,16 +480,7 @@ class ChemregProjectResource(UserHydrate, ModelResource):
                      self).get_object_list(request).prefetch_related(Prefetch('project_type'
                                                                               )).order_by('-modified')
 
-    def prepend_urls(self):
-        return [url(r"^(?P<resource_name>%s)/custom_fields/?$"
-                    % self._meta.resource_name,
-                    self.wrap_view('get_custom_fields'),
-                    name='get_custom_fields')]
-
-    def get_custom_fields(self, request):
-        return super(ChemregProjectResource,
-                     self).get_object_list(request).prefetch_related(Prefetch('custom_field_config'
-                                                                              ))
+                                                         
 
 #To be deprecated
     def get_searchform(self, bundle):
@@ -1451,7 +1442,7 @@ class ChemGlobalFieldsConfigResource(ModelResource):
     knownBy = fields.CharField(attribute="name")
     renderer_named = fields.CharField(default="customFieldRenderer")
     className = fields.CharField(default="htCenter htMiddle ") 
-    projects = fields.ToManyField("cbh_core_api.resources.NoCustomFieldsChemregProjectResource", attribute=lambda bundle: bundle.obj.custom_field_config.project)
+    projects = fields.ToManyField("cbh_core_api.resources.NoCustomFieldsChemregProjectResource", attribute=lambda bundle: bundle.obj.custom_field_config.project, readonly=True)
     editable = fields.BooleanField(default=True)
 
     def dehydrate_data(self, bundle):
