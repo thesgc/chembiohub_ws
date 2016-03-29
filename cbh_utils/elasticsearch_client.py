@@ -172,7 +172,7 @@ def build_es_request(queries, textsearch=""):
             new_query = build_phase_prefix_query(query["phrase"])
         
         elif query["query_type"] == 'pick_from_list': 
-          
+            print query["pick_from_list"] 
             new_query = {
                     "terms" :
                     { 
@@ -349,11 +349,15 @@ def get_list_data_elasticsearch(queries, index, sorts=[], autocomplete="", autoc
     data = es.search(index, body=es_request, ignore_unavailable=True)
 
     if autocomplete_field_path:
+        newbucks = []
         for bucket in data["aggregations"]["filtered_field_path"]["field_path_terms"]["buckets"]:
             #Un zero pad the returned items
             bucket["key"] = remove_terms_separator(bucket["key"])
             bucket["key"] = unzeropad(bucket["key"])
-
+            if bucket["key"]:
+                #Dont accept empty strings
+                newbucks.append(bucket)
+        data["aggregations"]["filtered_field_path"]["field_path_terms"]["buckets"] = newbucks
 
     return data
 
