@@ -275,14 +275,8 @@ autocomplete urls
         if bundle.request.GET.get("empty", False):
             return {}
         data = bundle.obj.field_values[1]
-        data["key"] = bundle.obj.name
-        if bundle.obj.UISELECTTAG in bundle.obj.field_type:
-            data['options'] = {'refreshDelay': 0,
-                                # 'async': {'url': "%s" % reverse('api_get_list_elasticsearch',
-                                #                          kwargs={'resource_name': 'cbh_compound_batches',
-                                #                                  'api_name': settings.WEBSERVICES_NAME})}
-                                
-                                }
+        
+        
         return {"form": [data]}
 
     def dehydrate_edit_schema(self, bundle):

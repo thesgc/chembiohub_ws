@@ -20,6 +20,7 @@ from tastypie.utils.mime import determine_format, build_content_type
 from base64 import b64decode, b64encode
 import time
 from cbh_chem_api.new_serializers import CBHCompoundBatchSerializer
+from django_q.tasks import async_iter, result
 
 EMPTY_ARRAY_B64 = b64encode("[]")
 
@@ -55,6 +56,48 @@ def reformat_project_data_fields_as_table_schema( table_schema_type, project_dat
     return start_schema + middle_table_schema + end_schema
 
 
+class CBHChemicalSearch(Resource):
+    uuid = fields.CharField()
+    query_type = fields.CharField()
+    molfile = fields.CharField()
+    smiles = fields.CharField()
+    pids = fields.ListField()
+    task_id = fields.CharField()
+
+
+
+    def post_list(self, request, **kwargs):
+        """
+        Creates a new resource/object with the provided data.
+        Calls ``obj_create`` with the provided data and returns a response
+        with the new resource's location.
+        If a new resource is created, return ``HttpCreated`` (201 Created).
+        If ``Meta.always_return_data = True``, there will be a populated body
+        of serialized data.
+        """
+        deserialized = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
+        deserialized = self.alter_deserialized_detail_data(request, deserialized)
+        bundle = self.build_bundle(data=dict_strip_unicode_keys(deserialized), request=request)
+        updated_bundle = self.obj_create(bundle, **self.remove_api_resource_names(kwargs))
+        
+        updated_bundle = self.alter_detail_data_to_serialize(request, updated_bundle)
+        return self.create_response(request, updated_bundle, response_class=http.HttpCreated, location=None)
+
+
+    def obj_create(self, bundle, **kwargs):
+        """
+        Generate a task id and send the relevant tasks to django q
+        """
+        pids = bundle.data["pids"]
+        args = [(int(pid), bundle.data["smiles"]) for pid in pids.split(",")]
+        bundle.data = self.add_task_id(bundle.data, args)
+        return bundle
+        
+    def add_task_id(self, data, args):
+        data["task_id"] = async_iter('cbh_chem_api.tasks.get_structure_search_for_project', args)
+        return data
+
+
 
 
 class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
@@ -70,6 +113,7 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
     warnings = CBHNoSerializedDictField('warnings')
     properties = CBHNoSerializedDictField('properties')
     custom_fields = CBHNoSerializedDictField('custom_fields')
+
 
 
     def dehydrate_timestamp(self, bundle):
@@ -279,6 +323,7 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
             
             bucks = data["aggregations"]["filtered_field_path"]["field_path_terms"]["buckets"]
             bundledata = {"items" : bucks,
+                            "autocomplete" : autocomplete,
                             "unique_count" : data["aggregations"]["filtered_field_path"]["unique_count"]["value"]}
         else:
             #This is just a standard request for data

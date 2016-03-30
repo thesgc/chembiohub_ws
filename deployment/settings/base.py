@@ -412,16 +412,23 @@ CBH_QUERY_SCHEMAFORM = {
                           "feedback": False,
                     }, 
                     { 
-                      'title' : 'Pick from list',
-                      'key' : 'pick_from_list',
-                      'condition' : 'model.query_type=="pick_from_list"', 
-                      "htmlClass": "col-sm-6",
-                      "onChange": "updated(modelValue,form)",
-                      "disableSuccessState":True,
-                      "feedback": False,
-                       "type" : "filtereddropdown",
-                      },
-                      {
+                        'title' : 'Pick from list',
+                        'key' : 'pick_from_list',
+                        'condition' : 'model.query_type=="pick_from_list"', 
+                        "htmlClass": "col-sm-6",
+                        "onChange": "updated(modelValue,form)",
+                        "disableSuccessState":True,
+                        "feedback": False,
+                        "type" : "filtereddropdown",
+                        "options":{
+                          "tagging" : True,
+                          "fetchDataEventName" : "openedSearchDropdown",
+                          "dataArrivesEventName" : "autoCompleteData",
+                          "multiple" : True,
+                          "staticItems" : [] 
+                        }
+                    },
+                    {
                           "type": "section",
                           "htmlClass": "row pull-right",
                           "items": [
