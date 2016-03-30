@@ -1506,6 +1506,7 @@ class SkinningResource(ModelResource):
     '''URL resourcing for pulling out sitewide skinning config '''
     tabular_data_schema = fields.DictField()
     query_schemaform = fields.DictField()
+    chem_query_schemaform = fields.DictField()
     sort_schemaform = fields.DictField()
     hide_schemaform = fields.DictField()
 
@@ -1542,6 +1543,9 @@ class SkinningResource(ModelResource):
 
     def dehydrate_sort_schemaform(self, bundle):
         return settings.CBH_SORT_SCHEMAFORM
+
+    def dehydrate_chem_query_schemaform(self, bundle):
+        return settings.CBH_CHEMICAL_QUERY_SCHEMAFORM
 
 
 

@@ -265,7 +265,16 @@ CBH_QUERY_TYPES = [
             'name': 'Not blank',
             'value': 'nonblanks',
         }
+
     ]
+
+CBH_CHEMICAL_QUERY_TYPES = [
+  
+        {
+            'name': 'Sketch',
+            'value': 'chemical',
+        },
+]
 
 CBH_SORT_DIRECTIONS = [{'name': 'No Sort', 'value': "No Sort" },
              {'name': 'Asc', 'value': 'asc'},
@@ -355,7 +364,54 @@ CBH_HIDE_SCHEMAFORM = {
 }
         
 
+CBH_CHEMICAL_QUERY_SCHEMAFORM = {
+  'default': {
+    "form": [
 
+                {
+                          "key" : "query_type",
+                          "title": "Filter type",
+                          "type": "select",
+                          "titleMap": CBH_CHEMICAL_QUERY_TYPES,
+                          "type": "radiobuttons",
+                          "style": {
+                            "selected": "btn-success btn-sm",
+                            "unselected": "btn-default btn-sm"
+                          },
+                          "htmlClass": "row",
+                          "onChange": "queryTypeChanged(modelValue,form)",
+                          "disableSuccessState":True,
+                          "feedback": False,
+                    },
+
+                    {
+                          "type": "section",
+                          "htmlClass": "row",
+                          "items": [
+
+
+                              { 
+                                'title' : 'Sketch',
+                                'key' : 'chemical',
+                                'condition' : 'model.query_type=="chemical"', 
+                                "htmlClass": "col-sm-6",
+                                "onChange": "updated(modelValue,form)",
+                                "disableSuccessState":True,
+                                "feedback": False,
+                                 "type" : "chemdoodle",
+                              }
+
+                          ]}
+    ],
+    'schema': {
+      "chemical" : {
+                    'type': 'string',
+                    'default': ""
+                }
+    },
+    "required": ["chemical"]
+  }
+}
 
 
 
@@ -523,7 +579,8 @@ CBH_QUERY_SCHEMAFORM = {
                     'type': 'string',
                     'title' : 'Less than',
                     "default": ""
-                },
+                }
+                
             },
             "required" : [ "sort_direction", "query_type", "phrase", "any_of", "equals", "starts_with", "ends_with", "greater_than", "less_than"]
         }
