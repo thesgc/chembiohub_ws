@@ -65,6 +65,7 @@ class CBHChemicalSearchResource(Resource):
     molfile = fields.CharField()
     smiles = fields.CharField()
     pids = fields.ListField()
+    filter_is_applied = fields.BooleanField(default=False)
 
     class Meta:
         resource_name = 'cbh_chemical_search'
@@ -139,7 +140,7 @@ class CBHChemicalSearchResource(Resource):
         if len(project_ids) == 0:
             project_ids = allowed_pids
 
-        args = [(pid, bundle.data["smiles"]) for pid in project_ids]
+        args = [(pid, bundle.data["query_type"], bundle.data["smiles"]) for pid in project_ids]
         bundle.data = self.add_task_id(bundle.data, args)
         return bundle
 
@@ -222,7 +223,7 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
         return value
 
 
-    def get_project_specific_data(self, request, queries, pids, sorts, textsearch):
+    def get_project_specific_data(self, request, queries, pids, sorts, textsearch, batch_ids_by_project):
         to_return = []
         for pid in pids:
             #We have removed the schema from the index for data efficiency so
@@ -243,7 +244,8 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
                     sorts=sorts, 
                     textsearch=textsearch,
                     offset=0,
-                    limit=10000 )
+                    limit=10000,
+                    batch_ids_by_project=batch_ids_by_project )
             standardised = self.prepare_es_hits(es_data)
 
             standardised["name"] = proj_data["name"]
@@ -356,6 +358,12 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
 
         concatenated_indices = elasticsearch_client.get_list_of_indicies(project_ids)
 
+        chemical_search_id = request.GET.get("chemical_search_id", False)
+        batch_ids_by_project = None
+        if chemical_search_id:
+            print "found"
+            batch_ids_by_project = result(chemical_search_id, wait=2000)
+            print batch_ids_by_project
         if request.GET.get("format", None) != "sdf" and request.GET.get("format", None) != "xlsx":
             data = elasticsearch_client.get_list_data_elasticsearch(queries,
                 concatenated_indices,
@@ -365,10 +373,12 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
                 textsearch=textsearch, 
                 autocomplete=autocomplete,
                 autocomplete_field_path=autocomplete_field_path,
-                autocomplete_size=autocomplete_size )
+                autocomplete_size=autocomplete_size,
+                batch_ids_by_project=batch_ids_by_project
+                 )
         else:
             #Limit , offset and autocomplete have no effect for a project export
-            data = self.get_project_specific_data(request,  queries, project_ids, sorts, textsearch)
+            data = self.get_project_specific_data(request,  queries, project_ids, sorts, textsearch, batch_ids_by_project)
             
             return self.create_response(request, data) 
 

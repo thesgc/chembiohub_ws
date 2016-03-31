@@ -334,11 +334,8 @@ def before_scenario(context, scenario):
         "pg_restore -Fc -h %s -d dev_db < %s" % (host, context.commit_based_filename), shell=True)
 
     django.setup()
-    from cbh_datastore_ws.elasticsearch_client import delete_main_index
-    delete_main_index()
 
-    from cbh_chembl_ws_extension.elasticsearch_client import delete_index, get_main_index_name
-    delete_index(get_main_index_name())
+
     from django.core.management import call_command
     #must index the data
     call_command("reindex_compounds_new")
@@ -352,7 +349,6 @@ def before_scenario(context, scenario):
 
     from cbh_chembl_model_extension.models import CBHCompoundBatch
     from cbh_core_model.models import Project, CustomFieldConfig, SkinningConfig
-    from cbh_datastore_model.models import DataPoint, DataPointClassification
     from django.contrib.auth.models import User, Group
     context.dfc =None
     context.response = None
@@ -395,6 +391,6 @@ def after_all(context):
     
     call_command("loaddata", "datatypes.json")
     call_command("loaddata", "projecttypes.json")
-    call_command("loaddata", "project_setup.json")
+    # call_command("loaddata", "project_setup.json")
 
 

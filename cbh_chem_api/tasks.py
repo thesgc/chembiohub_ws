@@ -13,3 +13,6 @@ def get_structure_search_for_project(project_id, search_type, smiles):
     batch_ids = search_function(smiles).values_list("molecule_id", flat=True)
     batch_ids = CBHCompoundBatch.objects.filter(related_molregno_id__in=batch_ids).values_list("id", flat=True)
     return {"project_id" : project_id,"batch_ids" : batch_ids}
+
+
+

@@ -11,7 +11,7 @@ from jsonpointer import resolve_pointer
 
 AGG_TERMS_SEPARATOR = "|||"
 
-
+BATCH_TYPE_NAME = "newbatches"
 def get_main_index_name():
     return "%s__%s" % (ES_PREFIX, ES_MAIN_INDEX_NAME)
 
@@ -98,7 +98,7 @@ def create_index(batches, index_names):
                 "update":
                 {
                     "_index": index_names[counter],
-                    "_type": "newbatches"
+                    "_type": BATCH_TYPE_NAME
                 }
             }
             if item.get("id", None):
@@ -144,8 +144,39 @@ def build_phase_prefix_query(phrase):
                 }
 
 
-def build_es_request(queries, textsearch=""):
+def build_es_request(queries, textsearch="", batch_ids_by_project=None):
     must_clauses = []
+    if batch_ids_by_project:
+        #The postgres backend has converted the chemical search
+        #Into a list of ids by project
+        #We then join these ids queries on a per project basis
+        match_these_ids_by_index = []
+        for search_dict in batch_ids_by_project:
+            index_name = get_project_index_name(search_dict["project_id"])
+            batch_ids = search_dict["batch_ids"]
+            index_query = { "indices":
+                                {
+                                    "indices": [index_name],
+                                    "query": {
+                                        "ids" : {
+                                            "type" : BATCH_TYPE_NAME,
+                                            "values" : [str(id) for id in batch_ids]
+                                        }
+                                    },
+                                    "no_match_query" : "none"
+                                }
+                            }
+            match_these_ids_by_index.append(index_query)
+
+        #Each document should be in the specified ID list for the project it is in
+        by_index_batch_id_query = {   "bool" :{
+                "should" : match_these_ids_by_index
+            }
+        }
+        print by_index_batch_id_query
+        must_clauses.append(by_index_batch_id_query)
+
+
 
     if textsearch:
         subquery = {
@@ -163,7 +194,6 @@ def build_es_request(queries, textsearch=""):
                         }
                     
         must_clauses.append(subquery)
-        print subquery
 
 
     for query in queries:
@@ -312,7 +342,7 @@ def remove_existing_queries_for_agg(queries, autocomplete_field_path):
     return queries
 
 
-def get_list_data_elasticsearch(queries, index, sorts=[], autocomplete="", autocomplete_field_path="", autocomplete_size=settings.MAX_AUTOCOMPLETE_SIZE, textsearch="", offset=0, limit=10):
+def get_list_data_elasticsearch(queries, index, sorts=[], autocomplete="", autocomplete_field_path="", autocomplete_size=settings.MAX_AUTOCOMPLETE_SIZE, textsearch="", offset=0, limit=10, batch_ids_by_project=None):
     es = elasticsearch.Elasticsearch()
     queries = remove_existing_queries_for_agg(queries, autocomplete_field_path)
     if len(queries) > 0  or len(textsearch) > 0:
@@ -321,7 +351,7 @@ def get_list_data_elasticsearch(queries, index, sorts=[], autocomplete="", autoc
                         
                         "bool" : {
                             "filter" : [    
-                                   build_es_request(queries, textsearch=textsearch)
+                                   build_es_request(queries, textsearch=textsearch, batch_ids_by_project=batch_ids_by_project)
                             ]
                         }
                     },

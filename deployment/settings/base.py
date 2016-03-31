@@ -426,6 +426,11 @@ CBH_CHEMICAL_QUERY_SCHEMAFORM = {
                             },
                             {
                               "type": "template",
+                              "template": '<div class="help-block col-xs-12 has-warning">Molecule changed since filter was applied, Click Apply Filter to search for this molecule.</div>',
+                              "condition" : 'model.error'
+                            },
+                            {
+                              "type": "template",
                               "template": '<div class="help-block col-xs-12 has-error">Draw a molecule and click Apply Filter to run structure search.</div>',
                               "condition" : 'model.molfile==""'
                             },
