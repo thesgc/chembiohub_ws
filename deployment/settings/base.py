@@ -416,23 +416,23 @@ CBH_CHEMICAL_QUERY_SCHEMAFORM = {
                           "items": [
                             {
                               "type": "template",
-                              "template": '<div class="help-block col-xs-12">Click Apply Filter to search for this molecule.</div>',
-                              "condition" : 'model.smiles'
-                            },
-                            {
-                              "type": "template",
                               "template": '<div class="help-block col-xs-12 has-error">Invalid molecule, check number of bonds around each atom.</div>',
-                              "condition" : 'model.error'
+                              "condition" : '!model.inprogress && model.error && model.molfile!=""'
                             },
                             {
                               "type": "template",
-                              "template": '<div class="help-block col-xs-12 has-warning">Molecule changed since filter was applied, Click Apply Filter to search for this molecule.</div>',
-                              "condition" : 'model.error'
+                              "template": '<div class="help-block col-xs-12 has-warning">Structure search has changed, Click Apply Filter to search or clear to cancel.</div>',
+                              "condition" : 'model.molfile && !model.filter_is_applied && !model.error'
+                            },
+                            {
+                              "type": "template",
+                              "template": '<div class="help-block col-xs-12 ">Data below is filtered for this molecule.</div>',
+                              "condition" : '!model.inprogress && model.molfile!="" && model.filter_is_applied'
                             },
                             {
                               "type": "template",
                               "template": '<div class="help-block col-xs-12 has-error">Draw a molecule and click Apply Filter to run structure search.</div>',
-                              "condition" : 'model.molfile==""'
+                              "condition" : '!model.inprogress && model.molfile==""'
                             },
                             
                           ]
@@ -444,21 +444,21 @@ CBH_CHEMICAL_QUERY_SCHEMAFORM = {
                           {
                                   "type": 'button',
                                   "value": "submit", 
-                                  "htmlClass": "col-xs-2 pull-right",
+                                  "htmlClass": "col-xs-3 pull-right",
                                   "style": 'btn-success btn-block ', 
-                                  "title": 'Apply Filter', 
-                                  "condition" : 'model.smiles',
-                                  "onClick" : "chemicalsubmit()"
+                                  "title": 'Apply and Close', 
+                                  "condition" : 'model.smiles && !model.inprogress',
+                                  "onClick" : "chemicalsubmit();closeMenu()"
 
                             },
                             {
                               "type": "template",
-                              "template": '<div class=" pull-right"><button class="btn btn-success  btn-block " type="button" disabled> Apply Filter</button></div>',
-                              "condition" : '!model.smiles'
+                              "template": '<div class=" pull-right"><button class="btn btn-success  btn-block " type="button" disabled>Apply and Close</button></div>',
+                              "condition" : '!model.smiles || model.inprogress'
                             },
                             {
                                   "type": 'button', 
-                                  "htmlClass": "col-xs-2 pull-right",
+                                  "htmlClass": "col-xs-3 pull-right",
                                   "style": 'btn-primary btn-block ',
                                   "title": 'Close', 
                                   "onClick": "closeMenu()" 
@@ -466,10 +466,10 @@ CBH_CHEMICAL_QUERY_SCHEMAFORM = {
                             },
                             {
                                   "type": 'button', 
-                                  "htmlClass": "col-xs-2 pull-right",
+                                  "htmlClass": "col-xs-3 pull-right",
                                   "style": 'btn-danger btn-block ', 
                                   "title": 'Clear', 
-                                  "onClick": "clearFilters()" 
+                                  "onClick": "removeStructureSearch()" 
 
                             },
                             

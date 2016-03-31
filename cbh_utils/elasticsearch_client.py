@@ -168,6 +168,7 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
                             }
             match_these_ids_by_index.append(index_query)
 
+        print match_these_ids_by_index
         #Each document should be in the specified ID list for the project it is in
         by_index_batch_id_query = {   "bool" :{
                 "should" : match_these_ids_by_index

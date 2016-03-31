@@ -24,6 +24,7 @@ from django_q.tasks import async_iter, result
 from django.core.cache import caches
 from tastypie.utils import dict_strip_unicode_keys
 from rdkit import Chem
+from cbh_chembl_model_extension.models import _ctab2image
 
 EMPTY_ARRAY_B64 = b64encode("[]")
 
@@ -66,6 +67,7 @@ class CBHChemicalSearchResource(Resource):
     smiles = fields.CharField()
     pids = fields.ListField()
     filter_is_applied = fields.BooleanField(default=False)
+    inprogress = fields.BooleanField(default=False)
 
     class Meta:
         resource_name = 'cbh_chemical_search'
@@ -86,7 +88,7 @@ class CBHChemicalSearchResource(Resource):
         Returns a single serialized resource.
         
         """
-        basic_bundle = self.build_bundle(request=request)
+        bundle = self.build_bundle(request=request)
 
         bundle.data = caches[settings.SESSION_CACHE_ALIAS].get("structure_search__%s" % kwargs.get("pk", None))
         bundle = self.alter_detail_data_to_serialize(request, bundle)
@@ -96,8 +98,13 @@ class CBHChemicalSearchResource(Resource):
         deserialized["smiles"] = self.convert_mol_string(deserialized["molfile"])
         if not deserialized["smiles"]:
             deserialized["error"] = True
+            deserialized["image"] = None
         else:
             deserialized["error"] = False
+            deserialized["image"] = _ctab2image(deserialized["molfile"],50,False, recalc=None)
+
+        deserialized["inprogress"] = False
+        deserialized["filter_is_applied"] = False
         return deserialized
 
     def post_list(self, request, **kwargs):
