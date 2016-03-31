@@ -268,14 +268,6 @@ CBH_QUERY_TYPES = [
 
     ]
 
-CBH_CHEMICAL_QUERY_TYPES = [
-  
-        {
-            'name': 'Sketch',
-            'value': 'chemical',
-        },
-]
-
 CBH_SORT_DIRECTIONS = [{'name': 'No Sort', 'value': "No Sort" },
              {'name': 'Asc', 'value': 'asc'},
              {'name': 'Desc', 'value': 'desc'},]
@@ -324,6 +316,9 @@ CBH_SORT_SCHEMAFORM = {
 }
 
 
+
+
+
 CBH_HIDE_SCHEMAFORM = {
     "default" :{
         "form" : [
@@ -364,52 +359,133 @@ CBH_HIDE_SCHEMAFORM = {
 }
         
 
+CBH_CHEMICAL_QUERY_TYPES = [
+  
+        {
+            'name': 'Substructure',
+            'value': 'with_substructure',
+        },
+        {
+            'name': 'Exact Match',
+            'value': 'flexmatch',
+        },
+]
+
+
 CBH_CHEMICAL_QUERY_SCHEMAFORM = {
   'default': {
     "form": [
 
-                {
-                          "key" : "query_type",
-                          "title": "Filter type",
-                          "type": "select",
-                          "titleMap": CBH_CHEMICAL_QUERY_TYPES,
-                          "type": "radiobuttons",
-                          "style": {
-                            "selected": "btn-success btn-sm",
-                            "unselected": "btn-default btn-sm"
-                          },
-                          "htmlClass": "row",
-                          "onChange": "queryTypeChanged(modelValue,form)",
-                          "disableSuccessState":True,
-                          "feedback": False,
-                    },
+                
 
                     {
                           "type": "section",
                           "htmlClass": "row",
                           "items": [
-
-
+                              {
+                                    "key" : "query_type",
+                                    "title": "Filter type",
+                                    "type": "select",
+                                    "titleMap": CBH_CHEMICAL_QUERY_TYPES,
+                                    "type": "radiobuttons",
+                                    "style": {
+                                      "selected": "btn-success btn-sm",
+                                      "unselected": "btn-default btn-sm"
+                                    },
+                                    "htmlClass": "col-sm-4",
+                                    "onChange": "chemicalUpdated(modelValue,form)",
+                                    "disableSuccessState":True,
+                                    "feedback": False,
+                              },
                               { 
                                 'title' : 'Sketch',
-                                'key' : 'chemical',
-                                'condition' : 'model.query_type=="chemical"', 
-                                "htmlClass": "col-sm-6",
-                                "onChange": "updated(modelValue,form)",
+                                'key' : 'molfile',
+                                'condition' : 'model.query_type=="with_substructure" || model.query_type=="flexmatch"', 
+                                "htmlClass": "col-sm-8",
+                                "onChange": "not avaliable",
                                 "disableSuccessState":True,
                                 "feedback": False,
                                  "type" : "chemdoodle",
                               }
 
-                          ]}
+                          ]
+                    },
+                    {
+                          "type": "section",
+                          "htmlClass": "row",
+                          "items": [
+                            {
+                              "type": "template",
+                              "template": '<div class="help-block col-xs-12">Click Apply Filter to search for this molecule.</div>',
+                              "condition" : 'model.smiles'
+                            },
+                            {
+                              "type": "template",
+                              "template": '<div class="help-block col-xs-12 has-error">Invalid molecule, check number of bonds around each atom.</div>',
+                              "condition" : 'model.error'
+                            },
+                            {
+                              "type": "template",
+                              "template": '<div class="help-block col-xs-12 has-error">Draw a molecule and click Apply Filter to run structure search.</div>',
+                              "condition" : 'model.molfile==""'
+                            },
+                            
+                          ]
+                      },
+                    {
+                          "type": "section",
+                          "htmlClass": "row",
+                          "items": [
+                          {
+                                  "type": 'button',
+                                  "value": "submit", 
+                                  "htmlClass": "col-xs-2 pull-right",
+                                  "style": 'btn-success btn-block ', 
+                                  "title": 'Apply Filter', 
+                                  "condition" : 'model.smiles',
+                                  "onClick" : "chemicalsubmit()"
+
+                            },
+                            {
+                              "type": "template",
+                              "template": '<div class=" pull-right"><button class="btn btn-success  btn-block " type="button" disabled> Apply Filter</button></div>',
+                              "condition" : '!model.smiles'
+                            },
+                            {
+                                  "type": 'button', 
+                                  "htmlClass": "col-xs-2 pull-right",
+                                  "style": 'btn-primary btn-block ',
+                                  "title": 'Close', 
+                                  "onClick": "closeMenu()" 
+
+                            },
+                            {
+                                  "type": 'button', 
+                                  "htmlClass": "col-xs-2 pull-right",
+                                  "style": 'btn-danger btn-block ', 
+                                  "title": 'Clear', 
+                                  "onClick": "clearFilters()" 
+
+                            },
+                            
+                          ]
+                      }
     ],
     'schema': {
-      "chemical" : {
-                    'type': 'string',
-                    'default': ""
-                }
+          "type": "object",
+          "properties": {
+          "query_type": {
+                        "type": "string",
+                        "enum" : [qt["value"] for qt in CBH_CHEMICAL_QUERY_TYPES],
+                        "default": "with_substructure"
+                    },
+          "molfile" : {
+                        'type': 'string',
+                        'default': ""
+                    }
+          }
     },
-    "required": ["chemical"]
+    "required": ["molfile"]
   }
 }
 

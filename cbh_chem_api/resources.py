@@ -21,6 +21,9 @@ from base64 import b64decode, b64encode
 import time
 from cbh_chem_api.new_serializers import CBHCompoundBatchSerializer
 from django_q.tasks import async_iter, result
+from django.core.cache import caches
+from tastypie.utils import dict_strip_unicode_keys
+from rdkit import Chem
 
 EMPTY_ARRAY_B64 = b64encode("[]")
 
@@ -56,15 +59,45 @@ def reformat_project_data_fields_as_table_schema( table_schema_type, project_dat
     return start_schema + middle_table_schema + end_schema
 
 
-class CBHChemicalSearch(Resource):
-    uuid = fields.CharField()
+class CBHChemicalSearchResource(Resource):
+    id = fields.CharField()
     query_type = fields.CharField()
     molfile = fields.CharField()
     smiles = fields.CharField()
     pids = fields.ListField()
-    task_id = fields.CharField()
 
+    class Meta:
+        resource_name = 'cbh_chemical_search'
+        authorization = ProjectAuthorization()
 
+    def convert_mol_string(self, strn):
+        # commit
+        try:
+            mol = Chem.MolFromMolBlock(strn)
+            smiles = Chem.MolToSmiles(mol)
+        except:
+            smiles = ""
+        
+        return smiles
+
+    def get_detail(self, request, **kwargs):
+        """
+        Returns a single serialized resource.
+        
+        """
+        basic_bundle = self.build_bundle(request=request)
+
+        bundle.data = caches[settings.SESSION_CACHE_ALIAS].get("structure_search__%s" % kwargs.get("pk", None))
+        bundle = self.alter_detail_data_to_serialize(request, bundle)
+        return self.create_response(request, bundle)
+
+    def alter_deserialized_detail_data(self, request, deserialized):
+        deserialized["smiles"] = self.convert_mol_string(deserialized["molfile"])
+        if not deserialized["smiles"]:
+            deserialized["error"] = True
+        else:
+            deserialized["error"] = False
+        return deserialized
 
     def post_list(self, request, **kwargs):
         """
@@ -77,10 +110,11 @@ class CBHChemicalSearch(Resource):
         """
         deserialized = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
         deserialized = self.alter_deserialized_detail_data(request, deserialized)
-        bundle = self.build_bundle(data=dict_strip_unicode_keys(deserialized), request=request)
+        bundle = self.build_bundle(data=deserialized, request=request)
         updated_bundle = self.obj_create(bundle, **self.remove_api_resource_names(kwargs))
         
         updated_bundle = self.alter_detail_data_to_serialize(request, updated_bundle)
+        
         return self.create_response(request, updated_bundle, response_class=http.HttpCreated, location=None)
 
 
@@ -88,13 +122,32 @@ class CBHChemicalSearch(Resource):
         """
         Generate a task id and send the relevant tasks to django q
         """
-        pids = bundle.data["pids"]
-        args = [(int(pid), bundle.data["smiles"]) for pid in pids.split(",")]
+        pids = bundle.data.get("pids", None)
+
+        project_ids = []
+        if pids:
+
+            project_ids = [int(pid) for pid in pids.split(",")]
+        
+        allowed_pids = set(self._meta.authorization.project_ids(bundle.request))
+
+        
+        for requested_pid in project_ids:
+            if requested_pid not in allowed_pids:
+                raise Unauthorized("No permissions for requested project") 
+
+        if len(project_ids) == 0:
+            project_ids = allowed_pids
+
+        args = [(pid, bundle.data["smiles"]) for pid in project_ids]
         bundle.data = self.add_task_id(bundle.data, args)
         return bundle
+
+
         
     def add_task_id(self, data, args):
-        data["task_id"] = async_iter('cbh_chem_api.tasks.get_structure_search_for_project', args)
+        data["id"] = async_iter('cbh_chem_api.tasks.get_structure_search_for_project', args)
+        caches[settings.SESSION_CACHE_ALIAS].set("structure_search__%s" % data["id"], data)
         return data
 
 

@@ -45,6 +45,7 @@ api.register(CBHFlowFileDownloadResource())
 api.register(ChemGlobalFieldsConfigResource())
 admin.autodiscover()
 api.register(CBHSavedSearchResource())
+api.register(CBHChemicalSearchResource())
 
 
 from django.contrib.auth.decorators import login_required
