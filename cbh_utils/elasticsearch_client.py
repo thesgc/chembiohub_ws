@@ -277,7 +277,47 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
 #Take the first 256 characters of the field and zero pad it if it is a string or float
 #We use the first 256 characters as this is what will be matched
 #In the pick from list query given that this is the max length of the raw field in elasticsearch
-ZERO_PAD_GROOVY_SCRIPT = "tmp = ''; for(item in _source.indexed_fields){if(item.field_path==field_path){tmp=item.value.take(" + str(settings.ELASTICSEARCH_MAX_FIELD_LENGTH) + ")}}; if(tmp.isInteger()){tmp = String.format('%014d',tmp.toInteger());};  else if(tmp.isFloat()){def (value1, value2) = tmp.tokenize('.'); tmp = String.format('%014d',value1.toInteger()) + '.' + value2 }; return tmp"
+ZERO_PAD_GROOVY_SCRIPT = """
+    tmp = ''; 
+    for(item in _source.indexed_fields){
+        if(item.field_path==field_path){
+            if(item.value instanceof String){ 
+                //The groovy take methoid is a failsafe substring
+                //We do this to ensure the string is same length as indexed data
+                tmp = item.value.take(""" + str(settings.ELASTICSEARCH_MAX_FIELD_LENGTH) + """)
+                //Zero pad integaers or floats
+                if(tmp.isInteger()){
+                    tmp = String.format('%014d',tmp.toInteger());
+                }
+                else if(tmp.isFloat()) {
+                    def (value1, value2) = tmp.tokenize('.'); 
+                    tmp = String.format('%014d',value1.toInteger()) + '.' + value2 
+                }
+                if(separate){
+                    //Add a separator so that we can retrieve the data in uppercase format 
+                    tmp = tmp.toLowerCase() + '""" + AGG_TERMS_SEPARATOR + """' + tmp;
+                }else if(lowerCase){
+                    tmp = tmp.toLowerCase();
+                }
+                
+            } else if(item.value instanceof List){
+                //If this is a list then run the string operations for each element of the list
+                if(item.value.size() > 0){
+                    def stockArr = [];
+                    tmp = stockArr;
+                    for (v in item.value){
+                        if(separate){
+                            stockArr.push( v.toString().toLowerCase() + '""" + AGG_TERMS_SEPARATOR + """' + v);
+                        }else if(lowerCase){
+                            stockArr.push( v.toString().toLowerCase() );
+                        }
+                    }
+                }
+            }
+        }
+    }; 
+    
+    return tmp;"""
 
 
 def build_sorts(sorts):
@@ -286,8 +326,10 @@ def build_sorts(sorts):
     out as a zero padded string if it is either an integer or a float"""
     elasticsearch_sorts = [
         {
-            "_script":{"script": ZERO_PAD_GROOVY_SCRIPT + ".toLowerCase()",
-            "params" : {"field_path" : sort["field_path"]},
+            "_script":{"script": ZERO_PAD_GROOVY_SCRIPT ,
+            "params" : {"field_path" : sort["field_path"],
+                                    "lowerCase" : True,
+                                    "separate" : False },
             "type" : "string", "order" : sort["sort_direction"]}
         }
         for sort in sorts
@@ -299,15 +341,19 @@ def get_nested_aggregation_for_field_path(autocomplete_field_path, autocomplete=
     base_agg = {
                 "field_path_terms" : {
                     "terms" : {
-                        "script" : ZERO_PAD_GROOVY_SCRIPT + ".toLowerCase() + '" + AGG_TERMS_SEPARATOR + "' + tmp",
-                        "params" : { "field_path" : autocomplete_field_path },
+                        "script" : ZERO_PAD_GROOVY_SCRIPT ,
+                        "params" : { "field_path" : autocomplete_field_path,
+                                    "lowerCase" : True,
+                                    "separate" : True },
                         "size" : autocomplete_size,
                          "order" : { "_term" : "asc" }
                     }
                 },
                 "unique_count": {"cardinality" : {
                     "script" : ZERO_PAD_GROOVY_SCRIPT,
-                    "params" : { "field_path" : autocomplete_field_path },
+                    "params" : { "field_path" : autocomplete_field_path ,
+                                    "lowerCase" : False,
+                                    "separate" : False},
                 }}
             }
 

@@ -313,6 +313,8 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
         return self.create_response(request, bundle)
 
 
+    
+
     def get_list(self, request, **kwargs):
         """
         Returns a serialized list of resources.

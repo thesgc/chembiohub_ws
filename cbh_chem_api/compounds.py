@@ -517,7 +517,7 @@ class CBHCompoundUploadResource(ModelResource):
         datasets = []
         while hasMoreData:
             bundles = self.get_cached_temporary_batch_data(
-                mb.id,  {"limit": limit, "offset": offset, "sorts": '[{"id": {"order": "desc"}}]'}, request)
+                mb.id,  {"query": '{"term" : {"properties.action.raw" : "New Batch"}}',"limit": limit, "offset": offset, "sorts": '[{"id": {"order": "desc"}}]'}, request)
            # allowing setting of headers to be fale during saving of drawn molecule
             if bundle.data["headers"]:
                 for d in bundles["objects"]:
@@ -543,15 +543,7 @@ class CBHCompoundUploadResource(ModelResource):
 
         processed = [process_batch_list(ds) for ds in datasets]
 
-        # if(mb.uploaded_file):
-        #     if(mb.uploaded_file.extension == ".sdf"):
-        #         newreq = copy.copy(request)
-        #         self.alter_batch_data_after_save(
-        #             to_be_saved, 
-        #             mb.uploaded_file.file,
-        #             newreq,
-        #             mb
-        #         )
+
         elasticsearch_client.delete_index(
             elasticsearch_client.get_temp_index_name(request, mb.id))
         
@@ -1414,7 +1406,10 @@ class CBHCompoundUploadResource(ModelResource):
 
             datum.data["project"] = proj
             datum = self.full_hydrate(datum)
-
+            #Quick hack to fix saving of sutom fields when validating a sketch
+            if bundledata.get("type") == "sketch" and len(bundles["objects"]) == 1:
+                datum.data["custom_fields"] = bundledata["custom_fields"]
+                datum.obj.custom_fields = bundledata["custom_fields"]
             data.append(datum)
         bundles["objects"] = data
         return bundles
