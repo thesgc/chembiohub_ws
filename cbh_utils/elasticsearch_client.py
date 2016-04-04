@@ -168,13 +168,11 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
                             }
             match_these_ids_by_index.append(index_query)
 
-        print match_these_ids_by_index
         #Each document should be in the specified ID list for the project it is in
         by_index_batch_id_query = {   "bool" :{
                 "should" : match_these_ids_by_index
             }
         }
-        print by_index_batch_id_query
         must_clauses.append(by_index_batch_id_query)
 
 
@@ -203,7 +201,6 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
             new_query = build_phase_prefix_query(query["phrase"])
         
         elif query["query_type"] == 'pick_from_list': 
-            print query["pick_from_list"] 
             new_query = {
                     "terms" :
                     { 
@@ -248,7 +245,6 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
 
         if new_query:
             q = get_template_nested_must_clause(query["field_path"], new_query)
-            print q
             must_clauses.append(q)
         else:
             new_query =  {

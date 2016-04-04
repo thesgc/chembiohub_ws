@@ -453,7 +453,7 @@ CBH_CHEMICAL_QUERY_SCHEMAFORM = {
                             },
                             {
                               "type": "template",
-                              "template": '<div class=" pull-right"><button class="btn btn-success  btn-block " type="button" disabled>Apply and Close</button></div>',
+                              "template": '<div class="col-xs-3 pull-right"><button class="btn btn-success  btn-block " type="button" disabled>Apply and Close</button></div>',
                               "condition" : '!model.smiles || model.inprogress'
                             },
                             {

@@ -370,9 +370,9 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
         chemical_search_id = request.GET.get("chemical_search_id", False)
         batch_ids_by_project = None
         if chemical_search_id:
-            print "found"
             batch_ids_by_project = result(chemical_search_id, wait=2000)
-            print batch_ids_by_project
+            if not batch_ids_by_project:
+                return HttpResponse('{"error": "Unable to process tructure search"}', status=503)
         if request.GET.get("format", None) != "sdf" and request.GET.get("format", None) != "xlsx":
             data = elasticsearch_client.get_list_data_elasticsearch(queries,
                 concatenated_indices,
