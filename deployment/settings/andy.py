@@ -13,6 +13,7 @@ INSTALLED_APPS = (
     'django.contrib.sites',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+
         'grappelli',
     'django.contrib.admin',
    'deployment',
@@ -28,8 +29,8 @@ INSTALLED_APPS = (
   'cbh_chembl_id_generator',
   'solo',
             'tastypie',
-    'django_q',
 
+        'django_q',
 
    )
 

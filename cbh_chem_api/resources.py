@@ -28,6 +28,16 @@ from cbh_chembl_model_extension.models import _ctab2image
 
 EMPTY_ARRAY_B64 = b64encode("[]")
 
+from django_q.tasks import schedule
+try:
+    schedule('cbh_chembl_model_extension.models.index_new_compounds',
+            name="index_new_compounds",
+             schedule_type='I')
+except IntegrityError:
+    #Already created
+    pass
+
+
 class CompoundPropertiesResource(ModelResource):
     class Meta:
         queryset = CompoundProperties.objects.all()
