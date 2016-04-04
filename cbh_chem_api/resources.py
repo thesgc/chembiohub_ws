@@ -25,7 +25,7 @@ from django.core.cache import caches
 from tastypie.utils import dict_strip_unicode_keys
 from rdkit import Chem
 from cbh_chembl_model_extension.models import _ctab2image
-
+from django.db import IntegrityError
 EMPTY_ARRAY_B64 = b64encode("[]")
 
 from django_q.tasks import schedule
