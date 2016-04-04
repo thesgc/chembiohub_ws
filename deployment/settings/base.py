@@ -558,7 +558,7 @@ CBH_QUERY_SCHEMAFORM = {
                         "feedback": False,
                         "type" : "filtereddropdown",
                         "options":{
-                          "tagging" : True,
+                          "tagging" : False,
                           "fetchDataEventName" : "openedSearchDropdown",
                           "dataArrivesEventName" : "autoCompleteData",
                           "multiple" : True,
