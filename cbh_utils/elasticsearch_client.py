@@ -6,7 +6,7 @@ try:
     ES_PREFIX = settings.ES_PREFIX
 except AttributeError:
     ES_PREFIX = "dev"
-ES_MAIN_INDEX_NAME = "chemreg_chemical_index_v2"
+ES_MAIN_INDEX_NAME = "crv2"
 from jsonpointer import resolve_pointer
 
 AGG_TERMS_SEPARATOR = "|||"
