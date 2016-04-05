@@ -963,6 +963,8 @@ class SkinningResource(ModelResource):
     sort_objects = fields.ListField(default=[])
     hide_objects = fields.ListField(default=[])
 
+    field_type_choices = fields.ListField(default=[])
+
     
     class Meta:
         always_return_data = True
@@ -992,6 +994,9 @@ class SkinningResource(ModelResource):
     def dehydrate_chem_query_schemaform(self, bundle):
         return settings.CBH_CHEMICAL_QUERY_SCHEMAFORM
 
+    def dehydrate_field_type_choices(self, bundle):
+        return [{"name": value["name"], "value": key} for key, value in PinnedCustomField.FIELD_TYPE_CHOICES.items()]
+
 
 
 class TemplateProjectFieldResource(ModelResource):
@@ -1016,10 +1021,14 @@ class TemplateProjectFieldResource(ModelResource):
 def get_field_list(project_type_bundle):
     if project_type_bundle.obj.saved_search_project_type:
         return project_type_bundle.obj.SAVED_SEARCH_TEMPLATE
-    else:
+    elif project_type_bundle.obj.plate_map_project_type:
+        return project_type_bundle.obj.PLATE_MAP_TEMPLATE
+    elif len(project_type_bundle.data["custom_field_config_template"]) > 0:
         for field in  project_type_bundle.data["custom_field_config_template"]:
             field.data["id"] = None
         return [field.data for field in project_type_bundle.data["custom_field_config_template"]]
+    else:
+        return project_type_bundle.obj.DEFAULT_TEMPLATE
 
 
 
