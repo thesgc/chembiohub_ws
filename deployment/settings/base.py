@@ -676,31 +676,31 @@ CBH_QUERY_SCHEMAFORM = {
 
 TABULAR_DATA_SETTINGS = { 
     "seach_page_edit_mode": {
-        "start": ["properties.archived", "clone", "image","uuid", "projectfull.name"],
+        "start": ["project_counter","properties.archived", "clone", "image","uuid", "projectfull.name"],
         "end": []
     },
     "export" : {
-        "start" :["image","uuid", "projectfull.name"],
+        "start" :["project_counter","image","uuid", "projectfull.name"],
         "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
                 },
     "cbh.restoreitems": {
-        "start" :["properties.archived", "image","uuid", "projectfull.name"],
+        "start" :["project_counter","properties.archived", "image","uuid", "projectfull.name"],
         "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
                 },
     "cbh.archiveitems": {
-        "start" :["properties.archived", "image","uuid", "projectfull.name"],
+        "start" :["project_counter","properties.archived", "image","uuid", "projectfull.name"],
         "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
                 },
     "cbh.searchv2": {
-        "start" :[ "clone", "image","uuid", "projectfull.name"],
+        "start" :[ "project_counter","clone", "image","uuid", "projectfull.name"],
         "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
                 },
     "add_page" : {
-        "start" :["image", "id", "originalSmiles","properties.action","standardInchiKey"],
+        "start" :["project_counter","image", "id", "originalSmiles","properties.action","standardInchiKey"],
         "end" : []
                 },
     "indexing" : {
-        "start" :["uuid", "projectfull.name", "properties.archived","projectfull.project_type.saved_search_project_type"],
+        "start" :["project_counter","uuid", "projectfull.name", "properties.archived","projectfull.project_type.saved_search_project_type"],
         "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
     },
     "indexing_temp" : {
@@ -708,13 +708,19 @@ TABULAR_DATA_SETTINGS = {
         "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
     },
     "schema": {
+        "project_counter":{
+            "knownBy" : "ID in project",
+            "data" : "project_counter",
+            "editable": False,
+            "className": "htCenter htMiddle ",
+        },
         "projectfull.project_type.saved_search_project_type" : {
             "noSort": True,
             "knownBy": "Is a saved search",
             "data": "projectfull.project_type.saved_search_project_type",
             "searchFormType" : "pick_from_list",
             "renderer_named": "archivedRenderer",
-            "editable": True,
+            "editable": False,
             "className": "htCenter htMiddle ",
         },
         "properties.archived" : {

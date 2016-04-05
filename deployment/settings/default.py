@@ -67,11 +67,6 @@ ENV_NAME: {
 }
 
 
-RQ_QUEUES = {      
-    'default': {       
-        'USE_REDIS_CACHE': ENV_NAME,      
-    },     
-}
 
 
 ES_PREFIX = ENV_NAME
