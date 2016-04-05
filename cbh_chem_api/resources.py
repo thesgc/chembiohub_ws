@@ -469,14 +469,20 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
                 
                 if field["edit_schema"]["properties"][field["name"]]["type"] == "object":
                     if bd["custom_fields"].get(field["name"], False):
-                        bd["custom_fields"][field["name"]] = json.loads(bd["custom_fields"][field["name"]])
-                    else:
-                        bd["custom_fields"][field["name"]] = field["edit_schema"]["properties"][field["name"]]["default"]
+                        try:
+                            bd["custom_fields"][field["name"]] = json.loads(bd["custom_fields"][field["name"]])
+                            continue
+                        except ValueError:
+                            pass
+                    bd["custom_fields"][field["name"]] = field["edit_schema"]["properties"][field["name"]]["default"]
                 if field["edit_schema"]["properties"][field["name"]]["type"] == "array":
                     if bd["custom_fields"].get(field["name"], False):
-                        bd["custom_fields"][field["name"]] = json.loads(bd["custom_fields"][field["name"]])
-                    else:
-                        bd["custom_fields"][field["name"]] = []
+                        try:
+                            bd["custom_fields"][field["name"]] = json.loads(bd["custom_fields"][field["name"]])
+                            continue
+                        except ValueError:
+                            pass
+                    bd["custom_fields"][field["name"]] = []
         return batch_dicts
 
 
