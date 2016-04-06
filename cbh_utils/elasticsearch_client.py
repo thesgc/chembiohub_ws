@@ -255,27 +255,6 @@ def create_index(batches, index_names, refresh=True):
 
 
 
-def get_template_nested_must_clause(field_path, field_query):
-    """Match both the original field path and whatever query we are trying to run on that field"""
-    column_query = {
-                                "term" : {
-                                    "indexed_fields.field_path" : field_path
-                                }
-                            }
-
-    template_must_clause = {
-        "nested" : {
-                "path" : "indexed_fields",
-                "query" : {
-                    "bool" : {
-                        "must" : [field_query, column_query]
-                    }
-                }
-            }
-        }
-    return template_must_clause
-
-
 def build_phase_prefix_query(phrase, field_path):
     return {
                     "multi_match" :
@@ -551,12 +530,22 @@ def unzeropad(input_string):
 def get_detail_data_elasticsearch(index, id):
     es = elasticsearch.Elasticsearch()
     es_request = {
-                        "query" : {"term": {"_id" : id}},
+                        "query":{
+                            "indices" : {
+                                "indices" : index.split(","), #We ran out of space in a GET request to put all of the indices in, so just using a query indead
+                                "query" : {
+                                    {"term": {"_id" : id}},
+                                },
+                                "no_match_query" : "none"
+                            }
+                        },
+
+
                         "_source" : {
                             "include": [ "*" ],
                             "exclude": [ "indexed_fields.*" ]
                         }
                     }
-    data = es.search(index, body=es_request, ignore_unavailable=True)
+    data = es.search("_all", body=es_request, ignore_unavailable=True)
 
     return data["hits"]["hits"][0]["_source"]
