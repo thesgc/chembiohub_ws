@@ -476,7 +476,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
                         except ValueError:
                             pass
                     bd["custom_fields"][field["name"]] = field["edit_schema"]["properties"][field["name"]]["default"]
-                if field["edit_schema"]["properties"][field["name"]]["type"] == "array":
+                elif field["edit_schema"]["properties"][field["name"]]["type"] == "array":
                     if bd["custom_fields"].get(field["name"], False):
                         try:
                             bd["custom_fields"][field["name"]] = json.loads(bd["custom_fields"][field["name"]])
@@ -484,6 +484,10 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
                         except ValueError:
                             pass
                     bd["custom_fields"][field["name"]] = []
+                elif not bd["custom_fields"].get(field["name"], False):
+                    #Clean up existing fields to a blank string
+                    bd["custom_fields"][field["name"]] = field["edit_schema"]["properties"][field["name"]].get("default", "")
+
         return batch_dicts
 
 
