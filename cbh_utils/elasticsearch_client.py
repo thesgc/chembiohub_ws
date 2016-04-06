@@ -6,16 +6,153 @@ try:
     ES_PREFIX = settings.ES_PREFIX
 except AttributeError:
     ES_PREFIX = "dev"
-ES_MAIN_INDEX_NAME = "crv2"
+ES_MAIN_INDEX_NAME = "crv3"
 from jsonpointer import resolve_pointer
-
 AGG_TERMS_SEPARATOR = "|||"
 
-BATCH_TYPE_NAME = "newbatches"
+BATCH_TYPE_NAME = "hashbatches"
+import hashlib
+
+ELASTICSEARCH_MAX_FIELD_LENGTH = 256
+
+"""
+The mapping patterns were generated using this python function
+
+The reason that we zero pad using regular expressions is to avoid doing that work in python and reduce the size of the request to elasticsearch when indexing
+
+for i in range(1,14):
+   data["%ddigit" % i] = {"type": "pattern_replace", "pattern" : "^([1-9]\d{%d})($|\.\d+$)" % (i-1) , "replacement" : "".join(["0" for j in range(0,(13-i))]) + "$1$2"}
+
+The list of patterns to be applied were generated like this:
+
+["%ddigit" % i for i in range(1,14)]
+"""
+
+
+ELASTICSEARCH_INDEX_MAPPING = {
+        "settings": {
+            "index.store.type": "niofs",
+            "analysis" : {
+                    "char_filter" : {
+                        "special_char_space_out" :{ # put spaces around special characters so they can still be indexed
+                            "type":"pattern_replace",
+                            "pattern":"([()\[\].,\-\+])",
+                            "replacement":" $1 "
+                        },
+                        '1digit': {'pattern': '^([1-9])($|\.\d+$)',
+                                        'replacement': '000000000000$1$2',
+                                        'type': 'pattern_replace'},
+                         '2digit': {'pattern': '^([1-9]\d{1})($|\.\d+$)',
+                                    'replacement': '00000000000$1$2',
+                                    'type': 'pattern_replace'},
+                         '3digit': {'pattern': '^([1-9]\d{2})($|\.\d+$)',
+                                    'replacement': '0000000000$1$2',
+                                    'type': 'pattern_replace'},
+                         '4digit': {'pattern': '^([1-9]\d{3})($|\.\d+$)',
+                                    'replacement': '000000000$1$2',
+                                    'type': 'pattern_replace'},
+                         '5digit': {'pattern': '^([1-9]\d{4})($|\.\d+$)',
+                                    'replacement': '00000000$1$2',
+                                    'type': 'pattern_replace'},
+                         '6digit': {'pattern': '^([1-9]\d{5})($|\.\d+$)',
+                                    'replacement': '0000000$1$2',
+                                    'type': 'pattern_replace'},
+                         '7digit': {'pattern': '^([1-9]\d{6})($|\.\d+$)',
+                                    'replacement': '000000$1$2',
+                                    'type': 'pattern_replace'},
+                         '8digit': {'pattern': '^([1-9]\d{7})($|\.\d+$)',
+                                    'replacement': '00000$1$2',
+                                    'type': 'pattern_replace'},
+                         '9digit': {'pattern': '^([1-9]\d{8})($|\.\d+$)',
+                                    'replacement': '0000$1$2',
+                                    'type': 'pattern_replace'},
+                        '10digit': {'pattern': '^([1-9]\d{9})($|\.\d+$)',
+                                     'replacement': '000$1$2',
+                                     'type': 'pattern_replace'},
+                         '11digit': {'pattern': '^([1-9]\d{10})($|\.\d+$)',
+                                     'replacement': '00$1$2',
+                                     'type': 'pattern_replace'},
+                         '12digit': {'pattern': '^([1-9]\d{11})($|\.\d+$)',
+                                     'replacement': '0$1$2',
+                                     'type': 'pattern_replace'},
+                    },
+                    "analyzer" : {
+                        "default_index" : {
+                            "tokenizer" : "whitespace",
+                            "filter" : [
+                                "lowercase"
+                            ],
+                            "char_filter" : [
+                                "html_strip", "special_char_space_out"
+                            ]
+                        },
+                        "lowercasekeywordanalyzer" : {
+                            "tokenizer" : "keyword",
+                            "filter" : [
+                                "lowercase"
+                            ],
+                            "char_filter" : [
+                                '1digit', '2digit', '3digit', '4digit', '5digit', '6digit', '7digit', '8digit', '9digit', '10digit', '11digit', '12digit'
+                            ]
+                        },
+                    }
+                },
+        },
+        "mappings": {
+            BATCH_TYPE_NAME: {
+                "dynamic": True,
+                "_all": {"enabled": False},
+                "date_detection": False,
+                "_source": {
+                    "includes": [
+                      "*",
+                    ],
+                    "excludes": [
+                      "indexed_fields_*",
+                    ]
+                  },
+                "dynamic_templates": [
+                {
+                    "indexed_fields": {
+                        "match": "indexed_fields_*",
+                        "match_mapping_type": "string",
+                        "mapping": {
+                            "type": "string", 
+                            "index_options": "positions", 
+                            "index": "analyzed", 
+                            "omit_norms": True, 
+                            "analyzer" : "default_index",
+                            "type": "string", 
+                            "store": "no", 
+                            "fields": {
+                                    "lowercase": {"type": "string", "store": "no", "analyzer" : "lowercasekeywordanalyzer", "index": "analyzed", "ignore_above": ELASTICSEARCH_MAX_FIELD_LENGTH},
+                                    "raw": {"type": "string", "store": "no", "index": "not_analyzed", "ignore_above": ELASTICSEARCH_MAX_FIELD_LENGTH}
+                                }
+                            }
+                        }
+                    },
+              
+               
+                {
+                    "ignored_fields": {
+                        "match": "*",
+                        "match_mapping_type": "string",
+                        "mapping": {
+                            "type": "string", "store": "no", "include_in_all": False, "index" : "no"
+                        }
+                    }
+                }
+                ]
+                
+            }
+        }
+    }
+
 def get_main_index_name():
     return "%s__%s" % (ES_PREFIX, ES_MAIN_INDEX_NAME)
 
 def get_project_index_name(project_id):
+    #return get_main_index_name()
     return "%s__%s__project__%d" % (ES_PREFIX, ES_MAIN_INDEX_NAME, project_id)
 
 def get_list_of_indicies(project_ids):
@@ -47,10 +184,13 @@ def fix_data_types_for_index( value):
     return unicode(value)
 
 
-
+def get_es_fieldname(pointer):
+    m = hashlib.md5()
+    m.update(pointer)
+    return "indexed_fields_%s" % m.hexdigest()
 
 def build_indexed_fields(document, schema):
-    document["indexed_fields"] = []
+    
     for field in schema:
         slashed_json_pointer = "/%s" % field["data"].replace(".", "/")
 
@@ -60,7 +200,10 @@ def build_indexed_fields(document, schema):
         if value:
             #We do not add an index for any blank, empty or non existant field, that way
             #we can be sure that the blanks filter will pick up all of the true blank fields
-            document["indexed_fields"].append({"name" : field["knownBy"], "value": value, "field_path": field["data"] })
+            hashed = get_es_fieldname(field["data"])
+            document[hashed] = value
+    print document
+
 
 def build_all_indexed_fields(batch_dicts, schema_list):
     assert(len(batch_dicts) == len(schema_list))
@@ -88,7 +231,7 @@ def create_index(batches, index_names):
     for index_name in index_names:
         es.indices.create(
         index_name,
-        body=settings.ELASTICSEARCH_INDEX_MAPPING,
+        body=ELASTICSEARCH_INDEX_MAPPING,
         ignore=400)
 
     bulk_items = []
@@ -133,15 +276,24 @@ def get_template_nested_must_clause(field_path, field_query):
     return template_must_clause
 
 
-def build_phase_prefix_query(phrase):
+def build_phase_prefix_query(phrase, field_path):
     return {
                     "multi_match" :
                     { 
                         "type": "phrase_prefix", 
-                        "fields": ["indexed_fields.value",] , 
+                        "fields": [get_es_fieldname(field_path),] , 
                         "query" : phrase
                     }
                 }
+
+
+def prepare_lowercase_zeropad_term(term):
+    if term.replace(".", "", 1).isdigit():
+        parts = term.split(".")
+        parts[0] = parts[0].zfill(13)
+        return ".".join(parts).lower()
+    return term.lower()
+
 
 
 def build_es_request(queries, textsearch="", batch_ids_by_project=None):
@@ -178,33 +330,31 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
 
 
     if textsearch:
-        subquery = {
-                    "nested" : {
-                            "path" : "indexed_fields",
-                            "query" : {
-                                
+        subquery = {"query" : {
                                     "multi_match" : { 
                                         "type": "phrase_prefix", 
-                                        "fields": ["indexed_fields.value",] , 
+                                        "fields": ["indexed_fields_*",] , 
                                         "query" : textsearch 
                                     }
                                 }
                             }
-                        }
                     
         must_clauses.append(subquery)
 
 
     for query in queries:
         new_query = None
+
         if query["query_type"] == 'phrase':
-            new_query = build_phase_prefix_query(query["phrase"])
+            new_query = build_phase_prefix_query(query["phrase"], query["field_path"])
+            
         
         elif query["query_type"] == 'pick_from_list': 
+
             new_query = {
                     "terms" :
                     { 
-                        "indexed_fields.value.raw": query["pick_from_list"] 
+                        "%s.lowercase" % get_es_fieldname(query["field_path"] ) : [prepare_lowercase_zeropad_term(t)  for t in query["pick_from_list"]]
                     }
                 }
 
@@ -213,10 +363,10 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
             new_query = {
                     "range" :
                     { 
-                        "indexed_fields.value.raw" : 
+                         "%s.lowercase" % get_es_fieldname(query["field_path"] ): 
                             {
-                                "gt" : query["greater_than"],
-                                "lt"  : query["less_than"]
+                                "gt" : prepare_lowercase_zeropad_term(query["greater_than"]),
+                                "lt"  : prepare_lowercase_zeropad_term(query["less_than"])
                             }
                     }
                 }
@@ -224,9 +374,9 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
             new_query = {
                     "range" :
                     { 
-                        "indexed_fields.value.raw" : 
+                         "%s.lowercase" % get_es_fieldname(query["field_path"] ): 
                             {
-                                "gt" : query["greater_than"],
+                                "gt" : prepare_lowercase_zeropad_term(query["greater_than"]),
                             }
                     }
                 }
@@ -234,99 +384,41 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
             new_query = {
                     "range" :
                     { 
-                        "indexed_fields.value.raw" : 
+                        "%s.lowercase" % get_es_fieldname(query["field_path"] ) : 
                             {
-                                "lt"  : query["less_than"]
+                                "lt"  : prepare_lowercase_zeropad_term(query["less_than"])
                             }
                     }
                 }
-
-
-
-        if new_query:
-            q = get_template_nested_must_clause(query["field_path"], new_query)
-            must_clauses.append(q)
-        else:
+        elif query["query_type"] ==  'nonblanks':
             new_query =  {
-                    "nested" : {
-                            "path" : "indexed_fields",
-                            "query" : {
-                                "term" : {
-                                    "indexed_fields.field_path" : query["field_path"]
-                                }
-                            }
-                        }
+                         "exists" : {"field" : "%s.lowercase" % get_es_fieldname(query["field_path"])}
                     } 
-            if query["query_type"] ==  'blanks':
-                must_clauses.append({
-                    "bool" : {
-                            "must_not" : [new_query]
-                        }
-                    })
-            elif query["query_type"] ==  'nonblanks':
-                must_clauses.append(new_query)
-        
 
+        elif query["query_type"] ==  'blanks':
+            new_query = {
+                    "bool" : {
+                            "must_not" : [{
+                                     "exists" : {"field" : "%s.lowercase" % get_es_fieldname(query["field_path"])}
+                                } ]
+                        }
+                    }
+        
+        if new_query:
+            must_clauses.append(new_query)
     
             
     return must_clauses
-#Take the first 256 characters of the field and zero pad it if it is a string or float
-#We use the first 256 characters as this is what will be matched
-#In the pick from list query given that this is the max length of the raw field in elasticsearch
-ZERO_PAD_GROOVY_SCRIPT = """
-    tmp = ''; 
-    for(item in _source.indexed_fields){
-        if(item.field_path==field_path){
-            if(item.value instanceof String){ 
-                //The groovy take methoid is a failsafe substring
-                //We do this to ensure the string is same length as indexed data
-                tmp = item.value.take(""" + str(settings.ELASTICSEARCH_MAX_FIELD_LENGTH) + """)
-                //Zero pad integaers or floats
-                if(tmp.isInteger()){
-                    tmp = String.format('%014d',tmp.toInteger());
-                }
-                else if(tmp.isFloat()) {
-                    def (value1, value2) = tmp.tokenize('.'); 
-                    tmp = String.format('%014d',value1.toInteger()) + '.' + value2 
-                }
-                if(separate){
-                    //Add a separator so that we can retrieve the data in uppercase format 
-                    tmp = tmp.toLowerCase() + '""" + AGG_TERMS_SEPARATOR + """' + tmp;
-                }else if(lowerCase){
-                    tmp = tmp.toLowerCase();
-                }
-                
-            } else if(item.value instanceof List){
-                //If this is a list then run the string operations for each element of the list
-                if(item.value.size() > 0){
-                    def stockArr = [];
-                    tmp = stockArr;
-                    for (v in item.value){
-                        if(separate){
-                            stockArr.push( v.toString().toLowerCase() + '""" + AGG_TERMS_SEPARATOR + """' + v);
-                        }else if(lowerCase){
-                            stockArr.push( v.toString().toLowerCase() );
-                        }
-                    }
-                }
-            }
-        }
-    }; 
-    
-    return tmp;"""
+
 
 
 def build_sorts(sorts):
-    """This script (written in groovy) picks out 
-    the field value in elasticsearch and spits it 
-    out as a zero padded string if it is either an integer or a float"""
+    """Sort by the lowercase version of the data"""
     elasticsearch_sorts = [
         {
-            "_script":{"script": ZERO_PAD_GROOVY_SCRIPT ,
-            "params" : {"field_path" : sort["field_path"],
-                                    "lowerCase" : True,
-                                    "separate" : False },
-            "type" : "string", "order" : sort["sort_direction"]}
+            "%s.lowercase" % get_es_fieldname(sort["field_path"]) :{
+                "order" : sort["sort_direction"]
+            }
         }
         for sort in sorts
     ]
@@ -334,29 +426,38 @@ def build_sorts(sorts):
 
 def get_nested_aggregation_for_field_path(autocomplete_field_path, autocomplete="", autocomplete_size=settings.MAX_AUTOCOMPLETE_SIZE):
     """Based upon an input term and field_path, generate an aggregation to group by that field returning zero padded numbers to get the order right"""
+    es_fname = get_es_fieldname(autocomplete_field_path )
     base_agg = {
                 "field_path_terms" : {
                     "terms" : {
-                        "script" : ZERO_PAD_GROOVY_SCRIPT ,
-                        "params" : { "field_path" : autocomplete_field_path,
-                                    "lowerCase" : True,
-                                    "separate" : True },
+                        "field" : "%s.lowercase" % es_fname,
                         "size" : autocomplete_size,
-                         "order" : { "_term" : "asc" }
+                         "order" : { "_term" : "asc" },
+                         
+                    },
+                    "aggs" : {
+                                "correct_case":
+                                    {
+                                        "terms" : {
+                                            "field" : "%s.raw" % es_fname,
+                                            "size" : 1,
+                                             "order" : { "_term" : "asc" },
+                                        }
+                                    }
                     }
                 },
-                "unique_count": {"cardinality" : {
-                    "script" : ZERO_PAD_GROOVY_SCRIPT,
-                    "params" : { "field_path" : autocomplete_field_path ,
-                                    "lowerCase" : False,
-                                    "separate" : False},
-                }}
+                "unique_count": {
+                                    "cardinality" : 
+                                    {
+                                    "field" : "%s.lowercase" % es_fname
+                                    }
+                }
             }
 
     if autocomplete:
         #If there is a search term, then, having applied a set of filters to the data (project, other search terms)
         #We then try to apply a term filter to the data being aggregated for the search term being looked for
-        query = get_template_nested_must_clause(autocomplete_field_path, build_phase_prefix_query(autocomplete))
+        query =  build_phase_prefix_query(autocomplete, autocomplete_field_path)
     else:
         query = { "match_all": {} }
 
@@ -391,61 +492,51 @@ def get_list_data_elasticsearch(queries, index, sorts=[], autocomplete="", autoc
     if len(queries) > 0  or len(textsearch) > 0:
         es_request = {  
                     "query":{
-                        
-                        "bool" : {
-                            "filter" : [    
-                                   build_es_request(queries, textsearch=textsearch, batch_ids_by_project=batch_ids_by_project)
-                            ]
+                        "indices" : {
+                            "indices" : index.split(","), #We ran out of space in a GET request to put all of the indices in, so just using a query indead
+                            "query" : {
+                                "bool" : {
+                                    "filter" : [    
+                                           build_es_request(queries, 
+                                            textsearch=textsearch, 
+                                            batch_ids_by_project=batch_ids_by_project)
+                                    ]
+                                }
+                            },
+                            "no_match_query" : "none"
                         }
                     },
                     "sort" : build_sorts(sorts),
                     "_source" : {
                         "include": [ "*" ],
-                        "exclude": [ "indexed_fields.*" , "bigimage" ]
+                        "exclude": [ "indexed_fields_*" , "bigimage" ]
                     },
                 }
         
     else:
-        es_request = {
-                        "query" : {"match_all": {}},
-                        "sort" : build_sorts(sorts),
-                        "_source" : {
-                            "include": [ "*" ],
-                            "exclude": [ "indexed_fields.*" , "bigimage" ]
-                        }
-                    }
+        raise Exception("You must input a query")
     if autocomplete_field_path:
         es_request["aggs"] = get_nested_aggregation_for_field_path(autocomplete_field_path, autocomplete=autocomplete, autocomplete_size=autocomplete_size)
     es_request["from"] = offset
     es_request["size"] = limit
 
-    data = es.search(index, body=es_request, ignore_unavailable=True)
+    data = es.search("_all", body=es_request, ignore_unavailable=True)
 
     if autocomplete_field_path:
-        newbucks = []
         for bucket in data["aggregations"]["filtered_field_path"]["field_path_terms"]["buckets"]:
-            #Un zero pad the returned items
-            bucket["key"] = remove_terms_separator(bucket["key"])
-            bucket["key"] = unzeropad(bucket["key"])
-            if bucket["key"]:
-                #Dont accept empty strings
-                newbucks.append(bucket)
-        data["aggregations"]["filtered_field_path"]["field_path_terms"]["buckets"] = newbucks
+            #Replace the key of the bucket with the first normal case version of it
+            for correct_case_bucket in bucket["correct_case"]["buckets"]:
+                #If there is a list field there will be choices to choose between - we must pick the
+                #Choice where the keys are equal but the correct case bucket may have different case
+                if bucket["key"] == correct_case_bucket["key"].lower():
+                    bucket["key"] = correct_case_bucket["key"]
+
+            del bucket["correct_case"]
 
     return data
 
-def remove_terms_separator(input_string):
-    return input_string.split(AGG_TERMS_SEPARATOR)[1]
 
-def unzeropad(input_string):
-    replace_up_to = 0
-    if input_string.replace(".", "", 1).isdigit():
-        for index, char in enumerate(input_string):
-            if char != "0":
-                replace_up_to = index
-                #found the first non zero so break
-                break 
-    return input_string[replace_up_to:]
+
 
 def get_detail_data_elasticsearch(index, id):
     es = elasticsearch.Elasticsearch()

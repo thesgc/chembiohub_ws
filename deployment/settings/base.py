@@ -407,7 +407,6 @@ CBH_CHEMICAL_QUERY_SCHEMAFORM = {
                                 "feedback": False,
                                  "type" : "chemdoodle",
                               }
-
                           ]
                     },
                     {
