@@ -525,16 +525,11 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         batches = self.get_object_list(request)
         # we only want to store certain fields in the search index
         from django.core.paginator import Paginator
-        paginator = Paginator(batches, 10000) # chunks of 1000
+        paginator = Paginator(batches, 100) # chunks of 1000
 
-        for page in range(1, paginator.num_pages +1):
-            bs = paginator.page(page).object_list
-            self.index_batch_list(request, bs, refresh=False)
-            
-            # here you can do what you want with the row
-            
-            print "done page %d of %d" % (page ,paginator.num_pages)
-
+        pages = [(paginator.page(page).object_list) for page in range(1, paginator.num_pages +1)]
+        
+        result_list = async_iter("cbh_chem_api.resources.index_batches_in_new_index",pages)
        
         return HttpResponse(content="test", )
         
