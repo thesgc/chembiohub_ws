@@ -527,9 +527,10 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         from django.core.paginator import Paginator
         paginator = Paginator(batches, 100) # chunks of 1000
 
-        pages = [(paginator.page(page).object_list) for page in range(1, paginator.num_pages +1)]
+        for page in range(1, paginator.num_pages +1):
         
-        result_list = async_iter("cbh_chem_api.resources.index_batches_in_new_index",pages)
+            result_list = async_iter("cbh_chem_api.resources.index_batches_in_new_index",((paginator.page(page).object_list,),))
+            print page
        
         return HttpResponse(content="test", )
         
