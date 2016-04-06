@@ -487,7 +487,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         return batch_dicts
 
 
-    def index_batch_list(self, request, batch_list):
+    def index_batch_list(self, request, batch_list, refresh=True):
         #retrieve some objects as json
         bundles = [
             self.full_dehydrate(self.build_bundle(obj=obj, request=request), for_list=True)
@@ -513,7 +513,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
             index_name = elasticsearch_client.get_project_index_name(batch["projectfull"]["id"])
             index_names.append(index_name)
         
-        batch_dicts = elasticsearch_client.index_dataset(batch_dicts, schemas, index_names)
+        batch_dicts = elasticsearch_client.index_dataset(batch_dicts, schemas, index_names, refresh=refresh)
             
 
     def reindex_elasticsearch(self, request, **kwargs):
@@ -525,7 +525,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
 
         for page in range(1, paginator.num_pages +1):
             bs = paginator.page(page).object_list
-            self.index_batch_list(request, bs)
+            self.index_batch_list(request, bs, refresh=False)
             
             # here you can do what you want with the row
             

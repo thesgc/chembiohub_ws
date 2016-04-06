@@ -213,10 +213,10 @@ def build_all_indexed_fields(batch_dicts, schema_list):
 
 
 
-def index_dataset( batch_dicts, schema_list, index_names):
+def index_dataset( batch_dicts, schema_list, index_names, refresh=True):
     build_all_indexed_fields(batch_dicts, schema_list)
     es_reindex = create_index(
-                batch_dicts, index_names)
+                batch_dicts, index_names, refresh=refresh)
     if es_reindex.get("errors"):
         print "ERRORS"
         print json.dumps(es_reindex)
@@ -224,7 +224,7 @@ def index_dataset( batch_dicts, schema_list, index_names):
 
 
 
-def create_index(batches, index_names):
+def create_index(batches, index_names, refresh=True):
     es = elasticsearch.Elasticsearch()
     t = time.time()
 
@@ -249,7 +249,7 @@ def create_index(batches, index_names):
             bulk_items.append(batch_doc)
             bulk_items.append({"doc" : item, "doc_as_upsert" : True })
         # Data is not refreshed!
-        data = es.bulk(body=bulk_items, refresh=True)
+        data = es.bulk(body=bulk_items, refresh=refresh)
 
     return {}
 
