@@ -404,6 +404,7 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
         if autocomplete_field_path:
             
             bucks = data["aggregations"]["filtered_field_path"]["field_path_terms"]["buckets"]
+
             bundledata = {"items" : bucks,
                             "autocomplete" : autocomplete,
                             "unique_count" : data["aggregations"]["filtered_field_path"]["unique_count"]["value"]}
@@ -500,6 +501,10 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         batch_dicts = self.prepare_fields_for_index(batch_dicts)
 
         project_data_field_sets = [batch_dict["projectfull"]["custom_field_config"].pop("project_data_fields") for batch_dict in batch_dicts]
+        #remove some more unneeded fields
+        cfts = [batch_dict["projectfull"]["project_type"].pop("custom_field_config_template") for batch_dict in batch_dicts]
+        cfts = [batch_dict["projectfull"]["project_type"].pop("project_template") for batch_dict in batch_dicts]
+
         schemas = [reformat_project_data_fields_as_table_schema( "indexing", pdfs) for pdfs in project_data_field_sets]
         index_names = []
 
@@ -516,7 +521,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         batches = self.get_object_list(request)
         # we only want to store certain fields in the search index
         from django.core.paginator import Paginator
-        paginator = Paginator(batches, 1000) # chunks of 1000
+        paginator = Paginator(batches, 10000) # chunks of 1000
 
         for page in range(1, paginator.num_pages +1):
             bs = paginator.page(page).object_list

@@ -202,7 +202,7 @@ def build_indexed_fields(document, schema):
             #we can be sure that the blanks filter will pick up all of the true blank fields
             hashed = get_es_fieldname(field["data"])
             document[hashed] = value
-    print document
+
 
 
 def build_all_indexed_fields(batch_dicts, schema_list):
@@ -487,6 +487,8 @@ def remove_existing_queries_for_agg(queries, autocomplete_field_path):
 
 
 def get_list_data_elasticsearch(queries, index, sorts=[], autocomplete="", autocomplete_field_path="", autocomplete_size=settings.MAX_AUTOCOMPLETE_SIZE, textsearch="", offset=0, limit=10, batch_ids_by_project=None):
+    """Build a query for elasticsearch by going through the input query dictionaries
+    Also add autocomplete if required by creating an aggregation"""
     es = elasticsearch.Elasticsearch()
     queries = remove_existing_queries_for_agg(queries, autocomplete_field_path)
     if len(queries) > 0  or len(textsearch) > 0:
@@ -528,14 +530,22 @@ def get_list_data_elasticsearch(queries, index, sorts=[], autocomplete="", autoc
             for correct_case_bucket in bucket["correct_case"]["buckets"]:
                 #If there is a list field there will be choices to choose between - we must pick the
                 #Choice where the keys are equal but the correct case bucket may have different case
-                if bucket["key"] == correct_case_bucket["key"].lower():
+                if unzeropad(bucket["key"]) == correct_case_bucket["key"].lower():
                     bucket["key"] = correct_case_bucket["key"]
 
             del bucket["correct_case"]
 
     return data
 
-
+def unzeropad(input_string):
+    replace_up_to = 0
+    if input_string.replace(".", "", 1).isdigit():
+        for index, char in enumerate(input_string):
+            if char != "0":
+                replace_up_to = index
+                #found the first non zero so break
+                break 
+    return input_string[replace_up_to:]
 
 
 def get_detail_data_elasticsearch(index, id):
