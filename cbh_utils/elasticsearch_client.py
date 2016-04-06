@@ -534,7 +534,7 @@ def get_detail_data_elasticsearch(index, id):
                             "indices" : {
                                 "indices" : index.split(","), #We ran out of space in a GET request to put all of the indices in, so just using a query indead
                                 "query" : {
-                                    {"term": {"_id" : id}},
+                                    "term": {"_id" : id},
                                 },
                                 "no_match_query" : "none"
                             }
