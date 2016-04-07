@@ -159,8 +159,9 @@ class CBHChemicalSearchResource(Resource):
             project_ids = allowed_pids
 
         allowed_pids = list(allowed_pids)
-        one_quarter = int(len(allowed_pids)/4) + 1
-        pid_chunks = list(chunks(allowed_pids, one_quarter))
+        one_eighth = int(len(allowed_pids)/8) + 1
+        #Split the projects into 8 equal parts
+        pid_chunks = list(chunks(allowed_pids, one_eighth))
 
         args = [(pid_list, bundle.data["query_type"], bundle.data["smiles"]) for pid_list in pid_chunks]
         bundle.data = self.add_task_id(bundle.data, args)
