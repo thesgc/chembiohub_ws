@@ -159,7 +159,7 @@ class CBHChemicalSearchResource(Resource):
             project_ids = allowed_pids
 
         allowed_pids = list(allowed_pids)
-        one_eighth = int(len(allowed_pids)/20) + 1
+        one_eighth = int(len(allowed_pids)/2) + 1
         #Split the projects into 8 equal parts
         pid_chunks = list(chunks(allowed_pids, one_eighth))
 
