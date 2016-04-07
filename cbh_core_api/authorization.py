@@ -153,15 +153,17 @@ class ProjectListAuthorization(Authorization):
 
     def alter_bundle_for_user_custom_field_restrictions(self, bundle, restricted_and_unrestricted_projects):
         """Post serialization modification to the list of fields based on the field permissions"""
+
         if bundle.data["id"] in restricted_and_unrestricted_projects[RESTRICTED]:
             new_fields = []
             for field in bundle.data["custom_field_config"].data["project_data_fields"]:
                 if field.data["open_or_restricted"] == RESTRICTED:
                     #This is a restricted field and the user's access is restricted therefore block them
-                    pass
+                    bundle.data["users_restricted_fields"].append(field["handsontable"]["data"])
                 else:
                     new_fields.append(field)
             bundle.data["custom_field_config"].data["project_data_fields"] = new_fields
+            
 
 
     def read_list(self, object_list, bundle):

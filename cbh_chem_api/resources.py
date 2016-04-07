@@ -157,19 +157,24 @@ class CBHChemicalSearchResource(Resource):
         if len(project_ids) == 0:
             project_ids = allowed_pids
 
-        args = [(pid, bundle.data["query_type"], bundle.data["smiles"]) for pid in project_ids]
+        pid_chunks = list(chunks(list(allowed_pids), 4))
+
+        args = [(pid_list, bundle.data["query_type"], bundle.data["smiles"]) for pid_list in pid_chunks]
         bundle.data = self.add_task_id(bundle.data, args)
         return bundle
 
 
         
     def add_task_id(self, data, args):
-        data["id"] = async_iter('cbh_chem_api.tasks.get_structure_search_for_project', args)
+        data["id"] = async_iter('cbh_chem_api.tasks.get_structure_search_for_projects', args)
         caches[settings.SESSION_CACHE_ALIAS].set("structure_search__%s" % data["id"], data)
         return data
 
 
-
+def chunks(l, n):
+    """Yield successive n-sized chunks from l."""
+    for i in range(0, len(l), n):
+        yield l[i:i+n]
 
 class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
     uuid = fields.CharField(default="")

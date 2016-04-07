@@ -104,7 +104,7 @@ redirect_stderr=true
     printf "$SUPERVISOR" > /tmp/uwsgi
 
     POSTGRES="[program:${ENV_NAME}_postgresql]
-command=$CONDA_ENV_PATH/bin/postgres  -D  $CONDA_ENV_PATH/var/postgresdata  -c  listen_addresses=''  -c  unix_socket_directories=$CONDA_ENV_PATH/var/postgressocket
+command=$CONDA_ENV_PATH/bin/postgres  -D  $CONDA_ENV_PATH/var/postgresdata  -c  listen_addresses=''  -c  unix_socket_directories=$CONDA_ENV_PATH/var/postgressocket -c fsync=off -c synchronous_commit=off -c full_page_writes=off -c shared_buffers=1024MB  -c work_mem=256MB
 user=$USERSUB
 autorestart=true" 
     printf "$POSTGRES" > /tmp/postgres

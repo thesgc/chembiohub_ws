@@ -32,6 +32,8 @@ The list of patterns to be applied were generated like this:
 ELASTICSEARCH_INDEX_MAPPING = {
         "settings": {
             "index.store.type": "niofs",
+            "index.max_result_window" : 10000000,
+
             "analysis" : {
                     "char_filter" : {
                         "special_char_space_out" :{ # put spaces around special characters so they can still be indexed
@@ -283,11 +285,11 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
         #We then join these ids queries on a per project basis
         match_these_ids_by_index = []
         for search_dict in batch_ids_by_project:
-            index_name = get_project_index_name(search_dict["project_id"])
+            index_names = [get_project_index_name(pid) for pid in search_dict["project_ids"]]
             batch_ids = search_dict["batch_ids"]
             index_query = { "indices":
                                 {
-                                    "indices": [index_name],
+                                    "indices": index_names,
                                     "query": {
                                         "ids" : {
                                             "type" : BATCH_TYPE_NAME,
