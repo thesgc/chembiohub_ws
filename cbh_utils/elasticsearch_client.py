@@ -398,7 +398,8 @@ def build_sorts(sorts):
     elasticsearch_sorts = [
         {
             "%s.lowercase" % get_es_fieldname(sort["field_path"]) :{
-                "order" : sort["sort_direction"]
+                "order" : sort["sort_direction"],
+                "unmapped_type" : "long"
             }
         }
         for sort in sorts
