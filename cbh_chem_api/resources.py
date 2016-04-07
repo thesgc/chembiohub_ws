@@ -385,7 +385,7 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
         chemical_search_id = request.GET.get("chemical_search_id", False)
         batch_ids_by_project = None
         if chemical_search_id:
-            batch_ids_by_project = result(chemical_search_id, wait=2000)
+            batch_ids_by_project = result(chemical_search_id, wait=20000)
             if not batch_ids_by_project:
                 return HttpResponse('{"error": "Unable to process tructure search"}', status=503)
         if request.GET.get("format", None) != "sdf" and request.GET.get("format", None) != "xlsx":
