@@ -30,9 +30,10 @@ EMPTY_ARRAY_B64 = b64encode("[]")
 
 from django_q.tasks import schedule
 try:
+    
     schedule('cbh_chembl_model_extension.models.index_new_compounds',
             name="index_new_compounds",
-             schedule_type='I')
+             schedule_type='H')
 except IntegrityError:
     #Already created
     pass
