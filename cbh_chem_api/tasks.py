@@ -21,7 +21,7 @@ def get_structure_search_for_projects(project_ids, search_type, smiles):
         if len(mol_ids) == 1000:
             restricted = True
             
-    batch_ids = CBHCompoundBatch.objects.filter(related_molregno_id__in=batch_ids).values_list("id", flat=True)
+    batch_ids = CBHCompoundBatch.objects.filter(related_molregno_id__in=mol_ids).values_list("id", flat=True)
 
     return {"project_ids" : project_ids,"batch_ids" : batch_ids, "restricted" : restricted}
 
