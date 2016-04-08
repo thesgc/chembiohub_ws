@@ -1,3 +1,14 @@
+"""
+This module provides a generic abstraction layer to Elasticsearch
+JSON objects can be indexed by providing a schema object per row you are trying to index
+Each of the indexed fields will be extracted from the nested JSON using a JSON pointer in the schema object
+Data from the field will then be prepared for indexing in Elasticsearch
+
+Details of the specific implementation of each step are detailed in the functions 
+
+"""
+
+
 from django.conf import settings
 import elasticsearch
 import json
