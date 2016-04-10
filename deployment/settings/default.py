@@ -136,6 +136,19 @@ for app in INSTALLED_APPS:
             }
 
 
+Q_CLUSTER = {
+    'name': 'DJRedis',
+    'workers': 12,
+    'timeout': 90,
+    'django_redis': ENV_NAME,
+    'catch_up' : False
+}
+
+ROOT_URLCONF = 'deployment.urls_v2'
+
+
+REDIS_FOR_ID_GENERATOR = ENV_NAME
+
 try:
     from .secret import *
 except ImportError:
