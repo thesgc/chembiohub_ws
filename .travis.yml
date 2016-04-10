@@ -19,4 +19,4 @@ script:
 - export PATH=/home/travis/anaconda2/envs/dev/bin:$PROJECT_HOME:$HOME/anaconda2/bin/:$PATH
 
 - export DJANGO_SETTINGS_MODULE="deployment.settings.default"
-- behave cbh_tests/features/
+- $CONDA_ENV_PATH/bin/behave cbh_tests/features/
