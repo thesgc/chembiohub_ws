@@ -1,3 +1,20 @@
+"""
+This module provides a generic abstraction layer to Elasticsearch
+JSON objects can be indexed by providing a schema object per row you are trying to index
+Each of the indexed fields will be extracted from the nested JSON using a JSON pointer in the schema object
+The actual JSON object will remain unchanged and will be served up by the search functions unchanged.
+The fields that you have chosen to index can be queried using JSON Paths in a format specified in the build_es_request function
+The web forms required to perform these searches are specified by the JSON schema in the django settings which is compatible
+with Angular Schema Form and other web frameworks
+This means that an advanced search interface can be provided on top of any JSON-based document data source
+Support for foreign key relationships is coming soon
+Data from the field will then be prepared for indexing in Elasticsearch
+
+Details of the specific implementation of each step are detailed in the functions 
+
+"""
+
+
 from django.conf import settings
 import elasticsearch
 import json
