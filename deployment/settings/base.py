@@ -173,39 +173,6 @@ TEMPLATE_DIRS = (
 )
 
 
-INSTALLED_APPS = (
-      'django.contrib.auth',
-
-
-       "django_hstore",
-
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.sites',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-        'grappelli',
-    'django.contrib.admin',
-   'deployment',
-   'chembl_core_db',
-   'chembl_core_model',
-  'chembl_business_model', 
-         'cbh_core_ws',
-
-       'flowjs',
-       'cbh_core_model',
-       'cbh_datastore_model',
-       'cbh_datastore_ws',
-  'cbh_chembl_model_extension',    
-  'cbh_chembl_ws_extension',
-  'cbh_chembl_id_generator',
-  'solo',
-            'tastypie',
-
-
-   )
-
-
 
 PROJECT_ROOT = os.path.abspath(os.path.dirname(__file__))
 
