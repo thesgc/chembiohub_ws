@@ -670,7 +670,28 @@ CBH_QUERY_SCHEMAFORM = {
 
 
 
+SAVED_SEARCH_SCHEMAFORM =  {
+          "form" : [
+        
+                {
+                    'key': 'alias',
+                    'placeholder': 'e.g. My Saved Search',
+                    'htmlClass': 'col-xs-12',
+                    'validationMessage': 'Please add an alias for this search',
+                },
+            ],
 
+          "schema" : {
+                          'type': 'object',
+                          'properties': {
+                                'alias': {
+                                    'title': 'Save search as...',
+                                    'type': 'string',
+                                },
+                            },
+                            'required': ['alias'], 
+                        }
+        }
 
 
 TABULAR_DATA_SETTINGS = { 

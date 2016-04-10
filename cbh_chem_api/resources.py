@@ -249,6 +249,9 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
         return value
 
 
+
+
+
     def get_project_specific_data(self, request, queries, pids, sorts, textsearch, batch_ids_by_project):
         to_return = []
         for pid in pids:
@@ -352,7 +355,6 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
             project_ids = [int(pid) for pid in pids.split(",")]
         
         allowed_pids = set(self._meta.authorization.project_ids(request))
-
         
         for requested_pid in project_ids:
             if requested_pid not in allowed_pids:
@@ -374,6 +376,8 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
         archived = request.GET.get("archived", "false")
         queries.append({"query_type": "phrase", "field_path": "properties.archived", "phrase": archived})
 
+       
+
         sorts = json.loads(b64decode(request.GET.get("encoded_sorts", EMPTY_ARRAY_B64)))
         if len(sorts) == 0:
             sorts = [{"field_path":"id","sort_direction":"desc"}]
@@ -385,6 +389,17 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
         autocomplete_size = request.GET.get("autocomplete_size", settings.MAX_AUTOCOMPLETE_SIZE)
 
         concatenated_indices = elasticsearch_client.get_list_of_indicies(project_ids)
+
+
+        pr = ChemregProjectResource()
+        resp = pr.get_list(request, do_cache=True)
+        tabular_data_schema = json.loads(resp.content)["tabular_data_schema"]
+
+        # for q in queries:
+        #     q["project_ids"] = self._meta.authorization.check_if_field_restricted(q["field_path"], allowed_pids, tabular_data_schema)
+
+        #autocomplete_project_ids = self._meta.authorization.check_if_field_restricted(autocomplete_field_path, allowed_pids, tabular_data_schema)
+
 
         chemical_search_id = request.GET.get("chemical_search_id", False)
         batch_ids_by_project = None

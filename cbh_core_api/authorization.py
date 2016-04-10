@@ -159,7 +159,7 @@ class ProjectListAuthorization(Authorization):
             for field in bundle.data["custom_field_config"].data["project_data_fields"]:
                 if field.data["open_or_restricted"] == RESTRICTED:
                     #This is a restricted field and the user's access is restricted therefore block them
-                    bundle.data["users_restricted_fields"].append(field["handsontable"]["data"])
+                    bundle.data["users_restricted_fields"].append(field["name"])
                 else:
                     new_fields.append(field)
             bundle.data["custom_field_config"].data["project_data_fields"] = new_fields
@@ -295,3 +295,23 @@ class ProjectAuthorization(Authorization):
 
     def read_list(self, object_list, bundle):
         return object_list
+
+    def check_if_field_restricted(self, field_path, project_ids_requested, tabular_data_schema):
+        """Here we take the field path value which points to a custom field and look it up in the global schema to projects_selected
+        if it is restricted for any of the projects in the list that the user has chosen for this request"""
+
+        #because this schema has been requested on a per-user basis, the fields which are restricted have already been taken into account and removed
+        #Therefore the project specific schema contains projects for which this field name is not restricted
+
+        proj_specific_schema = tabular_data_schema["schema"][field_path]
+
+        return [pidr  for pidr in project_ids_requested if pidr in proj_specific_schema]
+
+
+    def remove_restricted_fields_from_custom_fields_to_render(self, batch_dicts, user_restricted_fieldnames):
+        """Given a list of the field names to be removed on a per project basis - remove them based on the project id in the batch dictionary"""
+
+        for fieldname in user_restricted_fieldnames[batch_dict["projectfull"]["id"]]:
+                if fieldname in batch_dict["custom_fields"]:
+                    del batch_dict["custom_fields"][fieldname]
+        return batch_dict

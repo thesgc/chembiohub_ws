@@ -457,7 +457,7 @@ class ChemregProjectResource(UserHydrate, ModelResource):
 
     def get_list(self, request, **kwargs):
         serialized = request.session.get("projects_list_cache", None)
-        if serialized and request.GET.get("do_cache"):
+        if serialized and (request.GET.get("do_cache", False) or kwargs.get("do_cache", False)):
             desired_format = self.determine_format(request)
             print "from cache"
             return HttpResponse(content=serialized,
@@ -525,6 +525,10 @@ class ChemregProjectResource(UserHydrate, ModelResource):
         names_list = [] 
         #The tabular data schema is produced here as we have a list of the fields that the user has access to here
         schema = settings.TABULAR_DATA_SETTINGS["schema"].copy()
+
+        #set up a restricted fields lookup for removing restricted fields from output
+        bundle["user_restricted_fieldnames"] = {proj.data["id"] : proj.data["users_restricted_fields"] for proj in bundle[self._meta.collection_name]}
+
         for projbund in bundle["objects"]:
             for bund in projbund.data["custom_field_config"].data["project_data_fields"]:
                 if bund.data["handsontable"]["data"] not in schema:
@@ -538,10 +542,12 @@ class ChemregProjectResource(UserHydrate, ModelResource):
                     #We have set up the app so there is one field per project so here we are just
                     # ensuring we know the field type, everything else can be looked up from 
                 real_renderer_for_this_project = bund.obj.FIELD_TYPE_CHOICES[bund.obj.field_type]["data"]["renderer_named"]
-                schema[bund.data["handsontable"]["data"]]["project_specific_schema"][projbund.data["resource_uri"]] = { "field_type" : bund.obj.field_type, "renderer_named" : real_renderer_for_this_project , "open_or_restricted" : bund.obj.open_or_restricted}
-                schema[bund.data["handsontable"]["data"]]["projects"].append(projbund.data["resource_uri"])
+                schema[bund.data["handsontable"]["data"]]["project_specific_schema"][projbund.data["id"]] = { "field_type" : bund.obj.field_type, "renderer_named" : real_renderer_for_this_project , "open_or_restricted" : bund.obj.open_or_restricted}
 
                 del bund.data["handsontable"]
+                #del bund.data["users_restricted_fields"]
+
+
 
         bundle["tabular_data_schema"] = {}
         bundle["tabular_data_schema"]["included_in_tables"] = {}
@@ -592,7 +598,7 @@ class ChemregProjectResource(UserHydrate, ModelResource):
             rc['Content-Disposition'] = \
                 'attachment; filename=project_data_explanation.xlsx'
         elif not hasattr(data, "data"):
-            if data.get("objects", False) and request.GET.get("do_cache") and response_class == HttpResponse:
+            if data.get("objects", False) and (request.GET.get("do_cache", False) or kwargs.get("do_cache", False)) and response_class == HttpResponse:
                 request.session["projects_list_cache"] = serialized
         if response_class in [http.HttpCreated, http.HttpAccepted]:
             if "projects_list_cache" in request.session:
@@ -963,6 +969,8 @@ class SkinningResource(ModelResource):
     sort_schemaform = fields.DictField()
     hide_schemaform = fields.DictField()
 
+    savedsearch_schemaform = fields.DictField()
+
     filters_applied = fields.ListField(default=[])
     sorts_applied = fields.ListField(default=[])
     hides_applied = fields.ListField(default=[])
@@ -985,7 +993,8 @@ class SkinningResource(ModelResource):
         authentication = SessionAuthentication()
 
 
-
+    def dehydrate_savedsearch_schemaform(self, bundle):
+        return settings.SAVED_SEARCH_SCHEMAFORM
 
     def dehydrate_query_schemaform(self, bundle):
         return settings.CBH_QUERY_SCHEMAFORM
