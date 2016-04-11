@@ -598,7 +598,7 @@ class ChemregProjectResource(UserHydrate, ModelResource):
             rc['Content-Disposition'] = \
                 'attachment; filename=project_data_explanation.xlsx'
         elif not hasattr(data, "data"):
-            if data.get("objects", False) and (request.GET.get("do_cache", False) or kwargs.get("do_cache", False)) and response_class == HttpResponse:
+            if data.get("objects", False) and (request.GET.get("do_cache", False) or response_kwargs.get("do_cache", False)) and response_class == HttpResponse:
                 request.session["projects_list_cache"] = serialized
         if response_class in [http.HttpCreated, http.HttpAccepted]:
             if "projects_list_cache" in request.session:
