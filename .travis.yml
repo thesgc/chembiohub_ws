@@ -7,6 +7,7 @@ before_install:
 
 install:
 
+- sh scripts/install_ubuntu_dependencies.sh
 - bash install_ubuntu.md
 # The next couple lines fix a crash with multiprocessing on Travis and are not specific to using Miniconda
 - sudo rm -rf /dev/shm
