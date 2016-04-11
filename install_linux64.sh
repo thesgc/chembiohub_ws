@@ -79,7 +79,7 @@ if [ "$USER" != "travis" ]
  then
 
 
-    RANDOM_PORT=$(python generate_port.py)
+    RANDOM_PORT=$(python deployment/generate_port.py)
 
 
     SUPERVISOR="[program:${ENV_NAME}_uwsgi]
