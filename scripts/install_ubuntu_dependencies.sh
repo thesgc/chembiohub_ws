@@ -9,6 +9,10 @@ sudo apt-get update
 sudo apt-get install -y redis-server  ruby gem ruby-dev unzip fabric git apache2 libapache2-mod-proxy-html  libxml2-dev supervisor nodejs npm tcl8.5 software-properties-common python-software-properties nodejs-legacy
 sudo update-rc.d redis-server defaults
 sudo service redis-server start
-sudo a2enmod proxy proxy_http headers expires rewrite
-sudo gem install compass
-sudo npm install -g bower grunt-cli coffee-script
+
+if [ "$USER" != "travis" ]
+    then
+    sudo a2enmod proxy proxy_http headers expires rewrite
+    sudo gem install compass
+    sudo npm install -g bower grunt-cli coffee-script
+fi
