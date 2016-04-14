@@ -1,4 +1,7 @@
-
+"""
+deprecated soon - the original elasticsearch client for compound batches, now only used for the indexing of
+new data in a temporary index
+"""
 from django.conf import settings
 import elasticsearch
 import json
@@ -11,6 +14,7 @@ ES_MAIN_INDEX_NAME = "chemreg_chemical_index"
 
 
 def get_temp_index_name(request, multi_batch_id):
+    """Generate an index name for a particular multiple batch"""
     index_name = "%s__temp_multi_batch__%s__%s" % (
         ES_PREFIX, request.session.session_key, str(multi_batch_id))
     return index_name
@@ -19,15 +23,21 @@ def get_temp_index_name(request, multi_batch_id):
 
 
 def get_main_index_name():
+    """Generate the main index name for elasticsearch"""
     return "%s__%s" % (ES_PREFIX, ES_MAIN_INDEX_NAME)
 
 
 def delete_index(index_name):
+    """Delete an index permanently by name"""
     es = elasticsearch.Elasticsearch()
     return es.indices.delete(index_name,  ignore=[400, 404])
 
 
 def get_action_totals(index_name,  bundledata):
+    """
+    Use elasticsearch aggregations to find the stats required for the preview 
+    UI when uploading a set of compounds or inventory items
+    """
     es_request_body = {
         "size": 0,
         "query": {"match_all": {}},
@@ -50,6 +60,7 @@ def get_action_totals(index_name,  bundledata):
 
 
 def get(index_name, es_request_body, bundledata):
+    """Perform a search request against the elasticsearch index specified"""
     es = elasticsearch.Elasticsearch()
     result = es.search(index_name, body=es_request_body)
     data = []
@@ -65,6 +76,9 @@ def get(index_name, es_request_body, bundledata):
     return bundledata
 
 def get_project_uri_terms(project_id_list):
+    """Because of the way that we indexed the data in ChemiReg V1 the project is represented as a URI
+    but the actual search requests and the permissions requests tended to contain list oif ids
+    This function converts a list of ids into a list of resource uris"""
     project_terms = []
     for proj in project_id_list:
         project_name = '/%s/cbh_projects/%d' % (
@@ -77,6 +91,7 @@ def get_project_uri_terms(project_id_list):
 
 
 def get_custom_fields_query_from_string(cf_string):
+    """deperecated"""
     project_terms = []
     for keyvalue in json.loads(cf_string):
         
@@ -91,6 +106,7 @@ def get_custom_fields_query_from_string(cf_string):
 
 
 def get_cf_aggregation(search_term, field, single_field):
+    """Deperecated way of building an aggregation for a custom field"""
     search_regex = '.*%s.*|.*%s.*|.*%s.*|.*%s.*' % (
         search_term.title(), search_term, search_term.upper(), search_term.lower())
     field_to_search = '%s.raw' % (field)
@@ -126,6 +142,7 @@ def get_cf_aggregation(search_term, field, single_field):
 
 
 def get_autocomplete(projects, search_term, field, custom_fields=None, single_field=None):
+    """deprecated autocomplete method"""
     project_terms = get_project_uri_terms(projects)
     es = elasticsearch.Elasticsearch()
     
@@ -197,6 +214,7 @@ def get_autocomplete(projects, search_term, field, custom_fields=None, single_fi
 
 
 def create_temporary_index(batches, request, index_name):
+    """Index data in the old format, now mostly deprecated except for the file upload preview"""
     es = elasticsearch.Elasticsearch()
     t = time.time()
     store_type = "niofs"
@@ -312,6 +330,7 @@ def get_project_index_name(project):
 
 
 def reindex_compound(dataset, id):
+    """Reindex an item now deprecated"""
     # reindex the specified compound in the specified index
     index_name = get_main_index_name()
     es = elasticsearch.Elasticsearch()
