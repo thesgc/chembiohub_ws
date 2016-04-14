@@ -1,3 +1,9 @@
+"""
+Caching is not currently used
+as invalidation did not work for this class
+ possibly deprecated
+"""
+
 from django.core.cache import cache
 from django.http import HttpResponse
 from django.conf import settings
