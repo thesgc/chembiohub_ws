@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
-
+"""This module provides extra serializers to convert data into SDF or XLSX from the new search api
+unfinished refactoring"""
 from StringIO import StringIO
 
 from tastypie.serializers import Serializer
@@ -26,21 +27,17 @@ SDF_TEMPLATE = u">  <{name}>\n{value}\n\n"
 
 
 
-def write_excel_headers(schema, worksheet):
-    for column_no, field in enumerate(schema):
-        worksheet.write(0, column_no, field["knownBy"])
-    
 
 
 def get_column( schema,documents):
+    """Pull out the JSON pointer's value from the JSON doc"""
     slashed_json_pointer = "/%s" % schema["data"].replace(".", "/")
-    
-
     return [unicode(resolve_pointer(document,slashed_json_pointer, default=''))
             for  document in documents]
         
 
 def fix_column_types(df, schema):
+    """Convert the columns in the dataframe to numerical types if appropriate"""
     for field in schema:
         if field.get("field_type", None) == "number":
             df[field["knownBy"]] = df[field["knownBy"]].astype(float)
@@ -50,6 +47,7 @@ def fix_column_types(df, schema):
         #     df[field["knownBy"]] = pd.to_datetime(df[field["knownBy"]], coerce=True)
 
 def add_images_or_other_objects(col, column_schema, worksheet, objects, format, writer):
+    """Generate and save images against a given column in the worksheet"""
     if column_schema.get("field_type", None) == "b64png":
         coldata = get_column(column_schema, objects)
         files = []
@@ -73,6 +71,7 @@ def add_images_or_other_objects(col, column_schema, worksheet, objects, format, 
 
 
 class CBHCompoundBatchSerializer( Serializer):
+    """Main serializer for CBHCompoundBatches, providing functions to output data as SDF or XLSX"""
     formats = ['json', 'jsonp', 'xml', 'yaml', 'html', 'csv', 'xlsx', 'sdf']
     content_types = {'json': 'application/json',
                      'jsonp': 'text/javascript',
@@ -87,7 +86,7 @@ class CBHCompoundBatchSerializer( Serializer):
 
 
     def to_xlsx(self, data, options=None):
-        '''write excel file here'''
+        '''write excel file from the project by project data produced by the CBHCompoundbatchResource'''
         output = StringIO()
 
         project_records = self.to_simple(data, {})
@@ -187,7 +186,7 @@ class CBHCompoundBatchSerializer( Serializer):
 
 
     def to_sdf(self, data, options=None):
-        '''Convert to SDF'''
+        '''Unfinished SDF converter'''
         data = self.to_simple(data, {})
         try:
             if data.get("traceback", False):
