@@ -876,18 +876,24 @@ class ProjectPermissionResource(ModelResource):
 
 
 class Login( CSRFExemptMixin, FormView):
+    """
+    Login FormView using the standard locations for login templates in django
+    """
     form_class = AuthenticationForm
     template_name = "cbh_chem_api/login.html"
     logout = None
 
     def get(self, request, *args, **kwargs):
-
+        """
+        Ensure that the webauth is setup if required 
+        Set the CSRF cookie
+        """
         from django.middleware.csrf import get_token
         csrf_token = get_token(request)
         context = self.get_context_data(
             form=self.get_form(self.get_form_class()))
         redirect_to = settings.LOGIN_REDIRECT_URL
-        '''Borrowed from django base detail view'''
+
         if "django_webauth" in settings.INSTALLED_APPS:
             context["webauth_login"] = True
             username = request.META.get('REMOTE_USER', None)
@@ -926,6 +932,7 @@ class Login( CSRFExemptMixin, FormView):
 
 
     def form_valid(self, form):
+        """Remove test cookies as required"""
         redirect_to = settings.LOGIN_REDIRECT_URL
 
         auth_login(self.request, form.get_user())
@@ -935,15 +942,13 @@ class Login( CSRFExemptMixin, FormView):
         return HttpResponseRedirect(redirect_to)
 
     def form_invalid(self, form):
+        """Send the form back again if invalid with errors"""
         return self.render_to_response(self.get_context_data(form=form))
 
-    # def dispatch(self, request, *args, **kwargs):
-    #     request.session.set_test_cookie()
-    #     return super(Login, self).dispatch(request, *args, **kwargs)
 
 
 class Logout(View):
-
+    """Standard logout view to just redirect to the login page"""
     def get(self, request, *args, **kwargs):
         auth_logout(request)
         return HttpResponseRedirect(settings.LOGOUT_REDIRECT_URL)
@@ -965,26 +970,24 @@ def build_content_type(format, encoding='utf-8'):
 
 class SkinningResource(ModelResource):
 
-    '''URL resourcing for pulling out sitewide skinning config '''
-    tabular_data_schema = fields.DictField(default={})
-    query_schemaform = fields.DictField()
-    chem_query_schemaform = fields.DictField()
-    sort_schemaform = fields.DictField()
-    hide_schemaform = fields.DictField()
+    '''URL resourcing for pulling out sitewide skinning config 
+    Including the schemat for use on the search page
+    '''
+    tabular_data_schema = fields.DictField(default={}, help_text="empty dictionary, filled on the client side with the tabular data information in order to render handsontable")
+    query_schemaform = fields.DictField(help_text="The angular schema form schema and form used to render the search forms in ChemBio Hub Platform")
+    chem_query_schemaform = fields.DictField(help_text="The chemical angular schema form for chemical search")
+    sort_schemaform = fields.DictField(help_text="The angular schema form json schema used for sorting fields")
+    hide_schemaform = fields.DictField(help_text="The angular schema form json schema used for hiding fields")
+    savedsearch_schemaform = fields.DictField(help_text="The angular schema form json schema used for the saved search feature")
+    filters_applied = fields.ListField(default=[], help_text="empty list which is filled on the front end with the filters currently active on the dataset")
+    sorts_applied = fields.ListField(default=[], help_text="empty list which is filled on the front end with the sorts currently active on the dataset")
+    hides_applied = fields.ListField(default=[], help_text="empty list which is filled on the front end with the hidden fields on the dataset")
 
-    savedsearch_schemaform = fields.DictField()
+    filters_objects = fields.ListField(default=[], help_text="empty list which is filled on the front end with the columns which are currently filtered")
+    sort_objects = fields.ListField(default=[], help_text="empty list which is filled on the front end with the columns which are currently sorted")
+    hide_objects = fields.ListField(default=[],  help_text="empty list which is filled on the front end with the columns which are currently hidden")
+    field_type_choices = fields.ListField(default=[],  help_text="List of the fields types which the user must pick from when creating a project")
 
-    filters_applied = fields.ListField(default=[])
-    sorts_applied = fields.ListField(default=[])
-    hides_applied = fields.ListField(default=[])
-
-    filters_objects = fields.ListField(default=[])
-    sort_objects = fields.ListField(default=[])
-    hide_objects = fields.ListField(default=[])
-
-    field_type_choices = fields.ListField(default=[])
-
-    
     class Meta:
         always_return_data = True
         queryset = SkinningConfig.objects.all()
@@ -997,21 +1000,28 @@ class SkinningResource(ModelResource):
 
 
     def dehydrate_savedsearch_schemaform(self, bundle):
+        """Pull out the angular schema form json schema which is used when saving a search from the settings"""
         return settings.SAVED_SEARCH_SCHEMAFORM
 
     def dehydrate_query_schemaform(self, bundle):
+        """Pull out the search form angular schema form json schema from the settings"""
         return settings.CBH_QUERY_SCHEMAFORM
 
     def dehydrate_hide_schemaform(self, bundle):
+        """Pull out the angular schema form json schema from the settings which is used to hide a field"""
         return settings.CBH_HIDE_SCHEMAFORM
 
     def dehydrate_sort_schemaform(self, bundle):
+        """Pull out the angular schema form json schema from the settings which is used to sort a field"""
         return settings.CBH_SORT_SCHEMAFORM
 
     def dehydrate_chem_query_schemaform(self, bundle):
+        """Pull out the angular schema form json schema from the settings which is used to run chemical search"""
         return settings.CBH_CHEMICAL_QUERY_SCHEMAFORM
 
     def dehydrate_field_type_choices(self, bundle):
+        """Pull out the field type choices from the models file which are used when adding a project
+        todo consider moving project schemaform to the back end"""
         return [{"name": value["name"], "value": key} for key, value in PinnedCustomField.FIELD_TYPE_CHOICES.items()]
 
 
@@ -1036,6 +1046,9 @@ class TemplateProjectFieldResource(ModelResource):
 
 
 def get_field_list(project_type_bundle):
+    """Given a project type object bundle return a project template 
+    The project template is then used in the project adding form when the user clicks on that project type.
+    The default project template is a single empty text field"""
     if project_type_bundle.obj.saved_search_project_type:
         return project_type_bundle.obj.SAVED_SEARCH_TEMPLATE
     elif project_type_bundle.obj.plate_map_project_type:
@@ -1048,6 +1061,7 @@ def get_field_list(project_type_bundle):
         return project_type_bundle.obj.DEFAULT_TEMPLATE
 
 def get_fields(bundle):
+    """May be a merge error need to lookj into this todo"""
     if bundle.obj.custom_field_config_template_id is None:
         return []
     return get_model("cbh_core_model","PinnedCustomField").objects.filter(custom_field_config_id=bundle.obj.custom_field_config_template_id)
