@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
+"""
+Admin views for ChemBio Hub Platform
+This file is likely deprecated as there is no loinger a need for a separate project admin for Chemireg
 
+"""
 from django.contrib import admin
 from cbh_core_model.models import Project
 
@@ -8,7 +12,7 @@ from django.contrib.admin import ModelAdmin
 from cbh_core_api.admin import CreatedByAdmin
 
 class ChemregProject(Project):
-
+    
     class Meta:
         proxy = True
 
