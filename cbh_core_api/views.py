@@ -1,3 +1,9 @@
+"""
+Standard Django views as opposed to API views
+The Login, Logout and Index  views should also be moved in here
+
+"""
+
 from django import http
 from django import forms
 from django.conf import settings
@@ -17,6 +23,9 @@ class FlowFileForm(forms.Form):
 
 class UploadView(View):
     def dispatch(self, request, *args, **kwargs):
+        """Standard function to send data to either post or get
+        sets instance variables to be used in the post function in order to save model
+        """
         # get flow variables
         self.flowChunkNumber = int(request.REQUEST.get('flowChunkNumber'))
         self.flowChunckSize = int(request.REQUEST.get('flowChunkSize'))
@@ -30,14 +39,13 @@ class UploadView(View):
 
         # identifier is a combination of session key and flow identifier
         # create a new identifier which uses the project ID also
-        print(request)
         self.identifier = ('%s-%s' % (request.session.session_key, self.flowIdentifier))[:255]
         return super(UploadView, self).dispatch(request, *args, **kwargs)
 
     def get(self, *args, **kwargs):
         """
         Flow.js test if chunk exist before upload it again.
-        Return 200 if exist.
+        Return 200 if object exists
         """
         get_object_or_404(FlowFileChunk, number=self.flowChunkNumber, parent__identifier=self.identifier)
         return http.HttpResponse(self.identifier)
@@ -73,7 +81,10 @@ class UploadView(View):
 
 #this is for requesting identifiers
 class CBHFlowFileResource(ModelResource):
-    #sheet_names = fields.ListField()
+    """
+    Model resource to retrieve 
+    """
+    download_uri = fields.CharField(default="", help_text="URI for download of this particular file from the CBHFlowFileDownloadResource")
 
     class Meta:
         detail_uri_name = 'identifier'
@@ -82,20 +93,12 @@ class CBHFlowFileResource(ModelResource):
         allowed_methods = ['get', ]
         resource_name = 'cbh_flowfiles'
         queryset = FlowFile.objects.all()
-        #filtering = {"identifier": ALL_WITH_RELATIONS}
         exclude = ['identifier']
 
-    # def dehydrate_sheet_names(self, bundle):
-    #     try:
-    #         if bundle.obj.extension == "xlsx":
-    #             sheetnames = get_sheetnames(bundle.obj.path)
-    #             return sheetnames
-    #         return []
-    #     except XLRDError:
-    #         raise BadRequest("Incorrect format or corrupt file")
+
     def alter_detail_data_to_serialize(self, request, data):
+        """Build the download URI from the resource URI and add it to the get detail JSON response"""
         sessionid = data.request.COOKIES.get(settings.SESSION_COOKIE_NAME, "None")
-        print data.data
         bits = data.data["resource_uri"].split("/")
         bits[3] = bits[3][len(sessionid) + 1:]
         data.data["resource_uri"] = "/".join(bits)
@@ -105,6 +108,7 @@ class CBHFlowFileResource(ModelResource):
         return data
 
     def get_list(self, *args, **kwargs):
+        """Remove the security risk of a get list request as not needed"""
         raise NotImplemented
 
     def obj_get(self, bundle, **applicable_filters):
@@ -112,15 +116,18 @@ class CBHFlowFileResource(ModelResource):
         An ORM-specific implementation of ``apply_filters``.
         The default simply applies the ``applicable_filters`` as ``**kwargs``,
         but should make it possible to do more advanced things.
+        Here we take the identifier from the front end and 
+        combine with the user's session id to pull out the original object in a secure way
         """
         if applicable_filters.get("identifier", None):
-            print("applicable filters not none")
             applicable_filters["identifier"] = "%s-%s" % (
                 bundle.request.COOKIES.get(settings.SESSION_COOKIE_NAME, "None"), applicable_filters["identifier"])
         return super(CBHFlowFileResource, self).obj_get(bundle, **applicable_filters)
 
 #this is used to make the download request
 class CBHFlowFileDownloadResource(ModelResource):
+    """Resource to allow download of a particular file no matter what the 
+    original session id it was uploaded under """
 
     class Meta:
         always_return_data = True  # required to add the elasticsearch data
@@ -141,6 +148,7 @@ class CBHFlowFileDownloadResource(ModelResource):
         Calls ``cached_obj_get/obj_get`` to provide the data, then handles that result
         set and serializes it.
         Should return a HttpResponse (200 OK).
+        Guess the mimetype of the file and return it as an attachment object
         """
         basic_bundle = self.build_bundle(request=request)
 
@@ -155,7 +163,6 @@ class CBHFlowFileDownloadResource(ModelResource):
         #match this to a dictionary of mimetypes with extensions
         fb = obj.file.read()
         mimetype = mimetypes.guess_type(obj.full_path)[0]
-        print(obj.original_filename)
         #if mimetype.index('spreadsheetml') > 0:
         
         response = http.HttpResponse(fb, content_type=mimetypes.guess_type(obj.full_path)[0])
