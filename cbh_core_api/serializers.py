@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-
+"""
+Serializer functions required to export a list of fields for a project
+"""
 import cStringIO
 
 from tastypie.serializers import Serializer
@@ -12,16 +14,18 @@ import json
 from django.conf import settings
 
 def get_field_name_from_key(key):
+    """probably deprecated"""
     return key.replace(u"__space__", u" ")
 
 
 def get_key_from_field_name(name):
+    """probably deprecated"""
     return name.replace(u" ", u"__space__")
 
 
 class CustomFieldXLSSerializer(Serializer):
 
-    ''' COde for preparing an Excel summary of the custom fields for the given project '''
+    ''' Code for preparing an Excel summary of the custom fields for the given project '''
     formats = ['json', 'jsonp', 'xlsx']
     content_types = {'json': 'application/json',
                      'jsonp': 'text/javascript',
@@ -31,7 +35,12 @@ class CustomFieldXLSSerializer(Serializer):
 
 
     def to_xlsx(self, data, options=None):
+        """Translate a project's fields into xlsx"""
+
         try:
+            #Annoying way in which errors during serialization then cause tastypie to
+            #try to serialize the error response as XLSX which obviously doesn't work so
+            #We catch any response with a traceback in it and ensure it gets send straight to the front end
             if data.data.get("traceback", False):
                 raise ImmediateHttpResponse(BadRequest(json.dumps(data.data)))
         except AttributeError:
