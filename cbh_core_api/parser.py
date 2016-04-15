@@ -1,4 +1,4 @@
-
+"""Generic functions for processing SDF and XLSX files"""
 from pandas import ExcelFile
 import xlrd
 from copy import copy
@@ -21,6 +21,7 @@ def get_widths(df):
 
 
 def is_true(item):
+    """probably deprecated"""
     if str(item).lower() in ["y", "true", "yes"]:
         return True
     else:

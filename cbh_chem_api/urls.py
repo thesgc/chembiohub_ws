@@ -1,4 +1,4 @@
-
+"""Main url conf for the ChemBio Hub Platform app which is imported by the deployment urls.py"""
 from django.conf.urls import patterns, url, include
 from cbh_core_api.resources import Login, Logout
 from django.conf import settings

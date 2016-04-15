@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-
+"""Admin classes for ChemBio Hub Platofrm"""
 from django.contrib import admin
 from cbh_core_model.models import Project, PinnedCustomField, CustomFieldConfig, SkinningConfig, ProjectType, DataFormConfig
 
@@ -14,6 +14,7 @@ from solo.admin import SingletonModelAdmin
 from django import forms
 
 class CreatedByAdmin(object):
+    """Meta class to ensure that the created by field is filled in for objects created with the django admin"""
     def save_model(self, request, obj, form, change):
         if not obj.id:
             obj.created_by = request.user
@@ -37,6 +38,7 @@ class GrappelliSortableHiddenMixin(object):
 
 
 class DataFormConfigAdmin(CreatedByAdmin, ModelAdmin):
+    "deprecated"
     exclude = ["created_by", "parent"]
 
     def save_model(self, request, obj, form, change):
@@ -45,6 +47,7 @@ class DataFormConfigAdmin(CreatedByAdmin, ModelAdmin):
 
 
 class PinnedCustomFieldAdmin(ModelAdmin):
+    """Admin to edit individual PCF objects, now deprecated"""
     list_display = ["name",
                     "description",
                     "field_type",
@@ -63,6 +66,7 @@ class PinnedCustomFieldAdmin(ModelAdmin):
 
 
 class PinnedCustomFieldInlineForm(forms.ModelForm):
+    """Inline form for pinned custom fields"""
     standardised_alias = forms.ModelChoiceField(required=False, queryset=PinnedCustomField.objects.exclude(
         pinned_for_datatype=None).order_by("field_key"), empty_label="Not Mapped")
 
@@ -74,6 +78,7 @@ class PinnedCustomFieldInlineForm(forms.ModelForm):
 
 # GrappelliSortableHiddenMixin
 class PinnedCustomFieldInline(GrappelliSortableHiddenMixin, admin.TabularInline, ):
+    """Inline admin for pinned custom fields which adds the poisition"""
     model = PinnedCustomField
     exclude = ["field_key", "pinned_for_datatype",
                "attachment_field_mapped_to"]
@@ -97,7 +102,7 @@ class PinnedCustomFieldInline(GrappelliSortableHiddenMixin, admin.TabularInline,
 
 
 class CustomFieldConfigAdmin(ModelAdmin):
-
+    """Admin for custom field config objects"""
     exclude = ["created_by", ]
 
     search_fields = ('name',)
@@ -106,6 +111,7 @@ class CustomFieldConfigAdmin(ModelAdmin):
     inlines = [PinnedCustomFieldInline, ]
 
     def get_readonly_fields(self, request, obj=None):
+        """schemaform made to be read-only - this field is now deprecated"""
         if obj:  # editing an existing object
             return self.readonly_fields + ('schemaform',)
         return self.readonly_fields
@@ -121,10 +127,12 @@ class CustomFieldConfigAdmin(ModelAdmin):
 
 
 class ProjectTypeAdmin(ModelAdmin):
+    """Admin for project type objects"""
     list_display = ('name', 'show_compounds')
 
 
 class ProjectAdmin(CreatedByAdmin, ModelAdmin):
+    """Project admin site"""
     prepopulated_fields = {"project_key": ("name",)}
     list_display = ('name', 'project_key', 'created', 'project_type')
     search_fields = ('name',)
@@ -145,10 +153,12 @@ from cbh_core_model.models import CBHFlowFile as FlowFile, CBHFlowFileChunk as F
 
 
 class FlowFileChunkInline(admin.TabularInline):
+    
     model = FlowFileChunk
 
 
 class FlowFileAdmin(admin.ModelAdmin):
+    """FlowFile admin so that files can be deleted"""
     list_display = ['identifier', 'state', 'total_size', 'total_chunks', 'total_chunks_uploaded']
     list_filter = ['state']
     inlines = [FlowFileChunkInline]

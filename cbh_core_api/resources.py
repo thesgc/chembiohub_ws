@@ -1,3 +1,8 @@
+"""
+Main interface for requesting the project JSON data from ChemBio Hub Platform
+Also shcema and configuration APIs
+"""
+
 import logging
 
 # Get an instance of a logger
@@ -121,6 +126,8 @@ def build_content_type(format, encoding='utf-8'):
 
 
 class UserHydrate(object):
+    """Abstract class to make sure each 
+    resource object can hydrate the user object against it"""
     def hydrate_created_by(self, bundle):
         User = get_user_model()
 
@@ -138,14 +145,14 @@ class ChemRegDataPointProjectFieldResource(ModelResource):
     """Provides the schema information about a field that is required by front end apps"""
 
     edit_form = fields.DictField(
-        null=True, blank=False,  help_text=None)
+        null=True, blank=False,  help_text="an angular schema form element that can be used to edit this field ")
     edit_schema = fields.DictField(
-        null=True, blank=False,  help_text=None)
+        null=True, blank=False,   help_text="an angular schema form schema that can be used to edit this field ")
     view_form = fields.DictField(
-        null=True, blank=False, help_text=None
+        null=True, blank=False, help_text="possibly deprecated or never used
         )
     handsontable = fields.DictField(
-        null=True, blank=False, help_text=None
+        null=True, blank=False, help_text="A JSON object which is combined with the other fields on the system to make a handsontable columns object"
         )
     
 
@@ -164,48 +171,24 @@ class ChemRegDataPointProjectFieldResource(ModelResource):
 Provides information about the data types present in the flexible schema of the datapoint table
 For each field a set of attributes are returned:
 
-hide_form/schema - an angular schema form element that can be used to hide this column from view
 edit_form /schema - an angular schema form element that can be used to edit this field 
 
-assuming it is edited as part of a larger data form classification object
-- To change the key of the json schema then change the get_namespace method
 
-filter_form/schema - an angular schema form element that can be used to hide this filter this field
 
-exclude_form /schema an angular schema form element that can be used to hide this exclude values from this field
-
-sort_form /schema an angular schema form element that can be used to hide this exclude values from this field
-
-Things still to be implemented:
-
-actions form - would be used for mapping functions etc
-autocomplete urls
         ''',
 
                        'api_dispatch_list' : '''
 Provides information about the data types present in the flexible schema of the datapoint table
 For each field a set of attributes are returned:
 
-hide_form/schema - an angular schema form element that can be used to hide this column from view
 edit_form /schema - an angular schema form element that can be used to edit this field 
 
-assuming it is edited as part of a larger data form classification object
-- To change the key of the json schema then change the get_namespace method
 
-filter_form/schema - an angular schema form element that can be used to hide this filter this field
-
-exclude_form /schema an angular schema form element that can be used to hide this exclude values from this field
-
-sort_form /schema an angular schema form element that can be used to hide this exclude values from this field
-
-Things still to be implemented:
-
-actions form - would be used for mapping functions etc
-autocomplete urls
         '''
          }
 
     def dehydrate_handsontable(self, bundle):
+        """Generate the JSON object required by the handontable API"""
         return {
             "data" : "custom_fields.%s" % bundle.obj.name,
             "knownBy" : bundle.obj.name,
@@ -229,6 +212,9 @@ autocomplete urls
 
 
     def save(self, bundle, skip_errors=False):
+        """
+        Cannot remember why the save function is "re implemented" here
+        """
         if bundle.via_uri:
             return bundle
 
@@ -237,11 +223,6 @@ autocomplete urls
         if bundle.errors and not skip_errors:
             raise ImmediateHttpResponse(response=self.error_response(bundle.request, bundle.errors))
 
-        # Check if they're authorized.
-        # if bundle.obj.pk:
-        #     self.authorized_update_detail(self.get_object_list(bundle.request), bundle)
-        # else:
-        #     self.authorized_create_detail(self.get_object_list(bundle.request), bundle)
 
         # Save FKs just in case.
         self.save_related(bundle)
@@ -265,27 +246,26 @@ autocomplete urls
         to HTTP GET.
         Should return a HttpResponse (200 OK).
         """
-        # self.method_check(request, allowed=['get'])
-        # self.is_authenticated(request)
-        # self.throttle_check(request)
-        # self.log_throttled_access(request)
-        # bundle = self.build_bundle(request=request)
-        # self.authorized_read_detail(self.get_object_list(bundle.request), bundle)
+
         return self.create_response(request, self.build_schema())
 
     def get_namespace(self, bundle):
         '''
+        deprecated
             Hook to return the dotted path to this field based on the level and the name of the field
             The level name is formatted in the dehydrate method of the DataFormConfigResource
         '''
         return "{level}.project_data.%s" % (bundle.obj.get_space_replaced_name)
 
     def get_namespace_for_action_key(self, bundle, action_type):
+        """deprecated"""
         return action_type
 
 
     def dehydrate_edit_form(self, bundle):
-        '''  Slightly different implementation of this        '''
+        ''' Return the part of the edit form related to this field -
+        The edit forms will be combined on the front end see 
+        https://github.com/thesgc/ng-chem/blob/master/app/scripts/config.js'''
         if bundle.request.GET.get("empty", False):
             return {}
         data = bundle.obj.field_values[1]
@@ -294,13 +274,15 @@ autocomplete urls
         return {"form": [data]}
 
     def dehydrate_edit_schema(self, bundle):
-        '''          '''
+        ''' Return the part of the edit schema related to this field -
+        The edit schemas will be combined on the front end see 
+        https://github.com/thesgc/ng-chem/blob/master/app/scripts/config.js'''
         if bundle.request.GET.get("empty", False):
             return {}
         return {"properties": {bundle.obj.name: bundle.obj.field_values[0]}}
 
     def dehydrate_view_form(self, bundle):
-        '''          '''
+        '''possibly deprecated  '''
         if bundle.request.GET.get("empty", False):
             return {}
         data = bundle.obj.field_values[2]
@@ -330,11 +312,11 @@ class ChemRegCustomFieldConfigResource(UserHydrate, ModelResource):
 
     '''Return only the project type and custom field config name as returning the full field list would be '''
     data_type = fields.ForeignKey("cbh_core_api.resources.DataTypeResource",
-                                  'data_type',  null=True, blank=False, default=None, full=True)
+                                  'data_type',  null=True, blank=False, default=None, full=True, help_text="deprecate (assyreg data type)" )
     project_data_fields = fields.ToManyField(ChemRegDataPointProjectFieldResource, 
-        attribute="pinned_custom_field",null=True, blank=False, default=None, full=True)
+        attribute="pinned_custom_field",null=True, blank=False, default=None, full=True, help_text="List of the fields related to this cusotm field config, to be combined together to produce an edit schema")
     created_by = fields.ForeignKey(
-        "cbh_core_api.resources.UserResource", 'created_by')
+        "cbh_core_api.resources.UserResource", 'created_by', help_text="The user who added this object")
 
     class Meta:
         object_class = CustomFieldConfig
@@ -351,25 +333,11 @@ class ChemRegCustomFieldConfigResource(UserHydrate, ModelResource):
         filtering = {"id": ALL}
         allowed_methods = ['get', 'post', 'put', 'patch']
         description = {'api_dispatch_detail' : '''
-Provides data about a single level of a data form config
-
-data_type: A string to describe what "sort" of data this is (fields will generally be the same as other objects of this data type but that is up to the curator)
-project_data_fields:
-The fields that are in this particular custom field config:
-    Provides information about the data types present in the flexible schema of the datapoint table
-
-
 
         ''',
 
                        'api_dispatch_list' : '''
-Provides data about a single level of a data form config
 
-data_type: A string to describe what "sort" of data this is (fields will generally be the same as other objects of this data type but that is up to the curator)
-project_data_fields:
-The fields that are in this particular custom field config:
-    Provides information about the data types present in the flexible schema of the datapoint table
- 
         '''
                        }
 
@@ -414,15 +382,15 @@ The fields that are in this particular custom field config:
 class ChemregProjectResource(UserHydrate, ModelResource):
 
     project_type = fields.ForeignKey(
-        "cbh_core_api.resources.ProjectTypeResource", 'project_type', blank=False, null=False, full=True)
+        "cbh_core_api.resources.ProjectTypeResource", 'project_type', help_text="", blank=False, null=False, full=True, help_text="A tag for the type of data this project stores")
     custom_field_config = fields.ForeignKey(ChemRegCustomFieldConfigResource,
-                                            'custom_field_config', blank=False, null=False, full=True)
+                                            'custom_field_config', blank=False, null=False, full=True, help_text="The single custom field config object attached to this project")
     valid_cache_get_keys = ['format', 'limit', 'project_key',
                             'schemaform']
-    assays_configured = fields.BooleanField(default=False)
+    assays_configured = fields.BooleanField(default=False, help_text="deprecated")
     created_by = fields.ForeignKey(
-        "cbh_core_api.resources.UserResource", 'created_by')
-    users_restricted_fields = fields.ListField(default=[])
+        "cbh_core_api.resources.UserResource", 'created_by', help_text="The user who created this Project")
+    users_restricted_fields = fields.ListField(default=[], help_text="Possibly deprecated, was meant to list the restricted fields")
 
     class Meta:
 
@@ -445,9 +413,11 @@ class ChemregProjectResource(UserHydrate, ModelResource):
 
 
     def dehydrate_assays_configured(self, bundle):
+        """deprecated"""
         return bundle.obj.enabled_forms.count() > 0
 
     def save_related(self, bundle):
+        """Ensure that when saving the custom field config, any integrity errors from repeated names are passed up"""
         from django.db import IntegrityError
         try:
             return super(ChemregProjectResource, self).save_related(bundle)
@@ -456,6 +426,10 @@ class ChemregProjectResource(UserHydrate, ModelResource):
 
 
     def get_list(self, request, **kwargs):
+        """
+        Request the list response and if asked to, use the cache
+        Cache is invalidated each time a project anywhere on the system is updated by a signal in cbh_core_model
+        """
         serialized = request.session.get("projects_list_cache", None)
         if serialized and (request.GET.get("do_cache", False) or kwargs.get("do_cache", False)):
             desired_format = self.determine_format(request)
@@ -466,6 +440,8 @@ class ChemregProjectResource(UserHydrate, ModelResource):
         
 
     def post_list(self, request, **kwargs):
+        """Ensure that when saving the project, any integrity errors from repeated names are passed up as a 409 conflict"""
+
         from django.db import IntegrityError
         try:
             return super(ChemregProjectResource, self).post_list(request, **kwargs)
@@ -474,6 +450,8 @@ class ChemregProjectResource(UserHydrate, ModelResource):
 
 
     def patch_detail(self, request, **kwargs):
+        """Ensure that when saving the project, any integrity errors from repeated names are passed up as a 409 conflict"""
+
         from django.db import IntegrityError
         try:
             return super(ChemregProjectResource, self).patch_detail(request, **kwargs)
@@ -483,6 +461,8 @@ class ChemregProjectResource(UserHydrate, ModelResource):
 
 
     def patch_list(self, request, **kwargs):
+        """Ensure that when saving the project, any integrity errors from repeated names are passed up as a 409 conflict"""
+
         from django.db import IntegrityError
         try:
             return super(ChemregProjectResource, self).patch_list(request, **kwargs)
@@ -493,6 +473,7 @@ class ChemregProjectResource(UserHydrate, ModelResource):
 
 
     def get_object_list(self, request):
+        """Sort the projects by modified date descending by default"""
         return super(ChemregProjectResource,
                      self).get_object_list(request).prefetch_related(Prefetch('project_type'
                                                                               )).order_by('-modified')
@@ -547,8 +528,6 @@ class ChemregProjectResource(UserHydrate, ModelResource):
                 del bund.data["handsontable"]
                 #del bund.data["users_restricted_fields"]
 
-
-
         bundle["tabular_data_schema"] = {}
         bundle["tabular_data_schema"]["included_in_tables"] = {}
         for key, value in settings.TABULAR_DATA_SETTINGS.items():
@@ -561,6 +540,10 @@ class ChemregProjectResource(UserHydrate, ModelResource):
 
 
     def alter_detail_data_to_serialize(self, request, bundle):
+        """
+        Currently does not do all the things done by alter list data and perhaps better not to
+        as this function is used to update a project 
+        """
         userres = UserResource()
         userbundle = userres.build_bundle(obj=request.user,
                                           request=request)
@@ -584,6 +567,7 @@ class ChemregProjectResource(UserHydrate, ModelResource):
         """
         Extracts the common "which-format/serialize/return-response" cycle.
         Mostly a useful shortcut/hook.
+        Ensures that the cache is invalidated and re saved as appropriate
         """
 
         desired_format = self.determine_format(request)
@@ -609,6 +593,9 @@ class ChemregProjectResource(UserHydrate, ModelResource):
 
 
 class NoCustomFieldsChemregProjectResource(ChemregProjectResource):
+    """A class for use in related resources in cases where 
+    we do not want to save all or retrieve all of the custom fields such as when 
+    indexing the CBHCompoundBatch objects"""
     custom_field_config = fields.ForeignKey(ChemRegCustomFieldConfigResource,
                                             'custom_field_config', blank=False, null=False)
     class Meta(ChemregProjectResource.Meta):
@@ -620,6 +607,7 @@ class NoCustomFieldsChemregProjectResource(ChemregProjectResource):
 class CBHNoSerializedDictField(fields.ApiField):
     """
     A dictionary field.
+    Convert is no longer needed, we cast the data into the elasticsearch format elsewhere
     """
     dehydrated_type = 'dict'
     help_text = "A dictionary of data. Ex: {'price': 26.73, 'name': 'Daniel'}"
@@ -647,15 +635,19 @@ class CBHNoSerializedDictField(fields.ApiField):
 
 
 class CSRFExemptMixin(object):
+    """CSRF exception to ensure that the user can press the back button after logging in
+    and get the expected result"""
     @method_decorator(csrf_exempt)
     def dispatch(self, *args, **kwargs):
         return super(CSRFExemptMixin, self).dispatch(*args, **kwargs)
 
 def get_field_name_from_key(key):
+    """Possibly deprecated function to get a new field name when indexing data"""
     return key.replace(u"__space__", u" ")
 
 
 def get_key_from_field_name(name):
+    """Possibly deprecated function to get a new field name when indexing data"""
     return name.replace(u" ", u"__space__")
 
 
@@ -674,7 +666,7 @@ class SimpleResourceURIField(fields.ApiField):
 
     def __init__(self, to, attribute, full=False, related_name=None, default=fields.NOT_PROVIDED, null=False, blank=False, readonly=False,  unique=False, help_text=None, use_in='all'):
         """
-
+        Init method very similar to a realtedresource in tastypie
         """
         super(SimpleResourceURIField, self).__init__(attribute=attribute, default=default, null=null, blank=blank,
                                                      readonly=readonly, unique=unique, help_text=help_text, use_in=use_in)
@@ -692,6 +684,9 @@ class SimpleResourceURIField(fields.ApiField):
 
 
     def contribute_to_class(self, cls, name):
+        """
+     method very similar to a realtedresource in tastypie
+        """
         super(SimpleResourceURIField, self).contribute_to_class(cls, name)
 
         # Check if we're self-referential and hook it up.
@@ -763,6 +758,9 @@ class SimpleResourceURIField(fields.ApiField):
         
     @property
     def to_class(self):
+        """
+         method very similar to a realtedresource in tastypie
+        """
         # We need to be lazy here, because when the metaclass constructs the
         # Resources, other classes may not exist yet.
         # That said, memoize this so we never have to relookup/reimport.
@@ -798,10 +796,15 @@ class SimpleResourceURIField(fields.ApiField):
 
 
 class Index(TemplateView):
+    """
+    Serves the static template from the angularjs folder (the dist folder is the location that grunt build puts the production artifact
+    We then copy this dist folder across with collectstatic by declaring it in the list of static folders
+    """
 
     template_name = 'dist/index.html'  # or define get_template_names()
 
     def get(self, request, *args, **kwargs):
+        """Ensure that the csrf token is always set in the cookie when rendering"""
         context = self.get_context_data(**kwargs)
         from django.middleware.csrf import get_token
         csrf_token = get_token(request)
@@ -873,18 +876,24 @@ class ProjectPermissionResource(ModelResource):
 
 
 class Login( CSRFExemptMixin, FormView):
+    """
+    Login FormView using the standard locations for login templates in django
+    """
     form_class = AuthenticationForm
     template_name = "cbh_chem_api/login.html"
     logout = None
 
     def get(self, request, *args, **kwargs):
-
+        """
+        Ensure that the webauth is setup if required 
+        Set the CSRF cookie
+        """
         from django.middleware.csrf import get_token
         csrf_token = get_token(request)
         context = self.get_context_data(
             form=self.get_form(self.get_form_class()))
         redirect_to = settings.LOGIN_REDIRECT_URL
-        '''Borrowed from django base detail view'''
+
         if "django_webauth" in settings.INSTALLED_APPS:
             context["webauth_login"] = True
             username = request.META.get('REMOTE_USER', None)
@@ -923,6 +932,7 @@ class Login( CSRFExemptMixin, FormView):
 
 
     def form_valid(self, form):
+        """Remove test cookies as required"""
         redirect_to = settings.LOGIN_REDIRECT_URL
 
         auth_login(self.request, form.get_user())
@@ -932,15 +942,13 @@ class Login( CSRFExemptMixin, FormView):
         return HttpResponseRedirect(redirect_to)
 
     def form_invalid(self, form):
+        """Send the form back again if invalid with errors"""
         return self.render_to_response(self.get_context_data(form=form))
 
-    # def dispatch(self, request, *args, **kwargs):
-    #     request.session.set_test_cookie()
-    #     return super(Login, self).dispatch(request, *args, **kwargs)
 
 
 class Logout(View):
-
+    """Standard logout view to just redirect to the login page"""
     def get(self, request, *args, **kwargs):
         auth_logout(request)
         return HttpResponseRedirect(settings.LOGOUT_REDIRECT_URL)
@@ -962,26 +970,24 @@ def build_content_type(format, encoding='utf-8'):
 
 class SkinningResource(ModelResource):
 
-    '''URL resourcing for pulling out sitewide skinning config '''
-    tabular_data_schema = fields.DictField(default={})
-    query_schemaform = fields.DictField()
-    chem_query_schemaform = fields.DictField()
-    sort_schemaform = fields.DictField()
-    hide_schemaform = fields.DictField()
+    '''URL resourcing for pulling out sitewide skinning config 
+    Including the schemat for use on the search page
+    '''
+    tabular_data_schema = fields.DictField(default={}, help_text="empty dictionary, filled on the client side with the tabular data information in order to render handsontable")
+    query_schemaform = fields.DictField(help_text="The angular schema form schema and form used to render the search forms in ChemBio Hub Platform")
+    chem_query_schemaform = fields.DictField(help_text="The chemical angular schema form for chemical search")
+    sort_schemaform = fields.DictField(help_text="The angular schema form json schema used for sorting fields")
+    hide_schemaform = fields.DictField(help_text="The angular schema form json schema used for hiding fields")
+    savedsearch_schemaform = fields.DictField(help_text="The angular schema form json schema used for the saved search feature")
+    filters_applied = fields.ListField(default=[], help_text="empty list which is filled on the front end with the filters currently active on the dataset")
+    sorts_applied = fields.ListField(default=[], help_text="empty list which is filled on the front end with the sorts currently active on the dataset")
+    hides_applied = fields.ListField(default=[], help_text="empty list which is filled on the front end with the hidden fields on the dataset")
 
-    savedsearch_schemaform = fields.DictField()
+    filters_objects = fields.ListField(default=[], help_text="empty list which is filled on the front end with the columns which are currently filtered")
+    sort_objects = fields.ListField(default=[], help_text="empty list which is filled on the front end with the columns which are currently sorted")
+    hide_objects = fields.ListField(default=[],  help_text="empty list which is filled on the front end with the columns which are currently hidden")
+    field_type_choices = fields.ListField(default=[],  help_text="List of the fields types which the user must pick from when creating a project")
 
-    filters_applied = fields.ListField(default=[])
-    sorts_applied = fields.ListField(default=[])
-    hides_applied = fields.ListField(default=[])
-
-    filters_objects = fields.ListField(default=[])
-    sort_objects = fields.ListField(default=[])
-    hide_objects = fields.ListField(default=[])
-
-    field_type_choices = fields.ListField(default=[])
-
-    
     class Meta:
         always_return_data = True
         queryset = SkinningConfig.objects.all()
@@ -994,21 +1000,28 @@ class SkinningResource(ModelResource):
 
 
     def dehydrate_savedsearch_schemaform(self, bundle):
+        """Pull out the angular schema form json schema which is used when saving a search from the settings"""
         return settings.SAVED_SEARCH_SCHEMAFORM
 
     def dehydrate_query_schemaform(self, bundle):
+        """Pull out the search form angular schema form json schema from the settings"""
         return settings.CBH_QUERY_SCHEMAFORM
 
     def dehydrate_hide_schemaform(self, bundle):
+        """Pull out the angular schema form json schema from the settings which is used to hide a field"""
         return settings.CBH_HIDE_SCHEMAFORM
 
     def dehydrate_sort_schemaform(self, bundle):
+        """Pull out the angular schema form json schema from the settings which is used to sort a field"""
         return settings.CBH_SORT_SCHEMAFORM
 
     def dehydrate_chem_query_schemaform(self, bundle):
+        """Pull out the angular schema form json schema from the settings which is used to run chemical search"""
         return settings.CBH_CHEMICAL_QUERY_SCHEMAFORM
 
     def dehydrate_field_type_choices(self, bundle):
+        """Pull out the field type choices from the models file which are used when adding a project
+        todo consider moving project schemaform to the back end"""
         return [{"name": value["name"], "value": key} for key, value in PinnedCustomField.FIELD_TYPE_CHOICES.items()]
 
 
@@ -1033,6 +1046,9 @@ class TemplateProjectFieldResource(ModelResource):
 
 
 def get_field_list(project_type_bundle):
+    """Given a project type object bundle return a project template 
+    The project template is then used in the project adding form when the user clicks on that project type.
+    The default project template is a single empty text field"""
     if project_type_bundle.obj.saved_search_project_type:
         return project_type_bundle.obj.SAVED_SEARCH_TEMPLATE
     elif project_type_bundle.obj.plate_map_project_type:
@@ -1045,6 +1061,7 @@ def get_field_list(project_type_bundle):
         return project_type_bundle.obj.DEFAULT_TEMPLATE
 
 def get_fields(bundle):
+    """May be a merge error need to lookj into this todo"""
     if bundle.obj.custom_field_config_template_id is None:
         return []
     return get_model("cbh_core_model","PinnedCustomField").objects.filter(custom_field_config_id=bundle.obj.custom_field_config_template_id)

@@ -1,3 +1,5 @@
+"""Settings for the version of FLOWJS installed inside this app and used in the attachments api"""
+
 from django.conf import settings
 
 # Media path where the files are saved

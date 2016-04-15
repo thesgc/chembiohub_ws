@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
-
+"""
+Original serializer module for CBHCompoundbatchResource
+Currently in the process of being deprecated"""
 import cStringIO
 
 from tastypie.serializers import Serializer
@@ -67,6 +69,7 @@ def flatten_dict(d, base=None):
 
 
 class XLSXSerializer(Serializer):
+
     def to_xlsx(self, data, options=None):
         '''write excel file here'''
         output = cStringIO.StringIO()

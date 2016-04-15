@@ -1,7 +1,14 @@
+"""
+Enables Parsing of the Reaction XML form a ChemDraw file, linking molecule records with those found in the data
+
+"""
+
+
 import xmltodict
 
 
 def get_keys(x):
+    """Convert the XML list into a dictionary lookup"""
     dataKeys = {}
 
     for component in x['CDXML']['page']['stoichiometrygrid']['sgcomponent']:
@@ -12,6 +19,7 @@ def get_keys(x):
 
 
 def compounds(x, dataKeys,  product_ids, reagent_ids, reactant_ids):
+    """Iterate the stoichiometry grid of a chemdraw reaction"""
     for component in x['CDXML']['page']['stoichiometrygrid']['sgcomponent']:
         if not component.get('@ComponentIsHeader', False):
             role = None
@@ -38,9 +46,10 @@ def compounds(x, dataKeys,  product_ids, reagent_ids, reactant_ids):
 
 
 def parse(xml_path):
+    """Parse the Reaction XML form a ChemDraw file, linking molecule records with those found in the data"""
     with open(xml_path) as xfile:
         xml = xfile.read()
-    x = xmltodict.parse(xml)
+    x = xmltodict.parse(xml)
     if x['CDXML']['page'].get('scheme'):
         reactants = x['CDXML']['page']['scheme'][
             'step'].get('@ReactionStepReactants', None)

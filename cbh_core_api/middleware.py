@@ -1,5 +1,9 @@
 # coding=utf-8
-
+"""
+Middleware to log everything that tastypie spits out
+Quite over the top but occasionally useful
+Add the below class to the django MIDLLEWARE_CLASSES setting in order to enable
+"""
 import datetime
 import logging
 logger = logging.getLogger('tastypie')
@@ -20,7 +24,11 @@ SENSITIVE_HEADERS = ['Authorization', 'HTTP_AUTHORIZATION']
 
 
 class ResponseLoggingMiddleware(object):
-
+    """
+    Middleware to log everything that tastypie spits out
+    Quite over the top but occasionally useful
+    Add the below class to the django MIDLLEWARE_CLASSES setting in order to enable
+    """
     def process_response(self, request, response):
         if hasattr(request, 'user') and request.user.is_authenticated():
             credentials = request.user.pk
