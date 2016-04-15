@@ -1,3 +1,7 @@
+"""
+nearly deprecated old inteface to the compounds API
+"""
+
 from tastypie.resources import ALL
 from tastypie.resources import ALL_WITH_RELATIONS
 from tastypie.resources import ModelResource
@@ -70,11 +74,10 @@ def build_content_type(format, encoding='utf-8'):
 
 
 class CBHCompoundUploadResource(ModelResource):
+    """Old CBHCompoundBatch resource now only used for bulk data uploads"""
     project = SimpleResourceURIField(
-        NoCustomFieldsChemregProjectResource, 'project_id', blank=False, null=False)
+        NoCustomFieldsChemregProjectResource, 'project_id', blank=False, null=False, help_text="")
     creator = SimpleResourceURIField(UserResource, 'created_by_id', null=True, readonly=True)
-    # projectfull = fields.ForeignKey(
-    #      NoCustomFieldsChemregProjectResource, 'project', blank=False, null=False, full=True, readonly=True)
 
     class Meta:
         filtering = {
@@ -154,6 +157,7 @@ class CBHCompoundUploadResource(ModelResource):
         An ORM-specific implementation of ``apply_filters``.
         The default simply applies the ``applicable_filters`` as ``**kwargs``,
         but should make it possible to do more advanced things.
+        deprecated
         """
         pr = request.GET.get("project__project_key__in", None)
         if pr == "":
@@ -319,6 +323,7 @@ class CBHCompoundUploadResource(ModelResource):
         return label
 
     def reindex_elasticsearch(self, request, **kwargs):
+        """deprecated reindexer"""
         desired_format = self.determine_format(request)
         batches = self.get_object_list(request)
         # we only want to store certain fields in the search index
@@ -344,6 +349,7 @@ class CBHCompoundUploadResource(ModelResource):
         return HttpResponse(content="test", content_type=build_content_type(desired_format))
 
     def reindex_compound(self, request, **kwargs):
+        """deprecated"""
         # call this when we need to re-index a compound record which has had
         # fields edited
         desired_format = self.determine_format(request)
@@ -359,7 +365,7 @@ class CBHCompoundUploadResource(ModelResource):
         return HttpResponse(content=json.dumps({"data": es_reindex}), content_type=build_content_type(desired_format))
 
     def convert_mol_string(self, strn):
-        # commit
+        """deprecated and moved"""
         try:
             mol = Chem.MolFromMolBlock(strn)
             smiles = Chem.MolToSmiles(mol)
@@ -369,6 +375,7 @@ class CBHCompoundUploadResource(ModelResource):
         return smiles
 
     def match_list_to_moleculedictionaries(self, batch, project, structure_type="MOL"):
+        """deprecated"""
         if structure_type == "MOL":
             structure_key = batch.standard_inchi_key
         else:
@@ -410,9 +417,11 @@ class CBHCompoundUploadResource(ModelResource):
 
 
     def save_related(self, bundle):
+        """deprecated"""
         generate_structure_and_dictionary(bundle.obj)
 
     def alter_deserialized_list_data(self, request, deserialized):
+        """Weird way we added project to input data, not reccomended, now deprecated apart from for upload"""
         proj = Project.objects.get(project_key=deserialized["project_key"])
         deserialized["project"] = proj
         return deserialized
@@ -435,6 +444,7 @@ class CBHCompoundUploadResource(ModelResource):
         return bundle
 
     def prepend_urls(self):
+        """Add lots of extra methods to the API"""
         return [
             url(r"^(?P<resource_name>%s)/delete_index/?$" % self._meta.resource_name,
                 self.wrap_view('delete_index'), name="delete_index"),
@@ -480,13 +490,14 @@ class CBHCompoundUploadResource(ModelResource):
         pass
 
     def patch_dict(self, dictdata, headers):
+        """Apply a JSON patch to the data in a particular column"""
         for header in headers:
             json_patches = copy.copy(header.get("operations", False))
             if json_patches:
                 apply_json_patch(dictdata, json_patches)
 
     def multi_batch_save(self, request, **kwargs):
-        
+        """Save the data which has been cached in Elasticsearch"""
         deserialized = self.deserialize(request, request.body, format=request.META.get(
             'CONTENT_TYPE', 'application/json'))
 
@@ -552,14 +563,16 @@ class CBHCompoundUploadResource(ModelResource):
         return self.create_response(request, bundle, response_class=http.HttpCreated)
 
     def after_save_and_index_hook(self, request, multi_batch_id, project_key):
-
+        """Hook used to perform operations on data that has been saved"""
         pass
 
     def alter_batch_data_after_save(self, batch_list, python_file_object,request, multi_batch):
+        """Actually edit the data just after it has been saved"""
         pass
 
 
     def delete_index(self, request, **kwargs):
+        """Delete the index that was created for a multiple batch"""
         deserialized = self.deserialize(request, request.body, format=request.META.get(
             'CONTENT_TYPE', 'application/json'))
 
@@ -580,6 +593,7 @@ class CBHCompoundUploadResource(ModelResource):
         return self.create_response(request, bundle, response_class=http.HttpAccepted)
 
     def convert_custom_field(self, uncurated_value, field_schema):
+        """Tidy up the custom field values"""
         curated_value = uncurated_value
         if field_schema.get("format", "") == "yyyy-mm-dd":
             if uncurated_value:
@@ -650,6 +664,7 @@ class CBHCompoundUploadResource(ModelResource):
         return self.create_response(request, bundle, response_class=http.HttpAccepted)
 
     def validate_multi_batch(self, multi_batch, bundle, request, batches):
+        """Generate a set of staticstics about a set of data that has been uploaded"""
         batches_not_errors = [batch for batch in batches if batch and not batch.warnings.get(
             "parseerror", None) and not batch.warnings.get("smilesParseError", None)]
 
@@ -825,6 +840,10 @@ class CBHCompoundUploadResource(ModelResource):
         return self.create_response(request, to_be_serialized)
 
     def post_validate_list(self, request, **kwargs):
+        """
+        When a list of SMILES patterns are submitted, save them to elasticsearhc and
+        call the normal validate multi batch function to give the normal statistics page
+        """
         deserialized = self.deserialize(request, request.body, format=request.META.get(
             'CONTENT_TYPE', 'application/json'))
 
@@ -946,10 +965,15 @@ class CBHCompoundUploadResource(ModelResource):
         return self.validate_multi_batch(multiple_batch, bundle, request, batches)
 
     def preprocess_sdf_file(self, file_obj, request):
+        """Read the input SDF file and add some extra information to it"""
         pass
 
     def post_validate_files(self, request, **kwargs):
-
+        """Receive a flowfile ID which points at an uploaded SDF, XLSX or CDX file
+        Perform validation on the file's contents and then send the resultant elasticsearch index
+        to the validate mult batch method
+        More about data import information can be found in the wiki
+        """
         automapped_structure = False
         deserialized = self.deserialize(request, request.body, format=request.META.get(
             'CONTENT_TYPE', 'application/json'))
@@ -1305,6 +1329,7 @@ class CBHCompoundUploadResource(ModelResource):
         return rc
 
     def dehydrate(self, bundle):
+        """Tidy up the data adding timestamp etc, now mostly deprecated"""
         # try:
         data = bundle.obj.related_molregno
         user = None
@@ -1350,6 +1375,7 @@ class CBHCompoundUploadResource(ModelResource):
         return bundle
 
     def batches_to_es_ready(self, batches, request, non_chem_data_only=None):
+        """Convert the data to be ready to submit to elasticsearch"""
         batch_dicts = []
         index = 1
         es_serializer = CBHCompoundBatchElasticSearchSerializer()
@@ -1385,6 +1411,7 @@ class CBHCompoundUploadResource(ModelResource):
         return batch_dicts
 
     def set_cached_temporary_batches(self, batches, multi_batch_id, request):
+        """Index the new data when a new bulk upload is done"""
         es_serializer = CBHCompoundBatchElasticSearchSerializer()
         batch_dicts = self.batches_to_es_ready(batches, request)
         index_name = elasticsearch_client.get_temp_index_name(
@@ -1394,7 +1421,7 @@ class CBHCompoundUploadResource(ModelResource):
         # Now get rid of my ES preparation again
 
     def get_cached_temporary_batches(self, bundles, request, bundledata={}):
-
+        """Request the imported data which has been cached in Elasticsearch"""
         fakeobj = CBHCompoundBatch(project=bundledata["project"], id=10)
         bun = self.build_bundle(obj=fakeobj)
         bun = self.full_dehydrate(bun)
@@ -1629,6 +1656,7 @@ class CBHCompoundUploadResource(ModelResource):
         return self.create_response(request, bundledata)
 
     def get_cached_temporary_batch_data(self, multi_batch_id, get_data, request, bundledata={}):
+        """make the batch data into models so it can be serialized properly"""
         es_request = {
             "from": get_data.get("offset", 0),
             "size": get_data.get("limit", 50),
@@ -1644,6 +1672,7 @@ class CBHCompoundUploadResource(ModelResource):
         return bundledata
 
     def get_object_list(self, request):
+        """where to add select related etc."""
         return super(CBHCompoundUploadResource, self).get_object_list(request)
 
 
@@ -1659,8 +1688,7 @@ def deepgetattr(obj, attr, ex):
 
 
 class CBHCompoundMultipleBatchResource(ModelResource):
-    #comp_batch = fields.ForeignKey(CBHCompoundBatchResource, 'cbh_compound_batches', blank=False, null=False)
-    #batches = fields.ToManyField(CBHCompoundBatchResource, 'batches', full=True)
+    """Tastypie resource for multiple batches"""
     class Meta:
         filtering = {
             "created_by": ALL_WITH_RELATIONS,
@@ -1676,6 +1704,7 @@ class CBHCompoundMultipleBatchResource(ModelResource):
         authentication = SessionAuthentication()
 
     def apply_filters(self, request, applicable_filters):
+        """Ensure that the user only sees multiple batches from projects they are entitled to see"""
         pids = self._meta.authorization.project_ids(request)
         dataset = self.get_object_list(request).filter(
             **applicable_filters).filter(project_id__in=set(pids))
@@ -1683,11 +1712,14 @@ class CBHCompoundMultipleBatchResource(ModelResource):
         return dataset.order_by("-created")
 
     def get_object_list(self, request):
+        """When listing the multiple batches, ensure that the uploaded data field is not serialized"""
         return super(CBHCompoundMultipleBatchResource, self).get_object_list(request).defer('uploaded_data').prefetch_related(Prefetch("project"))
 
 
 class CBHCompoundBatchUpload(ModelResource):
-
+    """
+    May be deprecated
+    """
     class Meta:
         excludes = ['uploaded_data']
         always_return_data = True
@@ -1700,12 +1732,14 @@ class CBHCompoundBatchUpload(ModelResource):
         authentication = SessionAuthentication()
 
     def prepend_urls(self):
+        """Add a url to the API"""
         return [
             url(r"^(?P<resource_name>%s)/headers/?$" % self._meta.resource_name,
                 self.wrap_view('return_headers'), name="api_compound_batch_headers"),
         ]
 
     def return_headers(self, request, **kwargs):
+        """List the headers from an imported SDF or XLSX file"""
         deserialized = self.deserialize(request, request.body, format=request.META.get(
             'CONTENT_TYPE', 'application/json'))
 
@@ -1737,6 +1771,7 @@ class CBHCompoundBatchUpload(ModelResource):
 
 
 def get_all_sdf_headers(filename):
+    """Use the unix tools grep, cut, sort and uniq to pull out a set of headers from a file"""
     from subprocess import Popen, PIPE
     from shlex import split
     p1 = Popen(split('grep "^>" %s' % filename), stdout=PIPE)
