@@ -1,7 +1,12 @@
 """
 Main interface for requesting the project JSON data from ChemBio Hub Platform
-Also shcema and configuration APIs
+Also schema and configuration APIs
 """
+#FlowFile relocation
+import os
+import datetime
+from cbh_core_api.flowjs_settings import FLOWJS_PATH, FLOWJS_EXPIRATION_DAYS
+
 
 import logging
 
@@ -685,7 +690,7 @@ class SimpleResourceURIField(fields.ApiField):
 
     def contribute_to_class(self, cls, name):
         """
-     method very similar to a realtedresource in tastypie
+        method very similar to a realtedresource in tastypie
         """
         super(SimpleResourceURIField, self).contribute_to_class(cls, name)
 
@@ -1069,11 +1074,18 @@ def get_fields(bundle):
 
 class ProjectTypeResource(ModelResource):
     '''Resource for Project Type, specifies whether this is a chemical/inventory instance etc '''
-    copy_action_name = fields.CharField(default="Clone")
-    custom_field_config_template = fields.ToManyField("cbh_core_api.resources.TemplateProjectFieldResource", attribute=lambda bundle: get_fields(bundle) ,  full=True, readonly=True, null=True)
-    project_template = fields.DictField(default={})
+    copy_action_name = fields.CharField(default="Clone", 
+                                        help_text="The name for how the user clones the object changes dependent on the project type, this name comes from the back end and is used in front end buttons")
+    custom_field_config_template = fields.ToManyField("cbh_core_api.resources.TemplateProjectFieldResource", 
+        attribute=lambda bundle: get_fields(bundle) ,  
+        full=True, 
+        readonly=True, 
+        null=True,
+        help_text="Template set of fields for the projects that use this project type. Acts like a class inheritance")
+    project_template = fields.DictField(default={}, help_text="Full project template")
 
     def alter_list_data_to_serialize(self, request, data):
+        """Based on the custom field config template, generate a project template that can be used in the front end"""
         for bun in data["objects"]:
             bun.data["project_template"] =  {
                 "project_type": bun.data["resource_uri"],
@@ -1086,6 +1098,7 @@ class ProjectTypeResource(ModelResource):
         return data
 
     def dehydrate_copy_action_name(self, bundle):
+        """Set the copy action name for the buttons based on the project type"""
         if bundle.obj.show_compounds:
             return "Clone /<br/> Add Structure"
         else:
@@ -1094,6 +1107,7 @@ class ProjectTypeResource(ModelResource):
 
 
     class Meta:
+        """Setup for the project type resource. Be aware that anyone can currently update project types but we do not enable this feature in the front end"""
         always_return_data = True
         queryset = ProjectType.objects.all()
         resource_name = 'cbh_project_types'
@@ -1111,7 +1125,7 @@ class ProjectTypeResource(ModelResource):
 
 class DataTypeResource(ModelResource):
 
-    '''Resource for data types'''
+    '''Resource for data types deprecated as not used in ChemiReg'''
     plural = fields.CharField(null=True)
 
     class Meta:
@@ -1129,11 +1143,13 @@ class DataTypeResource(ModelResource):
         authorization = Authorization()
 
     def dehydrate_plural(self, bundle):
+        """A way of generating a pluralised name for a data type"""
         return inflection.pluralize(bundle.obj.name)
 
 
 
 class MyPasswordResetForm(PasswordResetForm):
+    """Password reset form used both for password resets and for users who have just been invited and need to set a password"""
     def save(self, domain_override=None,
              subject_template_name='registration/password_reset_subject.txt',
              email_template_name='registration/password_reset_email.html',
@@ -1147,6 +1163,7 @@ class MyPasswordResetForm(PasswordResetForm):
         email = self.cleaned_data["email"]
  
         if not domain_override:
+            #The sites framework does not necessarily give the correct URL of the deployed system so we get it from the request instead
             current_site = get_current_site(request)
             site_name = current_site.name
             domain = current_site.domain
@@ -1179,7 +1196,7 @@ class InvitationResource(UserHydrate, ModelResource):
     '''Resource for Invitation model. This will setup creation of the invite email and new user '''
 
     created_by = fields.ForeignKey(
-        "cbh_core_api.resources.UserResource", 'created_by', full=True)
+        "cbh_core_api.resources.UserResource", 'created_by', full=True, help_text="creator of the invitation")
     class Meta:
         queryset = Invitation.objects.all()
         resource_name = 'invitations'
@@ -1198,6 +1215,7 @@ class InvitationResource(UserHydrate, ModelResource):
 
 
     def get_form(self, email, new_user, data, created, request, email_template_name, subject_template_name):
+        """Save the data from the invitation form (results in an email being sent)"""
         server = settings.SERVER_EMAIL
         form = MyPasswordResetForm(QueryDict(urlencode({"email": email})))
         hostname = request.META["HTTP_ORIGIN"]
@@ -1278,11 +1296,11 @@ from django.contrib.auth.models import User
 
 class UserResource(ModelResource):
     '''Displays information about the User's privileges and personal data'''
-    can_view_chemreg = fields.BooleanField(default=True)
-    can_view_assayreg = fields.BooleanField(default=True)
-    is_logged_in = fields.BooleanField(default=False)
-    can_create_and_own_projects = fields.BooleanField(default=False)
-    display_name = fields.CharField(default="")
+    can_view_chemreg = fields.BooleanField(default=True, help_text="Whether the user has chemireg enabled deprecated")
+    can_view_assayreg = fields.BooleanField(default=True, help_text="Whether the user has assayreg enabled deprecated")
+    is_logged_in = fields.BooleanField(default=False,  help_text="Whether this user in the list is the logged in user")
+    can_create_and_own_projects = fields.BooleanField(default=False,  help_text="Whether this user is allowed to create or own projects")
+    display_name = fields.CharField(default="", help_text="How we want the name of this user to be displayed on the front end")
 
     class Meta:
         filtering = {
@@ -1297,15 +1315,18 @@ class UserResource(ModelResource):
 
 
     def apply_authorization_limits(self, request, object_list):
+        """probably deprecated"""
         return object_list.get(pk=request.user.id)
 
     def get_object_list(self, request):
-        # return super(UserResource,
-        # self).get_object_list(request).filter(pk=request.user.id)
+        """
+        deprecated override
+        """
         return super(UserResource, self).get_object_list(request)
 
 
     def dehydrate_display_name(self, bundle):
+        """How we want the username or first and last name to be displayed on the system"""
         if bundle.obj.first_name:
             return "%s %s" % (bundle.obj.first_name, bundle.obj.last_name)
         else:
@@ -1322,6 +1343,9 @@ class UserResource(ModelResource):
 
 
     def dehydrate_is_logged_in(self, bundle):
+        """
+        Whether the user is logged in
+        """
         if bundle.obj.id == bundle.request.user.id:
             return True
         return False
@@ -1349,11 +1373,6 @@ class UserResource(ModelResource):
             return False
         return True
 
-
-#FlowFile relocation
-import os
-import datetime
-from cbh_core_api.flowjs_settings import FLOWJS_PATH, FLOWJS_EXPIRATION_DAYS
 
 
 def chunk_upload_to(instance, filename):
