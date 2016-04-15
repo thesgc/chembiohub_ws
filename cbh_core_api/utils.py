@@ -1,3 +1,5 @@
+"""Utils for local flowjs"""
+
 import os
 import datetime
 from cbh_core_api.flowjs_settings import FLOWJS_PATH, FLOWJS_EXPIRATION_DAYS
