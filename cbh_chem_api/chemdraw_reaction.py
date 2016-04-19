@@ -39,20 +39,15 @@ def compounds(x, dataKeys,  product_ids, reagent_ids, reactant_ids):
                     dicttoyield[k] = str(float(v.strip()) * 100)
             yield dicttoyield
 
- # ReactionStepReactants="5"
- # ReactionStepProducts="23"
- # ReactionStepArrows="14"
- # ReactionStepObjectsAboveArrow="17"
-
 
 def parse(xml_path):
     """Parse the Reaction XML form a ChemDraw file, linking molecule records with those found in the data"""
     with open(xml_path) as xfile:
         xml = xfile.read()
-    x = xmltodict.parse(xml)
+    x = xmltodict.parse(xml)
     if x['CDXML']['page'].get('scheme'):
-        reactants = x['CDXML']['page']['scheme'][
-            'step'].get('@ReactionStepReactants', None)
+        reactants = x['CDXML']['page']['scheme']['step'].get(
+            '@ReactionStepReactants', None)
         reactant_ids = []
         if reactants:
             reactant_ids = reactants.split(' ')

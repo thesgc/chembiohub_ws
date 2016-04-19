@@ -152,7 +152,6 @@ class CBHChemicalSearchResource(Resource):
         """
         Takes an input molfile from a POST request and processes the structure search then
         saves it to the session cache 
-        
         """
         deserialized = self.deserialize(request, request.body, format=request.META.get('CONTENT_TYPE', 'application/json'))
         deserialized = self.alter_deserialized_detail_data(request, deserialized)

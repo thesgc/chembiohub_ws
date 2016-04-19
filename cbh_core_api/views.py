@@ -15,7 +15,7 @@ from tastypie.resources import ModelResource, Resource, ALL, ALL_WITH_RELATIONS
 from tastypie.authentication import SessionAuthentication
 from tastypie.serializers import Serializer
 import mimetypes
-
+from tastypie import fields
 
 class FlowFileForm(forms.Form):
     file = forms.FileField()

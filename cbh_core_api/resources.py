@@ -154,7 +154,7 @@ class ChemRegDataPointProjectFieldResource(ModelResource):
     edit_schema = fields.DictField(
         null=True, blank=False,   help_text="an angular schema form schema that can be used to edit this field ")
     view_form = fields.DictField(
-        null=True, blank=False, help_text="possibly deprecated or never used
+        null=True, blank=False, help_text="possibly deprecated or never used"
         )
     handsontable = fields.DictField(
         null=True, blank=False, help_text="A JSON object which is combined with the other fields on the system to make a handsontable columns object"
@@ -387,7 +387,7 @@ class ChemRegCustomFieldConfigResource(UserHydrate, ModelResource):
 class ChemregProjectResource(UserHydrate, ModelResource):
 
     project_type = fields.ForeignKey(
-        "cbh_core_api.resources.ProjectTypeResource", 'project_type', help_text="", blank=False, null=False, full=True, help_text="A tag for the type of data this project stores")
+        "cbh_core_api.resources.ProjectTypeResource", 'project_type',  blank=False, null=False, full=True, help_text="A tag for the type of data this project stores")
     custom_field_config = fields.ForeignKey(ChemRegCustomFieldConfigResource,
                                             'custom_field_config', blank=False, null=False, full=True, help_text="The single custom field config object attached to this project")
     valid_cache_get_keys = ['format', 'limit', 'project_key',
