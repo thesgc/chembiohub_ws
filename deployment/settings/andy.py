@@ -43,7 +43,7 @@ Q_CLUSTER = {
 }
 
 ROOT_URLCONF = 'deployment.urls_v2'
-WEBSERVICES_NAME="dev"
+WEBSERVICES_NAME="dev/api"
 LOGIN_REDIRECT_URL = '/#/projects/list'
 
 

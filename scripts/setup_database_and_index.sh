@@ -16,10 +16,8 @@ $CONDA_ENV_PATH/bin/createdb -h $CONDA_ENV_PATH/var/postgressocket/ ${ENV_NAME}_
 
 $CONDA_ENV_PATH/bin/python deployment/generate_secret_settings.py > deployment/settings/secret.py
 $CONDA_ENV_PATH/bin/python manage.py migrate
-$CONDA_ENV_PATH/bin/python manage.py loaddata datatypes.json
 $CONDA_ENV_PATH/bin/python manage.py loaddata projecttypes.json
-$CONDA_ENV_PATH/bin/python manage.py reindex_compounds
-$CONDA_ENV_PATH/bin/python manage.py reindex_datapoint_classifications
+$CONDA_ENV_PATH/bin/python manage.py reindex_compounds_new
 cd src/ng-chem
 bower install
 cd ../..
