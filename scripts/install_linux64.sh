@@ -8,6 +8,10 @@ export ENV_NAME=$1
 OLD_PATH="$PATH"
 OPERATING_SYSTEM=$2
 
+if [ -f "/home/vagrant/anaconda2" ]
+then
+CONDATEST="1"
+fi
 
 if [ "$CONDATEST" != "1" ]
 then

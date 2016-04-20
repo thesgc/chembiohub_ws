@@ -21,5 +21,8 @@ $CONDA_ENV_PATH/bin/python manage.py reindex_compounds_new
 cd src/ng-chem
 bower install
 cd ../..
-$CONDA_ENV_PATH/bin/python manage.py collectstatic --noinput
+if [ "$ENV_NAME" != "dev" ]
+then
+    $CONDA_ENV_PATH/bin/python manage.py collectstatic --noinput
+fi
 echo "from django.contrib.auth.models import User; User.objects.create_superuser('admin', 'admin@example.com', 'pass')" | $CONDA_ENV_PATH/bin/python manage.py shell
