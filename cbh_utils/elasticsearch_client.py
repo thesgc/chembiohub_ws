@@ -58,42 +58,7 @@ ELASTICSEARCH_INDEX_MAPPING = {
                             "pattern":"([()\[\].,\-\+])",
                             "replacement":" $1 "
                         },
-                        '1digit': {'pattern': '^([1-9])($|\.\d+$)',
-                                        'replacement': '000000000000$1$2',
-                                        'type': 'pattern_replace'},
-                         '2digit': {'pattern': '^([1-9]\d{1})($|\.\d+$)',
-                                    'replacement': '00000000000$1$2',
-                                    'type': 'pattern_replace'},
-                         '3digit': {'pattern': '^([1-9]\d{2})($|\.\d+$)',
-                                    'replacement': '0000000000$1$2',
-                                    'type': 'pattern_replace'},
-                         '4digit': {'pattern': '^([1-9]\d{3})($|\.\d+$)',
-                                    'replacement': '000000000$1$2',
-                                    'type': 'pattern_replace'},
-                         '5digit': {'pattern': '^([1-9]\d{4})($|\.\d+$)',
-                                    'replacement': '00000000$1$2',
-                                    'type': 'pattern_replace'},
-                         '6digit': {'pattern': '^([1-9]\d{5})($|\.\d+$)',
-                                    'replacement': '0000000$1$2',
-                                    'type': 'pattern_replace'},
-                         '7digit': {'pattern': '^([1-9]\d{6})($|\.\d+$)',
-                                    'replacement': '000000$1$2',
-                                    'type': 'pattern_replace'},
-                         '8digit': {'pattern': '^([1-9]\d{7})($|\.\d+$)',
-                                    'replacement': '00000$1$2',
-                                    'type': 'pattern_replace'},
-                         '9digit': {'pattern': '^([1-9]\d{8})($|\.\d+$)',
-                                    'replacement': '0000$1$2',
-                                    'type': 'pattern_replace'},
-                        '10digit': {'pattern': '^([1-9]\d{9})($|\.\d+$)',
-                                     'replacement': '000$1$2',
-                                     'type': 'pattern_replace'},
-                         '11digit': {'pattern': '^([1-9]\d{10})($|\.\d+$)',
-                                     'replacement': '00$1$2',
-                                     'type': 'pattern_replace'},
-                         '12digit': {'pattern': '^([1-9]\d{11})($|\.\d+$)',
-                                     'replacement': '0$1$2',
-                                     'type': 'pattern_replace'},
+                       
                     },
                     "analyzer" : {
                         "default_index" : {
@@ -109,9 +74,6 @@ ELASTICSEARCH_INDEX_MAPPING = {
                             "tokenizer" : "keyword",
                             "filter" : [
                                 "lowercase"
-                            ],
-                            "char_filter" : [
-                                '1digit', '2digit', '3digit', '4digit', '5digit', '6digit', '7digit', '8digit', '9digit', '10digit', '11digit', '12digit'
                             ]
                         },
                     }
@@ -122,16 +84,22 @@ ELASTICSEARCH_INDEX_MAPPING = {
                 "dynamic": True,
                 "_all": {"enabled": False},
                 "date_detection": False,
+                "properties":{
+                    "dataset" : {
+                        "type": "object",
+                        "dynamic" : False
+                    }
+                },
                 "_source": {
                     "includes": [
                       "*",
                     ],
                     "excludes": [
-                      "indexed_fields_*",
+                      "indexed_fields_*", "sortable_fields_*",
                     ]
                   },
                 "dynamic_templates": [
-                {
+                    {
                     "indexed_fields": {
                         "match": "indexed_fields_*",
                         "match_mapping_type": "string",
@@ -144,23 +112,24 @@ ELASTICSEARCH_INDEX_MAPPING = {
                             "type": "string", 
                             "store": "no", 
                             "fields": {
-                                    "lowercase": {"type": "string", "store": "no", "analyzer" : "lowercasekeywordanalyzer", "index": "analyzed", "ignore_above": ELASTICSEARCH_MAX_FIELD_LENGTH},
                                     "raw": {"type": "string", "store": "no", "index": "not_analyzed", "ignore_above": ELASTICSEARCH_MAX_FIELD_LENGTH}
                                 }
                             }
                         }
                     },
-              
-               
-                {
-                    "ignored_fields": {
-                        "match": "*",
+                    {
+                    "sortable_fields": {
+                        "match": "sortable_fields_*",
                         "match_mapping_type": "string",
                         "mapping": {
-                            "type": "string", "store": "no", "include_in_all": False, "index" : "no"
+                            "type": "string", "store": "no", "analyzer" : "lowercasekeywordanalyzer", "index": "analyzed", "ignore_above": ELASTICSEARCH_MAX_FIELD_LENGTH
                         }
+                    },
                     }
-                }
+
+              
+               
+               
                 ]
                 
             }
@@ -208,7 +177,14 @@ def get_es_fieldname(pointer):
     m.update(pointer)
     return "indexed_fields_%s" % m.hexdigest()
 
+def get_sortable_es_fieldname(pointer):
+    m = hashlib.md5()
+    m.update(pointer)
+    return "sortable_fields_%s" % m.hexdigest()
+
+
 def build_indexed_fields(document, schema):
+    to_index = {"dataset" : document}
     
     for field in schema:
         slashed_json_pointer = "/%s" % field["data"].replace(".", "/")
@@ -220,14 +196,17 @@ def build_indexed_fields(document, schema):
             #We do not add an index for any blank, empty or non existant field, that way
             #we can be sure that the blanks filter will pick up all of the true blank fields
             hashed = get_es_fieldname(field["data"])
-            document[hashed] = value
+            to_index[hashed] = value
+            sortable = get_sortable_es_fieldname(field["data"])
+            to_index[sortable] = zeropad(value)
+    return to_index
 
 
 
 def build_all_indexed_fields(batch_dicts, schema_list):
     assert(len(batch_dicts) == len(schema_list))
     for index,  schema in enumerate(schema_list):
-        build_indexed_fields(batch_dicts[index], schema)
+        batch_dicts[index] = build_indexed_fields(batch_dicts[index], schema)
 
 
 
@@ -254,6 +233,7 @@ def create_index(batches, index_names, refresh=True):
         ignore=400)
 
     bulk_items = []
+    result = {}
     if len(batches) > 0:
         for counter, item in enumerate(batches):
             batch_doc = {
@@ -263,14 +243,14 @@ def create_index(batches, index_names, refresh=True):
                     "_type": BATCH_TYPE_NAME
                 }
             }
-            if item.get("id", None):
-                batch_doc["update"]["_id"] = str(item["id"])
+            if item["dataset"].get("id", None):
+                batch_doc["update"]["_id"] = str(item["dataset"]["id"])
             bulk_items.append(batch_doc)
             bulk_items.append({"doc" : item, "doc_as_upsert" : True })
         # Data is not refreshed!
-        data = es.bulk(body=bulk_items, refresh=refresh)
+        result = es.bulk(body=bulk_items, refresh=refresh)
 
-    return {}
+    return result
 
 
 
@@ -285,12 +265,6 @@ def build_phase_prefix_query(phrase, field_path):
                 }
 
 
-def prepare_lowercase_zeropad_term(term):
-    if term.replace(".", "", 1).isdigit():
-        parts = term.split(".")
-        parts[0] = parts[0].zfill(13)
-        return ".".join(parts).lower()
-    return term.lower()
 
 
 
@@ -352,7 +326,7 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
             new_query = {
                     "terms" :
                     { 
-                        "%s.lowercase" % get_es_fieldname(query["field_path"] ) : [prepare_lowercase_zeropad_term(t)  for t in query["pick_from_list"]]
+                        get_sortable_es_fieldname(query["field_path"] ) : zeropad(query["pick_from_list"])
                     }
                 }
 
@@ -361,10 +335,10 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
             new_query = {
                     "range" :
                     { 
-                         "%s.lowercase" % get_es_fieldname(query["field_path"] ): 
+                         get_sortable_es_fieldname(query["field_path"] ): 
                             {
-                                "gt" : prepare_lowercase_zeropad_term(query["greater_than"]),
-                                "lt"  : prepare_lowercase_zeropad_term(query["less_than"])
+                                "gt" : zeropad(query["greater_than"]),
+                                "lt"  : zeropad(query["less_than"])
                             }
                     }
                 }
@@ -372,9 +346,9 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
             new_query = {
                     "range" :
                     { 
-                         "%s.lowercase" % get_es_fieldname(query["field_path"] ): 
+                         get_sortable_es_fieldname(query["field_path"] ): 
                             {
-                                "gt" : prepare_lowercase_zeropad_term(query["greater_than"]),
+                                "gt" : zeropad(query["greater_than"]),
                             }
                     }
                 }
@@ -382,9 +356,9 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
             new_query = {
                     "range" :
                     { 
-                        "%s.lowercase" % get_es_fieldname(query["field_path"] ) : 
+                        get_sortable_es_fieldname(query["field_path"] ) : 
                             {
-                                "lt"  : prepare_lowercase_zeropad_term(query["less_than"])
+                                "lt"  : zeropad(query["less_than"])
                             }
                     }
                 }
@@ -397,7 +371,7 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
             new_query = {
                     "bool" : {
                             "must_not" : [{
-                                     "exists" : {"field" : "%s.lowercase" % get_es_fieldname(query["field_path"])}
+                                     "exists" : {"field" : get_sortable_es_fieldname(query["field_path"] )}
                                 } ]
                         }
                     }
@@ -408,15 +382,23 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
             
     return must_clauses
 
+def get_missing_items_position(direction):
+    position_of_missing_items = {
+        "asc" : "_last",
+        "desc" : "_first"
+    }
+    return position_of_missing_items[direction]
 
 
 def build_sorts(sorts):
     """Sort by the lowercase version of the data"""
+
     elasticsearch_sorts = [
         {
-            "%s.lowercase" % get_es_fieldname(sort["field_path"]) :{
+            get_sortable_es_fieldname(sort["field_path"] ) :{
                 "order" : sort["sort_direction"],
-                "unmapped_type" : "long"
+                "unmapped_type" : "string",
+                "missing" : get_missing_items_position(sort["sort_direction"])
             }
         }
         for sort in sorts
@@ -426,10 +408,11 @@ def build_sorts(sorts):
 def get_nested_aggregation_for_field_path(autocomplete_field_path, autocomplete="", autocomplete_size=settings.MAX_AUTOCOMPLETE_SIZE):
     """Based upon an input term and field_path, generate an aggregation to group by that field returning zero padded numbers to get the order right"""
     es_fname = get_es_fieldname(autocomplete_field_path )
+    sortable_fname = get_sortable_es_fieldname(autocomplete_field_path )
     base_agg = {
                 "field_path_terms" : {
                     "terms" : {
-                        "field" : "%s.lowercase" % es_fname,
+                        "field" : sortable_fname,
                         "size" : autocomplete_size,
                          "order" : { "_term" : "asc" },
                          
@@ -448,7 +431,7 @@ def get_nested_aggregation_for_field_path(autocomplete_field_path, autocomplete=
                 "unique_count": {
                                     "cardinality" : 
                                     {
-                                    "field" : "%s.lowercase" % es_fname
+                                    "field" : sortable_fname
                                     }
                 }
             }
@@ -510,7 +493,7 @@ def get_list_data_elasticsearch(queries, index, sorts=[], autocomplete="", autoc
                     "sort" : build_sorts(sorts),
                     "_source" : {
                         "include": [ "*" ],
-                        "exclude": [ "indexed_fields_*" , "bigimage" ]
+                        "exclude": [ "dataset.bigimage" ]
                     },
                 }
         
@@ -536,14 +519,39 @@ def get_list_data_elasticsearch(queries, index, sorts=[], autocomplete="", autoc
 
     return data
 
+def zeropad(input_string):
+    """Zero pad integers and floats to ensure that they can be sorted correctly"""
+    if isinstance(input_string, basestring):
+        if len(input_string) > 0 :
+            if input_string[0].isdigit():
+                if "." in input_string:
+                    if input_string.replace(".", "", 1).isdigit():
+                        data = input_string.split(".")
+                        
+                        return "%s.%s" % (data[0].zfill(13), data[1])
+                elif input_string.isdigit():
+                    return input_string.zfill(13)
+        return input_string.lower()
+    elif hasattr(input_string, '__iter__') :
+        """we expect a list here"""
+        return [zeropad(string) for string in input_string]
+    else:
+        return input_string
+    
+
+
+
 def unzeropad(input_string):
+    """Remove zero padding from integers and floats"""
     replace_up_to = 0
-    if input_string.replace(".", "", 1).isdigit():
-        for index, char in enumerate(input_string):
-            if char != "0":
-                replace_up_to = index
-                #found the first non zero so break
-                break 
+    if len(input_string) > 0:
+        if input_string[0] == "0":
+            if input_string.replace(".", "", 1).isdigit():
+                for index, char in enumerate(input_string):
+                    if char != "0":
+                        replace_up_to = index
+                        #found the first non zero so break
+                        break 
     return input_string[replace_up_to:]
 
 
@@ -568,4 +576,4 @@ def get_detail_data_elasticsearch(index, id):
                     }
     data = es.search("_all", body=es_request, ignore_unavailable=True)
 
-    return data["hits"]["hits"][0]["_source"]
+    return data["hits"]["hits"][0]["_source"]["dataset"]

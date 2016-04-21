@@ -31,7 +31,14 @@ from tastypie.utils import dict_strip_unicode_keys
 from rdkit import Chem
 from cbh_chembl_model_extension.models import _ctab2image
 from django.db import IntegrityError
+from django.test import RequestFactory
+from django.contrib.auth import login
+from django.db.models.loading import get_model
+from django.contrib.auth import get_user_model
+from copy import deepcopy
+
 EMPTY_ARRAY_B64 = b64encode("[]")
+
 
 from django_q.tasks import schedule
 try:
@@ -85,6 +92,10 @@ def reformat_project_data_fields_as_table_schema( table_schema_type, project_dat
     end_schema = [settings.TABULAR_DATA_SETTINGS["schema"][end] for end in end_items]
 
     return start_schema + middle_table_schema + end_schema
+
+
+
+
 
 
 class CBHChemicalSearchResource(Resource):
@@ -484,7 +495,7 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
 
     def prepare_es_hits(self, hits):
         return {"objects": 
-                            [hit["_source"] for hit in hits["hits"]["hits"]],
+                            [hit["_source"]["dataset"] for hit in hits["hits"]["hits"]],
                             "meta" : {"total_count" : hits["hits"]["total"]}
                             }
 
@@ -534,6 +545,9 @@ class CBHSavedSearchResource(BaseCBHCompoundBatchResource):
 class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
     """Implementation of the BaseCBHCompoundBatchResource used to generate JSON objects to be
     indexed in elasticsearch"""
+    project = fields.ForeignKey(ChemregProjectResource, 'project', blank=False, null=False)
+    projectfull = fields.ForeignKey(ChemregProjectResource, 'project', blank=False, null=False)
+
     def prepare_fields_for_index(self, batch_dicts):
         """Fields are stored as strings in hstore so convert the list or object fields back from JSON"""
         for bd in batch_dicts:
@@ -562,7 +576,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         return batch_dicts
 
 
-    def index_batch_list(self, request, batch_list, refresh=True):
+    def index_batch_list(self, request, batch_list, project_and_indexing_schemata, refresh=True):
         """Index a list or queryset of compound batches into the elasticsearch indices (one index per project)"""
         bundles = [
             self.full_dehydrate(self.build_bundle(obj=obj, request=request), for_list=True)
@@ -572,15 +586,12 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         #retrieve schemas which tell the elasticsearch request which fields to index for each object (we avoid deserializing a single custom field config more than once)
         #Now make the schema list parallel to the batches list
         batch_dicts = [self.Meta.serializer.to_simple(bun, {}) for bun in bundles]
-
+        batch_dicts_with_project, indexing_schemata = add_cached_projects_to_batch_list(batch_dicts, project_and_indexing_schemata)
         batch_dicts = self.prepare_fields_for_index(batch_dicts)
 
-        project_data_field_sets = [batch_dict["projectfull"]["custom_field_config"].pop("project_data_fields") for batch_dict in batch_dicts]
-        #remove some more unneeded fields
-        cfts = [batch_dict["projectfull"]["project_type"].pop("custom_field_config_template") for batch_dict in batch_dicts]
-        cfts = [batch_dict["projectfull"]["project_type"].pop("project_template") for batch_dict in batch_dicts]
+        project_data_field_sets = [batch_dict["projectfull"]["custom_field_config"].pop("project_data_fields", True) for batch_dict in batch_dicts]
+        tab_data = [batch_dict["projectfull"].pop("tabular_data_schema", True) for batch_dict in batch_dicts]
 
-        schemas = [reformat_project_data_fields_as_table_schema( "indexing", pdfs) for pdfs in project_data_field_sets]
         index_names = []
 
         for batch in batch_dicts:
@@ -588,7 +599,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
             index_name = elasticsearch_client.get_project_index_name(batch["projectfull"]["id"])
             index_names.append(index_name)
         
-        batch_dicts = elasticsearch_client.index_dataset(batch_dicts, schemas, index_names, refresh=refresh)
+        batch_dicts = elasticsearch_client.index_dataset(batch_dicts, indexing_schemata, index_names, refresh=refresh)
             
 
     def reindex_elasticsearch(self, request, **kwargs):
@@ -597,23 +608,67 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         batches = self.get_object_list(request)
         # we only want to store certain fields in the search index
         from django.core.paginator import Paginator
-        paginator = Paginator(batches, 100) # chunks of 1000
-
+        paginator = Paginator(batches, 1000) # chunks of 1000
+        #Get all schemata for all projects 
+        indexing_schemata = get_indexing_schemata(None)
         for page in range(1, paginator.num_pages +1):
         
-            result_list = async_iter("cbh_chem_api.resources.index_batches_in_new_index",((paginator.page(page).object_list,),))
-            print page
+            result_list = index_batches_in_new_index(paginator.page(page).object_list, project_and_indexing_schemata=indexing_schemata)
        
         return HttpResponse(content="test", )
         
     class Meta(BaseCBHCompoundBatchResource.Meta):
         pass
 
+def add_cached_projects_to_batch_list(batch_dicts, project_and_indexing_schemata):
+    schemata_for_indexing = []
+    for batch_dict in batch_dicts:
+        projdata = project_and_indexing_schemata[batch_dict["project"]]
+       
+        schemata_for_indexing.append(projdata["tabular_data_schema"]["for_index"])
+        batch_dict["projectfull"] = deepcopy(projdata)
+    return (batch_dicts, schemata_for_indexing)
 
-def index_batches_in_new_index(batches):
+
+
+
+
+
+def get_indexing_schemata(project_ids):
+    """Get a cached version of the project schemata in the right format 
+    for elasticsearch indexing"""
+    if project_ids is None:
+        project_ids = get_model("cbh_core_model","Project").objects.filter().values_list("id", flat=True)
+    crp = ChemregProjectResource()
+    request_factory = RequestFactory()
+    user = get_user_model().objects.filter(is_superuser=True)[0]
+    projdatadict = {}
+    for pid in project_ids:
+        req = request_factory.get("/")
+        req.user = user
+        req.GET = req.GET.copy()
+        req.GET["tabular_data_schema"] = True
+
+        data = crp.get_detail(req, pk=pid)
+
+        projdata = json.loads(data.content)
+        #Do the dict lookups now to avoid multiple times later
+        projdata["tabular_data_schema"]["for_index"] = [ projdata["tabular_data_schema"]["schema"][field] 
+                                  for field in projdata["tabular_data_schema"]["included_in_tables"]["indexing"]["default"]]
+        projdatadict[projdata["resource_uri"]] = projdata
+
+    return projdatadict
+
+        
+
+
+def index_batches_in_new_index(batches, project_and_indexing_schemata=None):
     """function to index all the data, creating a HTTPRequest programatically"""
     request = HttpRequest()
-    IndexingCBHCompoundBatchResource().index_batch_list(request, batches)
+    if project_and_indexing_schemata is not None:
+        project_and_indexing_schemata = get_indexing_schemata({ batch.project_id  for batch in batches })
+
+    IndexingCBHCompoundBatchResource().index_batch_list(request, batches, project_and_indexing_schemata)
 
 
 

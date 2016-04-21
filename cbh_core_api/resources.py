@@ -411,6 +411,7 @@ class ChemregProjectResource(UserHydrate, ModelResource):
         filtering = {
             'project_key': ALL_WITH_RELATIONS,
             'project_type': ALL_WITH_RELATIONS,
+            'id': ALL_WITH_RELATIONS,
         }
         always_return_data=True
 
@@ -435,12 +436,13 @@ class ChemregProjectResource(UserHydrate, ModelResource):
         Request the list response and if asked to, use the cache
         Cache is invalidated each time a project anywhere on the system is updated by a signal in cbh_core_model
         """
-        serialized = request.session.get("projects_list_cache", None)
-        if serialized and (request.GET.get("do_cache", False) or kwargs.get("do_cache", False)):
-            desired_format = self.determine_format(request)
-            print "from cache"
-            return HttpResponse(content=serialized,
-                            content_type=build_content_type(desired_format))
+        if hasattr(request, "session"):
+            serialized = request.session.get("projects_list_cache", None)
+            if serialized and (request.GET.get("do_cache", False) or kwargs.get("do_cache", False)):
+                desired_format = self.determine_format(request)
+                print "from cache"
+                return HttpResponse(content=serialized,
+                                content_type=build_content_type(desired_format))
         return super(ChemregProjectResource, self).get_list(request, **kwargs)
         
 
@@ -555,7 +557,13 @@ class ChemregProjectResource(UserHydrate, ModelResource):
         userbundle = userres.full_dehydrate(userbundle)
         bundle.data['user'] = userbundle.data
 
-        self._meta.authorization.alter_project_data_for_permissions(bundle, request)
+        if request.GET.get("tabular_data_schema", False):
+            data = {"objects" : [bundle,]}
+            self.alter_list_data_to_serialize( request, data)
+            bundle.data = data["objects"][0].data
+            bundle.data["tabular_data_schema"] = data["tabular_data_schema"]
+        else:
+            self._meta.authorization.alter_project_data_for_permissions(bundle, request)
                           
         return bundle
 
@@ -588,10 +596,12 @@ class ChemregProjectResource(UserHydrate, ModelResource):
                 'attachment; filename=project_data_explanation.xlsx'
         elif not hasattr(data, "data"):
             if data.get("objects", False) and (request.GET.get("do_cache", False) or response_kwargs.get("do_cache", False)) and response_class == HttpResponse:
-                request.session["projects_list_cache"] = serialized
+                if hasattr(request, "session"):
+                    request.session["projects_list_cache"] = serialized
         if response_class in [http.HttpCreated, http.HttpAccepted]:
-            if "projects_list_cache" in request.session:
-                del request.session["projects_list_cache"]
+            if hasattr(request, "session"):
+                if "projects_list_cache" in request.session:
+                    del request.session["projects_list_cache"]
             remove_session_cached_projectlists()
         return rc
 
