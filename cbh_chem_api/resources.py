@@ -637,6 +637,7 @@ def add_cached_projects_to_batch_list(batch_dicts, project_and_indexing_schemata
 def get_indexing_schemata(project_ids):
     """Get a cached version of the project schemata in the right format 
     for elasticsearch indexing"""
+
     if project_ids is None:
         project_ids = get_model("cbh_core_model","Project").objects.filter().values_list("id", flat=True)
     crp = ChemregProjectResource()
@@ -665,7 +666,7 @@ def get_indexing_schemata(project_ids):
 def index_batches_in_new_index(batches, project_and_indexing_schemata=None):
     """function to index all the data, creating a HTTPRequest programatically"""
     request = HttpRequest()
-    if project_and_indexing_schemata is not None:
+    if project_and_indexing_schemata is None:
         project_and_indexing_schemata = get_indexing_schemata({ batch.project_id  for batch in batches })
 
     IndexingCBHCompoundBatchResource().index_batch_list(request, batches, project_and_indexing_schemata)
