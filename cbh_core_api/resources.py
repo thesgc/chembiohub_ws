@@ -13,7 +13,7 @@ import logging
 # Get an instance of a logger
 logger = logging.getLogger(__name__)
 
-
+from django.middleware.csrf import get_token
 from django.test import RequestFactory
 from tastypie.resources import ALL_WITH_RELATIONS, ALL
 from tastypie.resources import ModelResource
@@ -416,8 +416,6 @@ class ChemregProjectResource(UserHydrate, ModelResource):
         always_return_data=True
 
 
-
-
     def dehydrate_assays_configured(self, bundle):
         """deprecated"""
         return bundle.obj.enabled_forms.count() > 0
@@ -666,7 +664,6 @@ def get_key_from_field_name(name):
     return name.replace(u" ", u"__space__")
 
 
-from django.middleware.csrf import get_token
 
 
 class SimpleResourceURIField(fields.ApiField):

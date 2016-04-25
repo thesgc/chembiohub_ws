@@ -690,7 +690,7 @@ SAVED_SEARCH_SCHEMAFORM =  {
                             'required': ['alias'], 
                         }
         }
-
+        
 
 TABULAR_DATA_SETTINGS = { 
     "seach_page_edit_mode": {
@@ -699,7 +699,12 @@ TABULAR_DATA_SETTINGS = {
     },
     "export" : {
         "start" :["project_counter","image","uuid", "projectfull.name"],
-        "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
+        "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id","canonical_smiles" ,
+        "standard_inchi" ,
+        "standard_inchi_key" ,
+        "related_molregno.compoundproperties.full_mwt" ,
+        "related_molregno.compoundproperties.full_molformula",
+        "related_molregno.compoundproperties.alogp" ]
                 },
     "cbh.restoreitems": {
         "start" :["project_counter","properties.archived", "image","uuid", "projectfull.name"],
@@ -711,7 +716,12 @@ TABULAR_DATA_SETTINGS = {
                 },
     "cbh.searchv2": {
         "start" :[ "project_counter","clone", "image","uuid", "projectfull.name"],
-        "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
+        "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id" ,"canonical_smiles" ,
+        "standard_inchi" ,
+        "standard_inchi_key" ,
+        "related_molregno.compoundproperties.full_mwt" ,
+        "related_molregno.compoundproperties.full_molformula",
+        "related_molregno.compoundproperties.alogp" ]
                 },
     "add_page" : {
         "start" :["project_counter","image", "id", "originalSmiles","properties.action","standardInchiKey"],
@@ -719,13 +729,19 @@ TABULAR_DATA_SETTINGS = {
                 },
     "indexing" : {
         "start" :["project_counter","uuid", "projectfull.name", "properties.archived","projectfull.project_type.saved_search_project_type"],
-        "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
+        "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id","canonical_smiles" ,
+        "standard_inchi" ,
+        "standard_inchi_key" ,
+        "related_molregno.compoundproperties.full_mwt" ,
+        "related_molregno.compoundproperties.full_molformula",
+        "related_molregno.compoundproperties.alogp" ]
     },
     "indexing_temp" : {
         "start" :[ "row", "originalSmiles","properties.action","standardInchiKey", ],
         "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
     },
     "schema": {
+
         "project_counter":{
             "knownBy" : "ID in project",
             "data" : "project_counter",
@@ -845,6 +861,62 @@ TABULAR_DATA_SETTINGS = {
             "searchFormType" : "pick_from_list",
             "editable": False,
             "field_type"  : "integer",
+            "className": "htCenter htMiddle ",
+        },
+        "canonical_smiles" :{
+            "noSort": True,
+            "knownBy": "SMILES",
+            "data": "canonical_smiles",
+            "searchFormType" : "pick_from_list",
+            "editable": False,
+            "field_type"  : "string",
+            "className": "htCenter htMiddle ",
+        },
+        "standard_inchi" :{
+            "noSort": True,
+            "knownBy": "Standard InChI",
+            "data": "standard_inchi",
+            "searchFormType" : "pick_from_list",
+            "editable": False,
+            "field_type"  : "string",
+            "className": "htCenter htMiddle ",
+        },
+        "standard_inchi_key" :{
+            "noSort": True,
+            "knownBy": "Standard InChI Key",
+            "data": "standard_inchi_key",
+            "searchFormType" : "pick_from_list",
+            "editable": False,
+            "field_type"  : "string",
+            "className": "htCenter htMiddle ",
+        },
+        "related_molregno.compoundproperties.full_mwt" :{
+            "noSort": True,
+            "knownBy": "Molecular Weight",
+            "data": "related_molregno.compoundproperties.full_mwt",
+            "searchFormType" : "pick_from_list",
+            "editable": False,
+            "renderer_named" : "centeredNumericRenderer",
+            "field_type"  : "string",
+            "className": "htCenter htMiddle ",
+        },
+        "related_molregno.compoundproperties.full_molformula" :{
+            "noSort": True,
+            "knownBy": "Molecular Formula",
+            "data": "related_molregno.compoundproperties.full_molformula",
+            "searchFormType" : "pick_from_list",
+            "editable": False,
+            "field_type"  : "string",
+            "className": "htCenter htMiddle ",
+        },
+        "related_molregno.compoundproperties.alogp" :{
+            "noSort": True,
+            "knownBy": "ALogP (calculated)",
+            "data": "related_molregno.compoundproperties.alogp",
+            "searchFormType" : "pick_from_list",
+            "renderer_named" : "centeredNumericRenderer",
+            "editable": False,
+            "field_type"  : "string",
             "className": "htCenter htMiddle ",
         }
     }

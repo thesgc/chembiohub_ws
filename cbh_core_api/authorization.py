@@ -183,7 +183,7 @@ class ProjectListAuthorization(Authorization):
             for field in bundle.data["custom_field_config"].data["project_data_fields"]:
                 if field.data["open_or_restricted"] == RESTRICTED:
                     #This is a restricted field and the user's access is restricted therefore block them
-                    bundle.data["users_restricted_fields"].append(field["name"])
+                    bundle.data["users_restricted_fields"].append(field.data["name"])
                 else:
                     new_fields.append(field)
             bundle.data["custom_field_config"].data["project_data_fields"] = new_fields
@@ -225,6 +225,37 @@ class ProjectAuthorization(Authorization):
     A Permission class to be used against any object which is linked 
     by foreign key relationship to the project object
     """
+
+    def removed_restricted_fields_if_present(self, data, restricted_fieldnames):
+        """Receive a dictionary of project id and fields to remove
+        Go through a list of batch dictionaries
+        Remove  any fields that need removing on that project
+        """
+        for datadict in data:
+            pid = str(datadict["projectfull"]["id"])
+            if pid in restricted_fieldnames:
+                fields_to_remove = restricted_fieldnames[pid]
+                for f in fields_to_remove:
+                    if f in datadict["custom_fields"]:
+                        del datadict["custom_fields"][f]
+
+
+    def check_if_field_restricted(self, fieldname, pid_strings, restricted_fieldnames):
+        #remove custom_fields.
+        if not fieldname.startswith("custom_fields."):
+            return pid_strings
+        else:
+            fname = fieldname[14:]
+            pids_for_this_field = []
+            for pid_requested in pid_strings:
+                list_of_fields = restricted_fieldnames.get(str(pid_requested), [])
+                if fname in list_of_fields:
+                    pass
+                else:
+                    pids_for_this_field.append(int(pid_requested))
+            
+            #If there is a restricction on the projects this field could be used on, add it here
+            return pids_for_this_field
 
     def login_checks(self, request, model_klass, perms=None):
         """standard login checks to see if user is logged in"""
@@ -290,22 +321,19 @@ class ProjectAuthorization(Authorization):
         """Read list is now implemented in elasticsearch instead"""
         return object_list
 
-    def check_if_field_restricted(self, field_path, project_ids_requested, tabular_data_schema):
-        """Here we take the field path value which points to a custom field and look it up in the global schema to projects_selected
-        if it is restricted for any of the projects in the list that the user has chosen for this request"""
 
-        #because this schema has been requested on a per-user basis, the fields which are restricted have already been taken into account and removed
-        #Therefore the project specific schema contains projects for which this field name is not restricted
+    def removed_restricted_fields_if_present(self, data, restricted_fieldnames):
+        """Receive a dictionary of project id and fields to remove
+        Go through a list of batch dictionaries
+        Remove  any fields that need removing on that project
+        """
+        for datadict in data:
+            
+            pid = str(datadict["projectfull"]["id"])
+            if pid in restricted_fieldnames:
+                fields_to_remove = restricted_fieldnames[pid]
+                for f in fields_to_remove:
+                    if f in datadict["custom_fields"]:
+                        del datadict["custom_fields"][f]
 
-        proj_specific_schema = tabular_data_schema["schema"][field_path]
-
-        return [pidr  for pidr in project_ids_requested if pidr in proj_specific_schema]
-
-
-    def remove_restricted_fields_from_custom_fields_to_render(self, batch_dicts, user_restricted_fieldnames):
-        """Given a list of the field names to be removed on a per project basis - remove them based on the project id in the batch dictionary"""
-
-        for fieldname in user_restricted_fieldnames[batch_dict["projectfull"]["id"]]:
-                if fieldname in batch_dict["custom_fields"]:
-                    del batch_dict["custom_fields"][fieldname]
-        return batch_dict
+        return data

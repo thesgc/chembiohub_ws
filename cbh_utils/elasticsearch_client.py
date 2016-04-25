@@ -166,6 +166,9 @@ def fix_data_types_for_index( value):
         else:
             return None
     if type(value) is dict:
+        if "attachments" in value:
+            #file upload special case
+            return ", ".join([attachment.get("printName","") for attachment in value["attachments"]])
         return json.dumps(value)
     if type(value) is list:
         return [fix_data_types_for_index(v) for v in value]
@@ -473,7 +476,7 @@ def get_list_data_elasticsearch(queries, index, sorts=[], autocomplete="", autoc
     Also add autocomplete if required by creating an aggregation"""
     es = elasticsearch.Elasticsearch()
     queries = remove_existing_queries_for_agg(queries, autocomplete_field_path)
-    if len(queries) > 0  or len(textsearch) > 0:
+    if (len(queries) > 0  or len(textsearch) > 0)  and len(index) > 0:
         es_request = {  
                     "query":{
                         "indices" : {
@@ -496,7 +499,18 @@ def get_list_data_elasticsearch(queries, index, sorts=[], autocomplete="", autoc
                         "exclude": [ "dataset.bigimage" ]
                     },
                 }
-        
+    
+    elif len(index) == 0:
+        #No projects are included in the query 
+        #but we must return a graceful response
+        return {
+                 "hits":
+                    {"total": 0, 
+                       "hits" : []}, 
+                    "aggregations": {"filtered_field_path":{"unique_count" :{"value": 0},"field_path_terms" :{"buckets":[]}}}
+                }
+                
+
     else:
         raise Exception("You must input a query")
     if autocomplete_field_path:

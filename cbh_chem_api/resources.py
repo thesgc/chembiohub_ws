@@ -80,27 +80,10 @@ class MoleculeDictionaryResource(ModelResource):
 
 
 
-def reformat_project_data_fields_as_table_schema( table_schema_type, project_data_fields_json):
-    """Takes the standard output from project data fields and reformats it for use in table formats 
-    by including static schemas from the application settings - these include the fields that should be listed before and after the given field"""
-    if table_schema_type not in settings.TABULAR_DATA_SETTINGS:
-        raise Exception("Trying to reformat for a format that is not configured in TABULAR_DATA_SETTINGS")
-    start_items = settings.TABULAR_DATA_SETTINGS[table_schema_type]["start"]
-    end_items = settings.TABULAR_DATA_SETTINGS[table_schema_type]["end"]
-    start_schema = [settings.TABULAR_DATA_SETTINGS["schema"][start] for start in start_items]
-    middle_table_schema = [field["edit_form"]["form"][0] for field in project_data_fields_json]
-    end_schema = [settings.TABULAR_DATA_SETTINGS["schema"][end] for end in end_items]
-
-    return start_schema + middle_table_schema + end_schema
-
-
-
-
-
 
 class CBHChemicalSearchResource(Resource):
     """
-    Provides a REST interface to POST 
+    Provides a REST interface to POST a molfile for use with chemical search
     """
     id = fields.CharField(help_text="uuid generated on POST of data - comes from the task ID when molecule is searched for")
     query_type = fields.CharField(help_text="Chemical query type - currently supports 'with_substructure' or 'flexmatch'")
@@ -239,8 +222,6 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
     properties = CBHNoSerializedDictField('properties')
     custom_fields = CBHNoSerializedDictField('custom_fields')
 
-
-
     def dehydrate_timestamp(self, bundle):
         """Provide a viewer-friendly timestamp"""
         return str(bundle.obj.created)[0:10]
@@ -304,22 +285,19 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
 
 
     def get_project_specific_data(self, request, queries, pids, sorts, textsearch, batch_ids_by_project):
-        """When an Excel or SDF download is requested, present the data as a
-        project by project summary so that one spreadsheet can be used per project"""
+        """When an Excel or SDF download is requested, 
+        present the data as a
+        project by project summary so that 
+        one spreadsheet can be used per project"""
         to_return = []
-        for pid in pids:
-            #We have removed the schema from the index for data efficiency so
-            #We need to pull it out of the project resource
-            pr = ChemregProjectResource()
-            obj = pr._meta.queryset.get(pk=pid)
-            bundle = pr.build_bundle(obj=obj, request=request)
-            bundle = pr.full_dehydrate(bundle)
+        pids = list(pids)
+        table_schemata = get_schemata(pids, "export")
+        #We have removed the schema from the index for data efficiency so
+        #We need to pull it out of the project resource
             
-            proj_data = self._meta.serializer.to_simple(bundle.data, {})
-            project_data_fields_json = proj_data["custom_field_config"]["project_data_fields"]
-
-            table_schema_for_project = reformat_project_data_fields_as_table_schema( "export", project_data_fields_json)
-
+        for index, proj_data in enumerate(table_schemata):
+            table_schema_for_project = proj_data["tabular_data_schema"]["for_export"]
+            pid = pids[index]
             proj_index = elasticsearch_client.get_project_index_name(pid)
             es_data = elasticsearch_client.get_list_data_elasticsearch(queries,
                     proj_index,
@@ -333,33 +311,41 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
             standardised["name"] = proj_data["name"]
             standardised["id"] = pid
             standardised["schema"] = table_schema_for_project
+            base = request.META.get("wsgi.url_scheme","http") 
+            base += "://"
+            base += request.META.get("HTTP_HOST", "")
+            for field in standardised["schema"]:
+                field["base_url"] = base
             to_return.append(standardised)
-        query_reps = [{"fieldn": "Project", "pick_from_list": ",".join([str(ret["name"]) for ret in to_return]) }]
-        for i, q in enumerate(queries):
-            qrep = {qtype["value"] : u"" for qtype in settings.CBH_QUERY_TYPES}
-            qrep["fieldn"] = ""
-            for key, value in q.items():
-                if key == "pick_from_list":
-                    qrep[key] = ", ".join(value)
-                elif key == "field_path":
-                    if value:
-                        knownBy = settings.TABULAR_DATA_SETTINGS["schema"].get(value,{}).get("knownBy", "")
-                        if not knownBy:
-                            knownBy = str(value.split(".")[-1])
-                        qrep["fieldn"] = "".join([l for l in knownBy])
-                else:
-                    qrep[key] = str(value)
+        
+        if request.GET.get("format", "") != "sdf":
+            #For the Excel sheet print out the query used
+            query_reps = [{"fieldn": "Project", "pick_from_list": ",".join([str(ret["name"]) for ret in to_return]) }]
+            for i, q in enumerate(queries):
+                qrep = {qtype["value"] : u"" for qtype in settings.CBH_QUERY_TYPES}
+                qrep["fieldn"] = ""
+                for key, value in q.items():
+                    if key == "pick_from_list":
+                        qrep[key] = ", ".join(value)
+                    elif key == "field_path":
+                        if value:
+                            knownBy = settings.TABULAR_DATA_SETTINGS["schema"].get(value,{}).get("knownBy", "")
+                            if not knownBy:
+                                knownBy = str(value.split(".")[-1])
+                            qrep["fieldn"] = "".join([l for l in knownBy])
+                    else:
+                        qrep[key] = str(value)
 
-            qrep["id"] = i+1
-            query_reps.append(qrep)
+                qrep["id"] = i+1
+                query_reps.append(qrep)
 
-        schem = [{"data": "id", "knownBy" : "Row"}, {"data": "fieldn", "knownBy" : "Col"}] + [{"data": qtype["value"], "knownBy" : qtype["name"]} for qtype in settings.CBH_QUERY_TYPES]
-        query_summary = {
-                "name" : "_Query Used",
-                "objects" : query_reps,
-                "schema" : schem
-                }
-        to_return.append(query_summary)
+            schem = [{"data": "id", "knownBy" : "Row"}, {"data": "fieldn", "knownBy" : "Col"}] + [{"data": qtype["value"], "knownBy" : qtype["name"]} for qtype in settings.CBH_QUERY_TYPES]
+            query_summary = {
+                    "name" : "_Query Used",
+                    "objects" : query_reps,
+                    "schema" : schem
+                    }
+            to_return.append(query_summary)
         return to_return
 
 
@@ -442,18 +428,20 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
         autocomplete_field_path = request.GET.get("autocomplete_field_path", "")
         autocomplete_size = request.GET.get("autocomplete_size", settings.MAX_AUTOCOMPLETE_SIZE)
 
-        concatenated_indices = elasticsearch_client.get_list_of_indicies(project_ids)
-
-
         pr = ChemregProjectResource()
         resp = pr.get_list(request, do_cache=True)
-        tabular_data_schema = json.loads(resp.content)["tabular_data_schema"]
+        project_content = json.loads(resp.content)
+        restricted_fieldnames = project_content["user_restricted_fieldnames"]
 
-        # for q in queries:
-        #     q["project_ids"] = self._meta.authorization.check_if_field_restricted(q["field_path"], allowed_pids, tabular_data_schema)
+        #The project ids list needs to be reduced down
+        #Because we dont support OR queries then every time you query a project for 
+        #a field then only the projects that have that field (and unrestricted) need to be shown
+        for q in queries:
+             project_ids = self._meta.authorization.check_if_field_restricted(q["field_path"], project_ids, restricted_fieldnames)
+        if autocomplete_field_path:
+            project_ids = self._meta.authorization.check_if_field_restricted(autocomplete_field_path, project_ids, restricted_fieldnames)
 
-        #autocomplete_project_ids = self._meta.authorization.check_if_field_restricted(autocomplete_field_path, allowed_pids, tabular_data_schema)
-
+        concatenated_indices = elasticsearch_client.get_list_of_indicies(project_ids)
 
         chemical_search_id = request.GET.get("chemical_search_id", False)
         batch_ids_by_project = None
@@ -473,24 +461,27 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
                 autocomplete_size=autocomplete_size,
                 batch_ids_by_project=batch_ids_by_project
                  )
+            
+            
+            if autocomplete_field_path:
+            
+                bucks = data["aggregations"]["filtered_field_path"]["field_path_terms"]["buckets"]
+
+                bundledata = {"items" : bucks,
+                            "autocomplete" : autocomplete,
+                            "unique_count" : data["aggregations"]["filtered_field_path"]["unique_count"]["value"]}
+        
+            else:
+
+                bundledata = self.prepare_es_hits(data)
+                bundledata["objects"] = self._meta.authorization.removed_restricted_fields_if_present(bundledata["objects"], restricted_fieldnames)
         else:
             #Limit , offset and autocomplete have no effect for a project export
             data = self.get_project_specific_data(request,  queries, project_ids, sorts, textsearch, batch_ids_by_project)
-            
+
             return self.create_response(request, data) 
 
-        if autocomplete_field_path:
-            
-            bucks = data["aggregations"]["filtered_field_path"]["field_path_terms"]["buckets"]
 
-            bundledata = {"items" : bucks,
-                            "autocomplete" : autocomplete,
-                            "unique_count" : data["aggregations"]["filtered_field_path"]["unique_count"]["value"]}
-        else:
-            #This is just a standard request for data
-            bundledata = self.prepare_es_hits(data)
-
-            bundledata = self.alter_list_data_to_serialize(request, bundledata)
         return self.create_response(request, bundledata) 
 
     def prepare_es_hits(self, hits):
@@ -545,12 +536,14 @@ class CBHSavedSearchResource(BaseCBHCompoundBatchResource):
 class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
     """Implementation of the BaseCBHCompoundBatchResource used to generate JSON objects to be
     indexed in elasticsearch"""
-    project = fields.ForeignKey(ChemregProjectResource, 'project', blank=False, null=False)
-    projectfull = fields.ForeignKey(ChemregProjectResource, 'project', blank=False, null=False)
+    project = SimpleResourceURIField(ChemregProjectResource, "project_id")
+    projectfull = SimpleResourceURIField(ChemregProjectResource, "project_id")
 
     def prepare_fields_for_index(self, batch_dicts):
         """Fields are stored as strings in hstore so convert the list or object fields back from JSON"""
         for bd in batch_dicts:
+            if not bd.get("related_molregno", None):
+                bd["related_molregno"] = {"compoundproperties" : {}}
             for field in bd["projectfull"]["custom_field_config"]["project_data_fields"]:
                 
                 if field["edit_schema"]["properties"][field["name"]]["type"] == "object":
@@ -586,7 +579,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         #retrieve schemas which tell the elasticsearch request which fields to index for each object (we avoid deserializing a single custom field config more than once)
         #Now make the schema list parallel to the batches list
         batch_dicts = [self.Meta.serializer.to_simple(bun, {}) for bun in bundles]
-        batch_dicts_with_project, indexing_schemata = add_cached_projects_to_batch_list(batch_dicts, project_and_indexing_schemata)
+        batch_dicts, indexing_schemata = add_cached_projects_to_batch_list(batch_dicts, project_and_indexing_schemata)
         batch_dicts = self.prepare_fields_for_index(batch_dicts)
 
         project_data_field_sets = [batch_dict["projectfull"]["custom_field_config"].pop("project_data_fields", True) for batch_dict in batch_dicts]
@@ -625,25 +618,19 @@ def add_cached_projects_to_batch_list(batch_dicts, project_and_indexing_schemata
     for batch_dict in batch_dicts:
         projdata = project_and_indexing_schemata[batch_dict["project"]]
        
-        schemata_for_indexing.append(projdata["tabular_data_schema"]["for_index"])
+        schemata_for_indexing.append(projdata["tabular_data_schema"]["for_indexing"])
         batch_dict["projectfull"] = deepcopy(projdata)
     return (batch_dicts, schemata_for_indexing)
 
 
-
-
-
-
-def get_indexing_schemata(project_ids):
-    """Get a cached version of the project schemata in the right format 
-    for elasticsearch indexing"""
-
+def get_schemata(project_ids, fieldlist_name="indexing"):
     if project_ids is None:
         project_ids = get_model("cbh_core_model","Project").objects.filter().values_list("id", flat=True)
     crp = ChemregProjectResource()
     request_factory = RequestFactory()
     user = get_user_model().objects.filter(is_superuser=True)[0]
-    projdatadict = {}
+    
+ 
     for pid in project_ids:
         req = request_factory.get("/")
         req.user = user
@@ -653,9 +640,19 @@ def get_indexing_schemata(project_ids):
         data = crp.get_detail(req, pk=pid)
 
         projdata = json.loads(data.content)
+        projdata["tabular_data_schema"]["for_%s" % fieldlist_name] = [ projdata["tabular_data_schema"]["schema"][field] 
+                                  for field in projdata["tabular_data_schema"]["included_in_tables"][fieldlist_name]["default"]]
+        yield projdata
+
+
+def get_indexing_schemata(project_ids, fieldlist_name="indexing"):
+    """Get a cached version of the project schemata in the right format 
+    for elasticsearch indexing or for retrieving the Excel backup of the data"""
+
+    proj_datasets = get_schemata(project_ids, fieldlist_name="indexing")
         #Do the dict lookups now to avoid multiple times later
-        projdata["tabular_data_schema"]["for_index"] = [ projdata["tabular_data_schema"]["schema"][field] 
-                                  for field in projdata["tabular_data_schema"]["included_in_tables"]["indexing"]["default"]]
+    projdatadict = {}
+    for projdata in proj_datasets:
         projdatadict[projdata["resource_uri"]] = projdata
 
     return projdatadict

@@ -104,7 +104,7 @@ class CBHFlowFileResource(ModelResource):
         data.data["resource_uri"] = "/".join(bits)
         del data.data["identifier"]
         downloadres = CBHFlowFileDownloadResource()
-        data.data["download_uri"] = downloadres._build_reverse_url('api_dispatch_detail', kwargs={"api_name": downloadres._meta.api_name, "resource_name": downloadres._meta.resource_name,  "pk": data.data["id"]})
+        data.data["download_uri"] =  downloadres._build_reverse_url('api_dispatch_detail', kwargs={"api_name": downloadres._meta.api_name, "resource_name": downloadres._meta.resource_name,  "pk": data.data["id"]})
         return data
 
     def get_list(self, *args, **kwargs):

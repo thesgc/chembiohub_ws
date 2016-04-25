@@ -24,16 +24,55 @@ import xlsxwriter
 
 SDF_TEMPLATE = u">  <{name}>\n{value}\n\n"
 
+EMPTY_FILE_DESCRIPTION = "No files"
+# Adding hyperlinks is not really possible because the Excel format only really
+ATTACHMENT_TEMPLATE = ' {base_url}{url} {printName}'
+#EXCEL_FORMAT  = '=HYPERLINK("{base_url}/#/searchv2/{doc_id}", "{number} files Ctrl + click to view/download")'
+
+EXCEL_FORMAT  = '{base_url}/#/searchv2/{doc_id}'
+
+def prepare_file_output(input_data, schema, export_type, doc_id):
+
+    if isinstance(input_data, dict):
+        list_of_attachments = input_data.get("attachments", [])
+        if len(list_of_attachments) > 0:
+            if export_type == "xlsx":
+                return EXCEL_FORMAT.format(**{"base_url": schema.get("base_url", ""),
+                                              "number" : len(list_of_attachments),
+                                              "doc_id" : doc_id})
+            output_list = []
+            for attachment in list_of_attachments:
+                attachment["base_url"] = schema.get("base_url", "")
+                output = ATTACHMENT_TEMPLATE.format(**attachment)
+                output_list.append(output)
+            return ", \n".join(output_list)
+                 
+    return EMPTY_FILE_DESCRIPTION
+
+
+def prepare_output(document, schema, export_type, slashed_json_pointer):
+    
+    input_data =  resolve_pointer(document,slashed_json_pointer, default='')
+
+    if isinstance(input_data, basestring):
+        return unicode(input_data)
+    elif isinstance(input_data, list):
+        return ", ".join([unicode(datum) for dataum in input_data])
+    elif isinstance(input_data, dict):
+        doc_id = document.get("id", "")        
+        return prepare_file_output(input_data, schema, export_type, doc_id)
+    return unicode(input_data)
 
 
 
 
-
-def get_column( schema,documents):
+def get_column( schema,documents, export_type):
     """Pull out the JSON pointer's value from the JSON doc"""
+
     slashed_json_pointer = "/%s" % schema["data"].replace(".", "/")
-    return [unicode(resolve_pointer(document,slashed_json_pointer, default=''))
-            for  document in documents]
+    return [prepare_output(document, schema, export_type, slashed_json_pointer) for document in documents]
+           
+            
         
 
 def fix_column_types(df, schema):
@@ -49,7 +88,7 @@ def fix_column_types(df, schema):
 def add_images_or_other_objects(col, column_schema, worksheet, objects, format, writer):
     """Generate and save images against a given column in the worksheet"""
     if column_schema.get("field_type", None) == "b64png":
-        coldata = get_column(column_schema, objects)
+        coldata = get_column(column_schema, objects, "xlsx")
         files = []
         for i, imagestring in enumerate(coldata):
             row_to_write = i+1
@@ -65,9 +104,7 @@ def add_images_or_other_objects(col, column_schema, worksheet, objects, format, 
                 files.append(filename)
             else:
                 worksheet.set_row(row_to_write, None, format)
-        # for fi in list(set(files)):
-        #     os.remove(fi)                      
-            
+
 
 
 class CBHCompoundBatchSerializer( Serializer):
@@ -112,7 +149,7 @@ class CBHCompoundBatchSerializer( Serializer):
                 else:
                     for col, column_schema in enumerate(projectsheet["schema"]):
                     #     write_excel_column(column_schema, projectsheet["objects"], worksheet, col)
-                        jsondef[column_schema["knownBy"]] = get_column(column_schema, projectsheet["objects"])
+                        jsondef[column_schema["knownBy"]] = get_column(column_schema, projectsheet["objects"], "xlsx")
                     
                     df = pd.DataFrame(jsondef)
                     
@@ -153,32 +190,7 @@ class CBHCompoundBatchSerializer( Serializer):
                         worksheet.set_column(index, index, width, format)
             writer.save()
         
-            #workbook.close()
-        
-
-        # 
-
-        # writer = pd.ExcelWriter('temp.xlsx', engine='xlsxwriter')
-        # writer.book.filename = output
-        # df.to_excel(writer, sheet_name='Sheet1', index=False)
-        # workbook = writer.book
-        # format = workbook.add_format()
-        # worksheet = writer.sheets['Sheet1']
        
-                
-
-
-
-        # # make the UOx ID and SMILES columns bigger
-        # # BUG - can't set column format until pandas 0.16
-        # # https://github.com/pydata/pandas/issues/9167
-        # for index, width in enumerate(widths):
-        #     if width > 150:
-        #         width = 150
-        #     elif width < 15:
-        #         width = 15
-        #     worksheet.set_column(index, index, width)
-        # writer.save()
         # for fi in list(set(files)):
         #     os.remove(fi)
         return output.getvalue()
@@ -186,59 +198,54 @@ class CBHCompoundBatchSerializer( Serializer):
 
 
     def to_sdf(self, data, options=None):
-        '''Unfinished SDF converter'''
-        data = self.to_simple(data, {})
-        try:
+        ''' SDF converter'''
+        project_records = self.to_simple(data, {})
+
+        if isinstance(data, dict):
             if data.get("traceback", False):
-                raise ImmediateHttpResponse(BadRequest(json.dumps(data.data)))
-        except AttributeError:
-            pass
-        mols = []
-        index = 0
-        options = options or {}
-        try:
-            exp_json = json.loads(data.get('export', []))
-        except:
-            raise ImmediateHttpResponse(BadRequest(data))
+                # worksheet = workbook.add_worksheet("Error")
+                # worksheet.write(0,0,data["traceback"])
+                print data
 
-        df = pd.DataFrame(exp_json)
-        df.fillna('', inplace=True)
-        cols = df.columns.tolist()
-        # now for the list we have in the order we have it, move the columns by name
-        # this way you end up with your core fields at the start and custom
-        # fields at the end.
-        ordered_fields = ['UOx ID', 'Project']
-        headers = data.get('headers', {})
-        ordered_fields += headers["custom_fields"]
-        ordered_fields += headers["uncurated_fields"]
-        for idx, item in enumerate(ordered_fields):
-            cols.insert(idx, cols.pop(cols.index(item)))
-
-        # reindex the dataframe
-        df = df.ix[:, cols]
-        # pull data back out of dataframe to put into rdkit tools
-
-        row_iterator = df.iterrows()
-        headers = list(df)
         mol_strings = []
-        for index, row in row_iterator:
-            # Simple string based SDF formatter
-            mol_str = row['ctab'].replace(
-                "RDKit          2D\n", "Generated by ChemBio Hub ChemiReg http://chembiohub.ox.ac.uk/chemireg\n").split("END")[0]
-            properties = []
-            for field in headers:
-                if field != "ctab":
-                    try:
-                        properties.append(
-                            SDF_TEMPLATE.format(
-                                **{"name": unicode(field), "value": unicode(row[field])}
+        for projectsheet in project_records:
+            # worksheet = workbook.add_worksheet(projectsheet["name"])
+            # write_excel_headers(projectsheet["schema"], worksheet)
+            jsondef = {}
+            empty = False
+            if len(projectsheet["objects"])== 0:
+                #Add a single default object to an empty dataframe to stop the bug in the writer
+                
+                empty = True
+            else:
+                sdf_cols = [column_schema for column_schema in projectsheet["schema"] if column_schema["data"] != "image"]
+                for col, column_schema in enumerate(sdf_cols):
+                    jsondef[column_schema["knownBy"]] = get_column(column_schema, projectsheet["objects"], "sdf")
+                
+                df = pd.DataFrame(jsondef)
+                df.fillna('', inplace=True)
+                df = df[[col["knownBy"] for col in sdf_cols]]
+
+                row_iterator = df.iterrows()
+                headers = list(df)
+                for index, row in row_iterator:
+                    ctab = projectsheet["objects"][index]["ctab"]
+                    mol_str  = ctab.replace("RDKit          2D\n", "Generated by ChemBio Hub ChemiReg http://chembiohub.ox.ac.uk/chemireg\n").split("END")[0]
+                    properties = []
+                    for field in headers:
+                        try:
+                            properties.append(
+                                SDF_TEMPLATE.format(
+                                    **{"name": unicode(field), "value": unicode(row[field])}
+                                )
                             )
-                        )
-                    except Exception as e:
-                        import traceback
-                        import sys
-                        print(traceback.format_exception(*sys.exc_info()))
-            mol_strings.append("".join([mol_str, "END\n"] + properties))
+                        except Exception as e:
+                            import traceback
+                            import sys
+                            print(traceback.format_exception(*sys.exc_info()))
+
+
+                    mol_strings.append("".join([mol_str, "END\n"] + properties))
         return "$$$$\n".join(mol_strings) + "$$$$"
 
 
