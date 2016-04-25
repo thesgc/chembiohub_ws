@@ -601,13 +601,13 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         batches = self.get_object_list(request)
         # we only want to store certain fields in the search index
         from django.core.paginator import Paginator
-        paginator = Paginator(batches, 1000) # chunks of 1000
+        paginator = Paginator(batches, 5000) # chunks of 1000
         #Get all schemata for all projects 
         indexing_schemata = get_indexing_schemata(None)
         for page in range(1, paginator.num_pages +1):
         
             result_list = index_batches_in_new_index(paginator.page(page).object_list, project_and_indexing_schemata=indexing_schemata)
-       
+            print "%d of %s" % (page, paginator.num_pages)
         return HttpResponse(content="test", )
         
     class Meta(BaseCBHCompoundBatchResource.Meta):
