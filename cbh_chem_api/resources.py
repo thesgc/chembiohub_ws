@@ -649,6 +649,7 @@ def get_schemata(project_ids, fieldlist_name="indexing", request=None):
         data = crp.get_detail(req, pk=pid)
 
         projdata = json.loads(data.content)
+        print projdata
         projdata["tabular_data_schema"]["for_%s" % fieldlist_name] = [ projdata["tabular_data_schema"]["schema"][field] 
                                   for field in projdata["tabular_data_schema"]["included_in_tables"][fieldlist_name]["default"]]
         yield projdata
