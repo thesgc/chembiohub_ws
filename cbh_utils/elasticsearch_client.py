@@ -367,7 +367,7 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
                 }
         elif query["query_type"] ==  'nonblanks':
             new_query =  {
-                         "exists" : {"field" : "%s.lowercase" % get_es_fieldname(query["field_path"])}
+                         "exists" : {"field" :  get_sortable_es_fieldname(query["field_path"])}
                     } 
 
         elif query["query_type"] ==  'blanks':
