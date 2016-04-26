@@ -632,13 +632,16 @@ def get_schemata(project_ids, fieldlist_name="indexing", request=None):
     
  
     for pid in project_ids:
+        req = request_factory.get("/")
         if request:
+
             #Ensures that the restricted fields are obeyed if downloading data
-            req = request
+            #Note that we cannot use the request raw because it will try to export XLSX because
+            #of the way that tastypie works
+            req.user = request.user
         else:
             #If this request is coming from the reindex_all_compounds request then we need to
             #Ensure that a superuser is aganst the request so we have access to all fields
-            req = request_factory.get("/")
             req.user = user
         req.GET = req.GET.copy()
         req.GET["tabular_data_schema"] = True
