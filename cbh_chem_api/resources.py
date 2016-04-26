@@ -291,7 +291,7 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
         one spreadsheet can be used per project"""
         to_return = []
         pids = list(pids)
-        table_schemata = get_schemata(pids, "export")
+        table_schemata = get_schemata(pids, "export", request=request)
         #We have removed the schema from the index for data efficiency so
         #We need to pull it out of the project resource
             
@@ -623,7 +623,7 @@ def add_cached_projects_to_batch_list(batch_dicts, project_and_indexing_schemata
     return (batch_dicts, schemata_for_indexing)
 
 
-def get_schemata(project_ids, fieldlist_name="indexing"):
+def get_schemata(project_ids, fieldlist_name="indexing", request=None):
     if project_ids is None:
         project_ids = get_model("cbh_core_model","Project").objects.filter().values_list("id", flat=True)
     crp = ChemregProjectResource()
@@ -632,8 +632,11 @@ def get_schemata(project_ids, fieldlist_name="indexing"):
     
  
     for pid in project_ids:
-        req = request_factory.get("/")
-        req.user = user
+        if request:
+            req = request
+        else:
+            req = request_factory.get("/")
+            req.user = user
         req.GET = req.GET.copy()
         req.GET["tabular_data_schema"] = True
 
