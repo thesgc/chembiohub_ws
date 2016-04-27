@@ -199,7 +199,9 @@ edit_form /schema - an angular schema form element that can be used to edit this
             "knownBy" : bundle.obj.name,
             "renderer_named" : "customFieldRenderer",
             "className" : "htCenter htMiddle ",
-            "editable" : False
+            "editable" : True, # flags the field as editable so edit links appear in it
+            "editor" : False    # ensures that the handsontable in cell editor is disabled
+
         }
 
 
@@ -583,7 +585,7 @@ class ChemregProjectResource(UserHydrate, ModelResource):
 
         desired_format = self.determine_format(request)
         serialized = self.serialize(request, data, desired_format)
-        
+
         rc = response_class(content=serialized,
                             content_type=build_content_type(desired_format),
                             **response_kwargs)
