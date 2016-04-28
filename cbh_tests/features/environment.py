@@ -338,7 +338,7 @@ def before_scenario(context, scenario):
 
     from django.core.management import call_command
     #must index the data
-    call_command("reindex_compounds_new")
+
 
 
     from django.test.simple import DjangoTestSuiteRunner
@@ -363,7 +363,7 @@ def before_scenario(context, scenario):
     from django.test import Client
     context.dclient = Client()
     context.dclient.login(username="testuser", password="testuser")
-    
+    call_command("reindex_compounds_new")    
     context.runner.setup_test_environment()
     time.sleep(5)
 
