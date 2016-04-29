@@ -238,20 +238,28 @@ def create_index(batches, index_names, refresh=True):
     bulk_items = []
     result = {}
     if len(batches) > 0:
-        for counter, item in enumerate(batches):
-            batch_doc = {
-                "update":
-                {
-                    "_index": index_names[counter],
-                    "_type": BATCH_TYPE_NAME
+        if len(batches) == 1:
+            bid = batches[0]["dataset"].get("id", None)
+            es.index(index=index_names[0], 
+                     doc_type=BATCH_TYPE_NAME, 
+                     id=bid, 
+                     body=batches[0],
+                     refresh=True)
+        else:
+            for counter, item in enumerate(batches):
+                batch_doc = {
+                    "update":
+                    {
+                        "_index": index_names[counter],
+                        "_type": BATCH_TYPE_NAME
+                    }
                 }
-            }
-            if item["dataset"].get("id", None):
-                batch_doc["update"]["_id"] = str(item["dataset"]["id"])
-            bulk_items.append(batch_doc)
-            bulk_items.append({"doc" : item, "doc_as_upsert" : True })
-        # Data is not refreshed!
-        result = es.bulk(body=bulk_items, refresh=refresh)
+                if item["dataset"].get("id", None):
+                    batch_doc["update"]["_id"] = str(item["dataset"]["id"])
+                bulk_items.append(batch_doc)
+                bulk_items.append({"doc" : item, "doc_as_upsert" : True })
+            # Data is not refreshed!
+            result = es.bulk(body=bulk_items, refresh=True)
 
     return result
 
