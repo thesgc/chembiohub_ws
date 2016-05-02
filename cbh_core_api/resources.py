@@ -58,7 +58,14 @@ from tastypie.authorization import Authorization
 from tastypie import http
 from django.contrib.auth.views import password_reset
 from django.db import IntegrityError
-from django.db.models import get_model
+try:
+    # django >= 1.7
+    from django.apps import apps
+    get_model = apps.get_model
+except ImportError:
+    # django < 1.7
+    from django.db.models import get_model
+
 # If ``csrf_exempt`` isn't present, stub it.
 try:
     from django.views.decorators.csrf import csrf_exempt

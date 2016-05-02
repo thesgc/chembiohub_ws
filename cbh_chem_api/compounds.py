@@ -190,38 +190,7 @@ class CBHCompoundUploadResource(ModelResource):
         #    cms = CompoundMols.objects.all()
         # To be generalised
         cust = request.GET.get("search_custom_fields__kv_any", None)
-        # initialise this with project ids, sets up the correct AND
-        # initialisation with custom fields
-        '''
-        cust_queries = Q(project_id__in=set(pids))
-        if cust:
-            # loop through the custom fields
-            # split on pipe (|)
-            # put items which are from the same custom field into an OR Q query
-            # https://docs.djangoproject.com/en/1.7/topics/db/queries/#complex-lookups-with-q-objects
-            cfields = json.loads(cust)
-            grouped_fields = {}
-            for cfield in cfields:
-                cfield_parts = cfield.split("|")
-                if grouped_fields.has_key(cfield_parts[0]):
-                    grouped_fields[cfield_parts[0]].append(cfield)
-                else:
-                    grouped_fields[cfield_parts[0]] = [cfield]
 
-            #grouped_fields = json.dumps(grouped_fields)
-            for key, val in grouped_fields.iteritems():
-                print val
-                field_specific_queries = [
-                    Q(custom_fields__kv_single=value) for value in val]
-                # initialise with the first object
-                inner_queries = field_specific_queries.pop()
-                for item in field_specific_queries:
-                    # OR the subqueries from the same custom field column
-                    inner_queries |= item
-                # AND the sets of custom field queries
-                cust_queries &= inner_queries
-            #applicable_filters["custom_fields__kv_any"] = cust
-        '''
         if cms != None:
             # run the sql for pulling in new compounds into compound_mols
             indexed = CBHCompoundBatch.objects.index_new_compounds()

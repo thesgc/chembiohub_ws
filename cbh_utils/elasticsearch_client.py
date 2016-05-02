@@ -287,7 +287,9 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
         #We then join these ids queries on a per project basis
         match_these_ids_by_index = []
         for search_dict in batch_ids_by_project:
-            index_names = [get_project_index_name(pid) for pid in search_dict["project_ids"]]
+            print search_dict
+            index_names = [get_project_index_name(search_dict["project_id"]),]
+
             batch_ids = search_dict["batch_ids"]
             index_query = { "indices":
                                 {
@@ -301,6 +303,7 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
                                     "no_match_query" : "none"
                                 }
                             }
+            print index_query
             match_these_ids_by_index.append(index_query)
 
         #Each document should be in the specified ID list for the project it is in

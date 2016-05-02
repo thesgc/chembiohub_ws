@@ -33,7 +33,14 @@ from cbh_chembl_model_extension.models import _ctab2image
 from django.db import IntegrityError
 from django.test import RequestFactory
 from django.contrib.auth import login
-from django.db.models.loading import get_model
+try:
+    # django >= 1.7
+    from django.apps import apps
+    get_model = apps.get_model
+except ImportError:
+    # django < 1.7
+    from django.db.models import get_model
+
 from django.contrib.auth import get_user_model
 from copy import deepcopy
 
@@ -446,9 +453,11 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
         chemical_search_id = request.GET.get("chemical_search_id", False)
         batch_ids_by_project = None
         if chemical_search_id:
-            batch_ids_by_project = result(chemical_search_id, wait=20000)
-            if not batch_ids_by_project:
-                return HttpResponse('{"error": "Unable to process tructure search"}', status=503)
+            batch_result = result(chemical_search_id, wait=20000)
+            if not batch_result:
+                return HttpResponse('{"error": "Unable to process structure search"}', status=503)
+            else:
+                batch_ids_by_project = batch_result[0]
         if request.GET.get("format", None) != "sdf" and request.GET.get("format", None) != "xlsx":
             data = elasticsearch_client.get_list_data_elasticsearch(queries,
                 concatenated_indices,

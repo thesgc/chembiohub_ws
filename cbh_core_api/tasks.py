@@ -6,7 +6,7 @@ from django.conf import settings
 from django.contrib.auth.models import User
 from django.contrib.sessions.models import Session
 from django.http import HttpRequest
-from django.utils.importlib import import_module
+from importlib import import_module
 import datetime
 
 
