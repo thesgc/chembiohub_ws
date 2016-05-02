@@ -340,8 +340,10 @@ def before_scenario(context, scenario):
     #must index the data
 
 
-
-    from django.test.simple import DjangoTestSuiteRunner
+    try:
+        from django.test.simple import DjangoTestSuiteRunner
+    except ImportError:
+        from django.test.runner import DiscoverRunner as DjangoTestSuiteRunner
     context.runner = DjangoTestSuiteRunner(interactive=False)
 
     context.api_client = TClient()
@@ -372,15 +374,15 @@ def after_scenario(context, scenario):
     # context.runner.teardown_databases(context.old_db_config)
 
     context.api_client.client.logout()
-    from django import db
-    db.close_connection()
+    from django.db import connection
+    connection.close()
     from subprocess import call
 
 
 
 def after_all(context):
-    from django import db
-    db.close_connection()
+    from django.db import connection
+    connection.close()
     from subprocess import Popen, PIPE, call
 
         #We can't import resources unless django.setup has been called

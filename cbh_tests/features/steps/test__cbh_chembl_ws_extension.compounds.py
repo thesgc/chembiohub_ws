@@ -1,8 +1,8 @@
 from behave import given, when, then
 import json
-from cbh_core_model.models import Project, CustomFieldConfig, PinnedCustomField, ProjectType
+#from cbh_core_model.models import Project, CustomFieldConfig, PinnedCustomField, ProjectType
 from django.db import IntegrityError
-from django.contrib.auth.models import User
+#from django.contrib.auth.models import User
 
 
 

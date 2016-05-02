@@ -1,5 +1,5 @@
 from behave import given, when, then
-from django.contrib.auth.models import User
+#from django.contrib.auth.models import User
 
 
 

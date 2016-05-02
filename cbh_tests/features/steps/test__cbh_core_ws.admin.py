@@ -5,9 +5,9 @@ Note I do not test the admin UI directly as this is too much work for little rew
 
 from behave import given, when, then
 import json
-from cbh_core_model.models import Project, CustomFieldConfig, PinnedCustomField, ProjectType, PERMISSION_CODENAME_SEPARATOR
+#from cbh_core_model.models import Project, CustomFieldConfig, PinnedCustomField, ProjectType, PERMISSION_CODENAME_SEPARATOR
 from django.db import IntegrityError
-from django.contrib.auth.models import User, Permission
+#from django.contrib.auth.models import User, Permission
 
 
 

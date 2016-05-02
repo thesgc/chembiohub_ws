@@ -21,6 +21,7 @@ INSTALLED_APPS = (
 
         'grappelli',
     'django.contrib.admin',
+      'solo',
    'deployment',
    'chembl_core_db',
    'chembl_core_model',
@@ -32,10 +33,11 @@ INSTALLED_APPS = (
   'cbh_chembl_model_extension',    
   'cbh_chem_api',
   'cbh_chembl_id_generator',
-  'solo',
+
             'tastypie',
 
         'django_q',
+        'cbh_tests'
 
    )
 
