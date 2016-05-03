@@ -46,23 +46,10 @@ from copy import deepcopy
 
 EMPTY_ARRAY_B64 = b64encode("[]")
 
-from django.db.utils import ProgrammingError
-from django_q.tasks import schedule
+from django_q.tasks import async
 
 
-def db_table_exists(table_name):
-    from django.db import connection
-    exists = table_name in connection.introspection.table_names()
-    return exists
-try:
-    if db_table_exists("django_q_schedule"):
-        
-        schedule('cbh_chembl_model_extension.models.index_new_compounds',
-                name="index_new_compounds",
-                 schedule_type='H')
-except IntegrityError, ProgrammingError:
-    #Already created or running before migrations were run
-    pass
+
 
 
 class CompoundPropertiesResource(ModelResource):
@@ -690,6 +677,9 @@ def index_batches_in_new_index(batches, project_and_indexing_schemata=None):
     request = HttpRequest()
     if project_and_indexing_schemata is None:
         project_and_indexing_schemata = get_indexing_schemata({ batch.project_id  for batch in batches })
+        #This should be none for cases apart from the bulk index operation
+        #Therefore we can run the structure indexing at this point too.
+        async('cbh_chembl_model_extension.models.index_new_compounds',)
 
     IndexingCBHCompoundBatchResource().index_batch_list(request, batches, project_and_indexing_schemata)
 
