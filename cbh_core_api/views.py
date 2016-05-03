@@ -27,14 +27,14 @@ class UploadView(View):
         sets instance variables to be used in the post function in order to save model
         """
         # get flow variables
-        self.flowChunkNumber = int(request.REQUEST.get('flowChunkNumber'))
-        self.flowChunckSize = int(request.REQUEST.get('flowChunkSize'))
-        self.flowCurrentChunkSize = int(request.REQUEST.get('flowCurrentChunkSize'))
-        self.flowTotalSize = int(request.REQUEST.get('flowTotalSize'))
-        self.flowIdentifier = request.REQUEST.get('flowIdentifier')
-        self.flowFilename = request.REQUEST.get('flowFilename')
-        self.flowRelativePath = request.REQUEST.get('flowRelativePath')
-        self.flowTotalChunks = int(request.REQUEST.get('flowTotalChunks'))
+        self.flowChunkNumber = int(request.POST.get('flowChunkNumber'))
+        self.flowChunckSize = int(request.POST.get('flowChunkSize'))
+        self.flowCurrentChunkSize = int(request.POST.get('flowCurrentChunkSize'))
+        self.flowTotalSize = int(request.POST.get('flowTotalSize'))
+        self.flowIdentifier = request.POST.get('flowIdentifier')
+        self.flowFilename = request.POST.get('flowFilename')
+        self.flowRelativePath = request.POST.get('flowRelativePath')
+        self.flowTotalChunks = int(request.POST.get('flowTotalChunks'))
 
 
         # identifier is a combination of session key and flow identifier
