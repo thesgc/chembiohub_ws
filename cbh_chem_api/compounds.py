@@ -46,7 +46,7 @@ from cbh_core_model.models import Project, PinnedCustomField
 from tastypie.authentication import SessionAuthentication
 import json
 from tastypie.paginator import Paginator
-from flowjs.models import FlowFile
+from cbh_core_model.models import CBHFlowFile
 import pandas as pd
 from django.db.models import Max, Q
 from tastypie.serializers import Serializer
@@ -238,7 +238,7 @@ class CBHCompoundUploadResource(ModelResource):
         '''Fetch the UOx ids from elasticsearch'''
         bundle = self.build_bundle(request=request)
         pids = self._meta.authorization.project_ids(request)
-        filters = {"project__id__in": pids}
+        filters = {"project__id__in": pids }
         prefix = request.GET.get(
             "chembl_id__chembl_id__startswith", None).upper()
         desired_format = self.determine_format(request)
@@ -913,7 +913,7 @@ class CBHCompoundUploadResource(ModelResource):
             project=bundle.data["project"])
         try:
             b = CBHCompoundBatch.objects.from_rd_mol(
-                mol, project=bundle.data["project"])
+                mol, project=bundle.data["project"], orig_ctab=ctab)
             batches.append(b)
         except Exception, e:
             b = CBHCompoundBatch.objects.blinded(
@@ -938,7 +938,7 @@ class CBHCompoundUploadResource(ModelResource):
         pass
 
     def post_validate_files(self, request, **kwargs):
-        """Receive a flowfile ID which points at an uploaded SDF, XLSX or CDX file
+        """Receive a CBHFlowFile ID which points at an uploaded SDF, XLSX or CDX file
         Perform validation on the file's contents and then send the resultant elasticsearch index
         to the validate mult batch method
         More about data import information can be found in the wiki
@@ -955,7 +955,7 @@ class CBHCompoundUploadResource(ModelResource):
             self.get_object_list(bundle.request), bundle)
         file_name = bundle.data['file_name']
         session_key = request.COOKIES[settings.SESSION_COOKIE_NAME]
-        correct_file = FlowFile.objects.get(
+        correct_file = CBHFlowFile.objects.get(
             identifier="%s-%s" % (session_key, file_name))
         batches = []
         headers = []
@@ -1684,59 +1684,6 @@ class CBHCompoundMultipleBatchResource(ModelResource):
         """When listing the multiple batches, ensure that the uploaded data field is not serialized"""
         return super(CBHCompoundMultipleBatchResource, self).get_object_list(request).defer('uploaded_data').prefetch_related(Prefetch("project"))
 
-
-class CBHCompoundBatchUpload(ModelResource):
-    """
-    May be deprecated
-    """
-    class Meta:
-        excludes = ['uploaded_data']
-        always_return_data = True
-        queryset = FlowFile.objects.all()
-        resource_name = 'cbh_batch_upload'
-        authorization = Authorization()
-        include_resource_uri = False
-        allowed_methods = ['get', 'post', 'put']
-        default_format = 'application/json'
-        authentication = SessionAuthentication()
-
-    def prepend_urls(self):
-        """Add a url to the API"""
-        return [
-            url(r"^(?P<resource_name>%s)/headers/?$" % self._meta.resource_name,
-                self.wrap_view('return_headers'), name="api_compound_batch_headers"),
-        ]
-
-    def return_headers(self, request, **kwargs):
-        """List the headers from an imported SDF or XLSX file"""
-        deserialized = self.deserialize(request, request.body, format=request.META.get(
-            'CONTENT_TYPE', 'application/json'))
-
-        deserialized = self.alter_deserialized_detail_data(
-            request, deserialized)
-        bundle = self.build_bundle(
-            data=dict_strip_unicode_keys(deserialized), request=request)
-        request_json = bundle.data
-        file_name = request_json['file_name']
-        session_key = request.COOKIES[settings.SESSION_COOKIE_NAME]
-        correct_file = self.get_object_list(request).get(
-            identifier="%s-%s" % (session_key, file_name))
-
-        header_json = {}
-        if (correct_file.extension == ".sdf"):
-            # read in the file
-            headers = get_all_sdf_headers(correct_file.file.name)
-        elif(correct_file.extension in (".xls", ".xlsx")):
-            # read in excel file, use pandas to read the headers
-            df = pd.read_excel(correct_file.file)
-            headers = list(df)
-        # this converts to json in preparation to be added to the response
-        bundle.data["headers"] = list(set(headers))
-        # send back
-        # we should allow SD file uploads with no meta data
-        if (len(headers) == 0 and correct_file.extension in (".xls", ".xlsx")):
-            raise BadRequest("no_headers")
-        return self.create_response(request, bundle, response_class=http.HttpAccepted)
 
 
 def get_all_sdf_headers(filename):

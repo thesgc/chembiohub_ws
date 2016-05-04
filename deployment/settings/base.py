@@ -701,7 +701,7 @@ TABULAR_DATA_SETTINGS = {
     },
     "export" : {
         "start" :["project_counter","image","uuid", "projectfull.name"],
-        "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id","canonical_smiles" ,
+        "end" : ["userfull.display_name" ,"timestamp" , "id" , "multiple_batch_id","canonical_smiles" ,
         "standard_inchi" ,
         "standard_inchi_key" ,
         "related_molregno.compoundproperties.full_mwt" ,
@@ -710,15 +710,15 @@ TABULAR_DATA_SETTINGS = {
                 },
     "cbh.restoreitems": {
         "start" :["project_counter","properties.archived", "image","uuid", "projectfull.name"],
-        "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
+        "end" : ["userfull.display_name" ,"timestamp" , "id" , "multiple_batch_id"]
                 },
     "cbh.archiveitems": {
         "start" :["project_counter","properties.archived", "image","uuid", "projectfull.name"],
-        "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
+        "end" : ["userfull.display_name" ,"timestamp" , "id" , "multiple_batch_id"]
                 },
     "cbh.searchv2": {
         "start" :[ "project_counter","clone", "image","uuid", "projectfull.name"],
-        "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id" ,"canonical_smiles" ,
+        "end" : ["userfull.display_name" ,"timestamp" , "id" , "multiple_batch_id" ,"canonical_smiles" ,
         "standard_inchi" ,
         "standard_inchi_key" ,
         "related_molregno.compoundproperties.full_mwt" ,
@@ -731,7 +731,7 @@ TABULAR_DATA_SETTINGS = {
                 },
     "indexing" : {
         "start" :["project_counter","uuid", "projectfull.name", "properties.archived","projectfull.project_type.saved_search_project_type"],
-        "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id","canonical_smiles" ,
+        "end" : ["userfull.display_name" ,"timestamp" , "id" , "multiple_batch_id","canonical_smiles" ,
         "standard_inchi" ,
         "standard_inchi_key" ,
         "related_molregno.compoundproperties.full_mwt" ,
@@ -740,7 +740,7 @@ TABULAR_DATA_SETTINGS = {
     },
     "indexing_temp" : {
         "start" :[ "row", "originalSmiles","properties.action","standardInchiKey", ],
-        "end" : ["created_by" ,"timestamp" , "id" , "multiple_batch_id"]
+        "end" : ["userfull.display_name" ,"timestamp" , "id" , "multiple_batch_id"]
     },
     "schema": {
 
@@ -839,10 +839,10 @@ TABULAR_DATA_SETTINGS = {
             "className": "htCenter htMiddle ",
             "renderer_named": "projectRenderer",
         },
-        "created_by" : {
+        "userfull.display_name" : {
             "noSort": True,
             "knownBy": "Added By",
-            "data": "created_by",
+            "data": "userfull.display_name",
             "searchFormType" : "pick_from_list",
             "editable": False,
             "className": "htCenter htMiddle ",
