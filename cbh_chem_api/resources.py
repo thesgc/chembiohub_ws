@@ -16,6 +16,7 @@ from tastypie.authorization import Authorization
 from tastypie import fields
 from cbh_core_api.authorization import ProjectAuthorization
 from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate, CBHNoSerializedDictField,  ChemregProjectResource, ChemRegCustomFieldConfigResource, NoCustomFieldsChemregProjectResource
+from cbh_core_model.models import Project
 from cbh_utils import elasticsearch_client
 import json 
 from django.http import HttpResponse, HttpRequest
@@ -601,16 +602,19 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
     def reindex_elasticsearch(self, request, **kwargs):
         """Reindex all of the data into elasticsearch"""
         desired_format = self.determine_format(request)
-        batches = self.get_object_list(request)
-        # we only want to store certain fields in the search index
-        from django.core.paginator import Paginator
-        paginator = Paginator(batches, 5000) # chunks of 1000
-        #Get all schemata for all projects 
-        indexing_schemata = get_indexing_schemata(None)
-        for page in range(1, paginator.num_pages +1):
+        projects = Project.objects.all().values_list("id", flat=True)
+        for index, pid in enumerate(projects):
+            batches = self.get_object_list(request).filter(project_id=pid)
+            # we only want to store certain fields in the search index
+            from django.core.paginator import Paginator
+            paginator = Paginator(batches, 2000) # chunks of 1000
+            #Get all schemata for all projects 
+            indexing_schemata = get_indexing_schemata([pid])
+            for page in range(1, paginator.num_pages +1):
         
-            result_list = index_batches_in_new_index(paginator.page(page).object_list, project_and_indexing_schemata=indexing_schemata)
-            print "%d of %s" % (page, paginator.num_pages)
+                result_list = index_batches_in_new_index(paginator.page(page).object_list, project_and_indexing_schemata=indexing_schemata)
+                print "%d of %s" % (page, paginator.num_pages)
+            print "%d projects of %d" % (index+1,len(projects)) 
         return HttpResponse(content="test", )
         
     class Meta(BaseCBHCompoundBatchResource.Meta):
