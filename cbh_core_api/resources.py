@@ -405,6 +405,7 @@ class ChemregProjectResource(UserHydrate, ModelResource):
     created_by = fields.ForeignKey(
         "cbh_core_api.resources.UserResource", 'created_by', help_text="The user who created this Project")
     users_restricted_fields = fields.ListField(default=[], help_text="Possibly deprecated, was meant to list the restricted fields")
+    flowjs_upload_url = fields.CharField(default="", help_text="The URL to be used when uploading data or attachments associated with this project")
 
     class Meta:
 
@@ -423,6 +424,12 @@ class ChemregProjectResource(UserHydrate, ModelResource):
             'id': ALL_WITH_RELATIONS,
         }
         always_return_data=True
+
+    def dehydrate_flowjs_upload_url(self, bundle):
+        try:
+            return reverse('flowv2_upload', kwargs={'project_id': bundle.obj.id })
+        except Exception:
+            return ""
 
 
     def dehydrate_assays_configured(self, bundle):
@@ -503,18 +510,6 @@ class ChemregProjectResource(UserHydrate, ModelResource):
         userbundle = userres.full_dehydrate(userbundle)
         bundle['user'] = userbundle.data
         self._meta.authorization.alter_project_data_for_permissions(bundle, request)
-        for bund in bundle[self._meta.collection_name]:
-            #print("bund")
-            #print(bund)
-            for field in bund.data['custom_field_config'].data['project_data_fields']:
-                if field.data['field_type'] == field.obj.FILE_ATTACHMENT:
-                    field.data['edit_form']['form'][0]['uploadOptions']['modal']['flow']['init'] = { 'target': reverse('flowv2_upload', 
-                                                                                                            kwargs={'project_id': bund.data['id'],
-                                                                                                                    }), 
-                                                                                                     'headers': {
-                                                                                                        'X-CSRFToken': csrf.get_token(request)
-                                                                                                                } 
-                                                                                                            }
         
 
         names_list = [] 
