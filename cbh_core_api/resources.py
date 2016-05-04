@@ -1362,8 +1362,9 @@ class UserResource(ModelResource):
         """
         Whether the user is logged in
         """
-        if bundle.obj.id == bundle.request.user.id:
-            return True
+        if hasattr(bundle.request, "user"):
+            if bundle.obj.id == bundle.request.user.id:
+                return True
         return False
 
     def dehydrate_can_view_chemreg(self, bundle):

@@ -541,6 +541,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
     indexed in elasticsearch"""
     project = SimpleResourceURIField(ChemregProjectResource, "project_id")
     projectfull = SimpleResourceURIField(ChemregProjectResource, "project_id")
+    userfull = fields.DictField(default={})
 
     def prepare_fields_for_index(self, batch_dicts):
         """Fields are stored as strings in hstore so convert the list or object fields back from JSON"""
@@ -574,6 +575,8 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
 
     def index_batch_list(self, request, batch_list, project_and_indexing_schemata, refresh=True):
         """Index a list or queryset of compound batches into the elasticsearch indices (one index per project)"""
+        user_list = json.loads(UserResource().get_list(request).content)
+        user_lookup = { u["resource_uri"]: u for u in user_list["objects"] }
         bundles = [
             self.full_dehydrate(self.build_bundle(obj=obj, request=request), for_list=True)
             for obj in batch_list
@@ -594,6 +597,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
             batch["projectfull"]["custom_field_config"] = batch["projectfull"]["custom_field_config"]["resource_uri"]
             index_name = elasticsearch_client.get_project_index_name(batch["projectfull"]["id"])
             index_names.append(index_name)
+            batch["userfull"] = user_lookup[batch["creator"]]
         
         batch_dicts = elasticsearch_client.index_dataset(batch_dicts, indexing_schemata, index_names, refresh=refresh)
             

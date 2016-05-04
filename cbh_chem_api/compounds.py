@@ -238,7 +238,7 @@ class CBHCompoundUploadResource(ModelResource):
         '''Fetch the UOx ids from elasticsearch'''
         bundle = self.build_bundle(request=request)
         pids = self._meta.authorization.project_ids(request)
-        filters = {"project__id__in": pids}
+        filters = {"project__id__in": pids }
         prefix = request.GET.get(
             "chembl_id__chembl_id__startswith", None).upper()
         desired_format = self.determine_format(request)
@@ -913,7 +913,7 @@ class CBHCompoundUploadResource(ModelResource):
             project=bundle.data["project"])
         try:
             b = CBHCompoundBatch.objects.from_rd_mol(
-                mol, project=bundle.data["project"])
+                mol, project=bundle.data["project"], orig_ctab=ctab)
             batches.append(b)
         except Exception, e:
             b = CBHCompoundBatch.objects.blinded(
