@@ -579,7 +579,7 @@ class CBHCompoundUploadResource(ModelResource):
         return curated_value
 
     def update_temp_batches(self, request, **kwargs):
-        '''change the structure column for an excel file'''
+        '''Update a set of molecules into elasticsearch (used in ChemBio Hub to set the action field to ignore or new batch)'''
         deserialized = self.deserialize(request, request.body, format=request.META.get(
             'CONTENT_TYPE', 'application/json'))
 
