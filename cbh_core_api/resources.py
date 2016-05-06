@@ -1315,7 +1315,8 @@ class UserResource(ModelResource):
 
     class Meta:
         filtering = {
-            "username": ALL_WITH_RELATIONS
+            "username": ALL_WITH_RELATIONS,
+            "id": ALL_WITH_RELATIONS,
         }
         queryset = User.objects.all()
         resource_name = 'users'

@@ -283,7 +283,7 @@ class BaseCBHCompoundBatchResource(ModelResource):
         return value
 
 
-    def hydrate_creator(self, bundle):
+    def hydrate(self, bundle):
         bundle.obj.created_by_id = bundle.request.user.id
         return bundle
 
@@ -578,8 +578,15 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
 
     def index_batch_list(self, request, batch_list, project_and_indexing_schemata, refresh=True):
         """Index a list or queryset of compound batches into the elasticsearch indices (one index per project)"""
+        
         request.GET = request.GET.copy()
         request.GET["limit"] = "10000"
+        ids = {b.created_by_id  for b in batch_list}
+        no_none = []
+        for uid in ids:
+            if uid:
+                no_none.append(str(uid))
+        request.GET["id__in"] = ",".join(no_none)
         user_list = json.loads(UserResource().get_list(request).content)
         user_lookup = { u["resource_uri"]: u for u in user_list["objects"] }
         bundles = [
@@ -691,8 +698,6 @@ def index_batches_in_new_index(batches, project_and_indexing_schemata=None):
         project_and_indexing_schemata = get_indexing_schemata({ batch.project_id  for batch in batches })
         #This should be none for cases apart from the bulk index operation
         #Therefore we can run the structure indexing at this point too.
-        async('cbh_chembl_model_extension.models.index_new_compounds',)
-
     IndexingCBHCompoundBatchResource().index_batch_list(request, batches, project_and_indexing_schemata)
 
 
