@@ -578,6 +578,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         """Index a list or queryset of compound batches into the elasticsearch indices (one index per project)"""
         user_list = json.loads(UserResource().get_list(request).content)
         user_lookup = { u["resource_uri"]: u for u in user_list["objects"] }
+        print user_lookup
         bundles = [
             self.full_dehydrate(self.build_bundle(obj=obj, request=request), for_list=True)
             for obj in batch_list
