@@ -207,7 +207,7 @@ def chunks(l, n):
     for i in range(0, len(l), n):
         yield l[i:i+n]
 
-class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
+class BaseCBHCompoundBatchResource(ModelResource):
     """New base resource for a compound batch, abstract implementation used
     in the indexing of compound batches as well as in the search API and the saved searches
     ModelResource - these fields are in addition to the fields already present in the CBHCompoundBatch model"""
@@ -283,7 +283,9 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
         return value
 
 
-
+    def hydrate_creator(self, bundle):
+        bundle.obj.created_by_id = bundle.request.user.id
+        return bundle
 
 
     def get_project_specific_data(self, request, queries, pids, sorts, textsearch, batch_ids_by_project):
