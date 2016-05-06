@@ -380,7 +380,112 @@ class BaseCBHCompoundBatchResource(ModelResource):
         return self.create_response(request, bundle)
 
 
-    
+
+
+
+    def save_related(self, bundle):
+        """
+        Handles the saving of related non-M2M data.
+        Calling assigning ``child.parent = parent`` & then calling
+        ``Child.save`` isn't good enough to make sure the ``parent``
+        is saved.
+        To get around this, we go through all our related fields &
+        call ``save`` on them if they have related, non-M2M data.
+        M2M data is handled by the ``ModelResource.save_m2m`` method.
+        """
+        for field_name, field_object in self.fields.items():
+            if not field_object.is_related:
+                continue
+
+            if field_object.is_m2m:
+                continue
+
+            if not field_object.attribute:
+                continue
+
+            if field_object.readonly:
+                continue
+
+            if field_object.blank and field_name not in bundle.data:
+                continue
+
+            # Get the object.
+            try:
+                related_obj = getattr(bundle.obj, field_object.attribute)
+            except ObjectDoesNotExist:
+                # Django 1.8: unset related objects default to None, no error
+                related_obj = None
+
+            # We didn't get it, so maybe we created it but haven't saved it
+            if related_obj is None:
+                related_obj = bundle.related_objects_to_save.get(field_object.attribute, None)
+
+            if field_object.related_name:
+                if not self.get_bundle_detail_data(bundle):
+                    bundle.obj.save()
+
+                setattr(related_obj, field_object.related_name, bundle.obj)
+
+            related_resource = field_object.get_related_resource(related_obj)
+
+            if bundle.data.get(field_name) and hasattr(bundle.data[field_name], 'keys'):
+                # Only build & save if there's data, not just a URI.
+                related_bundle = related_resource.build_bundle(
+                    obj=related_obj,
+                    data=bundle.data.get(field_name),
+                    request=bundle.request,
+                    objects_saved=bundle.objects_saved
+                )
+                related_resource.full_hydrate(related_bundle)
+                if field_name != "project":
+                    related_resource.save(related_bundle)
+                related_obj = related_bundle.obj
+
+            if related_obj:
+                setattr(bundle.obj, field_object.attribute, related_obj)
+
+
+
+
+
+
+
+
+
+
+
+    def save(self, bundle, skip_errors=False):
+        if bundle.via_uri:
+            return bundle
+
+        self.is_valid(bundle)
+
+        if bundle.errors and not skip_errors:
+
+            raise ImmediateHttpResponse(response=self.error_response(bundle.request, bundle.errors))
+
+        # Check if they're authorized.
+        if bundle.obj.pk:
+            self.authorized_update_detail(self.get_object_list(bundle.request), bundle)
+        else:
+            self.authorized_create_detail(self.get_object_list(bundle.request), bundle)
+
+
+        # Save FKs just in case.
+        self.save_related(bundle)
+        print "got"
+
+        # Save the main object.
+        obj_id = self.create_identifier(bundle.obj)
+
+        if obj_id not in bundle.objects_saved or bundle.obj._state.adding:
+            bundle.obj.save()
+            bundle.objects_saved.add(obj_id)
+
+        # Now pick up the M2M bits.
+        m2m_bundle = self.hydrate_m2m(bundle)
+        self.save_m2m(m2m_bundle)
+        return bundle
 
     def get_list(self, request, **kwargs):
         """
