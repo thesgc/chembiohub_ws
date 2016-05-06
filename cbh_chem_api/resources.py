@@ -576,9 +576,10 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
 
     def index_batch_list(self, request, batch_list, project_and_indexing_schemata, refresh=True):
         """Index a list or queryset of compound batches into the elasticsearch indices (one index per project)"""
+        request.GET = request.GET.copy()
+        request.GET["limit"] = "10000"
         user_list = json.loads(UserResource().get_list(request).content)
         user_lookup = { u["resource_uri"]: u for u in user_list["objects"] }
-        print user_lookup
         bundles = [
             self.full_dehydrate(self.build_bundle(obj=obj, request=request), for_list=True)
             for obj in batch_list
@@ -599,7 +600,6 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
             batch["projectfull"]["custom_field_config"] = batch["projectfull"]["custom_field_config"]["resource_uri"]
             index_name = elasticsearch_client.get_project_index_name(batch["projectfull"]["id"])
             index_names.append(index_name)
-            print batch["creator"]
             batch["userfull"] = user_lookup[batch["creator"]]
         
         batch_dicts = elasticsearch_client.index_dataset(batch_dicts, indexing_schemata, index_names, refresh=refresh)
