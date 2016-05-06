@@ -600,7 +600,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
             batch["projectfull"]["custom_field_config"] = batch["projectfull"]["custom_field_config"]["resource_uri"]
             index_name = elasticsearch_client.get_project_index_name(batch["projectfull"]["id"])
             index_names.append(index_name)
-            batch["userfull"] = user_lookup[batch["creator"]]
+            batch["userfull"] = user_lookup.get(batch["creator"], {"display_name" : "User Deleted"})
         
         batch_dicts = elasticsearch_client.index_dataset(batch_dicts, indexing_schemata, index_names, refresh=refresh)
             
