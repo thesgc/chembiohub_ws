@@ -22,6 +22,9 @@ def project_types(context):
 
 
 
+
+
+
 @given("testuser")
 def step(context):
     pass
@@ -113,6 +116,14 @@ def projects(context):
     resp = context.api_client.client.get("/" + settings.WEBSERVICES_NAME + "/cbh_projects/")
     context.test_case.assertHttpOK(resp)
     context.projects_on_system = json.loads(resp.content)["objects"]
+
+
+@then("the upload URL from the first project in the list points to the right place")
+def test_url(context):
+    from django.conf import settings
+    context.upload_url = context.projects_on_system[0]["flowjs_upload_url"]
+    context.test_case.assertEqual(context.upload_url, "/" + settings.WEBSERVICES_NAME + "/flowv2/upload/1/")
+
 
 
 @when("I patch the updated first project in the list back to the system")

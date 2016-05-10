@@ -5,17 +5,6 @@ from django.db import IntegrityError
 #from django.contrib.auth.models import User
 
 
-
-
-
-
-
-
-
-
-
-
-
 @given(u'I create a compound batch from a drawing as before')
 def step_impl(context):
     context.execute_steps(u"""
@@ -35,7 +24,7 @@ def step_impl(context):
 @when(u'I request the compound batch with ID 1 from the get_detail api')
 def step_impl(context):
     from django.conf import settings
-    resp = context.api_client.get("/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches/1" , format='json')
+    resp = context.api_client.get("/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches_v2/1" , format='json')
     context.batch_response = resp
 
 @then(u'the batch response is OK')
@@ -43,26 +32,29 @@ def step_impl(context):
     context.test_case.assertHttpOK(context.batch_response)
 
 
-@when(u'I list compound batches in the system with get_list_elasticsearch')
+@when(u'I list compound batches in the system')
 def step_impl(context):
     from django.conf import settings
-    resp = context.api_client.get("/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches/get_list_elasticsearch/", format='json')
+    resp = context.api_client.get("/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches_v2/", format='json')
     context.batches_response = resp
 
-@then(u'the created compound batch has a uox id in the chemblId field')
+@then(u'the created compound batch has a uox id in the uuid field')
 def step_impl(context):
     from django.conf import settings
     data = json.loads(context.batches_response.content)["objects"]
-    context.test_case.assertEquals(len(data), 1)
+    print("final")
     print(data)
-    context.test_case.assertTrue(data[0]["chemblId"].startswith(settings.ID_PREFIX))
+    context.test_case.assertEquals(len(data), 1)
+
+    
+    context.test_case.assertTrue(data[0]["uuid"].startswith(settings.ID_PREFIX))
 
 
-@then("the created compound batch has a multipleBatchId")
+@then("the created compound batch has a multiple_batch_id")
 def step(context):
     data = json.loads(context.batches_response.content)["objects"]
     context.test_case.assertEquals(len(data), 1)
-    context.test_case.assertEquals(data[0]["multipleBatchId"], 1)
+    context.test_case.assertEquals(data[0]["multiple_batch_id"], 1)
 
 
 
@@ -133,10 +125,10 @@ def proj_create(context):
 
 
 
-@given(u'I add the blinded batch id as EMPTY_STRING')
+@given(u'I add the blinded batch id as EMPTY_ID')
 def step_impl(context):
     project_json = json.loads(context.project_response.content)
-    context.saved_search_data["blinded_batch_id"] =  "EMPTY_STRING"
+    context.saved_search_data["blinded_batch_id"] =  "EMPTY_ID"
 
 
 @given(u'I add the project key')
@@ -158,7 +150,7 @@ def step_impl(context):
         When I POST a project to cbh_projects
         Then the project is created
         Given A URL to redirect the user to and a GET request URL and an alias and description for my saved search
-        and I add the blinded batch id as EMPTY_STRING
+        and I add the blinded batch id as EMPTY_ID
         and I add the project key
         When I send the search by POST request
         Then The saved search response is created
@@ -188,10 +180,10 @@ def step(context):
 
 
 
-@given(u'I add the blinded batch id to my compound POST data as EMPTY_STRING')
+@given(u'I add the blinded batch id to my compound POST data as EMPTY_ID')
 def step_impl(context):
     project_json = json.loads(context.project_response.content)
-    context.post_data["blinded_batch_id"] =  "EMPTY_STRING"
+    context.post_data["blinded_batch_id"] =  "EMPTY_ID"
 
 
 
@@ -246,8 +238,9 @@ def step_impl(context):
 @when(u'I submit the compound by POST request')
 def step_impl(context):
     from django.conf import settings
-    resp = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches/", format='json', data=context.post_data)
+    resp = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches_v2/", format='json', data=context.post_data)
     context.compound_response = resp
+    print (resp.content)
 
 
 @then(u'a compound batch is created')
@@ -255,10 +248,18 @@ def step_impl(context):
     context.test_case.assertHttpCreated(context.compound_response)
 
 
+#The below scenarios are inconsistent and need an update
 @given(u'I add the project key to the compound data')
 def step_impl(context):
     project_json = json.loads(context.project_response.content)
     context.post_data["project_key"] =  project_json["project_key"]
+
+
+@given(u'I add the project primary key to the compound data')
+def step_impl(context):
+    project_json = json.loads(context.project_response.content)
+    context.post_data["project"] =  {"pk" : project_json["id"] }
+
 
 
 @given(u'I set the state to validate')
@@ -270,19 +271,12 @@ def step_impl(context):
 
 
 
-@when(u'I reindex the compound')
-def step_impl(context):
-    from django.conf import settings
-    comp = json.loads(context.compound_response.content)
-    resp = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/cbh_saved_search/reindex_compound/", format='json', data={"id": comp["id"]})
-    context.compound_index_response = resp
-
-
 @then(u'the blinded batch ID is generated')
 def step_impl(context):
     from django.conf import settings
     comp = json.loads(context.compound_response.content)
-    context.test_case.assertTrue(comp["blindedBatchId"].startswith(settings.ID_PREFIX))
+    print (comp["blinded_batch_id"])
+    context.test_case.assertTrue(comp["blinded_batch_id"].startswith(settings.ID_PREFIX))
 
 
 

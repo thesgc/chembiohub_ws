@@ -1,5 +1,6 @@
 Feature: A user can save a search and owns it, organisations can also own a saved search
 
+    @wipnot
     Scenario: A saved search is created
         Given I have loaded the fixtures for project types
         Given testuser
@@ -11,7 +12,7 @@ Feature: A user can save a search and owns it, organisations can also own a save
         Then the project is created
         When I refresh the user object
         Given A URL to redirect the user to and a GET request URL and an alias and description for my saved search
-        and I add the blinded batch id as EMPTY_STRING
+        and I add the blinded batch id as EMPTY_ID
         and I add the project key
         When I send the search by POST request
         Then The saved search response is created
@@ -19,7 +20,7 @@ Feature: A user can save a search and owns it, organisations can also own a save
         Then The saved search index response is OK
 
 
-
+    @wipnot
     Scenario: A user can list the compound batches on the system and does not see this saved search as it is in a saved search project
         Given I create a saved search as before
         When I list compound batches in the system with get_list_elasticsearch
@@ -27,7 +28,7 @@ Feature: A user can save a search and owns it, organisations can also own a save
         and I see no compound batches
 
 
-
+    @wipnot
     Scenario: A user can list the saved searches on the system and sees this
         Given I create a saved search as before
         When I list saved searches in the system with get_list_elasticsearch

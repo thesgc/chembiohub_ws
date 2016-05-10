@@ -365,9 +365,13 @@ def before_scenario(context, scenario):
     from django.test import Client
     context.dclient = Client()
     context.dclient.login(username="testuser", password="testuser")
-    call_command("reindex_compounds_new")    
+    call_command("reindex_compounds_new")   
+    import elasticsearch
+    es = elasticsearch.Elasticsearch()
+    #Delete all existing indices
+    es.indices.delete("dev*")
     context.runner.setup_test_environment()
-    time.sleep(5)
+    
 
 def after_scenario(context, scenario):
     # Tear down the scenario test environment.
