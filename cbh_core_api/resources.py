@@ -980,8 +980,6 @@ def build_content_type(format, encoding='utf-8'):
 
 
 
-
-
 class SkinningResource(ModelResource):
 
     '''URL resourcing for pulling out sitewide skinning config 

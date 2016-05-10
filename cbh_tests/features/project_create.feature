@@ -2,7 +2,7 @@ Feature: user can create projects
 
 
     Scenario: User can create a project if they have permission to
-        Given I have loaded the fixtures for project types and data types
+        Given I have loaded the fixtures for project types
         Given testuser
         Given testuser has the cbh_core_model.add_project permission
         When I log in testuser
@@ -15,7 +15,7 @@ Feature: user can create projects
 
 
     Scenario: User cannot create a project if they do not have that permission
-        Given I have loaded the fixtures for project types and data types
+        Given I have loaded the fixtures for project types
         Given testuser
         When I log in testuser
         Then I can list the projects types on the system and there are 4

@@ -15,7 +15,7 @@ Feature: A user can save a compound with and without a structure and can clone a
 
 
     Scenario: A compound batch with structure has a UOx ID  in the chemblId field
-        Given I have loaded the fixtures for project types and data types
+        Given I have loaded the fixtures for project types
         Given testuser
         Given testuser has the cbh_core_model.add_project permission
         When I log in testuser

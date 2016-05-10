@@ -1,13 +1,13 @@
 from behave import given, when, then
 import json
-#from cbh_core_model.models import Project, CustomFieldConfig, PinnedCustomField, ProjectType, PERMISSION_CODENAME_SEPARATOR
+
 from django.db import IntegrityError
-#from django.contrib.auth.models import User, Permission
 
 
 @then("the project permission name matches the new name of the project")
 def test_sync_permissions_name_change(context):
-
+    from django.contrib.auth.models import User, Permission
+    from cbh_core_model.models import  PERMISSION_CODENAME_SEPARATOR
     projdata = json.loads(context.updated_project_response.content)
     id = projdata["id"]
     perms = Permission.objects.filter(codename__startswith=str(id) + PERMISSION_CODENAME_SEPARATOR)
@@ -32,12 +32,17 @@ def test_custom_field_config_permissions_name_change(context):
 
 @then("the project creator is automatically an owner")
 def test_sync_permissions_owner(context):
+    from cbh_core_model.models import User
+    from cbh_core_model.models import  PERMISSION_CODENAME_SEPARATOR
     context.user = User.objects.get(pk=context.user.pk)
     context.test_case.assertTrue(context.user.has_perm("cbh_core_model.%d%sowner" % (context.projects_on_system[0]["id"],  PERMISSION_CODENAME_SEPARATOR  )))
 
 
 @given("I make testuser a viewer of the first project in the list")
 def test_make_viewer(context):
+    from cbh_core_model.models import  PERMISSION_CODENAME_SEPARATOR
+    from cbh_core_model.models import User
+    from cbh_core_model.models import User, Project
     p = Project.objects.get(pk=context.projects_on_system[0]["id"])
     context.test_case.assertFalse(context.user.has_perm("cbh_core_model.%d%sviewer" % (context.projects_on_system[0]["id"],  PERMISSION_CODENAME_SEPARATOR  )))    
     p.make_viewer(context.user)
@@ -48,6 +53,8 @@ def test_make_viewer(context):
 
 @given("I make testuser an editor of the first project in the list")
 def test_make_editor(context):
+    from cbh_core_model.models import  PERMISSION_CODENAME_SEPARATOR
+    from cbh_core_model.models import User, Project
     p = Project.objects.get(pk=context.projects_on_system[0]["id"])
     context.test_case.assertFalse(context.user.has_perm("cbh_core_model.%d%seditor" % (context.projects_on_system[0]["id"],  PERMISSION_CODENAME_SEPARATOR  )))
     p.make_editor(context.user)
@@ -57,22 +64,11 @@ def test_make_editor(context):
 
 @given("I remove all of the testusers permissions")
 def remove_perms(context):
+    from cbh_core_model.models import User
     context.user.user_permissions.clear()
     #Need to re fetch the user from the database - see  https://docs.djangoproject.com/en/1.8/topics/auth/default/#permission-caching
     context.user = User.objects.get(pk=context.user.pk)
 
-
-
-# @given("I create new custom field configs and data form configs based on the data given")
-# def create_realdata(context):
-#     from cbh_core_model.models import Project, CustomFieldConfig, PinnedCustomField, ProjectType, DataType, DataFormConfig
-#     from cbh_datastore_model.models import DataPoint, DataPointClassification, DataPointClassificationPermission
-#     setup = OrderedDict(
-#         [("l0", {"dtype": "Project", }),
-#          ("l1", {"dtype": "Sub-project", }),
-#          ("l2", {"dtype": "Assay"}),
-#          ("l3", {"dtype": "Activity"}), ]
-#     )
 
 
 

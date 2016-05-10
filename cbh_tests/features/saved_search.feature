@@ -1,7 +1,7 @@
 Feature: A user can save a search and owns it, organisations can also own a saved search
 
     Scenario: A saved search is created
-        Given I have loaded the fixtures for project types and data types
+        Given I have loaded the fixtures for project types
         Given testuser
         Given testuser has the cbh_core_model.add_project permission
         When I log in testuser
