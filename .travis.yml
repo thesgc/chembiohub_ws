@@ -20,4 +20,4 @@ script:
 - export PATH=/home/travis/anaconda2/envs/dev/bin:$PROJECT_HOME:$HOME/anaconda2/bin/:$PATH
 
 - export DJANGO_SETTINGS_MODULE="deployment.settings.default"
-- $CONDA_ENV_PATH/bin/behave cbh_tests/features/ -i project
+- $CONDA_ENV_PATH/bin/behave cbh_tests/features/ --tags=-wip,-wipnot

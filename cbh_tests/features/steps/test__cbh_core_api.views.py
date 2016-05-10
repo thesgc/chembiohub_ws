@@ -9,7 +9,7 @@ def step(context):
     """Note that here we use the django client rather than the tastypie client"""
     from django.conf import settings
     with open("cbh_tests/test_image.png") as f:
-        context.flowfilepostresp = context.api_client.client.post("/" + settings.WEBSERVICES_NAME + "/flow/upload/", {"file": f, "flowChunkNumber": 1, 
+        context.flowfilepostresp = context.api_client.client.post(context.upload_url, {"file": f, "flowChunkNumber": 1, 
             "flowChunkSize": 22222222, 
             "flowCurrentChunkSize": 137227,
             "flowTotalSize": 137227,
@@ -26,7 +26,7 @@ def step(context, filename):
     from django.conf import settings
     context.current_uuid = shortuuid.uuid()
     with open("cbh_tests/fixtures/%s" % filename) as f:
-        context.flowfilepostresp = context.api_client.client.post("/" + settings.WEBSERVICES_NAME + "/flow/upload/",  {"file": f, "flowChunkNumber": 1, 
+        context.flowfilepostresp = context.api_client.client.post(context.upload_url,  {"file": f, "flowChunkNumber": 1, 
             "flowChunkSize": 22222222, 
             "flowCurrentChunkSize": 137227,
             "flowTotalSize": 137227,

@@ -3,15 +3,18 @@ Feature: A user can upload a file and save compounds
     Scenario: A flow file can be uploaded for use in compounds
         Given I create a project as before
         When I refresh the user object
+        Then I can list the projects on the system
+        Then the upload URL from the first project in the list points to the right place
         When I upload eight_member_ring.xlsx to flowfiles
         Then The flow file response contains the identifier I gave the file
 
     Scenario Outline: Data in a file can be previewed based on 20+ examples
         Given I create a project as before
         When I refresh the user object
+        Then I can list the projects on the system
+        Then the upload URL from the first project in the list points to the right place
         When I upload <filename> to flowfiles
         Then The flow file response contains the identifier I gave the file
-
         When I validate the compounds file
         Then the response from post validate files is accepted
 
