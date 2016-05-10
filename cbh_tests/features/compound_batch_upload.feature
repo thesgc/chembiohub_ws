@@ -44,5 +44,3 @@ Feature: A user can upload a file and save compounds
 
 
 
-
-   # Scenario: An 8 membered ring and an organometallic complex can be register
