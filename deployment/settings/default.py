@@ -169,3 +169,9 @@ try:
     from .secret import *
 except ImportError:
     print "No Secret settings, using default secret key which is insecure"
+try:
+    import django_webauth
+    INSTALLED_APPS = list(INSTALLED_APPS) + ["django_webauth",]
+except ImportError:
+    pass
+

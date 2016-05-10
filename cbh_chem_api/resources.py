@@ -16,6 +16,7 @@ from tastypie.authorization import Authorization
 from tastypie import fields
 from cbh_core_api.authorization import ProjectAuthorization
 from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate, CBHNoSerializedDictField,  ChemregProjectResource, ChemRegCustomFieldConfigResource, NoCustomFieldsChemregProjectResource
+from cbh_core_model.models import Project
 from cbh_utils import elasticsearch_client
 import json 
 from django.http import HttpResponse, HttpRequest
@@ -206,7 +207,7 @@ def chunks(l, n):
     for i in range(0, len(l), n):
         yield l[i:i+n]
 
-class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
+class BaseCBHCompoundBatchResource(ModelResource):
     """New base resource for a compound batch, abstract implementation used
     in the indexing of compound batches as well as in the search API and the saved searches
     ModelResource - these fields are in addition to the fields already present in the CBHCompoundBatch model"""
@@ -282,7 +283,9 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
         return value
 
 
-
+    def hydrate(self, bundle):
+        bundle.obj.created_by_id = bundle.request.user.id
+        return bundle
 
 
     def get_project_specific_data(self, request, queries, pids, sorts, textsearch, batch_ids_by_project):
@@ -377,7 +380,112 @@ class BaseCBHCompoundBatchResource(UserHydrate, ModelResource):
         return self.create_response(request, bundle)
 
 
-    
+
+
+
+    def save_related(self, bundle):
+        """
+        Handles the saving of related non-M2M data.
+        Calling assigning ``child.parent = parent`` & then calling
+        ``Child.save`` isn't good enough to make sure the ``parent``
+        is saved.
+        To get around this, we go through all our related fields &
+        call ``save`` on them if they have related, non-M2M data.
+        M2M data is handled by the ``ModelResource.save_m2m`` method.
+        """
+        for field_name, field_object in self.fields.items():
+            if not field_object.is_related:
+                continue
+
+            if field_object.is_m2m:
+                continue
+
+            if not field_object.attribute:
+                continue
+
+            if field_object.readonly:
+                continue
+
+            if field_object.blank and field_name not in bundle.data:
+                continue
+
+            # Get the object.
+            try:
+                related_obj = getattr(bundle.obj, field_object.attribute)
+            except ObjectDoesNotExist:
+                # Django 1.8: unset related objects default to None, no error
+                related_obj = None
+
+            # We didn't get it, so maybe we created it but haven't saved it
+            if related_obj is None:
+                related_obj = bundle.related_objects_to_save.get(field_object.attribute, None)
+
+            if field_object.related_name:
+                if not self.get_bundle_detail_data(bundle):
+                    bundle.obj.save()
+
+                setattr(related_obj, field_object.related_name, bundle.obj)
+
+            related_resource = field_object.get_related_resource(related_obj)
+
+            if bundle.data.get(field_name) and hasattr(bundle.data[field_name], 'keys'):
+                # Only build & save if there's data, not just a URI.
+                related_bundle = related_resource.build_bundle(
+                    obj=related_obj,
+                    data=bundle.data.get(field_name),
+                    request=bundle.request,
+                    objects_saved=bundle.objects_saved
+                )
+                related_resource.full_hydrate(related_bundle)
+                if field_name != "project":
+                    related_resource.save(related_bundle)
+                related_obj = related_bundle.obj
+
+            if related_obj:
+                setattr(bundle.obj, field_object.attribute, related_obj)
+
+
+
+
+
+
+
+
+
+
+
+    def save(self, bundle, skip_errors=False):
+        if bundle.via_uri:
+            return bundle
+
+        self.is_valid(bundle)
+
+        if bundle.errors and not skip_errors:
+
+            raise ImmediateHttpResponse(response=self.error_response(bundle.request, bundle.errors))
+
+        # Check if they're authorized.
+        if bundle.obj.pk:
+            self.authorized_update_detail(self.get_object_list(bundle.request), bundle)
+        else:
+            self.authorized_create_detail(self.get_object_list(bundle.request), bundle)
+
+
+        # Save FKs just in case.
+        self.save_related(bundle)
+        print "got"
+
+        # Save the main object.
+        obj_id = self.create_identifier(bundle.obj)
+
+        if obj_id not in bundle.objects_saved or bundle.obj._state.adding:
+            bundle.obj.save()
+            bundle.objects_saved.add(obj_id)
+
+        # Now pick up the M2M bits.
+        m2m_bundle = self.hydrate_m2m(bundle)
+        self.save_m2m(m2m_bundle)
+        return bundle
 
     def get_list(self, request, **kwargs):
         """
@@ -541,6 +649,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
     indexed in elasticsearch"""
     project = SimpleResourceURIField(ChemregProjectResource, "project_id")
     projectfull = SimpleResourceURIField(ChemregProjectResource, "project_id")
+    userfull = fields.DictField(default={})
 
     def prepare_fields_for_index(self, batch_dicts):
         """Fields are stored as strings in hstore so convert the list or object fields back from JSON"""
@@ -574,6 +683,17 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
 
     def index_batch_list(self, request, batch_list, project_and_indexing_schemata, refresh=True):
         """Index a list or queryset of compound batches into the elasticsearch indices (one index per project)"""
+        
+        request.GET = request.GET.copy()
+        request.GET["limit"] = "10000"
+        ids = {b.created_by_id  for b in batch_list}
+        no_none = []
+        for uid in ids:
+            if uid:
+                no_none.append(str(uid))
+        request.GET["id__in"] = ",".join(no_none)
+        user_list = json.loads(UserResource().get_list(request).content)
+        user_lookup = { u["resource_uri"]: u for u in user_list["objects"] }
         bundles = [
             self.full_dehydrate(self.build_bundle(obj=obj, request=request), for_list=True)
             for obj in batch_list
@@ -594,6 +714,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
             batch["projectfull"]["custom_field_config"] = batch["projectfull"]["custom_field_config"]["resource_uri"]
             index_name = elasticsearch_client.get_project_index_name(batch["projectfull"]["id"])
             index_names.append(index_name)
+            batch["userfull"] = user_lookup.get(batch["creator"], {"display_name" : "User Deleted"})
         
         batch_dicts = elasticsearch_client.index_dataset(batch_dicts, indexing_schemata, index_names, refresh=refresh)
             
@@ -601,16 +722,19 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
     def reindex_elasticsearch(self, request, **kwargs):
         """Reindex all of the data into elasticsearch"""
         desired_format = self.determine_format(request)
-        batches = self.get_object_list(request)
-        # we only want to store certain fields in the search index
-        from django.core.paginator import Paginator
-        paginator = Paginator(batches, 5000) # chunks of 1000
-        #Get all schemata for all projects 
-        indexing_schemata = get_indexing_schemata(None)
-        for page in range(1, paginator.num_pages +1):
+        projects = Project.objects.all().values_list("id", flat=True)
+        for index, pid in enumerate(projects):
+            batches = self.get_object_list(request).filter(project_id=pid)
+            # we only want to store certain fields in the search index
+            from django.core.paginator import Paginator
+            paginator = Paginator(batches, 2000) # chunks of 1000
+            #Get all schemata for all projects 
+            indexing_schemata = get_indexing_schemata([pid])
+            for page in range(1, paginator.num_pages +1):
         
-            result_list = index_batches_in_new_index(paginator.page(page).object_list, project_and_indexing_schemata=indexing_schemata)
-            print "%d of %s" % (page, paginator.num_pages)
+                result_list = index_batches_in_new_index(paginator.page(page).object_list, project_and_indexing_schemata=indexing_schemata)
+                print "%d of %s" % (page, paginator.num_pages)
+            print "%d projects of %d" % (index+1,len(projects)) 
         return HttpResponse(content="test", )
         
     class Meta(BaseCBHCompoundBatchResource.Meta):
@@ -679,8 +803,6 @@ def index_batches_in_new_index(batches, project_and_indexing_schemata=None):
         project_and_indexing_schemata = get_indexing_schemata({ batch.project_id  for batch in batches })
         #This should be none for cases apart from the bulk index operation
         #Therefore we can run the structure indexing at this point too.
-        async('cbh_chembl_model_extension.models.index_new_compounds',)
-
     IndexingCBHCompoundBatchResource().index_batch_list(request, batches, project_and_indexing_schemata)
 
 
