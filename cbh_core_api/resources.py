@@ -325,8 +325,6 @@ edit_form /schema - an angular schema form element that can be used to edit this
 class ChemRegCustomFieldConfigResource(UserHydrate, ModelResource):
 
     '''Return only the project type and custom field config name as returning the full field list would be '''
-    data_type = fields.ForeignKey("cbh_core_api.resources.DataTypeResource",
-                                  'data_type',  null=True, blank=False, default=None, full=True, help_text="deprecate (assyreg data type)" )
     project_data_fields = fields.ToManyField(ChemRegDataPointProjectFieldResource, 
         attribute="pinned_custom_field",null=True, blank=False, default=None, full=True, help_text="List of the fields related to this cusotm field config, to be combined together to produce an edit schema")
     created_by = fields.ForeignKey(
@@ -335,7 +333,7 @@ class ChemRegCustomFieldConfigResource(UserHydrate, ModelResource):
     class Meta:
         object_class = CustomFieldConfig
         queryset = CustomFieldConfig.objects.select_related(
-            "created_by", "data_type",)
+            "created_by",)
         excludes = ("schemaform")
         include_resource_uri = True
         resource_name = 'cbh_chemreg_custom_field_config'
