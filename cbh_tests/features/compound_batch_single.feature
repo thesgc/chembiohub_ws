@@ -26,7 +26,6 @@ Feature: A user can save a compound with and without a structure and can clone a
         Then the created compound batch has a uox id in the uuid field
         Then the created compound batch has a multiple_batch_id
 
-    @wip
     Scenario: An inventory record is created
         Given I create a project as before
         When I refresh the user object

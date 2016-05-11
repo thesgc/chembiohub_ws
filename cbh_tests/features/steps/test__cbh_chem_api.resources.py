@@ -59,9 +59,14 @@ def step(context):
 
 
 
-@then(u'the get list elasticsearch response is OK')
+@then(u'the compound batch list response is OK')
 def step_impl(context):
     context.test_case.assertHttpOK(context.batches_response)
+
+@then(u'the saved search response is OK')
+def step_impl(context):
+    context.test_case.assertHttpOK(context.batches_response)
+
 
 @then(u'I see no compound batches')
 def step_impl(context):
@@ -71,10 +76,10 @@ def step_impl(context):
 
 
 
-@when(u'I list saved searches in the system with get_list_elasticsearch')
+@when(u'I list saved searches in the system')
 def step_impl(context):
     from django.conf import settings
-    resp = context.api_client.get("/" + settings.WEBSERVICES_NAME + "/cbh_saved_search/get_list_elasticsearch/", format='json')
+    resp = context.api_client.get("/" + settings.WEBSERVICES_NAME + "/cbh_saved_search/", format='json')
     context.batches_response = resp
 
 
@@ -82,16 +87,10 @@ def step_impl(context):
 def step_impl(context):
     data = json.loads(context.batches_response.content)["objects"]
     context.test_case.assertEquals(len(data), 1)
-    context.test_case.assertEquals(data[0]["customFields"]["alias"], "My new saved search")
+    context.test_case.assertEquals(data[0]["custom_fields"]["alias"], "My new saved search")
 
 
 
-@when(u'I reindex the saved search')
-def step_impl(context):
-    from django.conf import settings
-    saved_search_json = json.loads(context.saved_search_response.content)
-    resp = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/cbh_saved_search/reindex_compound/", format='json', data={"id": saved_search_json["id"]})
-    context.saved_search_index_resp = resp
 
 
 @then(u'The saved search index response is OK')
@@ -103,10 +102,10 @@ def step_impl(context):
 def step_impl(context):
     project_json = json.loads(context.project_response.content)
     context.saved_search_data = {
-        "project": project_json["resource_uri"],
-        "customFields" : {"alias": "My new saved search",
+        "project": {"pk" : project_json["id"]},
+        "custom_fields" : {"alias": "My new saved search",
                             "url" : "http://localhost:9000/search"},
-        "uncuratedFields":{},
+        "uncurated_fields":{},
         "warnings" :{}, "properties" :{},  "errors" :{}
     }
 
@@ -149,13 +148,11 @@ def step_impl(context):
         Given I create a project JSON by adding the saved search project type and the static custom field config schema for saved searches
         When I POST a project to cbh_projects
         Then the project is created
+        When I refresh the user object
         Given A URL to redirect the user to and a GET request URL and an alias and description for my saved search
         and I add the blinded batch id as EMPTY_ID
-        and I add the project key
         When I send the search by POST request
         Then The saved search response is created
-        When I reindex the saved search 
-        Then The saved search index response is OK
 
         """)
 
@@ -165,13 +162,17 @@ def step_impl(context):
     project_json = json.loads(context.project_response.content)
     context.post_data = {
         "project": project_json["resource_uri"],
-        "customFields" : {"test": "My test field"
+        "custom_fields" : {"test": "My test field"
                          },
-        "uncuratedFields":{},
+        "uncurated_fields":{},
         "warnings" :{}, 
         "properties" :{}, 
         "errors" :{}
     }
+
+@given(u'I set the restricted field to the value foo')
+def step(context):
+    context.post_data["restricted"] = "foo"
 
 
 @given(u'I set the type of the request to sketch')
@@ -235,12 +236,31 @@ def step_impl(context):
 
 
 
+@when(u'a compound exists in the project with this restricted field')
+def step(context):
+    context.execute_steps(u"""
+        Given I have a compound batch with no structure
+        Given I set the restricted field to the value foo
+        Given I add the project primary key to the compound data
+        When I submit the compound by POST request
+        Then a compound batch is created        
+        """)
+
+
 @when(u'I submit the compound by POST request')
 def step_impl(context):
     from django.conf import settings
     resp = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches_v2/", format='json', data=context.post_data)
     context.compound_response = resp
     print (resp.content)
+
+
+@then(u'the output data from search does not contain the restricted field')
+def step(context):
+    data = json.loads(context.batches_response.content)
+    batch = data["objects"][0]
+    context.test_case.assertTrue("restricted" not in batch["custom_fields"])
+    context.test_case.assertTrue("test" in batch["custom_fields"])
 
 
 @then(u'a compound batch is created')

@@ -24,7 +24,6 @@ def project_types(context):
 
 
 
-
 @given("testuser")
 def step(context):
     pass
@@ -109,13 +108,51 @@ def step_impl(context):
 
 
 
+@then("the first project in the list contains the restricted field in the schemata")
+def step(context):
+    fields = context.projects_on_system[0]["custom_field_config"]["project_data_fields"]
+    has_restricted = False
+    for field in fields:
+        if field["name"] == "restricted":
+            has_restricted = True
+    context.test_case.assertTrue(has_restricted)
+
+    has_restricted = False
+    for field_path in context.tabular_schema["schema"]:
+        if field_path == "custom_fields.restricted":
+            has_restricted = True
+
+    context.test_case.assertTrue(has_restricted)
+
+
+@then("the first project in the list does not contain the restricted field in the schemata")
+def step(context):
+    fields = context.projects_on_system[0]["custom_field_config"]["project_data_fields"]
+    has_restricted = False
+    for field in fields:
+        if field["name"] == "restricted":
+            has_restricted = True
+    context.test_case.assertFalse(has_restricted)
+
+    has_restricted = False
+    for field_path in context.tabular_schema["schema"]:
+        if field_path == "custom_fields.restricted":
+            has_restricted = True
+
+    context.test_case.assertFalse(has_restricted)
+
+
+
+
+
 
 @then("I can list the projects on the system")
 def projects(context):
     from django.conf import settings
     resp = context.api_client.client.get("/" + settings.WEBSERVICES_NAME + "/cbh_projects/")
     context.test_case.assertHttpOK(resp)
-    context.projects_on_system = json.loads(resp.content)["objects"]
+    context.projects_on_system = json.loads(resp.content)["objects"]#
+    context.tabular_schema = json.loads(resp.content)["tabular_data_schema"]
 
 
 @then("the upload URL from the first project in the list points to the right place")
@@ -131,6 +168,15 @@ def project_patch(context):
     resp = context.api_client.patch(context.projects_on_system[0]["resource_uri"], data=context.projects_on_system[0])
     context.updated_project_response = resp
 
+@given("I add a restricted field")
+def step(context):
+    new_field = { 
+                    "name" : "restricted", 
+                    "open_or_restricted" : "restricted",  
+                    "field_type" : "char", 
+                    "description" : "" 
+                }
+    context.projects_on_system[0]["custom_field_config"]["project_data_fields"].append(new_field)
 
 
 @then("project update response is accepted")

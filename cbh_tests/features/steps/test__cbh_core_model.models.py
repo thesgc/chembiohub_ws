@@ -62,6 +62,25 @@ def test_make_editor(context):
     context.user = User.objects.get(pk=context.user.pk)
     context.test_case.assertTrue(context.user.has_perm("cbh_core_model.%d%seditor" % (context.projects_on_system[0]["id"],  PERMISSION_CODENAME_SEPARATOR  )))
 
+
+
+@given("I make testuser an owner of the first project in the list")
+def step(context):
+    from cbh_core_model.models import  PERMISSION_CODENAME_SEPARATOR
+    from cbh_core_model.models import User, Project
+    p = Project.objects.get(pk=context.projects_on_system[0]["id"])
+    #context.test_case.assertFalse(context.user.has_perm("cbh_core_model.%d%sowner" % (context.projects_on_system[0]["id"],  PERMISSION_CODENAME_SEPARATOR  )))
+    p.make_owner(context.user)
+    #Need to re fetch the user from the database - see  https://docs.djangoproject.com/en/1.8/topics/auth/default/#permission-caching
+    context.user = User.objects.get(pk=context.user.pk)
+    context.test_case.assertTrue(context.user.has_perm("cbh_core_model.%d%sowner" % (context.projects_on_system[0]["id"],  PERMISSION_CODENAME_SEPARATOR  )))
+
+
+
+
+
+
+
 @given("I remove all of the testusers permissions")
 def remove_perms(context):
     from cbh_core_model.models import User
