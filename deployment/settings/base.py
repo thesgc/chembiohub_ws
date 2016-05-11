@@ -737,11 +737,8 @@ TABULAR_DATA_SETTINGS = {
         "related_molregno.compoundproperties.full_mwt" ,
         "related_molregno.compoundproperties.full_molformula",
         "related_molregno.compoundproperties.alogp" ]
-    },
-    "indexing_temp" : {
-        "start" :[ "row", "originalSmiles","properties.action","standardInchiKey", ],
-        "end" : ["userfull.display_name" ,"timestamp" , "id" , "multiple_batch_id"]
-    },
+    }
+    ,
     "schema": {
 
         "project_counter":{

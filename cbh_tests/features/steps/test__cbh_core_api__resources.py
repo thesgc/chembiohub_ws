@@ -21,6 +21,41 @@ def project_types(context):
     context.project_types = json_content["objects"]
 
 
+@then("the tabular schema included in fields all exist in the schema")
+def step(context):
+    counter = 0
+    for key, value in context.tabular_schema["included_in_tables"].items():
+        for fieldname in value["default"]:
+            print (fieldname)
+            context.test_case.assertTrue(fieldname in context.tabular_schema["schema"])
+            counter += 1
+    context.test_case.assertTrue(counter > 0)
+
+@then("all the tabular fields have a knownBy value")
+def step(context):
+    counter = 0
+    for key, value in context.tabular_schema["included_in_tables"].items():
+        for fieldname in value["default"]:
+            print (fieldname)
+            knownBy = context.tabular_schema["schema"][fieldname]["knownBy"]
+            context.test_case.assertTrue(len(knownBy) > 0)
+            context.test_case.assertTrue(isinstance(knownBy, basestring))
+            counter += 1
+    context.test_case.assertTrue(counter > 0)
+
+@then("all the tabular Data Schema included in fields have a project specific schema with a string ID inside it if they are custom fields")
+def step(context):
+    counter = 0
+    for key, value in context.tabular_schema["included_in_tables"].items():
+        for fieldname in value["default"]:
+            if fieldname.startswith("custom_fields"):
+                proj_spec = context.tabular_schema["schema"][fieldname]["project_specific_schema"]
+                context.test_case.assertTrue("1" in proj_spec)
+                counter += 1
+    context.test_case.assertTrue(counter > 0)
+
+
+
 
 @given("testuser")
 def step(context):
