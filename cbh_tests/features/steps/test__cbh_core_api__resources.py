@@ -4,6 +4,12 @@ from django.db import IntegrityError
 import json
 
 
+@then("all required fields are in the skinning configuration")
+def step(context):
+    for field in ["file_errors_from_backend","data_manager_email","chem_query_schemaform","id","enable_smiles_input","tabular_data_schema","hide_schemaform","field_type_choices","query_schemaform","filters_objects","savedsearch_schemaform","data_manager_name","sorts_applied","result_alias","project_alias","hides_applied","instance_alias","filters_applied","hide_objects","sort_objects","sort_schemaform","resource_uri"]:
+        context.test_case.assertTrue(field in context.skinning["objects"][0])
+
+
 
 @then("I can list the users on the system")
 def users(context):
@@ -74,6 +80,7 @@ def logout(context):
 def skinning(context):
     from django.conf import settings
     resp = context.api_client.get("/" +settings.WEBSERVICES_NAME + "/cbh_skinning/")
+    context.skinning = json.loads(resp.content)
     context.test_case.assertHttpOK(resp)
 
 
