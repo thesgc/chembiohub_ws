@@ -63,6 +63,26 @@ def test_make_editor(context):
     context.test_case.assertTrue(context.user.has_perm("cbh_core_model.%d%seditor" % (context.projects_on_system[0]["id"],  PERMISSION_CODENAME_SEPARATOR  )))
 
 
+@given('I give anotheruser superuser permissions')
+def step(context):
+    context.anotheruser.is_superuser = True
+    context.anotheruser.save()
+
+@given('I give anotheruser add project permissions')
+def step(context):
+    from django.contrib.auth.models import Permission
+    from django.contrib.contenttypes.models import ContentType
+    from cbh_core_model.models import User, Project
+    ct = ContentType.objects.get_for_model(Project)
+
+    pm =  Permission.objects.get( codename="add_project",  
+            content_type_id=ct.id)
+
+
+    context.anotheruser.user_permissions = [pm,]
+    context.anotheruser.save()
+    context.anotheruser = User.objects.get(id=context.anotheruser.id)
+
 
 @given("I make testuser an owner of the first project in the list")
 def step(context):

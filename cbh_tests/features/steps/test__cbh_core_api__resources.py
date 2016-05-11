@@ -8,8 +8,8 @@ import json
 @then("I can list the users on the system")
 def users(context):
     from django.conf import settings
-    resp = context.api_client.client.get("/" +settings.WEBSERVICES_NAME + "/users/")
-    context.test_case.assertHttpOK(resp)
+    context.userresp = context.api_client.client.get("/" +settings.WEBSERVICES_NAME + "/users/")
+    context.test_case.assertHttpOK(context.userresp)
 
 @then("I can list the projects types on the system and there are 4")
 def project_types(context):
@@ -19,8 +19,6 @@ def project_types(context):
     json_content = json.loads(resp.content)
     context.test_case.assertEqual(len(json_content["objects"]), 4)
     context.project_types = json_content["objects"]
-
-
 
 
 
@@ -143,6 +141,108 @@ def step(context):
 
 
 
+@when("I request the owner permissions for the first project in the list")
+def step(context):
+    from django.conf import settings
+    from cbh_core_model.models import  PERMISSION_CODENAME_SEPARATOR
+    codename = "%d%sowner" % (context.projects_on_system[0]["id"],  PERMISSION_CODENAME_SEPARATOR  )
+    context.permissions_response = context.api_client.client.get("/" + settings.WEBSERVICES_NAME + "/cbh_permissions/" + codename)  
+    
+
+@then("the response permission response is OK")
+def step(context):
+    context.test_case.assertHttpOK(context.permissions_response)
+
+@then("the permissions response is unauthorized")
+def step(context):
+    context.test_case.assertHttpUnauthorized(context.permissions_response)
+
+
+@when("I request the editor permissions for the first project in the list")
+def step(context):
+    from django.conf import settings
+    from cbh_core_model.models import  PERMISSION_CODENAME_SEPARATOR
+    codename = "%d%seditor" % (context.projects_on_system[0]["id"],  PERMISSION_CODENAME_SEPARATOR  )
+    context.permissions_response = context.api_client.client.get("/" + settings.WEBSERVICES_NAME + "/cbh_permissions/" + codename)  
+    
+
+
+@when(u'I patch back the editor permissions with anotheruser added')
+def step_impl(context):
+    context.execute_steps(u"""
+        Then I can list the users on the system
+        """)
+    user_list = json.loads(context.userresp.content)["objects"]
+    
+    for user in user_list:
+        if user["username"] == "anotheruser":
+            uri = user["resource_uri"]
+
+    perms = json.loads(context.permissions_response.content)
+    perms["users"].append(uri)
+
+    from django.conf import settings
+    from cbh_core_model.models import  PERMISSION_CODENAME_SEPARATOR
+    codename = "%d%seditor" % (context.projects_on_system[0]["id"],  PERMISSION_CODENAME_SEPARATOR  )
+    context.permissions_response = context.api_client.patch("/" + settings.WEBSERVICES_NAME + "/cbh_permissions/" + codename, data=perms)  
+
+
+
+
+
+@when(u'I patch back the owner permissions with anotheruser added')
+def step_impl(context):
+    context.execute_steps(u"""
+        Then I can list the users on the system
+        """)
+    user_list = json.loads(context.userresp.content)["objects"]
+    
+    for user in user_list:
+        if user["username"] == "anotheruser":
+            uri = user["resource_uri"]
+
+    perms = json.loads(context.permissions_response.content)
+    perms["users"].append(uri)
+
+    from django.conf import settings
+    from cbh_core_model.models import  PERMISSION_CODENAME_SEPARATOR
+    codename = "%d%sowner" % (context.projects_on_system[0]["id"],  PERMISSION_CODENAME_SEPARATOR  )
+    context.permissions_response = context.api_client.patch("/" + settings.WEBSERVICES_NAME + "/cbh_permissions/" + codename, data=perms)  
+
+
+@then(u'the permissions response is accepted')
+def step_impl(context):
+    context.test_case.assertHttpAccepted(context.permissions_response)
+
+
+@then("the permissions response shows that I am an owner")
+def step(context):
+    context.execute_steps(u"""
+        Then I can list the users on the system
+        """)
+    user_list = json.loads(context.userresp.content)["objects"]
+
+    for user in user_list:
+        if user["username"] == "testuser":
+            uri = user["resource_uri"]
+
+    perms = json.loads(context.permissions_response.content)
+
+    #The uri for testuser should be equal to the list of owners
+    context.test_case.assertEqual(perms["users"], [uri,])
+
+@when("I patch back the owner permissions as empty")
+def step(context):
+    perms = json.loads(context.permissions_response.content)
+    perms["users"] = []
+    from django.conf import settings
+    from cbh_core_model.models import  PERMISSION_CODENAME_SEPARATOR
+    print(perms)
+    codename = "%d%sowner" % (context.projects_on_system[0]["id"],  PERMISSION_CODENAME_SEPARATOR  )
+    context.permissions_response = context.api_client.patch("/" + settings.WEBSERVICES_NAME + "/cbh_permissions/" + codename, 
+                                                                   format='json',
+                                                                   data=perms)
+
 
 
 
@@ -165,7 +265,7 @@ def test_url(context):
 
 @when("I patch the updated first project in the list back to the system")
 def project_patch(context):
-    resp = context.api_client.patch(context.projects_on_system[0]["resource_uri"], data=context.projects_on_system[0])
+    resp = context.api_client.patch(context.projects_on_system[0]["resource_uri"], format='json', data=context.projects_on_system[0])
     context.updated_project_response = resp
 
 @given("I add a restricted field")
