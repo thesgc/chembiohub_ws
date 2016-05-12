@@ -4,7 +4,7 @@ It provides the webservices to add, search for and index CBHCompoundBatch object
 
 """
 from chembl_business_model.models.compounds import CompoundProperties, MoleculeDictionary
-from cbh_chembl_model_extension.models import CBHCompoundBatch, generate_uox_id
+from cbh_chembl_model_extension.models import CBHCompoundBatch, generate_uox_id, index_new_compounds
 from tastypie.resources import ALL
 from tastypie.resources import ALL_WITH_RELATIONS
 from tastypie.resources import ModelResource, Resource
@@ -559,6 +559,7 @@ class BaseCBHCompoundBatchResource(ModelResource):
             if not batch_result:
                 return HttpResponse('{"error": "Unable to process structure search"}', status=503)
             else:
+                print batch_result
                 batch_ids_by_project = batch_result[0]
         if request.GET.get("format", None) != "sdf" and request.GET.get("format", None) != "xlsx":
             data = elasticsearch_client.get_list_data_elasticsearch(queries,
@@ -803,6 +804,7 @@ def index_batches_in_new_index(batches, project_and_indexing_schemata=None):
         project_and_indexing_schemata = get_indexing_schemata({ batch.project_id  for batch in batches })
         #This should be none for cases apart from the bulk index operation
         #Therefore we can run the structure indexing at this point too.
+        index_new_compounds()
     IndexingCBHCompoundBatchResource().index_batch_list(request, batches, project_and_indexing_schemata)
 
 

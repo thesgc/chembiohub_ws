@@ -21,6 +21,72 @@ def step_impl(context):
         then the response from multi batch save is created""")
 
 
+@given(u'I save propane butane benzene and ethyl benzene via SMILES')
+def step(context):
+    context.execute_steps(u"""
+        Given I set up the SMILES data
+        When I validate propane butane benzene and ethyl benzene via SMILES
+        Then the response from post validate list is accepted
+        When I take the response from post validate drawn and post it to multi batch save
+        then the response from multi batch save is created
+        When I list compound batches in the system
+        Then 4 compound batches have been created
+    """)
+
+
+@then(u'I get a chemical search id in the response')
+def step_impl(context):
+    data = json.loads(context.chemical_search_response.content)
+    context.test_case.assertTrue(isinstance(data["id"], basestring))
+    context.test_case.assertTrue(len(data["id"]) > 10)
+    context.chemical_search_id = data["id"]
+
+
+@when(u'I run a chemical search')
+def step(context):
+    from django.conf import settings
+    url = "/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches_v2/?chemical_search_id=" + context.chemical_search_id 
+    print(url)
+    resp = context.api_client.get(url, format='json')
+    context.batches_response = resp
+
+@then(u'I get 3 chemical search results')
+def step(context):
+    data = json.loads(context.batches_response.content)["objects"]
+    print("found mols")
+    print(len(data))
+    context.test_case.assertTrue(len(data) == 3)
+
+@then(u'I get 1 chemical search result')
+def step(context):
+    data = json.loads(context.batches_response.content)["objects"]
+    print("found mols")
+    print(len(data))
+    context.test_case.assertTrue(len(data) == 1)
+
+
+
+
+@when(u'I POST the molfile for propane as a flexmatch')
+def step_impl(context):
+    post_data = {"molfile":"Molecule from ChemDoodle Web Components\n\nhttp://www.ichemlabs.com\n  3  2  0  0  0  0            999 V2000\n   -0.8660   -0.2500    0.0000 C   0  0  0  0  0  0\n    0.0000    0.2500    0.0000 C   0  0  0  0  0  0\n    0.8660   -0.2500    0.0000 C   0  0  0  0  0  0\n  1  21  0     0  0\n  2  31  0     0  0\nM  END","query_type":"flexmatch"}
+    from django.conf import settings
+    resp = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/cbh_chemical_search/", format='json', data=post_data)
+    context.chemical_search_response = resp
+
+
+@when(u'I POST the molfile for propane as a with_substructure')
+def step_impl(context):
+    post_data = {"molfile":"Molecule from ChemDoodle Web Components\n\nhttp://www.ichemlabs.com\n  3  2  0  0  0  0            999 V2000\n   -0.8660   -0.2500    0.0000 C   0  0  0  0  0  0\n    0.0000    0.2500    0.0000 C   0  0  0  0  0  0\n    0.8660   -0.2500    0.0000 C   0  0  0  0  0  0\n  1  21  0     0  0\n  2  31  0     0  0\nM  END","query_type":"with_substructure"}
+    from django.conf import settings
+    resp = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/cbh_chemical_search/", format='json', data=post_data)
+    context.chemical_search_response = resp
+
+
+
+
+
+
 @when(u'I validate propane butane benzene and ethyl benzene via SMILES')
 def step(context):
     from django.conf import settings
