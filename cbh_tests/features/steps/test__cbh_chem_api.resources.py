@@ -21,6 +21,34 @@ def step_impl(context):
         then the response from multi batch save is created""")
 
 
+@when(u'I validate propane butane benzene and ethyl benzene via SMILES')
+def step(context):
+    from django.conf import settings
+    resp = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches/validate_list/", format='json', data=context.post_data)
+    context.val_response = resp
+
+@given(u'I set up the SMILES data')
+def step(context):
+    context.execute_steps(u"""
+        Given I create a project as before
+        When I refresh the user object
+        Given I have a compound batch with no structure
+        and I add the project key to the compound data
+        and I set the state to validate
+    """)
+    context.post_data["smilesdata"] = """CCc1ccccc1
+CCC
+CCCC
+c1ccccc1"""
+
+@when(u'I save the post validate multiple batch')
+def step(context):
+    from django.conf import settings
+    resp = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches/multi_batch_save/", format='json', data=context.post_data)
+
+
+
+
 @when(u'I request the compound batch with ID 1 from the get_detail api')
 def step_impl(context):
     from django.conf import settings
@@ -202,7 +230,17 @@ def step_impl(context):
     context.valdata = json.loads(context.val_response.content)
 
 
+@then(u'the response from post validate list is accepted')
+def step_impl(context):
+    context.test_case.assertHttpAccepted(context.val_response )
+    print (context.val_response)
+    context.valdata = json.loads(context.val_response.content)
 
+
+@then(u'4 compound batches have been created')
+def step(context):
+    data = json.loads(context.batches_response.content)["objects"]
+    context.test_case.assertEquals(len(data), 4)
 
 
 @when(u'I take the response from post validate drawn and post it to multi batch save')

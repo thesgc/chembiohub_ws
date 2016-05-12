@@ -17,15 +17,6 @@ http://pypi.python.org/pypi/BeautifulSoup/
 Acknowledgements:
 For the basic solution: https://github.com/nathforge/django-mechanize/
 
-  %load_ext autoreload
-%autoreload 2
-from tastypie.test import TestApiClient
-api_client = TestApiClient()
-from django.test.simple import DjangoTestSuiteRunner
-runner = DjangoTestSuiteRunner(interactive=False)
-runner.setup_test_environment()
-runner.setup_databases()
-
 
 
 """
