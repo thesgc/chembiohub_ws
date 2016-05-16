@@ -31,6 +31,7 @@ INSTALLED_APPS = (
             'tastypie',
 
         'django_q',
+          'cbh_datastore_model', #just to get rid of some things
 
    )
 

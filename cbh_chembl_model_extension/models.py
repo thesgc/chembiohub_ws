@@ -37,7 +37,6 @@ from chembl_business_model.utils import inchiFromPipe
 from rdkit.Chem import InchiToInchiKey
 from rdkit.Chem import MolFromInchi
 from rdkit.Chem import MolToMolBlock
-from flowjs.models import FlowFile
 from picklefield.fields import PickledObjectField
 from pybel import readstring
 from django.db.models.signals import post_save

@@ -137,19 +137,6 @@ class ProjectPermissionMixin(models.Model):
 
     objects = ProjectPermissionManager()
 
-    def get_project_key(self):
-        """Not sure if used, possibly never had time to integrate so deprecated"""
-        return str(self.pk)
-
-    def sync_old_permissions(self):
-        '''first we delete the existing permissions that are not labelled in the model'''        
-        ct = self.get_old_contenttype_for_instance()
-        deleteable_permissions = Permission.objects.filter(content_type_id=ct.pk).exclude(
-            codename__in=[perm[0] for perm in PROJECT_PERMISSIONS])
-        deleteable_permissions.delete()
-        for perm in PROJECT_PERMISSIONS:
-            pm = Permission.objects.get_or_create(
-                content_type_id=ct.id, codename=perm[0], name=perm[1])
 
     def sync_permissions(self):
         '''first we delete the existing permissions that are not labelled in the model'''
@@ -157,11 +144,7 @@ class ProjectPermissionMixin(models.Model):
             self.get_instance_permission_by_codename(perm[0])
 
 
-    def get_old_contenttype_for_instance(self):
-        """deprecated"""
-        ct = ContentType.objects.get(
-            app_label=self.get_project_key(), model=self)
-        return ct
+
 
     def get_contenttype_for_instance(self):
         """All project permissions now simply sit under the project content type"""
@@ -269,26 +252,6 @@ class DataType(TimeStampedModel):
         return self.name
 
 
-class CustomFieldConfigManager(models.Manager):
-    """Manage functions for custom field configs"""
-    def from_schema_lists(self, data, names, data_types, widths, name, creator):
-        '''
-            Based on the lists of data and data types parsed from a single excel sheet or other tabular data...
-            Generate a custom field config object
-        '''
-        custom_field_config, created = self.get_or_create(
-                created_by=creator, name=name)
-        if  created:
-            for colindex, pandas_dtype in enumerate(data_types):
-                pcf = PinnedCustomField()
-                pcf.field_type = pcf.pandas_converter(
-                        widths[colindex], pandas_dtype)
-                pcf.name = names[colindex]
-                pcf.position = colindex
-                pcf.custom_field_config = custom_field_config
-                custom_field_config.pinned_custom_field.add(pcf)
-            custom_field_config.save()
-        return custom_field_config
 
 
 class CustomFieldConfig(TimeStampedModel):
@@ -298,9 +261,6 @@ class CustomFieldConfig(TimeStampedModel):
     name = models.CharField(unique=True, max_length=500, null=False, blank=False)
     created_by = models.ForeignKey("auth.User")
     schemaform = models.TextField(default="", null=True, blank=True, )
-    data_type = models.ForeignKey(
-        DataType, null=True, blank=True, default=None)
-    objects = CustomFieldConfigManager()
 
     def __unicode__(self):
         return self.name
