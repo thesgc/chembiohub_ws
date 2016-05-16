@@ -6,6 +6,16 @@ threading._DummyThread._Thread__stop = lambda x: 42
 TASTYPIE_ALLOW_MISSING_SLASH = True
 TASTYPIE_CANNED_ERROR = "An internal server error occurred. Please contact ChEMBL help."
 
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
+
+
+other_paths = [
+"legacy_migrations/",
+]
+
+for path in other_paths:
+    sys.path.insert(0, BASE_DIR + "/" + path)
+
 
 INSTALLED_APPS = (
       'django.contrib.auth',
@@ -37,7 +47,7 @@ INSTALLED_APPS = (
             'tastypie',
 
         'django_q',
-        'cbh_tests'
+        'cbh_tests',
           'cbh_datastore_model', #just to get rid of some things
 
 

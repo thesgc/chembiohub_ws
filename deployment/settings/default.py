@@ -7,15 +7,6 @@ DEBUG=True
 
 TEMPLATE_DEBUG = DEBUG
 
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
-
-
-other_paths = [
-"legacy_migrations/",
-]
-
-for path in other_paths:
-    sys.path.insert(0, BASE_DIR + "/" + path)
 
 
 def get_username():
