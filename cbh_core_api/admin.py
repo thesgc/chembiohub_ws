@@ -65,13 +65,6 @@ class PinnedCustomFieldAdmin(ModelAdmin):
         obj.save()
 
 
-class PinnedCustomFieldInlineForm(forms.ModelForm):
-    """Inline form for pinned custom fields"""
-
-    class Meta:
-        model = PinnedCustomField
-        exclude = [
-             "attachment_field_mapped_to"]
 
 
 # GrappelliSortableHiddenMixin
@@ -84,7 +77,6 @@ class PinnedCustomFieldInline(GrappelliSortableHiddenMixin, admin.TabularInline,
         models.CharField: {'widget': TextInput(attrs={'size': '20'})},
     }
     extra = 3
-    form = PinnedCustomFieldInlineForm
 
     def get_extra(self, request, obj=None, **kwargs):
         """Dynamically sets the number of extra forms. 0 if the related object

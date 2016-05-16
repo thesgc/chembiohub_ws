@@ -208,24 +208,6 @@ def set_images(batch):
 
 class CBHCompoundBatchManager(models.Manager):
     """Manager methods for the generation of compound batch objects"""
-    def get_image_for_assayreg(self, field, dpc, level):
-        """deprecated assayreg methods"""
-        project = dpc.get("l0_permitted_projects")[0]
-        if project[len(project) - 1] == "/":
-            project = project[:-1]
-        bits = project.split("/")
-        id = bits[len(bits)-1]
-        field_value = dpc[level]["project_data"].get(
-            field["elasticsearch_fieldname"], None)
-        #Fetch a batch with this UOx id if it is in the same project
-        if field_value is not None:
-            batches = CBHCompoundBatch.objects.filter(
-                related_molregno__chembl__chembl_id=field_value,
-                project_id=int(id))
-            if batches.count() > 0:
-                if batches[0].ctab:
-                    return  _ctab2image(batches[0].ctab,75,False, recalc=None)
-        return None
 
     def blinded(self, project=None):
         '''Generate a batch with a blinded id'''
@@ -293,7 +275,6 @@ class CBHCompoundMultipleBatch(TimeStampedModel):
     uploaded_file = models.ForeignKey(
         "cbh_core_model.CBHFlowFile", null=True, blank=True, default=None, help_text="File that was uploaded to generate this multiple batch")
     saved = models.BooleanField(default=False, help_text="Whether this multiple batch has been saved or not")
-    #batches = models.ForeignKey(CBHCompoundBatch, null=True, default=None)
 
 
 class CBHCompoundBatch(TimeStampedModel):

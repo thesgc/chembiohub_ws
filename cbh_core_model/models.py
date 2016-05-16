@@ -624,10 +624,6 @@ class PinnedCustomField(TimeStampedModel):
     position = models.PositiveSmallIntegerField(help_text="Auto-filled field that says what order the fields in a custom field config should be displayed int he form")
     default = models.CharField(max_length=500, default="", blank=True, help_text="The default value of this field to be applied when adding data via the angular schema form")
 
-    standardised_alias = models.ForeignKey(
-        "self", related_name="alias_mapped_from", blank=True, null=True, default=None,  help_text="deprecated")
-    attachment_field_mapped_to = models.ForeignKey(
-        "self", related_name="attachment_field_mapped_from", blank=True, null=True, default=None,  help_text="deprecated")
     open_or_restricted = models.CharField(max_length=20, default=OPEN, choices=RESTRICTION_CHOICES,  help_text="Whether to open up this field to people who only have viewer rights on the project")
 
     def validate_field(self, value):
