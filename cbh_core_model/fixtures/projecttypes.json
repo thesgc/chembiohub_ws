@@ -1,0 +1,29 @@
+[{
+    "fields": {
+        "name": "Compounds",
+        "set_as_default" : true
+    },
+    "model": "cbh_core_model.projecttype",
+    "pk": 2
+}, {
+    "fields": {
+        "show_compounds": false,
+        "name": "Inventory"
+    },
+    "model": "cbh_core_model.projecttype",
+    "pk": 1
+}, {
+    "fields": {
+        "name": "Saved Search",
+        "saved_search_project_type": true
+    },
+    "model": "cbh_core_model.projecttype",
+    "pk": 3
+}, {
+    "fields": {
+        "name": "Plate Map",
+        "plate_map_project_type": true
+    },
+    "model": "cbh_core_model.projecttype",
+    "pk": 4
+}]
