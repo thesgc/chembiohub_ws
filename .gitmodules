@@ -10,6 +10,9 @@
 [submodule "src/chembl_core_db"]
 	path = src/chembl_core_db
 	url = git://github.com/thesgc/chembl_core_db.git
+[submodule "src/chembl_core_model"]
+        path = src/chembl_core_model
+        url = git://github.com/thesgc/chembl_core_model.git
 [submodule "src/ng-chem"]
 	path = src/ng-chem
 	url = git://github.com/thesgc/ng-chem.git
