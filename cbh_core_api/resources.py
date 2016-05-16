@@ -29,7 +29,6 @@ from tastypie.exceptions import ImmediateHttpResponse
 
 from django.contrib.auth.forms import PasswordResetForm
 from cbh_core_model.models import CustomFieldConfig
-from cbh_core_model.models import DataType
 from cbh_core_model.models import Project
 from cbh_core_model.models import ProjectType
 from cbh_core_model.models import SkinningConfig
@@ -430,9 +429,6 @@ class ChemregProjectResource(UserHydrate, ModelResource):
             return ""
 
 
-    def dehydrate_assays_configured(self, bundle):
-        """deprecated"""
-        return bundle.obj.enabled_forms.count() > 0
 
     def save_related(self, bundle):
         """Ensure that when saving the custom field config, any integrity errors from repeated names are passed up"""
@@ -1127,31 +1123,6 @@ class ProjectTypeResource(ModelResource):
             "saved_search_project_type": ALL,
             "plate_map_project_type": ALL
         }
-
-
-
-class DataTypeResource(ModelResource):
-
-    '''Resource for data types deprecated as not used in ChemiReg'''
-    plural = fields.CharField(null=True)
-
-    class Meta:
-        always_return_data = True
-        queryset = DataType.objects.all()
-        resource_name = 'cbh_data_types'
-        authorization = Authorization()
-        include_resource_uri = True
-        allowed_methods = ['get', 'post', 'patch', 'put']
-        default_format = 'application/json'
-        authentication = SessionAuthentication()
-        filtering = {
-            "name": ALL_WITH_RELATIONS
-        }
-        authorization = Authorization()
-
-    def dehydrate_plural(self, bundle):
-        """A way of generating a pluralised name for a data type"""
-        return inflection.pluralize(bundle.obj.name)
 
 
 

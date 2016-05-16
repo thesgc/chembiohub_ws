@@ -395,7 +395,6 @@ def after_all(context):
     from django.core.management import call_command
     call_command("reindex_compounds_new")
     
-    call_command("loaddata", "datatypes.json")
     call_command("loaddata", "projecttypes.json")
     # call_command("loaddata", "project_setup.json")
 

@@ -239,20 +239,6 @@ post_save.connect(make_default, sender=ProjectType, dispatch_uid="ptype")
 
 
 
-class DataType(TimeStampedModel):
-    """Deprecated part of assayreg"""
-    name = models.CharField(unique=True, max_length=500)
-    uri = models.CharField(max_length=1000, default="")
-    version = models.CharField(max_length=10, default="")
-
-    def get_space_replaced_name(self):
-        return self.name.replace(u" ", u"__space__")
-
-    def __unicode__(self):
-        return self.name
-
-
-
 
 class CustomFieldConfig(TimeStampedModel):
     '''
@@ -385,8 +371,6 @@ class Project(TimeStampedModel, ProjectPermissionMixin):
         "cbh_core_model.CustomFieldConfig", related_name="project", null=True, blank=True, default=None, help_text="Custom field config object which is linked to this project")
     project_type = models.ForeignKey(
         ProjectType, null=True, blank=True, default=None, help_text="Project type that this project is linked to")
-    is_default = models.BooleanField(default=False, help_text="deprecated field not used for anythign")
-    enabled_forms = models.ManyToManyField(DataFormConfig, blank=True, help_text="deprecated field not used for anything")
     project_counter_start = models.IntegerField(default=1, help_text="start of the incremental ID field for this project")
 
     class Meta:
@@ -633,8 +617,6 @@ class PinnedCustomField(TimeStampedModel):
     custom_field_config = models.ForeignKey(
         "cbh_core_model.CustomFieldConfig", related_name='pinned_custom_field', default=None, null=True, blank=True, help_text="the custom field config object this field is part of")
     required = models.BooleanField(default=False, help_text="Whetehr the field is required")
-    part_of_blinded_key = models.BooleanField(
-        default=False, verbose_name="blind key", help_text="deprecated unused field")
     field_type = models.CharField(default="char", choices=(
         (name, value["name"]) for name, value in FIELD_TYPE_CHOICES.items()), max_length=15, help_text="The data type of the data to be added in the front end forms for this field" )
     allowed_values = models.CharField(
@@ -642,8 +624,6 @@ class PinnedCustomField(TimeStampedModel):
     position = models.PositiveSmallIntegerField(help_text="Auto-filled field that says what order the fields in a custom field config should be displayed int he form")
     default = models.CharField(max_length=500, default="", blank=True, help_text="The default value of this field to be applied when adding data via the angular schema form")
 
-    pinned_for_datatype = models.ForeignKey(
-        DataType, blank=True, null=True, default=None, help_text="deprecated")
     standardised_alias = models.ForeignKey(
         "self", related_name="alias_mapped_from", blank=True, null=True, default=None,  help_text="deprecated")
     attachment_field_mapped_to = models.ForeignKey(
@@ -698,13 +678,7 @@ class PinnedCustomField(TimeStampedModel):
         form["description"] = obj.description
         form["disableSuccessState"] = True
         form["feedback"] = True
-        # form["allowed_values"] = obj.allowed_values
-        # form["part_of_blinded_key"] = obj.part_of_blinded_key
         searchitems = []
-        # if data.get("format", False) == "file_upload":
-        #     #specify the default to be a flowfile
-        #     data['default'] = models.ForeignKey(FlowFile, null=True, blank=True, default=None)
-
         if obj.default:
             data['default'] = obj.default
         else:

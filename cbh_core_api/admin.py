@@ -51,10 +51,10 @@ class PinnedCustomFieldAdmin(ModelAdmin):
     list_display = ["name",
                     "description",
                     "field_type",
-                    "allowed_values", "pinned_for_datatype", "field_key"]
+                    "allowed_values"]
 
-    exclude = ["field_key", "standardised_alias",
-               "custom_field_config", "part_of_blinded_key", "position"]
+    exclude = ["field_key",
+               "custom_field_config", "position"]
 
     def get_queryset(self, request):
         qs = super(PinnedCustomFieldAdmin, self).get_queryset(request)
@@ -67,21 +67,17 @@ class PinnedCustomFieldAdmin(ModelAdmin):
 
 class PinnedCustomFieldInlineForm(forms.ModelForm):
     """Inline form for pinned custom fields"""
-    standardised_alias = forms.ModelChoiceField(required=False, queryset=PinnedCustomField.objects.exclude(
-        pinned_for_datatype=None).order_by("field_key"), empty_label="Not Mapped")
 
     class Meta:
         model = PinnedCustomField
         exclude = [
-            "field_key", "pinned_for_datatype", "attachment_field_mapped_to"]
+             "attachment_field_mapped_to"]
 
 
 # GrappelliSortableHiddenMixin
 class PinnedCustomFieldInline(GrappelliSortableHiddenMixin, admin.TabularInline, ):
     """Inline admin for pinned custom fields which adds the poisition"""
     model = PinnedCustomField
-    exclude = ["field_key", "pinned_for_datatype",
-               "attachment_field_mapped_to"]
 
     sortable_field_name = "position"
     formfield_overrides = {
