@@ -16,7 +16,6 @@ develop-eggs/
 dist/
 downloads/
 eggs/
-flowjs/
 lib/
 lib64/
 parts/
