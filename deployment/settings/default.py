@@ -11,14 +11,8 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
 
 other_paths = [
-"src/cbh_chembl_model_extension/",
-"src/cbh_chembl_id_generator/",
-"src/cbh_core_model/",
-"src/chembl_business_model/",
-"src/chembl_core_db/",
-"src/chembl_core_model/",
-"src/chembl_extras/",
-"src/django-flowjs/"]
+"legacy_migrations/",
+]
 
 for path in other_paths:
     sys.path.insert(0, BASE_DIR + "/" + path)
