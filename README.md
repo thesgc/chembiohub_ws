@@ -9,4 +9,4 @@ For installation instructions and other documentation please see [the wiki](http
 
 **Code documentation**
 
-[Links to all sections of the documentation including systems administration, installation, extension, API docs and front and back end code docs](../wiki)
+[Links to all sections of the documentation including systems administration, installation, extension, API docs and front and back end code docs](../../wiki)
