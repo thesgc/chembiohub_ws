@@ -8,7 +8,5 @@ The main holder project for ChemBio Hub Platform including back end web services
 For installation instructions and other documentation please see [the wiki](https://github.com/thesgc/chembiohub_ws/wiki)
 
 **Code documentation**
-* [Project folder structure](https://github.com/thesgc/chembiohub_ws/wiki/Project-folder-structure)
-* [Front end API docs](http://showyourworking.github.io/docs/#/api)
-* [Back end API (documented via tests)](https://github.com/thesgc/chembiohub_ws/tree/master/cbh_tests/features)
-* In code documentation has been added for all python modules that are in use.
+
+[Links to all sections of the documentation including systems administration, installation, extension, API docs and front and back end code docs](/wiki)
