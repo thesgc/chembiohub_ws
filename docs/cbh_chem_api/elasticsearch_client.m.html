@@ -1,0 +1,2007 @@
+<!doctype html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+
+    <title>cbh_chem_api.elasticsearch_client API documentation</title>
+    <meta name="description" content="deprecated soon - the original elasticsearch client for compound batches, now only used for the inde..." />
+
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
+  
+  <style type="text/css">
+  
+* {
+  box-sizing: border-box;
+}
+/*! normalize.css v1.1.1 | MIT License | git.io/normalize */
+
+/* ==========================================================================
+   HTML5 display definitions
+   ========================================================================== */
+
+/**
+ * Correct `block` display not defined in IE 6/7/8/9 and Firefox 3.
+ */
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+nav,
+section,
+summary {
+    display: block;
+}
+
+/**
+ * Correct `inline-block` display not defined in IE 6/7/8/9 and Firefox 3.
+ */
+
+audio,
+canvas,
+video {
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+}
+
+/**
+ * Prevent modern browsers from displaying `audio` without controls.
+ * Remove excess height in iOS 5 devices.
+ */
+
+audio:not([controls]) {
+    display: none;
+    height: 0;
+}
+
+/**
+ * Address styling not present in IE 7/8/9, Firefox 3, and Safari 4.
+ * Known issue: no IE 6 support.
+ */
+
+[hidden] {
+    display: none;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+/**
+ * 1. Prevent system color scheme's background color being used in Firefox, IE,
+ *    and Opera.
+ * 2. Prevent system color scheme's text color being used in Firefox, IE, and
+ *    Opera.
+ * 3. Correct text resizing oddly in IE 6/7 when body `font-size` is set using
+ *    `em` units.
+ * 4. Prevent iOS text size adjust after orientation change, without disabling
+ *    user zoom.
+ */
+
+html {
+    background: #fff; /* 1 */
+    color: #000; /* 2 */
+    font-size: 100%; /* 3 */
+    -webkit-text-size-adjust: 100%; /* 4 */
+    -ms-text-size-adjust: 100%; /* 4 */
+}
+
+/**
+ * Address `font-family` inconsistency between `textarea` and other form
+ * elements.
+ */
+
+html,
+button,
+input,
+select,
+textarea {
+    font-family: sans-serif;
+}
+
+/**
+ * Address margins handled incorrectly in IE 6/7.
+ */
+
+body {
+    margin: 0;
+}
+
+/* ==========================================================================
+   Links
+   ========================================================================== */
+
+/**
+ * Address `outline` inconsistency between Chrome and other browsers.
+ */
+
+a:focus {
+    outline: thin dotted;
+}
+
+/**
+ * Improve readability when focused and also mouse hovered in all browsers.
+ */
+
+a:active,
+a:hover {
+    outline: 0;
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+
+/**
+ * Address font sizes and margins set differently in IE 6/7.
+ * Address font sizes within `section` and `article` in Firefox 4+, Safari 5,
+ * and Chrome.
+ */
+
+h1 {
+    font-size: 2em;
+    margin: 0.67em 0;
+}
+
+h2 {
+    font-size: 1.5em;
+    margin: 0.83em 0;
+}
+
+h3 {
+    font-size: 1.17em;
+    margin: 1em 0;
+}
+
+h4 {
+    font-size: 1em;
+    margin: 1.33em 0;
+}
+
+h5 {
+    font-size: 0.83em;
+    margin: 1.67em 0;
+}
+
+h6 {
+    font-size: 0.67em;
+    margin: 2.33em 0;
+}
+
+/**
+ * Address styling not present in IE 7/8/9, Safari 5, and Chrome.
+ */
+
+abbr[title] {
+    border-bottom: 1px dotted;
+}
+
+/**
+ * Address style set to `bolder` in Firefox 3+, Safari 4/5, and Chrome.
+ */
+
+b,
+strong {
+    font-weight: bold;
+}
+
+blockquote {
+    margin: 1em 40px;
+}
+
+/**
+ * Address styling not present in Safari 5 and Chrome.
+ */
+
+dfn {
+    font-style: italic;
+}
+
+/**
+ * Address differences between Firefox and other browsers.
+ * Known issue: no IE 6/7 normalization.
+ */
+
+hr {
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    height: 0;
+}
+
+/**
+ * Address styling not present in IE 6/7/8/9.
+ */
+
+mark {
+    background: #ff0;
+    color: #000;
+}
+
+/**
+ * Address margins set differently in IE 6/7.
+ */
+
+p,
+pre {
+    margin: 1em 0;
+}
+
+/**
+ * Correct font family set oddly in IE 6, Safari 4/5, and Chrome.
+ */
+
+code,
+kbd,
+pre,
+samp {
+    font-family: monospace, serif;
+    _font-family: 'courier new', monospace;
+    font-size: 1em;
+}
+
+/**
+ * Improve readability of pre-formatted text in all browsers.
+ */
+
+pre {
+    white-space: pre;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/**
+ * Address CSS quotes not supported in IE 6/7.
+ */
+
+q {
+    quotes: none;
+}
+
+/**
+ * Address `quotes` property not supported in Safari 4.
+ */
+
+q:before,
+q:after {
+    content: '';
+    content: none;
+}
+
+/**
+ * Address inconsistent and variable font size in all browsers.
+ */
+
+small {
+    font-size: 80%;
+}
+
+/**
+ * Prevent `sub` and `sup` affecting `line-height` in all browsers.
+ */
+
+sub,
+sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+sup {
+    top: -0.5em;
+}
+
+sub {
+    bottom: -0.25em;
+}
+
+/* ==========================================================================
+   Lists
+   ========================================================================== */
+
+/**
+ * Address margins set differently in IE 6/7.
+ */
+
+dl,
+menu,
+ol,
+ul {
+    margin: 1em 0;
+}
+
+dd {
+    margin: 0 0 0 40px;
+}
+
+/**
+ * Address paddings set differently in IE 6/7.
+ */
+
+menu,
+ol,
+ul {
+    padding: 0 0 0 40px;
+}
+
+/**
+ * Correct list images handled incorrectly in IE 7.
+ */
+
+nav ul,
+nav ol {
+    list-style: none;
+    list-style-image: none;
+}
+
+/* ==========================================================================
+   Embedded content
+   ========================================================================== */
+
+/**
+ * 1. Remove border when inside `a` element in IE 6/7/8/9 and Firefox 3.
+ * 2. Improve image quality when scaled in IE 7.
+ */
+
+img {
+    border: 0; /* 1 */
+    -ms-interpolation-mode: bicubic; /* 2 */
+}
+
+/**
+ * Correct overflow displayed oddly in IE 9.
+ */
+
+svg:not(:root) {
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   Figures
+   ========================================================================== */
+
+/**
+ * Address margin not present in IE 6/7/8/9, Safari 5, and Opera 11.
+ */
+
+figure {
+    margin: 0;
+}
+
+/* ==========================================================================
+   Forms
+   ========================================================================== */
+
+/**
+ * Correct margin displayed oddly in IE 6/7.
+ */
+
+form {
+    margin: 0;
+}
+
+/**
+ * Define consistent border, margin, and padding.
+ */
+
+fieldset {
+    border: 1px solid #c0c0c0;
+    margin: 0 2px;
+    padding: 0.35em 0.625em 0.75em;
+}
+
+/**
+ * 1. Correct color not being inherited in IE 6/7/8/9.
+ * 2. Correct text not wrapping in Firefox 3.
+ * 3. Correct alignment displayed oddly in IE 6/7.
+ */
+
+legend {
+    border: 0; /* 1 */
+    padding: 0;
+    white-space: normal; /* 2 */
+    *margin-left: -7px; /* 3 */
+}
+
+/**
+ * 1. Correct font size not being inherited in all browsers.
+ * 2. Address margins set differently in IE 6/7, Firefox 3+, Safari 5,
+ *    and Chrome.
+ * 3. Improve appearance and consistency in all browsers.
+ */
+
+button,
+input,
+select,
+textarea {
+    font-size: 100%; /* 1 */
+    margin: 0; /* 2 */
+    vertical-align: baseline; /* 3 */
+    *vertical-align: middle; /* 3 */
+}
+
+/**
+ * Address Firefox 3+ setting `line-height` on `input` using `!important` in
+ * the UA stylesheet.
+ */
+
+button,
+input {
+    line-height: normal;
+}
+
+/**
+ * Address inconsistent `text-transform` inheritance for `button` and `select`.
+ * All other form control elements do not inherit `text-transform` values.
+ * Correct `button` style inheritance in Chrome, Safari 5+, and IE 6+.
+ * Correct `select` style inheritance in Firefox 4+ and Opera.
+ */
+
+button,
+select {
+    text-transform: none;
+}
+
+/**
+ * 1. Avoid the WebKit bug in Android 4.0.* where (2) destroys native `audio`
+ *    and `video` controls.
+ * 2. Correct inability to style clickable `input` types in iOS.
+ * 3. Improve usability and consistency of cursor style between image-type
+ *    `input` and others.
+ * 4. Remove inner spacing in IE 7 without affecting normal text inputs.
+ *    Known issue: inner spacing remains in IE 6.
+ */
+
+button,
+html input[type="button"], /* 1 */
+input[type="reset"],
+input[type="submit"] {
+    -webkit-appearance: button; /* 2 */
+    cursor: pointer; /* 3 */
+    *overflow: visible;  /* 4 */
+}
+
+/**
+ * Re-set default cursor for disabled elements.
+ */
+
+button[disabled],
+html input[disabled] {
+    cursor: default;
+}
+
+/**
+ * 1. Address box sizing set to content-box in IE 8/9.
+ * 2. Remove excess padding in IE 8/9.
+ * 3. Remove excess padding in IE 7.
+ *    Known issue: excess padding remains in IE 6.
+ */
+
+input[type="checkbox"],
+input[type="radio"] {
+    box-sizing: border-box; /* 1 */
+    padding: 0; /* 2 */
+    *height: 13px; /* 3 */
+    *width: 13px; /* 3 */
+}
+
+/**
+ * 1. Address `appearance` set to `searchfield` in Safari 5 and Chrome.
+ * 2. Address `box-sizing` set to `border-box` in Safari 5 and Chrome
+ *    (include `-moz` to future-proof).
+ */
+
+input[type="search"] {
+    -webkit-appearance: textfield; /* 1 */
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box; /* 2 */
+    box-sizing: content-box;
+}
+
+/**
+ * Remove inner padding and search cancel button in Safari 5 and Chrome
+ * on OS X.
+ */
+
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+}
+
+/**
+ * Remove inner padding and border in Firefox 3+.
+ */
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+}
+
+/**
+ * 1. Remove default vertical scrollbar in IE 6/7/8/9.
+ * 2. Improve readability and alignment in all browsers.
+ */
+
+textarea {
+    overflow: auto; /* 1 */
+    vertical-align: top; /* 2 */
+}
+
+/* ==========================================================================
+   Tables
+   ========================================================================== */
+
+/**
+ * Remove most spacing between table cells.
+ */
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+  </style>
+
+  <style type="text/css">
+  
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+  }
+  body {
+    background: #fff;
+    font-family: "Source Sans Pro", "Helvetica Neueue", Helvetica, sans;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 1.6em;
+  }
+  #content {
+    width: 70%;
+    max-width: 850px;
+    float: left;
+    padding: 30px 60px;
+    border-left: 1px solid #ddd;
+  }
+  #sidebar {
+    width: 25%;
+    float: left;
+    padding: 30px;
+    overflow: hidden;
+  }
+  #nav {
+    font-size: 130%;
+    margin: 0 0 15px 0;
+  }
+
+  #top {
+    display: block;
+    position: fixed;
+    bottom: 5px;
+    left: 5px;
+    font-size: .85em;
+    text-transform: uppercase;
+  }
+
+  #footer {
+    font-size: .75em;
+    padding: 5px 30px;
+    border-top: 1px solid #ddd;
+    text-align: right;
+  }
+    #footer p {
+      margin: 0 0 0 30px;
+      display: inline-block;
+    }
+
+  h1, h2, h3, h4, h5 {
+    font-weight: 300;
+  }
+  h1 {
+    font-size: 2.5em;
+    line-height: 1.1em;
+    margin: 0 0 .50em 0;
+  }
+
+  h2 {
+    font-size: 1.75em;
+    margin: 1em 0 .50em 0;
+  }
+
+  h3 {
+    margin: 25px 0 10px 0;
+  }
+
+  h4 {
+    margin: 0;
+    font-size: 105%;
+  }
+
+  a {
+    color: #058;
+    text-decoration: none;
+    transition: color .3s ease-in-out;
+  }
+
+  a:hover {
+    color: #e08524;
+    transition: color .3s ease-in-out;
+  }
+
+  pre, code, .mono, .name {
+    font-family: "Ubuntu Mono", "Cousine", "DejaVu Sans Mono", monospace;
+  }
+
+  .title .name {
+    font-weight: bold;
+  }
+  .section-title {
+    margin-top: 2em;
+  }
+  .ident {
+    color: #900;
+  }
+
+  code {
+    background: #f9f9f9;
+  } 
+
+  pre {
+    background: #fefefe;
+    border: 1px solid #ddd;
+    box-shadow: 2px 2px 0 #f3f3f3;
+    margin: 0 30px;
+    padding: 15px 30px;
+  }
+
+  .codehilite {
+    margin: 0 30px 10px 30px;
+  }
+
+    .codehilite pre {
+      margin: 0;
+    }
+    .codehilite .err { background: #ff3300; color: #fff !important; } 
+
+  table#module-list {
+    font-size: 110%;
+  }
+
+    table#module-list tr td:first-child {
+      padding-right: 10px;
+      white-space: nowrap;
+    }
+
+    table#module-list td {
+      vertical-align: top;
+      padding-bottom: 8px;
+    }
+
+      table#module-list td p {
+        margin: 0 0 7px 0;
+      }
+
+  .def {
+    display: table;
+  }
+
+    .def p {
+      display: table-cell;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .def p:first-child {
+      white-space: nowrap;
+    }
+
+    .def p:last-child {
+      width: 100%;
+    }
+
+
+  #index {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+    ul#index .class_name {
+      /* font-size: 110%; */
+      font-weight: bold;
+    }
+    #index ul {
+      margin: 0;
+    }
+
+  .item {
+    margin: 0 0 15px 0;
+  }
+
+    .item .class {
+      margin: 0 0 25px 30px;
+    }
+
+      .item .class ul.class_list {
+        margin: 0 0 20px 0;
+      }
+
+    .item .name {
+      background: #fafafa;
+      margin: 0;
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 3px;
+      display: inline-block;
+      min-width: 40%;
+    }
+      .item .name:hover {
+        background: #f6f6f6;
+      }
+
+    .item .empty_desc {
+      margin: 0 0 5px 0;
+      padding: 0;
+    }
+
+    .item .inheritance {
+      margin: 3px 0 0 30px;
+    }
+
+    .item .inherited {
+      color: #666;
+    }
+
+    .item .desc {
+      padding: 0 8px;
+      margin: 0;
+    }
+
+      .item .desc p {
+        margin: 0 0 10px 0;
+      }
+
+    .source_cont {
+      margin: 0;
+      padding: 0;
+    }
+
+    .source_link a {
+      background: #ffc300;
+      font-weight: 400;
+      font-size: .75em;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 1px 1px 0 #f4b700;
+      
+      padding: 3px 8px;
+      border-radius: 2px;
+      transition: background .3s ease-in-out;
+    }
+      .source_link a:hover {
+        background: #FF7200;
+        text-shadow: none;
+        transition: background .3s ease-in-out;
+      }
+
+    .source {
+      display: none;
+      max-height: 600px;
+      overflow-y: scroll;
+      margin-bottom: 15px;
+    }
+
+      .source .codehilite {
+        margin: 0;
+      }
+
+  .desc h1, .desc h2, .desc h3 {
+    font-size: 100% !important;
+  }
+  .clear {
+    clear: both;
+  }
+
+  @media all and (max-width: 950px) {
+    #sidebar {
+      width: 35%;
+    }
+    #content {
+      width: 65%;
+    }
+  }
+  @media all and (max-width: 650px) {
+    #top {
+      display: none;
+    }
+    #sidebar {
+      float: none;
+      width: auto;
+    }
+    #content {
+      float: none;
+      width: auto;
+      padding: 30px;
+    }
+
+    #index ul {
+      padding: 0;
+      margin-bottom: 15px;
+    }
+    #index ul li {
+      display: inline-block;
+      margin-right: 30px;
+    }
+    #footer {
+      text-align: left;
+    }
+    #footer p {
+      display: block;
+      margin: inherit;
+    }
+  }
+
+  /*****************************/
+
+  </style>
+
+  <style type="text/css">
+  .codehilite .hll { background-color: #ffffcc }
+.codehilite  { background: #f8f8f8; }
+.codehilite .c { color: #408080; font-style: italic } /* Comment */
+.codehilite .err { border: 1px solid #FF0000 } /* Error */
+.codehilite .k { color: #008000; font-weight: bold } /* Keyword */
+.codehilite .o { color: #666666 } /* Operator */
+.codehilite .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+.codehilite .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.codehilite .cp { color: #BC7A00 } /* Comment.Preproc */
+.codehilite .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
+.codehilite .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.codehilite .cs { color: #408080; font-style: italic } /* Comment.Special */
+.codehilite .gd { color: #A00000 } /* Generic.Deleted */
+.codehilite .ge { font-style: italic } /* Generic.Emph */
+.codehilite .gr { color: #FF0000 } /* Generic.Error */
+.codehilite .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.codehilite .gi { color: #00A000 } /* Generic.Inserted */
+.codehilite .go { color: #888888 } /* Generic.Output */
+.codehilite .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.codehilite .gs { font-weight: bold } /* Generic.Strong */
+.codehilite .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.codehilite .gt { color: #0044DD } /* Generic.Traceback */
+.codehilite .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.codehilite .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.codehilite .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.codehilite .kp { color: #008000 } /* Keyword.Pseudo */
+.codehilite .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.codehilite .kt { color: #B00040 } /* Keyword.Type */
+.codehilite .m { color: #666666 } /* Literal.Number */
+.codehilite .s { color: #BA2121 } /* Literal.String */
+.codehilite .na { color: #7D9029 } /* Name.Attribute */
+.codehilite .nb { color: #008000 } /* Name.Builtin */
+.codehilite .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.codehilite .no { color: #880000 } /* Name.Constant */
+.codehilite .nd { color: #AA22FF } /* Name.Decorator */
+.codehilite .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.codehilite .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.codehilite .nf { color: #0000FF } /* Name.Function */
+.codehilite .nl { color: #A0A000 } /* Name.Label */
+.codehilite .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.codehilite .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.codehilite .nv { color: #19177C } /* Name.Variable */
+.codehilite .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.codehilite .w { color: #bbbbbb } /* Text.Whitespace */
+.codehilite .mb { color: #666666 } /* Literal.Number.Bin */
+.codehilite .mf { color: #666666 } /* Literal.Number.Float */
+.codehilite .mh { color: #666666 } /* Literal.Number.Hex */
+.codehilite .mi { color: #666666 } /* Literal.Number.Integer */
+.codehilite .mo { color: #666666 } /* Literal.Number.Oct */
+.codehilite .sb { color: #BA2121 } /* Literal.String.Backtick */
+.codehilite .sc { color: #BA2121 } /* Literal.String.Char */
+.codehilite .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.codehilite .s2 { color: #BA2121 } /* Literal.String.Double */
+.codehilite .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.codehilite .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.codehilite .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.codehilite .sx { color: #008000 } /* Literal.String.Other */
+.codehilite .sr { color: #BB6688 } /* Literal.String.Regex */
+.codehilite .s1 { color: #BA2121 } /* Literal.String.Single */
+.codehilite .ss { color: #19177C } /* Literal.String.Symbol */
+.codehilite .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.codehilite .vc { color: #19177C } /* Name.Variable.Class */
+.codehilite .vg { color: #19177C } /* Name.Variable.Global */
+.codehilite .vi { color: #19177C } /* Name.Variable.Instance */
+.codehilite .il { color: #666666 } /* Literal.Number.Integer.Long */
+  </style>
+
+  <style type="text/css">
+  
+/* ==========================================================================
+   EXAMPLE Media Queries for Responsive Design.
+   These examples override the primary ('mobile first') styles.
+   Modify as content requires.
+   ========================================================================== */
+
+@media only screen and (min-width: 35em) {
+    /* Style adjustments for viewports that meet the condition */
+}
+
+@media print,
+       (-o-min-device-pixel-ratio: 5/4),
+       (-webkit-min-device-pixel-ratio: 1.25),
+       (min-resolution: 120dpi) {
+    /* Style adjustments for high resolution devices */
+}
+
+/* ==========================================================================
+   Print styles.
+   Inlined to avoid required HTTP connection: h5bp.com/r
+   ========================================================================== */
+
+@media print {
+    * {
+        background: transparent !important;
+        color: #000 !important; /* Black prints faster: h5bp.com/s */
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    a,
+    a:visited {
+        text-decoration: underline;
+    }
+
+    a[href]:after {
+        content: " (" attr(href) ")";
+    }
+
+    abbr[title]:after {
+        content: " (" attr(title) ")";
+    }
+
+    /*
+     * Don't show links for images, or javascript/internal links
+     */
+
+    .ir a:after,
+    a[href^="javascript:"]:after,
+    a[href^="#"]:after {
+        content: "";
+    }
+
+    pre,
+    blockquote {
+        border: 1px solid #999;
+        page-break-inside: avoid;
+    }
+
+    thead {
+        display: table-header-group; /* h5bp.com/t */
+    }
+
+    tr,
+    img {
+        page-break-inside: avoid;
+    }
+
+    img {
+        max-width: 100% !important;
+    }
+
+    @page {
+        margin: 0.5cm;
+    }
+
+    p,
+    h2,
+    h3 {
+        orphans: 3;
+        widows: 3;
+    }
+
+    h2,
+    h3 {
+        page-break-after: avoid;
+    }
+}
+
+  </style>
+
+  <script type="text/javascript">
+  function toggle(id, $link) {
+    $node = document.getElementById(id);
+    if (!$node)
+    return;
+    if (!$node.style.display || $node.style.display == 'none') {
+    $node.style.display = 'block';
+    $link.innerHTML = 'Hide source &nequiv;';
+    } else {
+    $node.style.display = 'none';
+    $link.innerHTML = 'Show source &equiv;';
+    }
+  }
+  </script>
+</head>
+<body>
+<a href="#" id="top">Top</a>
+
+<div id="container">
+    
+  
+  <div id="sidebar">
+    <h1>Index</h1>
+    <ul id="index">
+    <li class="set"><h3><a href="#header-variables">Module variables</a></h3>
+      
+  <ul>
+    <li class="mono"><a href="#cbh_chem_api.elasticsearch_client.ES_MAIN_INDEX_NAME">ES_MAIN_INDEX_NAME</a></li>
+    <li class="mono"><a href="#cbh_chem_api.elasticsearch_client.ES_PREFIX">ES_PREFIX</a></li>
+  </ul>
+
+    </li>
+
+    <li class="set"><h3><a href="#header-functions">Functions</a></h3>
+      
+  <ul>
+    <li class="mono"><a href="#cbh_chem_api.elasticsearch_client.create_temporary_index">create_temporary_index</a></li>
+    <li class="mono"><a href="#cbh_chem_api.elasticsearch_client.delete_index">delete_index</a></li>
+    <li class="mono"><a href="#cbh_chem_api.elasticsearch_client.get">get</a></li>
+    <li class="mono"><a href="#cbh_chem_api.elasticsearch_client.get_action_totals">get_action_totals</a></li>
+    <li class="mono"><a href="#cbh_chem_api.elasticsearch_client.get_autocomplete">get_autocomplete</a></li>
+    <li class="mono"><a href="#cbh_chem_api.elasticsearch_client.get_cf_aggregation">get_cf_aggregation</a></li>
+    <li class="mono"><a href="#cbh_chem_api.elasticsearch_client.get_custom_fields_query_from_string">get_custom_fields_query_from_string</a></li>
+    <li class="mono"><a href="#cbh_chem_api.elasticsearch_client.get_main_index_name">get_main_index_name</a></li>
+    <li class="mono"><a href="#cbh_chem_api.elasticsearch_client.get_project_index_name">get_project_index_name</a></li>
+    <li class="mono"><a href="#cbh_chem_api.elasticsearch_client.get_project_uri_terms">get_project_uri_terms</a></li>
+    <li class="mono"><a href="#cbh_chem_api.elasticsearch_client.get_temp_index_name">get_temp_index_name</a></li>
+    <li class="mono"><a href="#cbh_chem_api.elasticsearch_client.reindex_compound">reindex_compound</a></li>
+  </ul>
+
+    </li>
+
+
+    </ul>
+  </div>
+
+    <article id="content">
+      
+  
+
+  
+
+
+  <header id="section-intro">
+  <h1 class="title"><span class="name">cbh_chem_api.elasticsearch_client</span> module</h1>
+  <p>deprecated soon - the original elasticsearch client for compound batches, now only used for the indexing of
+new data in a temporary index</p>
+  
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_chem_api.elasticsearch_client', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_chem_api.elasticsearch_client" class="source">
+    <div class="codehilite"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">deprecated soon - the original elasticsearch client for compound batches, now only used for the indexing of</span>
+<span class="sd">new data in a temporary index</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">import</span> <span class="nn">elasticsearch</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">ES_PREFIX</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">ES_PREFIX</span>
+<span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+    <span class="n">ES_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;dev&quot;</span>
+<span class="n">ES_MAIN_INDEX_NAME</span> <span class="o">=</span> <span class="s2">&quot;chemreg_chemical_index&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">get_temp_index_name</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">multi_batch_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate an index name for a particular multiple batch&quot;&quot;&quot;</span>
+    <span class="n">index_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">__temp_multi_batch__</span><span class="si">%s</span><span class="s2">__</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">ES_PREFIX</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">session_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">multi_batch_id</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">index_name</span>
+    <span class="c1"># return &quot;%s__temp_multi_batch__%s__%s&quot; % (ES_PREFIX,</span>
+    <span class="c1"># request.session.session_key, str(multi_batch_id))</span>
+
+
+<span class="k">def</span> <span class="nf">get_main_index_name</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Generate the main index name for elasticsearch&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">__</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ES_PREFIX</span><span class="p">,</span> <span class="n">ES_MAIN_INDEX_NAME</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">delete_index</span><span class="p">(</span><span class="n">index_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Delete an index permanently by name&quot;&quot;&quot;</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">es</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">index_name</span><span class="p">,</span>  <span class="n">ignore</span><span class="o">=</span><span class="p">[</span><span class="mi">400</span><span class="p">,</span> <span class="mi">404</span><span class="p">])</span>
+
+
+<span class="k">def</span> <span class="nf">get_action_totals</span><span class="p">(</span><span class="n">index_name</span><span class="p">,</span>  <span class="n">bundledata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Use elasticsearch aggregations to find the stats required for the preview </span>
+<span class="sd">    UI when uploading a set of compounds or inventory items</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">es_request_body</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;match_all&quot;</span><span class="p">:</span> <span class="p">{}},</span>
+        <span class="s2">&quot;aggs&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;actions&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;terms&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;field&quot;</span><span class="p">:</span> <span class="s2">&quot;properties.action.raw&quot;</span><span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">()</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">index_name</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">es_request_body</span><span class="p">)</span>
+    <span class="n">bundledata</span><span class="p">[</span><span class="s2">&quot;savestats&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ignoring&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;newbatches&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">buck</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;aggregations&quot;</span><span class="p">][</span><span class="s2">&quot;actions&quot;</span><span class="p">][</span><span class="s2">&quot;buckets&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">buck</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;New Batch&quot;</span><span class="p">:</span>
+            <span class="n">bundledata</span><span class="p">[</span><span class="s2">&quot;savestats&quot;</span><span class="p">][</span><span class="s2">&quot;newbatches&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">buck</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doc_count&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">buck</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;Ignore&quot;</span><span class="p">:</span>
+            <span class="n">bundledata</span><span class="p">[</span><span class="s2">&quot;savestats&quot;</span><span class="p">][</span><span class="s2">&quot;ignoring&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">buck</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doc_count&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">bundledata</span>
+
+
+<span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">index_name</span><span class="p">,</span> <span class="n">es_request_body</span><span class="p">,</span> <span class="n">bundledata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Perform a search request against the elasticsearch index specified&quot;&quot;&quot;</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">()</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">index_name</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">es_request_body</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">hit</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;hits&quot;</span><span class="p">][</span><span class="s2">&quot;hits&quot;</span><span class="p">]:</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hit</span><span class="p">[</span><span class="s2">&quot;_source&quot;</span><span class="p">])</span>
+
+    <span class="n">bundledata</span><span class="p">[</span><span class="s2">&quot;meta&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;totalCount&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;hits&quot;</span><span class="p">][</span><span class="s2">&quot;total&quot;</span><span class="p">]}</span>
+    <span class="n">bundledata</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;aggregations&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="n">bundledata</span><span class="p">[</span><span class="s2">&quot;aggregations&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">res</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;aggregations&quot;</span><span class="p">][</span><span class="s2">&quot;autocomplete&quot;</span><span class="p">][</span><span class="s2">&quot;buckets&quot;</span><span class="p">]]</span>
+
+    <span class="k">return</span> <span class="n">bundledata</span>
+
+<span class="k">def</span> <span class="nf">get_project_uri_terms</span><span class="p">(</span><span class="n">project_id_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Because of the way that we indexed the data in ChemiReg V1 the project is represented as a URI</span>
+<span class="sd">    but the actual search requests and the permissions requests tended to contain list oif ids</span>
+<span class="sd">    This function converts a list of ids into a list of resource uris&quot;&quot;&quot;</span>
+    <span class="n">project_terms</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">project_id_list</span><span class="p">:</span>
+        <span class="n">project_name</span> <span class="o">=</span> <span class="s1">&#39;/</span><span class="si">%s</span><span class="s1">/cbh_projects/</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">WEBSERVICES_NAME</span><span class="p">,</span> <span class="n">proj</span><span class="p">)</span>
+        <span class="n">project_terms</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;term&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;project.raw&#39;</span><span class="p">:</span> <span class="n">project_name</span><span class="p">}})</span>
+    <span class="k">return</span> <span class="p">[{</span><span class="s1">&#39;bool&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;should&#39;</span><span class="p">:</span> <span class="n">project_terms</span><span class="p">,</span>
+    <span class="p">},</span> <span class="p">}]</span>
+
+
+
+<span class="k">def</span> <span class="nf">get_custom_fields_query_from_string</span><span class="p">(</span><span class="n">cf_string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;deperecated&quot;&quot;&quot;</span>
+    <span class="n">project_terms</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">keyvalue</span> <span class="ow">in</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">cf_string</span><span class="p">):</span>
+        
+        <span class="n">splitted</span> <span class="o">=</span> <span class="n">keyvalue</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
+        <span class="n">project_terms</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;term&quot;</span><span class="p">:</span> 
+                <span class="p">{</span><span class="s2">&quot;customFields.</span><span class="si">%s</span><span class="s2">.raw&quot;</span> <span class="o">%</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">:</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">1</span><span class="p">]}}</span>
+                <span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;bool&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;should&#39;</span><span class="p">:</span> <span class="n">project_terms</span><span class="p">,</span>
+                <span class="p">},</span> <span class="p">}</span>
+
+
+
+<span class="k">def</span> <span class="nf">get_cf_aggregation</span><span class="p">(</span><span class="n">search_term</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">single_field</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Deperecated way of building an aggregation for a custom field&quot;&quot;&quot;</span>
+    <span class="n">search_regex</span> <span class="o">=</span> <span class="s1">&#39;.*</span><span class="si">%s</span><span class="s1">.*|.*</span><span class="si">%s</span><span class="s1">.*|.*</span><span class="si">%s</span><span class="s1">.*|.*</span><span class="si">%s</span><span class="s1">.*&#39;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">search_term</span><span class="o">.</span><span class="n">title</span><span class="p">(),</span> <span class="n">search_term</span><span class="p">,</span> <span class="n">search_term</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">search_term</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+    <span class="n">field_to_search</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.raw&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">field</span><span class="p">)</span>
+    <span class="n">should_filter</span> <span class="o">=</span> <span class="p">[</span>
+                         
+                         <span class="p">{</span><span class="s1">&#39;regexp&#39;</span><span class="p">:</span> <span class="p">{</span>
+                             <span class="s1">&#39;custom_field_list.value.raw&#39;</span><span class="p">:</span>  <span class="n">search_regex</span><span class="p">}}</span>
+                         <span class="p">]</span>
+    <span class="k">if</span> <span class="n">single_field</span><span class="p">:</span>
+        <span class="c1">#We limit the search to a single field</span>
+        <span class="n">search_regex</span> <span class="o">=</span> <span class="s1">&#39;^</span><span class="si">%s</span><span class="s1">.*&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">single_field</span><span class="p">,</span> <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1">#We search only </span>
+        <span class="n">should_filter</span> <span class="o">+=</span> <span class="p">[{</span><span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="p">{</span>
+                             <span class="s1">&#39;custom_field_list.searchable_name.raw&#39;</span><span class="p">:</span>  <span class="n">search_term</span><span class="o">.</span><span class="n">lower</span><span class="p">()}}]</span>
+
+
+    <span class="n">search_filter</span> <span class="o">=</span>  <span class="p">{</span><span class="s1">&#39;bool&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;should&#39;</span><span class="p">:</span> <span class="n">should_filter</span>
+                    <span class="p">},</span> 
+                    <span class="p">}</span>
+
+    <span class="n">aggs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;autocomplete&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;terms&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;field&#39;</span><span class="p">:</span> <span class="n">field_to_search</span><span class="p">,</span>
+                          <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>
+                          <span class="s1">&#39;include&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">search_regex</span><span class="p">)</span>
+                          <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">search_filter</span><span class="p">,</span> <span class="n">aggs</span><span class="p">)</span>
+
+
+
+<span class="k">def</span> <span class="nf">get_autocomplete</span><span class="p">(</span><span class="n">projects</span><span class="p">,</span> <span class="n">search_term</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">custom_fields</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">single_field</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;deprecated autocomplete method&quot;&quot;&quot;</span>
+    <span class="n">project_terms</span> <span class="o">=</span> <span class="n">get_project_uri_terms</span><span class="p">(</span><span class="n">projects</span><span class="p">)</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">()</span>
+    
+    <span class="c1"># Search for a space before item to ensure it is a separate word, note</span>
+    <span class="c1"># that the terms have been formatted to allow this type of match to work</span>
+    <span class="n">search_regex</span> <span class="o">=</span> <span class="s1">&#39;.*</span><span class="si">%s</span><span class="s1">.*|.*</span><span class="si">%s</span><span class="s1">.*|.*</span><span class="si">%s</span><span class="s1">.*|.*</span><span class="si">%s</span><span class="s1">.*&#39;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">search_term</span><span class="o">.</span><span class="n">title</span><span class="p">(),</span> <span class="n">search_term</span><span class="p">,</span> <span class="n">search_term</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">search_term</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+    <span class="n">field_to_search</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.raw&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">field</span><span class="p">)</span>
+   
+
+    <span class="n">must_list</span> <span class="o">=</span> <span class="n">project_terms</span>
+
+    <span class="k">if</span> <span class="n">search_term</span> <span class="ow">and</span> <span class="n">custom_fields</span><span class="p">:</span>
+        <span class="n">must_list</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;bool&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;should&#39;</span><span class="p">:</span> <span class="p">[</span>
+                         <span class="p">{</span><span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="p">{</span>
+                             <span class="s1">&#39;custom_field_list.searchable_name.raw&#39;</span><span class="p">:</span>  <span class="n">search_term</span><span class="o">.</span><span class="n">lower</span><span class="p">()}},</span>
+                         <span class="p">{</span><span class="s1">&#39;regexp&#39;</span><span class="p">:</span> <span class="p">{</span>
+                             <span class="s1">&#39;custom_field_list.value.raw&#39;</span><span class="p">:</span>  <span class="n">search_regex</span><span class="p">}}</span>
+                         <span class="p">],</span>
+        <span class="p">},</span> <span class="p">})</span>
+
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">custom_fields</span> <span class="ow">and</span> <span class="n">single_field</span><span class="p">):</span>
+        <span class="c1"># create a bool must term which is the custom field identifier</span>
+        <span class="c1">#cust_str = &#39;custom_fields.value.raw&#39; % (single_field)</span>
+        <span class="c1"># agg_regex = &#39;^%s(.*)(%s)&#39; % (single_field, search_regex)</span>
+        <span class="n">agg_regex</span> <span class="o">=</span> <span class="s1">&#39;^</span><span class="si">%s</span><span class="s1">.*&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">single_field</span><span class="p">,</span> <span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">agg_regex</span> <span class="o">=</span> <span class="n">search_regex</span>
+        <span class="c1"># must_list.append({</span>
+        <span class="c1">#                       &#39;bool&#39;: {</span>
+        <span class="c1">#                           &#39;must&#39;: {&#39;prefix&#39;: { &#39;custom_field_list.name.raw&#39;:  single_field } }</span>
+        <span class="c1">#                       }</span>
+        <span class="c1">#                     })</span>
+    <span class="n">must_list</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+        <span class="s1">&#39;filtered&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;filter&#39;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bool&quot;</span><span class="p">:</span>
+                                   <span class="p">{</span><span class="s2">&quot;should&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;term&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;properties.archived&quot;</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span><span class="p">}},</span>
+                                               <span class="p">{</span><span class="s2">&quot;missing&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;field&quot;</span><span class="p">:</span> <span class="s2">&quot;properties.archived&quot;</span><span class="p">}}]}</span>
+                                   <span class="p">},</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="p">)</span>
+
+    <span class="n">body</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;query&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;bool&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;must&#39;</span><span class="p">:</span> <span class="n">must_list</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;aggs&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;autocomplete&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;terms&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;field&#39;</span><span class="p">:</span> <span class="n">field_to_search</span><span class="p">,</span>
+                          <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>
+                          <span class="s1">&#39;include&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">agg_regex</span><span class="p">)</span>
+                          <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        
+        <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="p">)</span>
+    <span class="c1"># return the results in the right format</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">res</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;aggregations&quot;</span><span class="p">][</span><span class="s2">&quot;autocomplete&quot;</span><span class="p">][</span><span class="s2">&quot;buckets&quot;</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">data</span>
+
+
+<span class="k">def</span> <span class="nf">create_temporary_index</span><span class="p">(</span><span class="n">batches</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">index_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Index data in the old format, now mostly deprecated except for the file upload preview&quot;&quot;&quot;</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">()</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">store_type</span> <span class="o">=</span> <span class="s2">&quot;niofs&quot;</span>
+
+    <span class="n">create_body</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;settings&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;index.store.type&quot;</span><span class="p">:</span> <span class="n">store_type</span><span class="p">,</span>
+            <span class="s2">&quot;analysis&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;analyzer&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;default_index&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;tokenizer&quot;</span> <span class="p">:</span> <span class="s2">&quot;whitespace&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;filter&quot;</span> <span class="p">:</span> <span class="p">[</span>
+                                <span class="s2">&quot;lowercase&quot;</span>
+                            <span class="p">],</span>
+                            <span class="s2">&quot;char_filter&quot;</span> <span class="p">:</span> <span class="p">[</span>
+                                <span class="s2">&quot;html_strip&quot;</span>
+                            <span class="p">]</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;mappings&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;_default_&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;_all&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;enabled&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">},</span>
+                <span class="s2">&quot;date_detection&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                
+                <span class="s2">&quot;properties&quot;</span><span class="p">:{</span>
+                    <span class="s2">&quot;created&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;not_analyzed&quot;</span>
+                    <span class="p">},</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;dynamic_templates&quot;</span><span class="p">:</span> <span class="p">[{</span>
+                    <span class="s2">&quot;ignored_fields&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;match&quot;</span><span class="p">:</span> <span class="s2">&quot;ctab|std_ctab|canonical_smiles|original_smiles&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;match_mapping_type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;mapping&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;store&quot;</span><span class="p">:</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="s2">&quot;include_in_all&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span> <span class="p">:</span> <span class="s2">&quot;no&quot;</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;sortable&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;match&quot;</span><span class="p">:</span> <span class="s2">&quot;customFields.*___sortable&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;match_mapping_type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;mapping&quot;</span><span class="p">:</span>  <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;store&quot;</span><span class="p">:</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;not_analyzed&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;ignore_above&quot;</span><span class="p">:</span> <span class="mi">256</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;uncurated_fields&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;match&quot;</span><span class="p">:</span> <span class="s2">&quot;uncuratedFields.*|image|bigimage&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;match_mapping_type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;mapping&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="s2">&quot;include_in_all&quot;</span><span class="p">:</span> <span class="bp">False</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;string_fields&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;match&quot;</span><span class="p">:</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;match_mapping_type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;mapping&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;store&quot;</span><span class="p">:</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;index_options&quot;</span><span class="p">:</span> <span class="s2">&quot;positions&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;analyzed&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;omit_norms&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> 
+                            <span class="s2">&quot;analyzer&quot;</span> <span class="p">:</span> <span class="s2">&quot;default_index&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                <span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;store&quot;</span><span class="p">:</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;not_analyzed&quot;</span><span class="p">,</span> <span class="s2">&quot;ignore_above&quot;</span><span class="p">:</span> <span class="mi">256</span><span class="p">}</span>
+                            <span class="p">}</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+                <span class="p">]</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="c1"># if(index_name == get_main_index_name()):</span>
+    <span class="c1">#     create_body[&#39;mappings&#39;][&#39;_source&#39;] = { &#39;enabled&#39;:False }</span>
+    <span class="c1">#index_name = get_temp_index_name(request, multi_batch_id)</span>
+
+    <span class="n">es</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">index_name</span><span class="p">,</span>
+        <span class="n">body</span><span class="o">=</span><span class="n">create_body</span><span class="p">,</span>
+        <span class="n">ignore</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+
+    <span class="n">bulk_items</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">batches</span><span class="p">:</span>
+            <span class="n">bulk_items</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s2">&quot;index&quot;</span><span class="p">:</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]),</span>
+                    <span class="s2">&quot;_index&quot;</span><span class="p">:</span> <span class="n">index_name</span><span class="p">,</span>
+                    <span class="s2">&quot;_type&quot;</span><span class="p">:</span> <span class="s2">&quot;batches&quot;</span>
+                <span class="p">}</span>
+            <span class="p">})</span>
+            <span class="n">bulk_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="c1"># Data is not refreshed!</span>
+        <span class="k">return</span> <span class="n">es</span><span class="o">.</span><span class="n">bulk</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">bulk_items</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{}</span>
+
+
+<span class="k">def</span> <span class="nf">get_project_index_name</span><span class="p">(</span><span class="n">project</span><span class="p">):</span>
+    <span class="n">index_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">__project__</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ES_PREFIX</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">project</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">index_name</span>
+
+
+<span class="k">def</span> <span class="nf">reindex_compound</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reindex an item now deprecated&quot;&quot;&quot;</span>
+    <span class="c1"># reindex the specified compound in the specified index</span>
+    <span class="n">index_name</span> <span class="o">=</span> <span class="n">get_main_index_name</span><span class="p">()</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">()</span>
+    <span class="n">update_body</span> <span class="o">=</span> <span class="n">dataset</span>
+    <span class="k">return</span> <span class="n">es</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span> <span class="n">doc_type</span><span class="o">=</span><span class="s2">&quot;batches&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index_name</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">update_body</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+
+  </header>
+
+  <section id="section-items">
+    <h2 class="section-title" id="header-variables">Module variables</h2>
+      <div class="item">
+      <p id="cbh_chem_api.elasticsearch_client.ES_MAIN_INDEX_NAME" class="name">var <span class="ident">ES_MAIN_INDEX_NAME</span></p>
+      
+  
+  <div class="source_cont">
+</div>
+
+      </div>
+      <div class="item">
+      <p id="cbh_chem_api.elasticsearch_client.ES_PREFIX" class="name">var <span class="ident">ES_PREFIX</span></p>
+      
+  
+  <div class="source_cont">
+</div>
+
+      </div>
+
+    <h2 class="section-title" id="header-functions">Functions</h2>
+      
+  <div class="item">
+    <div class="name def" id="cbh_chem_api.elasticsearch_client.create_temporary_index">
+    <p>def <span class="ident">create_temporary_index</span>(</p><p>batches, request, index_name)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Index data in the old format, now mostly deprecated except for the file upload preview</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_chem_api.elasticsearch_client.create_temporary_index', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_chem_api.elasticsearch_client.create_temporary_index" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">create_temporary_index</span><span class="p">(</span><span class="n">batches</span><span class="p">,</span> <span class="n">request</span><span class="p">,</span> <span class="n">index_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Index data in the old format, now mostly deprecated except for the file upload preview&quot;&quot;&quot;</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">()</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+    <span class="n">store_type</span> <span class="o">=</span> <span class="s2">&quot;niofs&quot;</span>
+
+    <span class="n">create_body</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;settings&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;index.store.type&quot;</span><span class="p">:</span> <span class="n">store_type</span><span class="p">,</span>
+            <span class="s2">&quot;analysis&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;analyzer&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;default_index&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;tokenizer&quot;</span> <span class="p">:</span> <span class="s2">&quot;whitespace&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;filter&quot;</span> <span class="p">:</span> <span class="p">[</span>
+                                <span class="s2">&quot;lowercase&quot;</span>
+                            <span class="p">],</span>
+                            <span class="s2">&quot;char_filter&quot;</span> <span class="p">:</span> <span class="p">[</span>
+                                <span class="s2">&quot;html_strip&quot;</span>
+                            <span class="p">]</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;mappings&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;_default_&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;_all&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;enabled&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">},</span>
+                <span class="s2">&quot;date_detection&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                
+                <span class="s2">&quot;properties&quot;</span><span class="p">:{</span>
+                    <span class="s2">&quot;created&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;not_analyzed&quot;</span>
+                    <span class="p">},</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;dynamic_templates&quot;</span><span class="p">:</span> <span class="p">[{</span>
+                    <span class="s2">&quot;ignored_fields&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;match&quot;</span><span class="p">:</span> <span class="s2">&quot;ctab|std_ctab|canonical_smiles|original_smiles&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;match_mapping_type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;mapping&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;store&quot;</span><span class="p">:</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="s2">&quot;include_in_all&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span> <span class="p">:</span> <span class="s2">&quot;no&quot;</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;sortable&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;match&quot;</span><span class="p">:</span> <span class="s2">&quot;customFields.*___sortable&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;match_mapping_type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;mapping&quot;</span><span class="p">:</span>  <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;store&quot;</span><span class="p">:</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;not_analyzed&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;ignore_above&quot;</span><span class="p">:</span> <span class="mi">256</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;uncurated_fields&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;match&quot;</span><span class="p">:</span> <span class="s2">&quot;uncuratedFields.*|image|bigimage&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;match_mapping_type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;mapping&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="s2">&quot;include_in_all&quot;</span><span class="p">:</span> <span class="bp">False</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;string_fields&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;match&quot;</span><span class="p">:</span> <span class="s2">&quot;*&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;match_mapping_type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;mapping&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;store&quot;</span><span class="p">:</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;index_options&quot;</span><span class="p">:</span> <span class="s2">&quot;positions&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;analyzed&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;omit_norms&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> 
+                            <span class="s2">&quot;analyzer&quot;</span> <span class="p">:</span> <span class="s2">&quot;default_index&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                <span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;store&quot;</span><span class="p">:</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;not_analyzed&quot;</span><span class="p">,</span> <span class="s2">&quot;ignore_above&quot;</span><span class="p">:</span> <span class="mi">256</span><span class="p">}</span>
+                            <span class="p">}</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+                <span class="p">]</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="c1"># if(index_name == get_main_index_name()):</span>
+    <span class="c1">#     create_body[&#39;mappings&#39;][&#39;_source&#39;] = { &#39;enabled&#39;:False }</span>
+    <span class="c1">#index_name = get_temp_index_name(request, multi_batch_id)</span>
+
+    <span class="n">es</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">index_name</span><span class="p">,</span>
+        <span class="n">body</span><span class="o">=</span><span class="n">create_body</span><span class="p">,</span>
+        <span class="n">ignore</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+
+    <span class="n">bulk_items</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">item</span> <span class="ow">in</span> <span class="n">batches</span><span class="p">:</span>
+            <span class="n">bulk_items</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+                <span class="s2">&quot;index&quot;</span><span class="p">:</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;_id&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;id&quot;</span><span class="p">]),</span>
+                    <span class="s2">&quot;_index&quot;</span><span class="p">:</span> <span class="n">index_name</span><span class="p">,</span>
+                    <span class="s2">&quot;_type&quot;</span><span class="p">:</span> <span class="s2">&quot;batches&quot;</span>
+                <span class="p">}</span>
+            <span class="p">})</span>
+            <span class="n">bulk_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">item</span><span class="p">)</span>
+        <span class="c1"># Data is not refreshed!</span>
+        <span class="k">return</span> <span class="n">es</span><span class="o">.</span><span class="n">bulk</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">bulk_items</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">{}</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_chem_api.elasticsearch_client.delete_index">
+    <p>def <span class="ident">delete_index</span>(</p><p>index_name)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Delete an index permanently by name</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_chem_api.elasticsearch_client.delete_index', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_chem_api.elasticsearch_client.delete_index" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">delete_index</span><span class="p">(</span><span class="n">index_name</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Delete an index permanently by name&quot;&quot;&quot;</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">es</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">index_name</span><span class="p">,</span>  <span class="n">ignore</span><span class="o">=</span><span class="p">[</span><span class="mi">400</span><span class="p">,</span> <span class="mi">404</span><span class="p">])</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_chem_api.elasticsearch_client.get">
+    <p>def <span class="ident">get</span>(</p><p>index_name, es_request_body, bundledata)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Perform a search request against the elasticsearch index specified</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_chem_api.elasticsearch_client.get', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_chem_api.elasticsearch_client.get" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get</span><span class="p">(</span><span class="n">index_name</span><span class="p">,</span> <span class="n">es_request_body</span><span class="p">,</span> <span class="n">bundledata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Perform a search request against the elasticsearch index specified&quot;&quot;&quot;</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">()</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">index_name</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">es_request_body</span><span class="p">)</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">hit</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;hits&quot;</span><span class="p">][</span><span class="s2">&quot;hits&quot;</span><span class="p">]:</span>
+        <span class="n">data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">hit</span><span class="p">[</span><span class="s2">&quot;_source&quot;</span><span class="p">])</span>
+
+    <span class="n">bundledata</span><span class="p">[</span><span class="s2">&quot;meta&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;totalCount&quot;</span><span class="p">:</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;hits&quot;</span><span class="p">][</span><span class="s2">&quot;total&quot;</span><span class="p">]}</span>
+    <span class="n">bundledata</span><span class="p">[</span><span class="s2">&quot;objects&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">data</span>
+    <span class="k">if</span> <span class="n">result</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;aggregations&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">):</span>
+        <span class="n">bundledata</span><span class="p">[</span><span class="s2">&quot;aggregations&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">res</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;aggregations&quot;</span><span class="p">][</span><span class="s2">&quot;autocomplete&quot;</span><span class="p">][</span><span class="s2">&quot;buckets&quot;</span><span class="p">]]</span>
+
+    <span class="k">return</span> <span class="n">bundledata</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_chem_api.elasticsearch_client.get_action_totals">
+    <p>def <span class="ident">get_action_totals</span>(</p><p>index_name, bundledata)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Use elasticsearch aggregations to find the stats required for the preview 
+UI when uploading a set of compounds or inventory items</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_chem_api.elasticsearch_client.get_action_totals', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_chem_api.elasticsearch_client.get_action_totals" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_action_totals</span><span class="p">(</span><span class="n">index_name</span><span class="p">,</span>  <span class="n">bundledata</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Use elasticsearch aggregations to find the stats required for the preview </span>
+<span class="sd">    UI when uploading a set of compounds or inventory items</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">es_request_body</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;size&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;match_all&quot;</span><span class="p">:</span> <span class="p">{}},</span>
+        <span class="s2">&quot;aggs&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;actions&quot;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;terms&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;field&quot;</span><span class="p">:</span> <span class="s2">&quot;properties.action.raw&quot;</span><span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">()</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">index_name</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">es_request_body</span><span class="p">)</span>
+    <span class="n">bundledata</span><span class="p">[</span><span class="s2">&quot;savestats&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ignoring&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;newbatches&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">}</span>
+    <span class="k">for</span> <span class="n">buck</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;aggregations&quot;</span><span class="p">][</span><span class="s2">&quot;actions&quot;</span><span class="p">][</span><span class="s2">&quot;buckets&quot;</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">buck</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;New Batch&quot;</span><span class="p">:</span>
+            <span class="n">bundledata</span><span class="p">[</span><span class="s2">&quot;savestats&quot;</span><span class="p">][</span><span class="s2">&quot;newbatches&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">buck</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doc_count&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">buck</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;key&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;Ignore&quot;</span><span class="p">:</span>
+            <span class="n">bundledata</span><span class="p">[</span><span class="s2">&quot;savestats&quot;</span><span class="p">][</span><span class="s2">&quot;ignoring&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">buck</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;doc_count&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">bundledata</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_chem_api.elasticsearch_client.get_autocomplete">
+    <p>def <span class="ident">get_autocomplete</span>(</p><p>projects, search_term, field, custom_fields=None, single_field=None)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>deprecated autocomplete method</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_chem_api.elasticsearch_client.get_autocomplete', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_chem_api.elasticsearch_client.get_autocomplete" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_autocomplete</span><span class="p">(</span><span class="n">projects</span><span class="p">,</span> <span class="n">search_term</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">custom_fields</span><span class="o">=</span><span class="bp">None</span><span class="p">,</span> <span class="n">single_field</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;deprecated autocomplete method&quot;&quot;&quot;</span>
+    <span class="n">project_terms</span> <span class="o">=</span> <span class="n">get_project_uri_terms</span><span class="p">(</span><span class="n">projects</span><span class="p">)</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">()</span>
+    
+    <span class="c1"># Search for a space before item to ensure it is a separate word, note</span>
+    <span class="c1"># that the terms have been formatted to allow this type of match to work</span>
+    <span class="n">search_regex</span> <span class="o">=</span> <span class="s1">&#39;.*</span><span class="si">%s</span><span class="s1">.*|.*</span><span class="si">%s</span><span class="s1">.*|.*</span><span class="si">%s</span><span class="s1">.*|.*</span><span class="si">%s</span><span class="s1">.*&#39;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">search_term</span><span class="o">.</span><span class="n">title</span><span class="p">(),</span> <span class="n">search_term</span><span class="p">,</span> <span class="n">search_term</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">search_term</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+    <span class="n">field_to_search</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.raw&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">field</span><span class="p">)</span>
+   
+
+    <span class="n">must_list</span> <span class="o">=</span> <span class="n">project_terms</span>
+
+    <span class="k">if</span> <span class="n">search_term</span> <span class="ow">and</span> <span class="n">custom_fields</span><span class="p">:</span>
+        <span class="n">must_list</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;bool&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;should&#39;</span><span class="p">:</span> <span class="p">[</span>
+                         <span class="p">{</span><span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="p">{</span>
+                             <span class="s1">&#39;custom_field_list.searchable_name.raw&#39;</span><span class="p">:</span>  <span class="n">search_term</span><span class="o">.</span><span class="n">lower</span><span class="p">()}},</span>
+                         <span class="p">{</span><span class="s1">&#39;regexp&#39;</span><span class="p">:</span> <span class="p">{</span>
+                             <span class="s1">&#39;custom_field_list.value.raw&#39;</span><span class="p">:</span>  <span class="n">search_regex</span><span class="p">}}</span>
+                         <span class="p">],</span>
+        <span class="p">},</span> <span class="p">})</span>
+
+
+    <span class="k">if</span> <span class="p">(</span><span class="n">custom_fields</span> <span class="ow">and</span> <span class="n">single_field</span><span class="p">):</span>
+        <span class="c1"># create a bool must term which is the custom field identifier</span>
+        <span class="c1">#cust_str = &#39;custom_fields.value.raw&#39; % (single_field)</span>
+        <span class="c1"># agg_regex = &#39;^%s(.*)(%s)&#39; % (single_field, search_regex)</span>
+        <span class="n">agg_regex</span> <span class="o">=</span> <span class="s1">&#39;^</span><span class="si">%s</span><span class="s1">.*&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">single_field</span><span class="p">,</span> <span class="p">)</span>
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">agg_regex</span> <span class="o">=</span> <span class="n">search_regex</span>
+        <span class="c1"># must_list.append({</span>
+        <span class="c1">#                       &#39;bool&#39;: {</span>
+        <span class="c1">#                           &#39;must&#39;: {&#39;prefix&#39;: { &#39;custom_field_list.name.raw&#39;:  single_field } }</span>
+        <span class="c1">#                       }</span>
+        <span class="c1">#                     })</span>
+    <span class="n">must_list</span><span class="o">.</span><span class="n">append</span><span class="p">({</span>
+        <span class="s1">&#39;filtered&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;filter&#39;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bool&quot;</span><span class="p">:</span>
+                                   <span class="p">{</span><span class="s2">&quot;should&quot;</span><span class="p">:</span> <span class="p">[{</span><span class="s2">&quot;term&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;properties.archived&quot;</span><span class="p">:</span> <span class="s2">&quot;false&quot;</span><span class="p">}},</span>
+                                               <span class="p">{</span><span class="s2">&quot;missing&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;field&quot;</span><span class="p">:</span> <span class="s2">&quot;properties.archived&quot;</span><span class="p">}}]}</span>
+                                   <span class="p">},</span>
+            <span class="p">}</span>
+        <span class="p">}</span> <span class="p">)</span>
+
+    <span class="n">body</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s1">&#39;query&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;bool&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;must&#39;</span><span class="p">:</span> <span class="n">must_list</span>
+            <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s1">&#39;aggs&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;autocomplete&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;terms&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;field&#39;</span><span class="p">:</span> <span class="n">field_to_search</span><span class="p">,</span>
+                          <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>
+                          <span class="s1">&#39;include&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">agg_regex</span><span class="p">)</span>
+                          <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">},</span>
+        
+        <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">body</span><span class="p">)</span>
+    <span class="c1"># return the results in the right format</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">res</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span>
+            <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;aggregations&quot;</span><span class="p">][</span><span class="s2">&quot;autocomplete&quot;</span><span class="p">][</span><span class="s2">&quot;buckets&quot;</span><span class="p">]]</span>
+    <span class="k">return</span> <span class="n">data</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_chem_api.elasticsearch_client.get_cf_aggregation">
+    <p>def <span class="ident">get_cf_aggregation</span>(</p><p>search_term, field, single_field)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Deperecated way of building an aggregation for a custom field</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_chem_api.elasticsearch_client.get_cf_aggregation', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_chem_api.elasticsearch_client.get_cf_aggregation" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_cf_aggregation</span><span class="p">(</span><span class="n">search_term</span><span class="p">,</span> <span class="n">field</span><span class="p">,</span> <span class="n">single_field</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Deperecated way of building an aggregation for a custom field&quot;&quot;&quot;</span>
+    <span class="n">search_regex</span> <span class="o">=</span> <span class="s1">&#39;.*</span><span class="si">%s</span><span class="s1">.*|.*</span><span class="si">%s</span><span class="s1">.*|.*</span><span class="si">%s</span><span class="s1">.*|.*</span><span class="si">%s</span><span class="s1">.*&#39;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">search_term</span><span class="o">.</span><span class="n">title</span><span class="p">(),</span> <span class="n">search_term</span><span class="p">,</span> <span class="n">search_term</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="n">search_term</span><span class="o">.</span><span class="n">lower</span><span class="p">())</span>
+    <span class="n">field_to_search</span> <span class="o">=</span> <span class="s1">&#39;</span><span class="si">%s</span><span class="s1">.raw&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">field</span><span class="p">)</span>
+    <span class="n">should_filter</span> <span class="o">=</span> <span class="p">[</span>
+                         
+                         <span class="p">{</span><span class="s1">&#39;regexp&#39;</span><span class="p">:</span> <span class="p">{</span>
+                             <span class="s1">&#39;custom_field_list.value.raw&#39;</span><span class="p">:</span>  <span class="n">search_regex</span><span class="p">}}</span>
+                         <span class="p">]</span>
+    <span class="k">if</span> <span class="n">single_field</span><span class="p">:</span>
+        <span class="c1">#We limit the search to a single field</span>
+        <span class="n">search_regex</span> <span class="o">=</span> <span class="s1">&#39;^</span><span class="si">%s</span><span class="s1">.*&#39;</span> <span class="o">%</span> <span class="p">(</span><span class="n">single_field</span><span class="p">,</span> <span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1">#We search only </span>
+        <span class="n">should_filter</span> <span class="o">+=</span> <span class="p">[{</span><span class="s1">&#39;prefix&#39;</span><span class="p">:</span> <span class="p">{</span>
+                             <span class="s1">&#39;custom_field_list.searchable_name.raw&#39;</span><span class="p">:</span>  <span class="n">search_term</span><span class="o">.</span><span class="n">lower</span><span class="p">()}}]</span>
+
+
+    <span class="n">search_filter</span> <span class="o">=</span>  <span class="p">{</span><span class="s1">&#39;bool&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;should&#39;</span><span class="p">:</span> <span class="n">should_filter</span>
+                    <span class="p">},</span> 
+                    <span class="p">}</span>
+
+    <span class="n">aggs</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;autocomplete&#39;</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s1">&#39;terms&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;field&#39;</span><span class="p">:</span> <span class="n">field_to_search</span><span class="p">,</span>
+                          <span class="s1">&#39;size&#39;</span><span class="p">:</span> <span class="mi">300</span><span class="p">,</span>
+                          <span class="s1">&#39;include&#39;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">search_regex</span><span class="p">)</span>
+                          <span class="p">}</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="k">return</span> <span class="p">(</span><span class="n">search_filter</span><span class="p">,</span> <span class="n">aggs</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_chem_api.elasticsearch_client.get_custom_fields_query_from_string">
+    <p>def <span class="ident">get_custom_fields_query_from_string</span>(</p><p>cf_string)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>deperecated</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_chem_api.elasticsearch_client.get_custom_fields_query_from_string', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_chem_api.elasticsearch_client.get_custom_fields_query_from_string" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_custom_fields_query_from_string</span><span class="p">(</span><span class="n">cf_string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;deperecated&quot;&quot;&quot;</span>
+    <span class="n">project_terms</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">keyvalue</span> <span class="ow">in</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">cf_string</span><span class="p">):</span>
+        
+        <span class="n">splitted</span> <span class="o">=</span> <span class="n">keyvalue</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
+        <span class="n">project_terms</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;term&quot;</span><span class="p">:</span> 
+                <span class="p">{</span><span class="s2">&quot;customFields.</span><span class="si">%s</span><span class="s2">.raw&quot;</span> <span class="o">%</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="p">:</span> <span class="n">splitted</span><span class="p">[</span><span class="mi">1</span><span class="p">]}}</span>
+                <span class="p">)</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s1">&#39;bool&#39;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s1">&#39;should&#39;</span><span class="p">:</span> <span class="n">project_terms</span><span class="p">,</span>
+                <span class="p">},</span> <span class="p">}</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_chem_api.elasticsearch_client.get_main_index_name">
+    <p>def <span class="ident">get_main_index_name</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Generate the main index name for elasticsearch</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_chem_api.elasticsearch_client.get_main_index_name', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_chem_api.elasticsearch_client.get_main_index_name" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_main_index_name</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Generate the main index name for elasticsearch&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">__</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ES_PREFIX</span><span class="p">,</span> <span class="n">ES_MAIN_INDEX_NAME</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_chem_api.elasticsearch_client.get_project_index_name">
+    <p>def <span class="ident">get_project_index_name</span>(</p><p>project)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_chem_api.elasticsearch_client.get_project_index_name', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_chem_api.elasticsearch_client.get_project_index_name" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_project_index_name</span><span class="p">(</span><span class="n">project</span><span class="p">):</span>
+    <span class="n">index_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">__project__</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ES_PREFIX</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">project</span><span class="o">.</span><span class="n">id</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">index_name</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_chem_api.elasticsearch_client.get_project_uri_terms">
+    <p>def <span class="ident">get_project_uri_terms</span>(</p><p>project_id_list)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Because of the way that we indexed the data in ChemiReg V1 the project is represented as a URI
+but the actual search requests and the permissions requests tended to contain list oif ids
+This function converts a list of ids into a list of resource uris</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_chem_api.elasticsearch_client.get_project_uri_terms', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_chem_api.elasticsearch_client.get_project_uri_terms" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_project_uri_terms</span><span class="p">(</span><span class="n">project_id_list</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Because of the way that we indexed the data in ChemiReg V1 the project is represented as a URI</span>
+<span class="sd">    but the actual search requests and the permissions requests tended to contain list oif ids</span>
+<span class="sd">    This function converts a list of ids into a list of resource uris&quot;&quot;&quot;</span>
+    <span class="n">project_terms</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">proj</span> <span class="ow">in</span> <span class="n">project_id_list</span><span class="p">:</span>
+        <span class="n">project_name</span> <span class="o">=</span> <span class="s1">&#39;/</span><span class="si">%s</span><span class="s1">/cbh_projects/</span><span class="si">%d</span><span class="s1">&#39;</span> <span class="o">%</span> <span class="p">(</span>
+            <span class="n">settings</span><span class="o">.</span><span class="n">WEBSERVICES_NAME</span><span class="p">,</span> <span class="n">proj</span><span class="p">)</span>
+        <span class="n">project_terms</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s1">&#39;term&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;project.raw&#39;</span><span class="p">:</span> <span class="n">project_name</span><span class="p">}})</span>
+    <span class="k">return</span> <span class="p">[{</span><span class="s1">&#39;bool&#39;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="s1">&#39;should&#39;</span><span class="p">:</span> <span class="n">project_terms</span><span class="p">,</span>
+    <span class="p">},</span> <span class="p">}]</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_chem_api.elasticsearch_client.get_temp_index_name">
+    <p>def <span class="ident">get_temp_index_name</span>(</p><p>request, multi_batch_id)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Generate an index name for a particular multiple batch</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_chem_api.elasticsearch_client.get_temp_index_name', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_chem_api.elasticsearch_client.get_temp_index_name" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_temp_index_name</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">multi_batch_id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Generate an index name for a particular multiple batch&quot;&quot;&quot;</span>
+    <span class="n">index_name</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">__temp_multi_batch__</span><span class="si">%s</span><span class="s2">__</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span>
+        <span class="n">ES_PREFIX</span><span class="p">,</span> <span class="n">request</span><span class="o">.</span><span class="n">session</span><span class="o">.</span><span class="n">session_key</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">multi_batch_id</span><span class="p">))</span>
+    <span class="k">return</span> <span class="n">index_name</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_chem_api.elasticsearch_client.reindex_compound">
+    <p>def <span class="ident">reindex_compound</span>(</p><p>dataset, id)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Reindex an item now deprecated</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_chem_api.elasticsearch_client.reindex_compound', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_chem_api.elasticsearch_client.reindex_compound" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">reindex_compound</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Reindex an item now deprecated&quot;&quot;&quot;</span>
+    <span class="c1"># reindex the specified compound in the specified index</span>
+    <span class="n">index_name</span> <span class="o">=</span> <span class="n">get_main_index_name</span><span class="p">()</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">()</span>
+    <span class="n">update_body</span> <span class="o">=</span> <span class="n">dataset</span>
+    <span class="k">return</span> <span class="n">es</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span> <span class="n">doc_type</span><span class="o">=</span><span class="s2">&quot;batches&quot;</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index_name</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">update_body</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+
+
+  </section>
+
+    </article>
+  <div class="clear"> </div>
+  <footer id="footer">
+    <p>
+      Documentation generated by
+      <a href="https://github.com/BurntSushi/pdoc">pdoc 0.3.2</a>
+    </p>
+
+    <p>pdoc is in the public domain with the
+      <a href="http://unlicense.org">UNLICENSE</a></p>
+
+    <p>Design by <a href="http://nadh.in">Kailash Nadh</a></p>
+  </footer>
+</div>
+</body>
+</html>

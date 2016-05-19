@@ -1,0 +1,2606 @@
+<!doctype html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimum-scale=1" />
+
+    <title>cbh_utils.elasticsearch_client API documentation</title>
+    <meta name="description" content="This module provides a generic abstraction layer to Elasticsearch
+JSON objects can be indexed by pro..." />
+
+  <link href='http://fonts.googleapis.com/css?family=Source+Sans+Pro:400,300' rel='stylesheet' type='text/css'>
+  
+  <style type="text/css">
+  
+* {
+  box-sizing: border-box;
+}
+/*! normalize.css v1.1.1 | MIT License | git.io/normalize */
+
+/* ==========================================================================
+   HTML5 display definitions
+   ========================================================================== */
+
+/**
+ * Correct `block` display not defined in IE 6/7/8/9 and Firefox 3.
+ */
+
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+main,
+nav,
+section,
+summary {
+    display: block;
+}
+
+/**
+ * Correct `inline-block` display not defined in IE 6/7/8/9 and Firefox 3.
+ */
+
+audio,
+canvas,
+video {
+    display: inline-block;
+    *display: inline;
+    *zoom: 1;
+}
+
+/**
+ * Prevent modern browsers from displaying `audio` without controls.
+ * Remove excess height in iOS 5 devices.
+ */
+
+audio:not([controls]) {
+    display: none;
+    height: 0;
+}
+
+/**
+ * Address styling not present in IE 7/8/9, Firefox 3, and Safari 4.
+ * Known issue: no IE 6 support.
+ */
+
+[hidden] {
+    display: none;
+}
+
+/* ==========================================================================
+   Base
+   ========================================================================== */
+
+/**
+ * 1. Prevent system color scheme's background color being used in Firefox, IE,
+ *    and Opera.
+ * 2. Prevent system color scheme's text color being used in Firefox, IE, and
+ *    Opera.
+ * 3. Correct text resizing oddly in IE 6/7 when body `font-size` is set using
+ *    `em` units.
+ * 4. Prevent iOS text size adjust after orientation change, without disabling
+ *    user zoom.
+ */
+
+html {
+    background: #fff; /* 1 */
+    color: #000; /* 2 */
+    font-size: 100%; /* 3 */
+    -webkit-text-size-adjust: 100%; /* 4 */
+    -ms-text-size-adjust: 100%; /* 4 */
+}
+
+/**
+ * Address `font-family` inconsistency between `textarea` and other form
+ * elements.
+ */
+
+html,
+button,
+input,
+select,
+textarea {
+    font-family: sans-serif;
+}
+
+/**
+ * Address margins handled incorrectly in IE 6/7.
+ */
+
+body {
+    margin: 0;
+}
+
+/* ==========================================================================
+   Links
+   ========================================================================== */
+
+/**
+ * Address `outline` inconsistency between Chrome and other browsers.
+ */
+
+a:focus {
+    outline: thin dotted;
+}
+
+/**
+ * Improve readability when focused and also mouse hovered in all browsers.
+ */
+
+a:active,
+a:hover {
+    outline: 0;
+}
+
+/* ==========================================================================
+   Typography
+   ========================================================================== */
+
+/**
+ * Address font sizes and margins set differently in IE 6/7.
+ * Address font sizes within `section` and `article` in Firefox 4+, Safari 5,
+ * and Chrome.
+ */
+
+h1 {
+    font-size: 2em;
+    margin: 0.67em 0;
+}
+
+h2 {
+    font-size: 1.5em;
+    margin: 0.83em 0;
+}
+
+h3 {
+    font-size: 1.17em;
+    margin: 1em 0;
+}
+
+h4 {
+    font-size: 1em;
+    margin: 1.33em 0;
+}
+
+h5 {
+    font-size: 0.83em;
+    margin: 1.67em 0;
+}
+
+h6 {
+    font-size: 0.67em;
+    margin: 2.33em 0;
+}
+
+/**
+ * Address styling not present in IE 7/8/9, Safari 5, and Chrome.
+ */
+
+abbr[title] {
+    border-bottom: 1px dotted;
+}
+
+/**
+ * Address style set to `bolder` in Firefox 3+, Safari 4/5, and Chrome.
+ */
+
+b,
+strong {
+    font-weight: bold;
+}
+
+blockquote {
+    margin: 1em 40px;
+}
+
+/**
+ * Address styling not present in Safari 5 and Chrome.
+ */
+
+dfn {
+    font-style: italic;
+}
+
+/**
+ * Address differences between Firefox and other browsers.
+ * Known issue: no IE 6/7 normalization.
+ */
+
+hr {
+    -moz-box-sizing: content-box;
+    box-sizing: content-box;
+    height: 0;
+}
+
+/**
+ * Address styling not present in IE 6/7/8/9.
+ */
+
+mark {
+    background: #ff0;
+    color: #000;
+}
+
+/**
+ * Address margins set differently in IE 6/7.
+ */
+
+p,
+pre {
+    margin: 1em 0;
+}
+
+/**
+ * Correct font family set oddly in IE 6, Safari 4/5, and Chrome.
+ */
+
+code,
+kbd,
+pre,
+samp {
+    font-family: monospace, serif;
+    _font-family: 'courier new', monospace;
+    font-size: 1em;
+}
+
+/**
+ * Improve readability of pre-formatted text in all browsers.
+ */
+
+pre {
+    white-space: pre;
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/**
+ * Address CSS quotes not supported in IE 6/7.
+ */
+
+q {
+    quotes: none;
+}
+
+/**
+ * Address `quotes` property not supported in Safari 4.
+ */
+
+q:before,
+q:after {
+    content: '';
+    content: none;
+}
+
+/**
+ * Address inconsistent and variable font size in all browsers.
+ */
+
+small {
+    font-size: 80%;
+}
+
+/**
+ * Prevent `sub` and `sup` affecting `line-height` in all browsers.
+ */
+
+sub,
+sup {
+    font-size: 75%;
+    line-height: 0;
+    position: relative;
+    vertical-align: baseline;
+}
+
+sup {
+    top: -0.5em;
+}
+
+sub {
+    bottom: -0.25em;
+}
+
+/* ==========================================================================
+   Lists
+   ========================================================================== */
+
+/**
+ * Address margins set differently in IE 6/7.
+ */
+
+dl,
+menu,
+ol,
+ul {
+    margin: 1em 0;
+}
+
+dd {
+    margin: 0 0 0 40px;
+}
+
+/**
+ * Address paddings set differently in IE 6/7.
+ */
+
+menu,
+ol,
+ul {
+    padding: 0 0 0 40px;
+}
+
+/**
+ * Correct list images handled incorrectly in IE 7.
+ */
+
+nav ul,
+nav ol {
+    list-style: none;
+    list-style-image: none;
+}
+
+/* ==========================================================================
+   Embedded content
+   ========================================================================== */
+
+/**
+ * 1. Remove border when inside `a` element in IE 6/7/8/9 and Firefox 3.
+ * 2. Improve image quality when scaled in IE 7.
+ */
+
+img {
+    border: 0; /* 1 */
+    -ms-interpolation-mode: bicubic; /* 2 */
+}
+
+/**
+ * Correct overflow displayed oddly in IE 9.
+ */
+
+svg:not(:root) {
+    overflow: hidden;
+}
+
+/* ==========================================================================
+   Figures
+   ========================================================================== */
+
+/**
+ * Address margin not present in IE 6/7/8/9, Safari 5, and Opera 11.
+ */
+
+figure {
+    margin: 0;
+}
+
+/* ==========================================================================
+   Forms
+   ========================================================================== */
+
+/**
+ * Correct margin displayed oddly in IE 6/7.
+ */
+
+form {
+    margin: 0;
+}
+
+/**
+ * Define consistent border, margin, and padding.
+ */
+
+fieldset {
+    border: 1px solid #c0c0c0;
+    margin: 0 2px;
+    padding: 0.35em 0.625em 0.75em;
+}
+
+/**
+ * 1. Correct color not being inherited in IE 6/7/8/9.
+ * 2. Correct text not wrapping in Firefox 3.
+ * 3. Correct alignment displayed oddly in IE 6/7.
+ */
+
+legend {
+    border: 0; /* 1 */
+    padding: 0;
+    white-space: normal; /* 2 */
+    *margin-left: -7px; /* 3 */
+}
+
+/**
+ * 1. Correct font size not being inherited in all browsers.
+ * 2. Address margins set differently in IE 6/7, Firefox 3+, Safari 5,
+ *    and Chrome.
+ * 3. Improve appearance and consistency in all browsers.
+ */
+
+button,
+input,
+select,
+textarea {
+    font-size: 100%; /* 1 */
+    margin: 0; /* 2 */
+    vertical-align: baseline; /* 3 */
+    *vertical-align: middle; /* 3 */
+}
+
+/**
+ * Address Firefox 3+ setting `line-height` on `input` using `!important` in
+ * the UA stylesheet.
+ */
+
+button,
+input {
+    line-height: normal;
+}
+
+/**
+ * Address inconsistent `text-transform` inheritance for `button` and `select`.
+ * All other form control elements do not inherit `text-transform` values.
+ * Correct `button` style inheritance in Chrome, Safari 5+, and IE 6+.
+ * Correct `select` style inheritance in Firefox 4+ and Opera.
+ */
+
+button,
+select {
+    text-transform: none;
+}
+
+/**
+ * 1. Avoid the WebKit bug in Android 4.0.* where (2) destroys native `audio`
+ *    and `video` controls.
+ * 2. Correct inability to style clickable `input` types in iOS.
+ * 3. Improve usability and consistency of cursor style between image-type
+ *    `input` and others.
+ * 4. Remove inner spacing in IE 7 without affecting normal text inputs.
+ *    Known issue: inner spacing remains in IE 6.
+ */
+
+button,
+html input[type="button"], /* 1 */
+input[type="reset"],
+input[type="submit"] {
+    -webkit-appearance: button; /* 2 */
+    cursor: pointer; /* 3 */
+    *overflow: visible;  /* 4 */
+}
+
+/**
+ * Re-set default cursor for disabled elements.
+ */
+
+button[disabled],
+html input[disabled] {
+    cursor: default;
+}
+
+/**
+ * 1. Address box sizing set to content-box in IE 8/9.
+ * 2. Remove excess padding in IE 8/9.
+ * 3. Remove excess padding in IE 7.
+ *    Known issue: excess padding remains in IE 6.
+ */
+
+input[type="checkbox"],
+input[type="radio"] {
+    box-sizing: border-box; /* 1 */
+    padding: 0; /* 2 */
+    *height: 13px; /* 3 */
+    *width: 13px; /* 3 */
+}
+
+/**
+ * 1. Address `appearance` set to `searchfield` in Safari 5 and Chrome.
+ * 2. Address `box-sizing` set to `border-box` in Safari 5 and Chrome
+ *    (include `-moz` to future-proof).
+ */
+
+input[type="search"] {
+    -webkit-appearance: textfield; /* 1 */
+    -moz-box-sizing: content-box;
+    -webkit-box-sizing: content-box; /* 2 */
+    box-sizing: content-box;
+}
+
+/**
+ * Remove inner padding and search cancel button in Safari 5 and Chrome
+ * on OS X.
+ */
+
+input[type="search"]::-webkit-search-cancel-button,
+input[type="search"]::-webkit-search-decoration {
+    -webkit-appearance: none;
+}
+
+/**
+ * Remove inner padding and border in Firefox 3+.
+ */
+
+button::-moz-focus-inner,
+input::-moz-focus-inner {
+    border: 0;
+    padding: 0;
+}
+
+/**
+ * 1. Remove default vertical scrollbar in IE 6/7/8/9.
+ * 2. Improve readability and alignment in all browsers.
+ */
+
+textarea {
+    overflow: auto; /* 1 */
+    vertical-align: top; /* 2 */
+}
+
+/* ==========================================================================
+   Tables
+   ========================================================================== */
+
+/**
+ * Remove most spacing between table cells.
+ */
+
+table {
+    border-collapse: collapse;
+    border-spacing: 0;
+}
+
+  </style>
+
+  <style type="text/css">
+  
+  html, body {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+  }
+  body {
+    background: #fff;
+    font-family: "Source Sans Pro", "Helvetica Neueue", Helvetica, sans;
+    font-weight: 300;
+    font-size: 16px;
+    line-height: 1.6em;
+  }
+  #content {
+    width: 70%;
+    max-width: 850px;
+    float: left;
+    padding: 30px 60px;
+    border-left: 1px solid #ddd;
+  }
+  #sidebar {
+    width: 25%;
+    float: left;
+    padding: 30px;
+    overflow: hidden;
+  }
+  #nav {
+    font-size: 130%;
+    margin: 0 0 15px 0;
+  }
+
+  #top {
+    display: block;
+    position: fixed;
+    bottom: 5px;
+    left: 5px;
+    font-size: .85em;
+    text-transform: uppercase;
+  }
+
+  #footer {
+    font-size: .75em;
+    padding: 5px 30px;
+    border-top: 1px solid #ddd;
+    text-align: right;
+  }
+    #footer p {
+      margin: 0 0 0 30px;
+      display: inline-block;
+    }
+
+  h1, h2, h3, h4, h5 {
+    font-weight: 300;
+  }
+  h1 {
+    font-size: 2.5em;
+    line-height: 1.1em;
+    margin: 0 0 .50em 0;
+  }
+
+  h2 {
+    font-size: 1.75em;
+    margin: 1em 0 .50em 0;
+  }
+
+  h3 {
+    margin: 25px 0 10px 0;
+  }
+
+  h4 {
+    margin: 0;
+    font-size: 105%;
+  }
+
+  a {
+    color: #058;
+    text-decoration: none;
+    transition: color .3s ease-in-out;
+  }
+
+  a:hover {
+    color: #e08524;
+    transition: color .3s ease-in-out;
+  }
+
+  pre, code, .mono, .name {
+    font-family: "Ubuntu Mono", "Cousine", "DejaVu Sans Mono", monospace;
+  }
+
+  .title .name {
+    font-weight: bold;
+  }
+  .section-title {
+    margin-top: 2em;
+  }
+  .ident {
+    color: #900;
+  }
+
+  code {
+    background: #f9f9f9;
+  } 
+
+  pre {
+    background: #fefefe;
+    border: 1px solid #ddd;
+    box-shadow: 2px 2px 0 #f3f3f3;
+    margin: 0 30px;
+    padding: 15px 30px;
+  }
+
+  .codehilite {
+    margin: 0 30px 10px 30px;
+  }
+
+    .codehilite pre {
+      margin: 0;
+    }
+    .codehilite .err { background: #ff3300; color: #fff !important; } 
+
+  table#module-list {
+    font-size: 110%;
+  }
+
+    table#module-list tr td:first-child {
+      padding-right: 10px;
+      white-space: nowrap;
+    }
+
+    table#module-list td {
+      vertical-align: top;
+      padding-bottom: 8px;
+    }
+
+      table#module-list td p {
+        margin: 0 0 7px 0;
+      }
+
+  .def {
+    display: table;
+  }
+
+    .def p {
+      display: table-cell;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    .def p:first-child {
+      white-space: nowrap;
+    }
+
+    .def p:last-child {
+      width: 100%;
+    }
+
+
+  #index {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+  }
+    ul#index .class_name {
+      /* font-size: 110%; */
+      font-weight: bold;
+    }
+    #index ul {
+      margin: 0;
+    }
+
+  .item {
+    margin: 0 0 15px 0;
+  }
+
+    .item .class {
+      margin: 0 0 25px 30px;
+    }
+
+      .item .class ul.class_list {
+        margin: 0 0 20px 0;
+      }
+
+    .item .name {
+      background: #fafafa;
+      margin: 0;
+      font-weight: bold;
+      padding: 5px 10px;
+      border-radius: 3px;
+      display: inline-block;
+      min-width: 40%;
+    }
+      .item .name:hover {
+        background: #f6f6f6;
+      }
+
+    .item .empty_desc {
+      margin: 0 0 5px 0;
+      padding: 0;
+    }
+
+    .item .inheritance {
+      margin: 3px 0 0 30px;
+    }
+
+    .item .inherited {
+      color: #666;
+    }
+
+    .item .desc {
+      padding: 0 8px;
+      margin: 0;
+    }
+
+      .item .desc p {
+        margin: 0 0 10px 0;
+      }
+
+    .source_cont {
+      margin: 0;
+      padding: 0;
+    }
+
+    .source_link a {
+      background: #ffc300;
+      font-weight: 400;
+      font-size: .75em;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 1px 1px 0 #f4b700;
+      
+      padding: 3px 8px;
+      border-radius: 2px;
+      transition: background .3s ease-in-out;
+    }
+      .source_link a:hover {
+        background: #FF7200;
+        text-shadow: none;
+        transition: background .3s ease-in-out;
+      }
+
+    .source {
+      display: none;
+      max-height: 600px;
+      overflow-y: scroll;
+      margin-bottom: 15px;
+    }
+
+      .source .codehilite {
+        margin: 0;
+      }
+
+  .desc h1, .desc h2, .desc h3 {
+    font-size: 100% !important;
+  }
+  .clear {
+    clear: both;
+  }
+
+  @media all and (max-width: 950px) {
+    #sidebar {
+      width: 35%;
+    }
+    #content {
+      width: 65%;
+    }
+  }
+  @media all and (max-width: 650px) {
+    #top {
+      display: none;
+    }
+    #sidebar {
+      float: none;
+      width: auto;
+    }
+    #content {
+      float: none;
+      width: auto;
+      padding: 30px;
+    }
+
+    #index ul {
+      padding: 0;
+      margin-bottom: 15px;
+    }
+    #index ul li {
+      display: inline-block;
+      margin-right: 30px;
+    }
+    #footer {
+      text-align: left;
+    }
+    #footer p {
+      display: block;
+      margin: inherit;
+    }
+  }
+
+  /*****************************/
+
+  </style>
+
+  <style type="text/css">
+  .codehilite .hll { background-color: #ffffcc }
+.codehilite  { background: #f8f8f8; }
+.codehilite .c { color: #408080; font-style: italic } /* Comment */
+.codehilite .err { border: 1px solid #FF0000 } /* Error */
+.codehilite .k { color: #008000; font-weight: bold } /* Keyword */
+.codehilite .o { color: #666666 } /* Operator */
+.codehilite .ch { color: #408080; font-style: italic } /* Comment.Hashbang */
+.codehilite .cm { color: #408080; font-style: italic } /* Comment.Multiline */
+.codehilite .cp { color: #BC7A00 } /* Comment.Preproc */
+.codehilite .cpf { color: #408080; font-style: italic } /* Comment.PreprocFile */
+.codehilite .c1 { color: #408080; font-style: italic } /* Comment.Single */
+.codehilite .cs { color: #408080; font-style: italic } /* Comment.Special */
+.codehilite .gd { color: #A00000 } /* Generic.Deleted */
+.codehilite .ge { font-style: italic } /* Generic.Emph */
+.codehilite .gr { color: #FF0000 } /* Generic.Error */
+.codehilite .gh { color: #000080; font-weight: bold } /* Generic.Heading */
+.codehilite .gi { color: #00A000 } /* Generic.Inserted */
+.codehilite .go { color: #888888 } /* Generic.Output */
+.codehilite .gp { color: #000080; font-weight: bold } /* Generic.Prompt */
+.codehilite .gs { font-weight: bold } /* Generic.Strong */
+.codehilite .gu { color: #800080; font-weight: bold } /* Generic.Subheading */
+.codehilite .gt { color: #0044DD } /* Generic.Traceback */
+.codehilite .kc { color: #008000; font-weight: bold } /* Keyword.Constant */
+.codehilite .kd { color: #008000; font-weight: bold } /* Keyword.Declaration */
+.codehilite .kn { color: #008000; font-weight: bold } /* Keyword.Namespace */
+.codehilite .kp { color: #008000 } /* Keyword.Pseudo */
+.codehilite .kr { color: #008000; font-weight: bold } /* Keyword.Reserved */
+.codehilite .kt { color: #B00040 } /* Keyword.Type */
+.codehilite .m { color: #666666 } /* Literal.Number */
+.codehilite .s { color: #BA2121 } /* Literal.String */
+.codehilite .na { color: #7D9029 } /* Name.Attribute */
+.codehilite .nb { color: #008000 } /* Name.Builtin */
+.codehilite .nc { color: #0000FF; font-weight: bold } /* Name.Class */
+.codehilite .no { color: #880000 } /* Name.Constant */
+.codehilite .nd { color: #AA22FF } /* Name.Decorator */
+.codehilite .ni { color: #999999; font-weight: bold } /* Name.Entity */
+.codehilite .ne { color: #D2413A; font-weight: bold } /* Name.Exception */
+.codehilite .nf { color: #0000FF } /* Name.Function */
+.codehilite .nl { color: #A0A000 } /* Name.Label */
+.codehilite .nn { color: #0000FF; font-weight: bold } /* Name.Namespace */
+.codehilite .nt { color: #008000; font-weight: bold } /* Name.Tag */
+.codehilite .nv { color: #19177C } /* Name.Variable */
+.codehilite .ow { color: #AA22FF; font-weight: bold } /* Operator.Word */
+.codehilite .w { color: #bbbbbb } /* Text.Whitespace */
+.codehilite .mb { color: #666666 } /* Literal.Number.Bin */
+.codehilite .mf { color: #666666 } /* Literal.Number.Float */
+.codehilite .mh { color: #666666 } /* Literal.Number.Hex */
+.codehilite .mi { color: #666666 } /* Literal.Number.Integer */
+.codehilite .mo { color: #666666 } /* Literal.Number.Oct */
+.codehilite .sb { color: #BA2121 } /* Literal.String.Backtick */
+.codehilite .sc { color: #BA2121 } /* Literal.String.Char */
+.codehilite .sd { color: #BA2121; font-style: italic } /* Literal.String.Doc */
+.codehilite .s2 { color: #BA2121 } /* Literal.String.Double */
+.codehilite .se { color: #BB6622; font-weight: bold } /* Literal.String.Escape */
+.codehilite .sh { color: #BA2121 } /* Literal.String.Heredoc */
+.codehilite .si { color: #BB6688; font-weight: bold } /* Literal.String.Interpol */
+.codehilite .sx { color: #008000 } /* Literal.String.Other */
+.codehilite .sr { color: #BB6688 } /* Literal.String.Regex */
+.codehilite .s1 { color: #BA2121 } /* Literal.String.Single */
+.codehilite .ss { color: #19177C } /* Literal.String.Symbol */
+.codehilite .bp { color: #008000 } /* Name.Builtin.Pseudo */
+.codehilite .vc { color: #19177C } /* Name.Variable.Class */
+.codehilite .vg { color: #19177C } /* Name.Variable.Global */
+.codehilite .vi { color: #19177C } /* Name.Variable.Instance */
+.codehilite .il { color: #666666 } /* Literal.Number.Integer.Long */
+  </style>
+
+  <style type="text/css">
+  
+/* ==========================================================================
+   EXAMPLE Media Queries for Responsive Design.
+   These examples override the primary ('mobile first') styles.
+   Modify as content requires.
+   ========================================================================== */
+
+@media only screen and (min-width: 35em) {
+    /* Style adjustments for viewports that meet the condition */
+}
+
+@media print,
+       (-o-min-device-pixel-ratio: 5/4),
+       (-webkit-min-device-pixel-ratio: 1.25),
+       (min-resolution: 120dpi) {
+    /* Style adjustments for high resolution devices */
+}
+
+/* ==========================================================================
+   Print styles.
+   Inlined to avoid required HTTP connection: h5bp.com/r
+   ========================================================================== */
+
+@media print {
+    * {
+        background: transparent !important;
+        color: #000 !important; /* Black prints faster: h5bp.com/s */
+        box-shadow: none !important;
+        text-shadow: none !important;
+    }
+
+    a,
+    a:visited {
+        text-decoration: underline;
+    }
+
+    a[href]:after {
+        content: " (" attr(href) ")";
+    }
+
+    abbr[title]:after {
+        content: " (" attr(title) ")";
+    }
+
+    /*
+     * Don't show links for images, or javascript/internal links
+     */
+
+    .ir a:after,
+    a[href^="javascript:"]:after,
+    a[href^="#"]:after {
+        content: "";
+    }
+
+    pre,
+    blockquote {
+        border: 1px solid #999;
+        page-break-inside: avoid;
+    }
+
+    thead {
+        display: table-header-group; /* h5bp.com/t */
+    }
+
+    tr,
+    img {
+        page-break-inside: avoid;
+    }
+
+    img {
+        max-width: 100% !important;
+    }
+
+    @page {
+        margin: 0.5cm;
+    }
+
+    p,
+    h2,
+    h3 {
+        orphans: 3;
+        widows: 3;
+    }
+
+    h2,
+    h3 {
+        page-break-after: avoid;
+    }
+}
+
+  </style>
+
+  <script type="text/javascript">
+  function toggle(id, $link) {
+    $node = document.getElementById(id);
+    if (!$node)
+    return;
+    if (!$node.style.display || $node.style.display == 'none') {
+    $node.style.display = 'block';
+    $link.innerHTML = 'Hide source &nequiv;';
+    } else {
+    $node.style.display = 'none';
+    $link.innerHTML = 'Show source &equiv;';
+    }
+  }
+  </script>
+</head>
+<body>
+<a href="#" id="top">Top</a>
+
+<div id="container">
+    
+  
+  <div id="sidebar">
+    <h1>Index</h1>
+    <ul id="index">
+    <li class="set"><h3><a href="#header-variables">Module variables</a></h3>
+      
+  <ul>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.AGG_TERMS_SEPARATOR">AGG_TERMS_SEPARATOR</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.BATCH_TYPE_NAME">BATCH_TYPE_NAME</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.ELASTICSEARCH_INDEX_MAPPING">ELASTICSEARCH_INDEX_MAPPING</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.ELASTICSEARCH_MAX_FIELD_LENGTH">ELASTICSEARCH_MAX_FIELD_LENGTH</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.ES_MAIN_INDEX_NAME">ES_MAIN_INDEX_NAME</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.ES_PREFIX">ES_PREFIX</a></li>
+  </ul>
+
+    </li>
+
+    <li class="set"><h3><a href="#header-functions">Functions</a></h3>
+      
+  <ul>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.build_all_indexed_fields">build_all_indexed_fields</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.build_es_request">build_es_request</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.build_indexed_fields">build_indexed_fields</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.build_phase_prefix_query">build_phase_prefix_query</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.build_sorts">build_sorts</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.create_index">create_index</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.fix_data_types_for_index">fix_data_types_for_index</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.get_detail_data_elasticsearch">get_detail_data_elasticsearch</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.get_es_fieldname">get_es_fieldname</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.get_list_data_elasticsearch">get_list_data_elasticsearch</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.get_list_of_indicies">get_list_of_indicies</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.get_main_index_name">get_main_index_name</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.get_missing_items_position">get_missing_items_position</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.get_nested_aggregation_for_field_path">get_nested_aggregation_for_field_path</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.get_project_index_name">get_project_index_name</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.get_sortable_es_fieldname">get_sortable_es_fieldname</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.index_dataset">index_dataset</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.remove_existing_queries_for_agg">remove_existing_queries_for_agg</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.unzeropad">unzeropad</a></li>
+    <li class="mono"><a href="#cbh_utils.elasticsearch_client.zeropad">zeropad</a></li>
+  </ul>
+
+    </li>
+
+
+    </ul>
+  </div>
+
+    <article id="content">
+      
+  
+
+  
+
+
+  <header id="section-intro">
+  <h1 class="title"><span class="name">cbh_utils.elasticsearch_client</span> module</h1>
+  <p>This module provides a generic abstraction layer to Elasticsearch
+JSON objects can be indexed by providing a schema object per row you are trying to index
+Each of the indexed fields will be extracted from the nested JSON using a JSON pointer in the schema object
+The actual JSON object will remain unchanged and will be served up by the search functions unchanged.
+The fields that you have chosen to index can be queried using JSON Paths in a format specified in the build_es_request function
+The web forms required to perform these searches are specified by the JSON schema in the django settings which is compatible
+with Angular Schema Form and other web frameworks
+This means that an advanced search interface can be provided on top of any JSON-based document data source
+Support for foreign key relationships is coming soon
+Data from the field will then be prepared for indexing in Elasticsearch</p>
+<p>Details of the specific implementation of each step are detailed in the functions</p>
+  
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client" class="source">
+    <div class="codehilite"><pre><span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module provides a generic abstraction layer to Elasticsearch</span>
+<span class="sd">JSON objects can be indexed by providing a schema object per row you are trying to index</span>
+<span class="sd">Each of the indexed fields will be extracted from the nested JSON using a JSON pointer in the schema object</span>
+<span class="sd">The actual JSON object will remain unchanged and will be served up by the search functions unchanged.</span>
+<span class="sd">The fields that you have chosen to index can be queried using JSON Paths in a format specified in the build_es_request function</span>
+<span class="sd">The web forms required to perform these searches are specified by the JSON schema in the django settings which is compatible</span>
+<span class="sd">with Angular Schema Form and other web frameworks</span>
+<span class="sd">This means that an advanced search interface can be provided on top of any JSON-based document data source</span>
+<span class="sd">Support for foreign key relationships is coming soon</span>
+<span class="sd">Data from the field will then be prepared for indexing in Elasticsearch</span>
+
+<span class="sd">Details of the specific implementation of each step are detailed in the functions </span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="kn">from</span> <span class="nn">django.conf</span> <span class="kn">import</span> <span class="n">settings</span>
+<span class="kn">import</span> <span class="nn">elasticsearch</span>
+<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">time</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">ES_PREFIX</span> <span class="o">=</span> <span class="n">settings</span><span class="o">.</span><span class="n">ES_PREFIX</span>
+<span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+    <span class="n">ES_PREFIX</span> <span class="o">=</span> <span class="s2">&quot;dev&quot;</span>
+<span class="n">ES_MAIN_INDEX_NAME</span> <span class="o">=</span> <span class="s2">&quot;crv3&quot;</span>
+<span class="kn">from</span> <span class="nn">jsonpointer</span> <span class="kn">import</span> <span class="n">resolve_pointer</span>
+<span class="n">AGG_TERMS_SEPARATOR</span> <span class="o">=</span> <span class="s2">&quot;|||&quot;</span>
+
+<span class="n">BATCH_TYPE_NAME</span> <span class="o">=</span> <span class="s2">&quot;hashbatches&quot;</span>
+<span class="kn">import</span> <span class="nn">hashlib</span>
+
+<span class="n">ELASTICSEARCH_MAX_FIELD_LENGTH</span> <span class="o">=</span> <span class="mi">256</span>
+
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The mapping patterns were generated using this python function</span>
+
+<span class="sd">The reason that we zero pad using regular expressions is to avoid doing that work in python and reduce the size of the request to elasticsearch when indexing</span>
+
+<span class="sd">for i in range(1,14):</span>
+<span class="sd">   data[&quot;%ddigit&quot; % i] = {&quot;type&quot;: &quot;pattern_replace&quot;, &quot;pattern&quot; : &quot;^([1-9]\d{%d})($|\.\d+$)&quot; % (i-1) , &quot;replacement&quot; : &quot;&quot;.join([&quot;0&quot; for j in range(0,(13-i))]) + &quot;$1$2&quot;}</span>
+
+<span class="sd">The list of patterns to be applied were generated like this:</span>
+
+<span class="sd">[&quot;%ddigit&quot; % i for i in range(1,14)]</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+
+<span class="n">ELASTICSEARCH_INDEX_MAPPING</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;settings&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="s2">&quot;index.store.type&quot;</span><span class="p">:</span> <span class="s2">&quot;niofs&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;index.max_result_window&quot;</span> <span class="p">:</span> <span class="mi">10000000</span><span class="p">,</span>
+
+            <span class="s2">&quot;analysis&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;char_filter&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;special_char_space_out&quot;</span> <span class="p">:{</span> <span class="c1"># put spaces around special characters so they can still be indexed</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span><span class="s2">&quot;pattern_replace&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;pattern&quot;</span><span class="p">:</span><span class="s2">&quot;([()\[\].,\-\+])&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;replacement&quot;</span><span class="p">:</span><span class="s2">&quot; $1 &quot;</span>
+                        <span class="p">},</span>
+                       
+                    <span class="p">},</span>
+                    <span class="s2">&quot;analyzer&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;default_index&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;tokenizer&quot;</span> <span class="p">:</span> <span class="s2">&quot;whitespace&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;filter&quot;</span> <span class="p">:</span> <span class="p">[</span>
+                                <span class="s2">&quot;lowercase&quot;</span>
+                            <span class="p">],</span>
+                            <span class="s2">&quot;char_filter&quot;</span> <span class="p">:</span> <span class="p">[</span>
+                                <span class="s2">&quot;html_strip&quot;</span><span class="p">,</span> <span class="s2">&quot;special_char_space_out&quot;</span>
+                            <span class="p">]</span>
+                        <span class="p">},</span>
+                        <span class="s2">&quot;lowercasekeywordanalyzer&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;tokenizer&quot;</span> <span class="p">:</span> <span class="s2">&quot;keyword&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;filter&quot;</span> <span class="p">:</span> <span class="p">[</span>
+                                <span class="s2">&quot;lowercase&quot;</span>
+                            <span class="p">]</span>
+                        <span class="p">},</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+        <span class="p">},</span>
+        <span class="s2">&quot;mappings&quot;</span><span class="p">:</span> <span class="p">{</span>
+            <span class="n">BATCH_TYPE_NAME</span><span class="p">:</span> <span class="p">{</span>
+                <span class="s2">&quot;dynamic&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span>
+                <span class="s2">&quot;_all&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;enabled&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">},</span>
+                <span class="s2">&quot;date_detection&quot;</span><span class="p">:</span> <span class="bp">False</span><span class="p">,</span>
+                <span class="s2">&quot;properties&quot;</span><span class="p">:{</span>
+                    <span class="s2">&quot;dataset&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;object&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;dynamic&quot;</span> <span class="p">:</span> <span class="bp">False</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;_source&quot;</span><span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;includes&quot;</span><span class="p">:</span> <span class="p">[</span>
+                      <span class="s2">&quot;*&quot;</span><span class="p">,</span>
+                    <span class="p">],</span>
+                    <span class="s2">&quot;excludes&quot;</span><span class="p">:</span> <span class="p">[</span>
+                      <span class="s2">&quot;indexed_fields_*&quot;</span><span class="p">,</span> <span class="s2">&quot;sortable_fields_*&quot;</span><span class="p">,</span>
+                    <span class="p">]</span>
+                  <span class="p">},</span>
+                <span class="s2">&quot;dynamic_templates&quot;</span><span class="p">:</span> <span class="p">[</span>
+                    <span class="p">{</span>
+                    <span class="s2">&quot;indexed_fields&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;match&quot;</span><span class="p">:</span> <span class="s2">&quot;indexed_fields_*&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;match_mapping_type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;mapping&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;index_options&quot;</span><span class="p">:</span> <span class="s2">&quot;positions&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;analyzed&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;omit_norms&quot;</span><span class="p">:</span> <span class="bp">True</span><span class="p">,</span> 
+                            <span class="s2">&quot;analyzer&quot;</span> <span class="p">:</span> <span class="s2">&quot;default_index&quot;</span><span class="p">,</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;store&quot;</span><span class="p">:</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> 
+                            <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                    <span class="s2">&quot;raw&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;store&quot;</span><span class="p">:</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;not_analyzed&quot;</span><span class="p">,</span> <span class="s2">&quot;ignore_above&quot;</span><span class="p">:</span> <span class="n">ELASTICSEARCH_MAX_FIELD_LENGTH</span><span class="p">}</span>
+                                <span class="p">}</span>
+                            <span class="p">}</span>
+                        <span class="p">}</span>
+                    <span class="p">},</span>
+                    <span class="p">{</span>
+                    <span class="s2">&quot;sortable_fields&quot;</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;match&quot;</span><span class="p">:</span> <span class="s2">&quot;sortable_fields_*&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;match_mapping_type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;mapping&quot;</span><span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span> <span class="s2">&quot;store&quot;</span><span class="p">:</span> <span class="s2">&quot;no&quot;</span><span class="p">,</span> <span class="s2">&quot;analyzer&quot;</span> <span class="p">:</span> <span class="s2">&quot;lowercasekeywordanalyzer&quot;</span><span class="p">,</span> <span class="s2">&quot;index&quot;</span><span class="p">:</span> <span class="s2">&quot;analyzed&quot;</span><span class="p">,</span> <span class="s2">&quot;ignore_above&quot;</span><span class="p">:</span> <span class="n">ELASTICSEARCH_MAX_FIELD_LENGTH</span>
+                        <span class="p">}</span>
+                    <span class="p">},</span>
+                    <span class="p">}</span>
+
+              
+               
+               
+                <span class="p">]</span>
+                
+            <span class="p">}</span>
+        <span class="p">}</span>
+    <span class="p">}</span>
+
+<span class="k">def</span> <span class="nf">get_main_index_name</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">__</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ES_PREFIX</span><span class="p">,</span> <span class="n">ES_MAIN_INDEX_NAME</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">get_project_index_name</span><span class="p">(</span><span class="n">project_id</span><span class="p">):</span>
+    <span class="c1">#return get_main_index_name()</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">__</span><span class="si">%s</span><span class="s2">__project__</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ES_PREFIX</span><span class="p">,</span> <span class="n">ES_MAIN_INDEX_NAME</span><span class="p">,</span> <span class="n">project_id</span><span class="p">)</span>
+
+<span class="k">def</span> <span class="nf">get_list_of_indicies</span><span class="p">(</span><span class="n">project_ids</span><span class="p">):</span>
+    <span class="n">list_of_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_project_index_name</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span> <span class="k">for</span> <span class="n">project_id</span> <span class="ow">in</span> <span class="n">project_ids</span><span class="p">]</span>
+    <span class="k">return</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">list_of_indices</span><span class="p">)</span>
+
+
+
+<span class="k">def</span> <span class="nf">fix_data_types_for_index</span><span class="p">(</span> <span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Elasticsearch will not index dictionaries&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="c1">#pick up empty strings etc but not false</span>
+
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">if</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;True&quot;</span> <span class="ow">or</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;False&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;attachments&quot;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+            <span class="c1">#file upload special case</span>
+            <span class="k">return</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">attachment</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;printName&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;attachments&quot;</span><span class="p">]])</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">fix_data_types_for_index</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">get_es_fieldname</span><span class="p">(</span><span class="n">pointer</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pointer</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;indexed_fields_</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">m</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+
+<span class="k">def</span> <span class="nf">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">pointer</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pointer</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;sortable_fields_</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">m</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">build_indexed_fields</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
+    <span class="n">to_index</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;dataset&quot;</span> <span class="p">:</span> <span class="n">document</span><span class="p">}</span>
+    
+    <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">schema</span><span class="p">:</span>
+        <span class="n">slashed_json_pointer</span> <span class="o">=</span> <span class="s2">&quot;/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">field</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">)</span>
+
+        <span class="n">raw_value</span> <span class="o">=</span> <span class="n">resolve_pointer</span><span class="p">(</span><span class="n">document</span><span class="p">,</span><span class="n">slashed_json_pointer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+        
+        <span class="n">value</span> <span class="o">=</span> <span class="n">fix_data_types_for_index</span><span class="p">(</span><span class="n">raw_value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
+            <span class="c1">#We do not add an index for any blank, empty or non existant field, that way</span>
+            <span class="c1">#we can be sure that the blanks filter will pick up all of the true blank fields</span>
+            <span class="n">hashed</span> <span class="o">=</span> <span class="n">get_es_fieldname</span><span class="p">(</span><span class="n">field</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">])</span>
+            <span class="n">to_index</span><span class="p">[</span><span class="n">hashed</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="n">sortable</span> <span class="o">=</span> <span class="n">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">field</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">])</span>
+            <span class="n">to_index</span><span class="p">[</span><span class="n">sortable</span><span class="p">]</span> <span class="o">=</span> <span class="n">zeropad</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">to_index</span>
+
+
+
+<span class="k">def</span> <span class="nf">build_all_indexed_fields</span><span class="p">(</span><span class="n">batch_dicts</span><span class="p">,</span> <span class="n">schema_list</span><span class="p">):</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">batch_dicts</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">schema_list</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span>  <span class="n">schema</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">schema_list</span><span class="p">):</span>
+        <span class="n">batch_dicts</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">build_indexed_fields</span><span class="p">(</span><span class="n">batch_dicts</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="n">schema</span><span class="p">)</span>
+
+
+
+
+<span class="k">def</span> <span class="nf">index_dataset</span><span class="p">(</span> <span class="n">batch_dicts</span><span class="p">,</span> <span class="n">schema_list</span><span class="p">,</span> <span class="n">index_names</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="n">build_all_indexed_fields</span><span class="p">(</span><span class="n">batch_dicts</span><span class="p">,</span> <span class="n">schema_list</span><span class="p">)</span>
+    <span class="n">es_reindex</span> <span class="o">=</span> <span class="n">create_index</span><span class="p">(</span>
+                <span class="n">batch_dicts</span><span class="p">,</span> <span class="n">index_names</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="n">refresh</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">es_reindex</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;errors&quot;</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s2">&quot;ERRORS&quot;</span>
+        <span class="k">print</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">es_reindex</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;indexing failed&quot;</span><span class="p">)</span>
+
+
+
+<span class="k">def</span> <span class="nf">create_index</span><span class="p">(</span><span class="n">batches</span><span class="p">,</span> <span class="n">index_names</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">()</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">index_name</span> <span class="ow">in</span> <span class="n">index_names</span><span class="p">:</span>
+        <span class="n">es</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">index_name</span><span class="p">,</span>
+        <span class="n">body</span><span class="o">=</span><span class="n">ELASTICSEARCH_INDEX_MAPPING</span><span class="p">,</span>
+        <span class="n">ignore</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+
+    <span class="n">bulk_items</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">bid</span> <span class="o">=</span> <span class="n">batches</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;dataset&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="n">es</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index_names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> 
+                     <span class="n">doc_type</span><span class="o">=</span><span class="n">BATCH_TYPE_NAME</span><span class="p">,</span> 
+                     <span class="nb">id</span><span class="o">=</span><span class="n">bid</span><span class="p">,</span> 
+                     <span class="n">body</span><span class="o">=</span><span class="n">batches</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                     <span class="n">refresh</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">counter</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">batches</span><span class="p">):</span>
+                <span class="n">batch_doc</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;update&quot;</span><span class="p">:</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;_index&quot;</span><span class="p">:</span> <span class="n">index_names</span><span class="p">[</span><span class="n">counter</span><span class="p">],</span>
+                        <span class="s2">&quot;_type&quot;</span><span class="p">:</span> <span class="n">BATCH_TYPE_NAME</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+                <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;dataset&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">):</span>
+                    <span class="n">batch_doc</span><span class="p">[</span><span class="s2">&quot;update&quot;</span><span class="p">][</span><span class="s2">&quot;_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;dataset&quot;</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+                <span class="n">bulk_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">batch_doc</span><span class="p">)</span>
+                <span class="n">bulk_items</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;doc&quot;</span> <span class="p">:</span> <span class="n">item</span><span class="p">,</span> <span class="s2">&quot;doc_as_upsert&quot;</span> <span class="p">:</span> <span class="bp">True</span> <span class="p">})</span>
+            <span class="c1"># Data is not refreshed!</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">bulk</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">bulk_items</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span>
+
+
+
+<span class="k">def</span> <span class="nf">build_phase_prefix_query</span><span class="p">(</span><span class="n">phrase</span><span class="p">,</span> <span class="n">field_path</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+                    <span class="s2">&quot;multi_match&quot;</span> <span class="p">:</span>
+                    <span class="p">{</span> 
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;phrase_prefix&quot;</span><span class="p">,</span> 
+                        <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">get_es_fieldname</span><span class="p">(</span><span class="n">field_path</span><span class="p">),]</span> <span class="p">,</span> 
+                        <span class="s2">&quot;query&quot;</span> <span class="p">:</span> <span class="n">phrase</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+
+
+
+
+
+<span class="k">def</span> <span class="nf">build_es_request</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> <span class="n">textsearch</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">batch_ids_by_project</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">must_clauses</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">batch_ids_by_project</span><span class="p">:</span>
+        <span class="c1">#The postgres backend has converted the chemical search</span>
+        <span class="c1">#Into a list of ids by project</span>
+        <span class="c1">#We then join these ids queries on a per project basis</span>
+        <span class="n">match_these_ids_by_index</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">search_dict</span> <span class="ow">in</span> <span class="n">batch_ids_by_project</span><span class="p">:</span>
+            <span class="k">print</span> <span class="n">search_dict</span>
+            <span class="n">index_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_project_index_name</span><span class="p">(</span><span class="n">search_dict</span><span class="p">[</span><span class="s2">&quot;project_id&quot;</span><span class="p">]),]</span>
+
+            <span class="n">batch_ids</span> <span class="o">=</span> <span class="n">search_dict</span><span class="p">[</span><span class="s2">&quot;batch_ids&quot;</span><span class="p">]</span>
+            <span class="n">index_query</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;indices&quot;</span><span class="p">:</span>
+                                <span class="p">{</span>
+                                    <span class="s2">&quot;indices&quot;</span><span class="p">:</span> <span class="n">index_names</span><span class="p">,</span>
+                                    <span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                        <span class="s2">&quot;ids&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                                            <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="n">BATCH_TYPE_NAME</span><span class="p">,</span>
+                                            <span class="s2">&quot;values&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">batch_ids</span><span class="p">]</span>
+                                        <span class="p">}</span>
+                                    <span class="p">},</span>
+                                    <span class="s2">&quot;no_match_query&quot;</span> <span class="p">:</span> <span class="s2">&quot;none&quot;</span>
+                                <span class="p">}</span>
+                            <span class="p">}</span>
+            <span class="k">print</span> <span class="n">index_query</span>
+            <span class="n">match_these_ids_by_index</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index_query</span><span class="p">)</span>
+
+        <span class="c1">#Each document should be in the specified ID list for the project it is in</span>
+        <span class="n">by_index_batch_id_query</span> <span class="o">=</span> <span class="p">{</span>   <span class="s2">&quot;bool&quot;</span> <span class="p">:{</span>
+                <span class="s2">&quot;should&quot;</span> <span class="p">:</span> <span class="n">match_these_ids_by_index</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="n">must_clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">by_index_batch_id_query</span><span class="p">)</span>
+
+
+
+    <span class="k">if</span> <span class="n">textsearch</span><span class="p">:</span>
+        <span class="n">subquery</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;query&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                                    <span class="s2">&quot;multi_match&quot;</span> <span class="p">:</span> <span class="p">{</span> 
+                                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;phrase_prefix&quot;</span><span class="p">,</span> 
+                                        <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;indexed_fields_*&quot;</span><span class="p">,]</span> <span class="p">,</span> 
+                                        <span class="s2">&quot;query&quot;</span> <span class="p">:</span> <span class="n">textsearch</span> 
+                                    <span class="p">}</span>
+                                <span class="p">}</span>
+                            <span class="p">}</span>
+                    
+        <span class="n">must_clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subquery</span><span class="p">)</span>
+
+
+    <span class="k">for</span> <span class="n">query</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">:</span>
+        <span class="n">new_query</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">if</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;query_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;phrase&#39;</span><span class="p">:</span>
+            <span class="n">new_query</span> <span class="o">=</span> <span class="n">build_phase_prefix_query</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;phrase&quot;</span><span class="p">],</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;field_path&quot;</span><span class="p">])</span>
+            
+        
+        <span class="k">elif</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;query_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;pick_from_list&#39;</span><span class="p">:</span> 
+
+            <span class="n">new_query</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;terms&quot;</span> <span class="p">:</span>
+                    <span class="p">{</span> 
+                        <span class="n">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;field_path&quot;</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="n">zeropad</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;pick_from_list&quot;</span><span class="p">])</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+
+            
+        <span class="k">elif</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;query_type&quot;</span><span class="p">]</span> <span class="o">==</span>  <span class="s1">&#39;between&#39;</span><span class="p">:</span>
+            <span class="n">new_query</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;range&quot;</span> <span class="p">:</span>
+                    <span class="p">{</span> 
+                         <span class="n">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;field_path&quot;</span><span class="p">]</span> <span class="p">):</span> 
+                            <span class="p">{</span>
+                                <span class="s2">&quot;gt&quot;</span> <span class="p">:</span> <span class="n">zeropad</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;greater_than&quot;</span><span class="p">]),</span>
+                                <span class="s2">&quot;lt&quot;</span>  <span class="p">:</span> <span class="n">zeropad</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;less_than&quot;</span><span class="p">])</span>
+                            <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+        <span class="k">elif</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;query_type&quot;</span><span class="p">]</span> <span class="o">==</span>  <span class="s1">&#39;greater_than&#39;</span><span class="p">:</span>
+            <span class="n">new_query</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;range&quot;</span> <span class="p">:</span>
+                    <span class="p">{</span> 
+                         <span class="n">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;field_path&quot;</span><span class="p">]</span> <span class="p">):</span> 
+                            <span class="p">{</span>
+                                <span class="s2">&quot;gt&quot;</span> <span class="p">:</span> <span class="n">zeropad</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;greater_than&quot;</span><span class="p">]),</span>
+                            <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+        <span class="k">elif</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;query_type&quot;</span><span class="p">]</span> <span class="o">==</span>  <span class="s1">&#39;less_than&#39;</span><span class="p">:</span>
+            <span class="n">new_query</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;range&quot;</span> <span class="p">:</span>
+                    <span class="p">{</span> 
+                        <span class="n">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;field_path&quot;</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span> 
+                            <span class="p">{</span>
+                                <span class="s2">&quot;lt&quot;</span>  <span class="p">:</span> <span class="n">zeropad</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;less_than&quot;</span><span class="p">])</span>
+                            <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+        <span class="k">elif</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;query_type&quot;</span><span class="p">]</span> <span class="o">==</span>  <span class="s1">&#39;nonblanks&#39;</span><span class="p">:</span>
+            <span class="n">new_query</span> <span class="o">=</span>  <span class="p">{</span>
+                         <span class="s2">&quot;exists&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;field&quot;</span> <span class="p">:</span>  <span class="n">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;field_path&quot;</span><span class="p">])}</span>
+                    <span class="p">}</span> 
+
+        <span class="k">elif</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;query_type&quot;</span><span class="p">]</span> <span class="o">==</span>  <span class="s1">&#39;blanks&#39;</span><span class="p">:</span>
+            <span class="n">new_query</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;bool&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;must_not&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+                                     <span class="s2">&quot;exists&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;field&quot;</span> <span class="p">:</span> <span class="n">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;field_path&quot;</span><span class="p">]</span> <span class="p">)}</span>
+                                <span class="p">}</span> <span class="p">]</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+        
+        <span class="k">if</span> <span class="n">new_query</span><span class="p">:</span>
+            <span class="n">must_clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_query</span><span class="p">)</span>
+    
+            
+    <span class="k">return</span> <span class="n">must_clauses</span>
+
+<span class="k">def</span> <span class="nf">get_missing_items_position</span><span class="p">(</span><span class="n">direction</span><span class="p">):</span>
+    <span class="n">position_of_missing_items</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;asc&quot;</span> <span class="p">:</span> <span class="s2">&quot;_last&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;desc&quot;</span> <span class="p">:</span> <span class="s2">&quot;_first&quot;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">position_of_missing_items</span><span class="p">[</span><span class="n">direction</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">build_sorts</span><span class="p">(</span><span class="n">sorts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sort by the lowercase version of the data&quot;&quot;&quot;</span>
+
+    <span class="n">elasticsearch_sorts</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="n">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">sort</span><span class="p">[</span><span class="s2">&quot;field_path&quot;</span><span class="p">]</span> <span class="p">)</span> <span class="p">:{</span>
+                <span class="s2">&quot;order&quot;</span> <span class="p">:</span> <span class="n">sort</span><span class="p">[</span><span class="s2">&quot;sort_direction&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;unmapped_type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;missing&quot;</span> <span class="p">:</span> <span class="n">get_missing_items_position</span><span class="p">(</span><span class="n">sort</span><span class="p">[</span><span class="s2">&quot;sort_direction&quot;</span><span class="p">])</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">sort</span> <span class="ow">in</span> <span class="n">sorts</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="n">elasticsearch_sorts</span>
+
+<span class="k">def</span> <span class="nf">get_nested_aggregation_for_field_path</span><span class="p">(</span><span class="n">autocomplete_field_path</span><span class="p">,</span> <span class="n">autocomplete</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">autocomplete_size</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">MAX_AUTOCOMPLETE_SIZE</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Based upon an input term and field_path, generate an aggregation to group by that field returning zero padded numbers to get the order right&quot;&quot;&quot;</span>
+    <span class="n">es_fname</span> <span class="o">=</span> <span class="n">get_es_fieldname</span><span class="p">(</span><span class="n">autocomplete_field_path</span> <span class="p">)</span>
+    <span class="n">sortable_fname</span> <span class="o">=</span> <span class="n">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">autocomplete_field_path</span> <span class="p">)</span>
+    <span class="n">base_agg</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;field_path_terms&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;terms&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;field&quot;</span> <span class="p">:</span> <span class="n">sortable_fname</span><span class="p">,</span>
+                        <span class="s2">&quot;size&quot;</span> <span class="p">:</span> <span class="n">autocomplete_size</span><span class="p">,</span>
+                         <span class="s2">&quot;order&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;_term&quot;</span> <span class="p">:</span> <span class="s2">&quot;asc&quot;</span> <span class="p">},</span>
+                         
+                    <span class="p">},</span>
+                    <span class="s2">&quot;aggs&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                                <span class="s2">&quot;correct_case&quot;</span><span class="p">:</span>
+                                    <span class="p">{</span>
+                                        <span class="s2">&quot;terms&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                                            <span class="s2">&quot;field&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.raw&quot;</span> <span class="o">%</span> <span class="n">es_fname</span><span class="p">,</span>
+                                            <span class="s2">&quot;size&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                                             <span class="s2">&quot;order&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;_term&quot;</span> <span class="p">:</span> <span class="s2">&quot;asc&quot;</span> <span class="p">},</span>
+                                        <span class="p">}</span>
+                                    <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;unique_count&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                    <span class="s2">&quot;cardinality&quot;</span> <span class="p">:</span> 
+                                    <span class="p">{</span>
+                                    <span class="s2">&quot;field&quot;</span> <span class="p">:</span> <span class="n">sortable_fname</span>
+                                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">autocomplete</span><span class="p">:</span>
+        <span class="c1">#If there is a search term, then, having applied a set of filters to the data (project, other search terms)</span>
+        <span class="c1">#We then try to apply a term filter to the data being aggregated for the search term being looked for</span>
+        <span class="n">query</span> <span class="o">=</span>  <span class="n">build_phase_prefix_query</span><span class="p">(</span><span class="n">autocomplete</span><span class="p">,</span> <span class="n">autocomplete_field_path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;match_all&quot;</span><span class="p">:</span> <span class="p">{}</span> <span class="p">}</span>
+
+    <span class="n">base_agg</span> <span class="o">=</span> <span class="p">{</span> 
+                <span class="s2">&quot;filtered_field_path&quot;</span><span class="p">:</span>
+                        <span class="p">{</span>
+                        <span class="s2">&quot;filter&quot;</span> <span class="p">:</span> <span class="n">query</span><span class="p">,</span>
+                        <span class="s2">&quot;aggs&quot;</span> <span class="p">:</span> <span class="n">base_agg</span>
+
+                        <span class="p">}</span>
+                <span class="p">}</span>
+                    
+  
+    <span class="k">return</span> <span class="n">base_agg</span>
+
+
+<span class="k">def</span> <span class="nf">remove_existing_queries_for_agg</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> <span class="n">autocomplete_field_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;We are trying to provide an aggregated autocomplete for a particular field</span>
+<span class="sd">    Therefore if a query has already been applied to that field, we need to remove that subquery&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">autocomplete_field_path</span><span class="p">:</span>
+        <span class="n">new_queries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">q</span><span class="p">[</span><span class="s2">&quot;field_path&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">autocomplete_field_path</span><span class="p">:</span>
+                <span class="n">new_queries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_queries</span>
+    <span class="k">return</span> <span class="n">queries</span>
+
+
+<span class="k">def</span> <span class="nf">get_list_data_elasticsearch</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">sorts</span><span class="o">=</span><span class="p">[],</span> <span class="n">autocomplete</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">autocomplete_field_path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">autocomplete_size</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">MAX_AUTOCOMPLETE_SIZE</span><span class="p">,</span> <span class="n">textsearch</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">batch_ids_by_project</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Build a query for elasticsearch by going through the input query dictionaries</span>
+<span class="sd">    Also add autocomplete if required by creating an aggregation&quot;&quot;&quot;</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">()</span>
+    <span class="n">queries</span> <span class="o">=</span> <span class="n">remove_existing_queries_for_agg</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> <span class="n">autocomplete_field_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>  <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">textsearch</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>  <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">es_request</span> <span class="o">=</span> <span class="p">{</span>  
+                    <span class="s2">&quot;query&quot;</span><span class="p">:{</span>
+                        <span class="s2">&quot;indices&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;indices&quot;</span> <span class="p">:</span> <span class="n">index</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">),</span> <span class="c1">#We ran out of space in a GET request to put all of the indices in, so just using a query indead</span>
+                            <span class="s2">&quot;query&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                                <span class="s2">&quot;bool&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                                    <span class="s2">&quot;filter&quot;</span> <span class="p">:</span> <span class="p">[</span>    
+                                           <span class="n">build_es_request</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> 
+                                            <span class="n">textsearch</span><span class="o">=</span><span class="n">textsearch</span><span class="p">,</span> 
+                                            <span class="n">batch_ids_by_project</span><span class="o">=</span><span class="n">batch_ids_by_project</span><span class="p">)</span>
+                                    <span class="p">]</span>
+                                <span class="p">}</span>
+                            <span class="p">},</span>
+                            <span class="s2">&quot;no_match_query&quot;</span> <span class="p">:</span> <span class="s2">&quot;none&quot;</span>
+                        <span class="p">}</span>
+                    <span class="p">},</span>
+                    <span class="s2">&quot;sort&quot;</span> <span class="p">:</span> <span class="n">build_sorts</span><span class="p">(</span><span class="n">sorts</span><span class="p">),</span>
+                    <span class="s2">&quot;_source&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;include&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;*&quot;</span> <span class="p">],</span>
+                        <span class="s2">&quot;exclude&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;dataset.bigimage&quot;</span> <span class="p">]</span>
+                    <span class="p">},</span>
+                <span class="p">}</span>
+    
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1">#No projects are included in the query </span>
+        <span class="c1">#but we must return a graceful response</span>
+        <span class="k">return</span> <span class="p">{</span>
+                 <span class="s2">&quot;hits&quot;</span><span class="p">:</span>
+                    <span class="p">{</span><span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> 
+                       <span class="s2">&quot;hits&quot;</span> <span class="p">:</span> <span class="p">[]},</span> 
+                    <span class="s2">&quot;aggregations&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;filtered_field_path&quot;</span><span class="p">:{</span><span class="s2">&quot;unique_count&quot;</span> <span class="p">:{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span><span class="s2">&quot;field_path_terms&quot;</span> <span class="p">:{</span><span class="s2">&quot;buckets&quot;</span><span class="p">:[]}}}</span>
+                <span class="p">}</span>
+                
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;You must input a query&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">autocomplete_field_path</span><span class="p">:</span>
+        <span class="n">es_request</span><span class="p">[</span><span class="s2">&quot;aggs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_nested_aggregation_for_field_path</span><span class="p">(</span><span class="n">autocomplete_field_path</span><span class="p">,</span> <span class="n">autocomplete</span><span class="o">=</span><span class="n">autocomplete</span><span class="p">,</span> <span class="n">autocomplete_size</span><span class="o">=</span><span class="n">autocomplete_size</span><span class="p">)</span>
+    <span class="n">es_request</span><span class="p">[</span><span class="s2">&quot;from&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">offset</span>
+    <span class="n">es_request</span><span class="p">[</span><span class="s2">&quot;size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">limit</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;_all&quot;</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">es_request</span><span class="p">,</span> <span class="n">ignore_unavailable</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">autocomplete_field_path</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">bucket</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;aggregations&quot;</span><span class="p">][</span><span class="s2">&quot;filtered_field_path&quot;</span><span class="p">][</span><span class="s2">&quot;field_path_terms&quot;</span><span class="p">][</span><span class="s2">&quot;buckets&quot;</span><span class="p">]:</span>
+            <span class="c1">#Replace the key of the bucket with the first normal case version of it</span>
+            <span class="k">for</span> <span class="n">correct_case_bucket</span> <span class="ow">in</span> <span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;correct_case&quot;</span><span class="p">][</span><span class="s2">&quot;buckets&quot;</span><span class="p">]:</span>
+                <span class="c1">#If there is a list field there will be choices to choose between - we must pick the</span>
+                <span class="c1">#Choice where the keys are equal but the correct case bucket may have different case</span>
+                <span class="k">if</span> <span class="n">unzeropad</span><span class="p">(</span><span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="n">correct_case_bucket</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                    <span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">correct_case_bucket</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span>
+
+            <span class="k">del</span> <span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;correct_case&quot;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">data</span>
+
+<span class="k">def</span> <span class="nf">zeropad</span><span class="p">(</span><span class="n">input_string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Zero pad integers and floats to ensure that they can be sorted correctly&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_string</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_string</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="n">input_string</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                <span class="k">if</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="n">input_string</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">input_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                        <span class="n">data</span> <span class="o">=</span> <span class="n">input_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+                        
+                        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">13</span><span class="p">),</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">input_string</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                    <span class="k">return</span> <span class="n">input_string</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">input_string</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">input_string</span><span class="p">,</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;we expect a list here&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">zeropad</span><span class="p">(</span><span class="n">string</span><span class="p">)</span> <span class="k">for</span> <span class="n">string</span> <span class="ow">in</span> <span class="n">input_string</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">input_string</span>
+    
+
+
+
+<span class="k">def</span> <span class="nf">unzeropad</span><span class="p">(</span><span class="n">input_string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Remove zero padding from integers and floats&quot;&quot;&quot;</span>
+    <span class="n">replace_up_to</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_string</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">input_string</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;0&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">input_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">char</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">input_string</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">char</span> <span class="o">!=</span> <span class="s2">&quot;0&quot;</span><span class="p">:</span>
+                        <span class="n">replace_up_to</span> <span class="o">=</span> <span class="n">index</span>
+                        <span class="c1">#found the first non zero so break</span>
+                        <span class="k">break</span> 
+    <span class="k">return</span> <span class="n">input_string</span><span class="p">[</span><span class="n">replace_up_to</span><span class="p">:]</span>
+
+
+<span class="k">def</span> <span class="nf">get_detail_data_elasticsearch</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">()</span>
+    <span class="n">es_request</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s2">&quot;query&quot;</span><span class="p">:{</span>
+                            <span class="s2">&quot;indices&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                                <span class="s2">&quot;indices&quot;</span> <span class="p">:</span> <span class="n">index</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">),</span> <span class="c1">#We ran out of space in a GET request to put all of the indices in, so just using a query indead</span>
+                                <span class="s2">&quot;query&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                                    <span class="s2">&quot;term&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;_id&quot;</span> <span class="p">:</span> <span class="nb">id</span><span class="p">},</span>
+                                <span class="p">},</span>
+                                <span class="s2">&quot;no_match_query&quot;</span> <span class="p">:</span> <span class="s2">&quot;none&quot;</span>
+                            <span class="p">}</span>
+                        <span class="p">},</span>
+
+
+                        <span class="s2">&quot;_source&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;include&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;*&quot;</span> <span class="p">],</span>
+                            <span class="s2">&quot;exclude&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;indexed_fields.*&quot;</span> <span class="p">]</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;_all&quot;</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">es_request</span><span class="p">,</span> <span class="n">ignore_unavailable</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;hits&quot;</span><span class="p">][</span><span class="s2">&quot;hits&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;_source&quot;</span><span class="p">][</span><span class="s2">&quot;dataset&quot;</span><span class="p">]</span>
+</pre></div>
+
+  </div>
+
+  </header>
+
+  <section id="section-items">
+    <h2 class="section-title" id="header-variables">Module variables</h2>
+      <div class="item">
+      <p id="cbh_utils.elasticsearch_client.AGG_TERMS_SEPARATOR" class="name">var <span class="ident">AGG_TERMS_SEPARATOR</span></p>
+      
+  
+  <div class="source_cont">
+</div>
+
+      </div>
+      <div class="item">
+      <p id="cbh_utils.elasticsearch_client.BATCH_TYPE_NAME" class="name">var <span class="ident">BATCH_TYPE_NAME</span></p>
+      
+  
+  <div class="source_cont">
+</div>
+
+      </div>
+      <div class="item">
+      <p id="cbh_utils.elasticsearch_client.ELASTICSEARCH_INDEX_MAPPING" class="name">var <span class="ident">ELASTICSEARCH_INDEX_MAPPING</span></p>
+      
+  
+  <div class="source_cont">
+</div>
+
+      </div>
+      <div class="item">
+      <p id="cbh_utils.elasticsearch_client.ELASTICSEARCH_MAX_FIELD_LENGTH" class="name">var <span class="ident">ELASTICSEARCH_MAX_FIELD_LENGTH</span></p>
+      
+  
+    <div class="desc"><p>The mapping patterns were generated using this python function</p>
+<p>The reason that we zero pad using regular expressions is to avoid doing that work in python and reduce the size of the request to elasticsearch when indexing</p>
+<p>for i in range(1,14):
+   data["%ddigit" % i] = {"type": "pattern_replace", "pattern" : "^([1-9]\d{%d})($|.\d+$)" % (i-1) , "replacement" : "".join(["0" for j in range(0,(13-i))]) + "$1$2"}</p>
+<p>The list of patterns to be applied were generated like this:</p>
+<p>["%ddigit" % i for i in range(1,14)]</p></div>
+  <div class="source_cont">
+</div>
+
+      </div>
+      <div class="item">
+      <p id="cbh_utils.elasticsearch_client.ES_MAIN_INDEX_NAME" class="name">var <span class="ident">ES_MAIN_INDEX_NAME</span></p>
+      
+  
+  <div class="source_cont">
+</div>
+
+      </div>
+      <div class="item">
+      <p id="cbh_utils.elasticsearch_client.ES_PREFIX" class="name">var <span class="ident">ES_PREFIX</span></p>
+      
+  
+  <div class="source_cont">
+</div>
+
+      </div>
+
+    <h2 class="section-title" id="header-functions">Functions</h2>
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.build_all_indexed_fields">
+    <p>def <span class="ident">build_all_indexed_fields</span>(</p><p>batch_dicts, schema_list)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.build_all_indexed_fields', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.build_all_indexed_fields" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">build_all_indexed_fields</span><span class="p">(</span><span class="n">batch_dicts</span><span class="p">,</span> <span class="n">schema_list</span><span class="p">):</span>
+    <span class="k">assert</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">batch_dicts</span><span class="p">)</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">schema_list</span><span class="p">))</span>
+    <span class="k">for</span> <span class="n">index</span><span class="p">,</span>  <span class="n">schema</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">schema_list</span><span class="p">):</span>
+        <span class="n">batch_dicts</span><span class="p">[</span><span class="n">index</span><span class="p">]</span> <span class="o">=</span> <span class="n">build_indexed_fields</span><span class="p">(</span><span class="n">batch_dicts</span><span class="p">[</span><span class="n">index</span><span class="p">],</span> <span class="n">schema</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.build_es_request">
+    <p>def <span class="ident">build_es_request</span>(</p><p>queries, textsearch=&#39;&#39;, batch_ids_by_project=None)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.build_es_request', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.build_es_request" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">build_es_request</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> <span class="n">textsearch</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">batch_ids_by_project</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="n">must_clauses</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">if</span> <span class="n">batch_ids_by_project</span><span class="p">:</span>
+        <span class="c1">#The postgres backend has converted the chemical search</span>
+        <span class="c1">#Into a list of ids by project</span>
+        <span class="c1">#We then join these ids queries on a per project basis</span>
+        <span class="n">match_these_ids_by_index</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">search_dict</span> <span class="ow">in</span> <span class="n">batch_ids_by_project</span><span class="p">:</span>
+            <span class="k">print</span> <span class="n">search_dict</span>
+            <span class="n">index_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_project_index_name</span><span class="p">(</span><span class="n">search_dict</span><span class="p">[</span><span class="s2">&quot;project_id&quot;</span><span class="p">]),]</span>
+
+            <span class="n">batch_ids</span> <span class="o">=</span> <span class="n">search_dict</span><span class="p">[</span><span class="s2">&quot;batch_ids&quot;</span><span class="p">]</span>
+            <span class="n">index_query</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;indices&quot;</span><span class="p">:</span>
+                                <span class="p">{</span>
+                                    <span class="s2">&quot;indices&quot;</span><span class="p">:</span> <span class="n">index_names</span><span class="p">,</span>
+                                    <span class="s2">&quot;query&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                        <span class="s2">&quot;ids&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                                            <span class="s2">&quot;type&quot;</span> <span class="p">:</span> <span class="n">BATCH_TYPE_NAME</span><span class="p">,</span>
+                                            <span class="s2">&quot;values&quot;</span> <span class="p">:</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="nb">id</span><span class="p">)</span> <span class="k">for</span> <span class="nb">id</span> <span class="ow">in</span> <span class="n">batch_ids</span><span class="p">]</span>
+                                        <span class="p">}</span>
+                                    <span class="p">},</span>
+                                    <span class="s2">&quot;no_match_query&quot;</span> <span class="p">:</span> <span class="s2">&quot;none&quot;</span>
+                                <span class="p">}</span>
+                            <span class="p">}</span>
+            <span class="k">print</span> <span class="n">index_query</span>
+            <span class="n">match_these_ids_by_index</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">index_query</span><span class="p">)</span>
+
+        <span class="c1">#Each document should be in the specified ID list for the project it is in</span>
+        <span class="n">by_index_batch_id_query</span> <span class="o">=</span> <span class="p">{</span>   <span class="s2">&quot;bool&quot;</span> <span class="p">:{</span>
+                <span class="s2">&quot;should&quot;</span> <span class="p">:</span> <span class="n">match_these_ids_by_index</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="n">must_clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">by_index_batch_id_query</span><span class="p">)</span>
+
+
+
+    <span class="k">if</span> <span class="n">textsearch</span><span class="p">:</span>
+        <span class="n">subquery</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;query&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                                    <span class="s2">&quot;multi_match&quot;</span> <span class="p">:</span> <span class="p">{</span> 
+                                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;phrase_prefix&quot;</span><span class="p">,</span> 
+                                        <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;indexed_fields_*&quot;</span><span class="p">,]</span> <span class="p">,</span> 
+                                        <span class="s2">&quot;query&quot;</span> <span class="p">:</span> <span class="n">textsearch</span> 
+                                    <span class="p">}</span>
+                                <span class="p">}</span>
+                            <span class="p">}</span>
+                    
+        <span class="n">must_clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">subquery</span><span class="p">)</span>
+
+
+    <span class="k">for</span> <span class="n">query</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">:</span>
+        <span class="n">new_query</span> <span class="o">=</span> <span class="bp">None</span>
+
+        <span class="k">if</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;query_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;phrase&#39;</span><span class="p">:</span>
+            <span class="n">new_query</span> <span class="o">=</span> <span class="n">build_phase_prefix_query</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;phrase&quot;</span><span class="p">],</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;field_path&quot;</span><span class="p">])</span>
+            
+        
+        <span class="k">elif</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;query_type&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="s1">&#39;pick_from_list&#39;</span><span class="p">:</span> 
+
+            <span class="n">new_query</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;terms&quot;</span> <span class="p">:</span>
+                    <span class="p">{</span> 
+                        <span class="n">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;field_path&quot;</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span> <span class="n">zeropad</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;pick_from_list&quot;</span><span class="p">])</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+
+            
+        <span class="k">elif</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;query_type&quot;</span><span class="p">]</span> <span class="o">==</span>  <span class="s1">&#39;between&#39;</span><span class="p">:</span>
+            <span class="n">new_query</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;range&quot;</span> <span class="p">:</span>
+                    <span class="p">{</span> 
+                         <span class="n">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;field_path&quot;</span><span class="p">]</span> <span class="p">):</span> 
+                            <span class="p">{</span>
+                                <span class="s2">&quot;gt&quot;</span> <span class="p">:</span> <span class="n">zeropad</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;greater_than&quot;</span><span class="p">]),</span>
+                                <span class="s2">&quot;lt&quot;</span>  <span class="p">:</span> <span class="n">zeropad</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;less_than&quot;</span><span class="p">])</span>
+                            <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+        <span class="k">elif</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;query_type&quot;</span><span class="p">]</span> <span class="o">==</span>  <span class="s1">&#39;greater_than&#39;</span><span class="p">:</span>
+            <span class="n">new_query</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;range&quot;</span> <span class="p">:</span>
+                    <span class="p">{</span> 
+                         <span class="n">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;field_path&quot;</span><span class="p">]</span> <span class="p">):</span> 
+                            <span class="p">{</span>
+                                <span class="s2">&quot;gt&quot;</span> <span class="p">:</span> <span class="n">zeropad</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;greater_than&quot;</span><span class="p">]),</span>
+                            <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+        <span class="k">elif</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;query_type&quot;</span><span class="p">]</span> <span class="o">==</span>  <span class="s1">&#39;less_than&#39;</span><span class="p">:</span>
+            <span class="n">new_query</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;range&quot;</span> <span class="p">:</span>
+                    <span class="p">{</span> 
+                        <span class="n">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;field_path&quot;</span><span class="p">]</span> <span class="p">)</span> <span class="p">:</span> 
+                            <span class="p">{</span>
+                                <span class="s2">&quot;lt&quot;</span>  <span class="p">:</span> <span class="n">zeropad</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;less_than&quot;</span><span class="p">])</span>
+                            <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+        <span class="k">elif</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;query_type&quot;</span><span class="p">]</span> <span class="o">==</span>  <span class="s1">&#39;nonblanks&#39;</span><span class="p">:</span>
+            <span class="n">new_query</span> <span class="o">=</span>  <span class="p">{</span>
+                         <span class="s2">&quot;exists&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;field&quot;</span> <span class="p">:</span>  <span class="n">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;field_path&quot;</span><span class="p">])}</span>
+                    <span class="p">}</span> 
+
+        <span class="k">elif</span> <span class="n">query</span><span class="p">[</span><span class="s2">&quot;query_type&quot;</span><span class="p">]</span> <span class="o">==</span>  <span class="s1">&#39;blanks&#39;</span><span class="p">:</span>
+            <span class="n">new_query</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;bool&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;must_not&quot;</span> <span class="p">:</span> <span class="p">[{</span>
+                                     <span class="s2">&quot;exists&quot;</span> <span class="p">:</span> <span class="p">{</span><span class="s2">&quot;field&quot;</span> <span class="p">:</span> <span class="n">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">query</span><span class="p">[</span><span class="s2">&quot;field_path&quot;</span><span class="p">]</span> <span class="p">)}</span>
+                                <span class="p">}</span> <span class="p">]</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+        
+        <span class="k">if</span> <span class="n">new_query</span><span class="p">:</span>
+            <span class="n">must_clauses</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_query</span><span class="p">)</span>
+    
+            
+    <span class="k">return</span> <span class="n">must_clauses</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.build_indexed_fields">
+    <p>def <span class="ident">build_indexed_fields</span>(</p><p>document, schema)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.build_indexed_fields', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.build_indexed_fields" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">build_indexed_fields</span><span class="p">(</span><span class="n">document</span><span class="p">,</span> <span class="n">schema</span><span class="p">):</span>
+    <span class="n">to_index</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;dataset&quot;</span> <span class="p">:</span> <span class="n">document</span><span class="p">}</span>
+    
+    <span class="k">for</span> <span class="n">field</span> <span class="ow">in</span> <span class="n">schema</span><span class="p">:</span>
+        <span class="n">slashed_json_pointer</span> <span class="o">=</span> <span class="s2">&quot;/</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">field</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;/&quot;</span><span class="p">)</span>
+
+        <span class="n">raw_value</span> <span class="o">=</span> <span class="n">resolve_pointer</span><span class="p">(</span><span class="n">document</span><span class="p">,</span><span class="n">slashed_json_pointer</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="bp">None</span><span class="p">)</span>
+        
+        <span class="n">value</span> <span class="o">=</span> <span class="n">fix_data_types_for_index</span><span class="p">(</span><span class="n">raw_value</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">value</span><span class="p">:</span>
+            <span class="c1">#We do not add an index for any blank, empty or non existant field, that way</span>
+            <span class="c1">#we can be sure that the blanks filter will pick up all of the true blank fields</span>
+            <span class="n">hashed</span> <span class="o">=</span> <span class="n">get_es_fieldname</span><span class="p">(</span><span class="n">field</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">])</span>
+            <span class="n">to_index</span><span class="p">[</span><span class="n">hashed</span><span class="p">]</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="n">sortable</span> <span class="o">=</span> <span class="n">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">field</span><span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">])</span>
+            <span class="n">to_index</span><span class="p">[</span><span class="n">sortable</span><span class="p">]</span> <span class="o">=</span> <span class="n">zeropad</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">to_index</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.build_phase_prefix_query">
+    <p>def <span class="ident">build_phase_prefix_query</span>(</p><p>phrase, field_path)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.build_phase_prefix_query', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.build_phase_prefix_query" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">build_phase_prefix_query</span><span class="p">(</span><span class="n">phrase</span><span class="p">,</span> <span class="n">field_path</span><span class="p">):</span>
+    <span class="k">return</span> <span class="p">{</span>
+                    <span class="s2">&quot;multi_match&quot;</span> <span class="p">:</span>
+                    <span class="p">{</span> 
+                        <span class="s2">&quot;type&quot;</span><span class="p">:</span> <span class="s2">&quot;phrase_prefix&quot;</span><span class="p">,</span> 
+                        <span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="p">[</span><span class="n">get_es_fieldname</span><span class="p">(</span><span class="n">field_path</span><span class="p">),]</span> <span class="p">,</span> 
+                        <span class="s2">&quot;query&quot;</span> <span class="p">:</span> <span class="n">phrase</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.build_sorts">
+    <p>def <span class="ident">build_sorts</span>(</p><p>sorts)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Sort by the lowercase version of the data</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.build_sorts', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.build_sorts" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">build_sorts</span><span class="p">(</span><span class="n">sorts</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Sort by the lowercase version of the data&quot;&quot;&quot;</span>
+
+    <span class="n">elasticsearch_sorts</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">{</span>
+            <span class="n">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">sort</span><span class="p">[</span><span class="s2">&quot;field_path&quot;</span><span class="p">]</span> <span class="p">)</span> <span class="p">:{</span>
+                <span class="s2">&quot;order&quot;</span> <span class="p">:</span> <span class="n">sort</span><span class="p">[</span><span class="s2">&quot;sort_direction&quot;</span><span class="p">],</span>
+                <span class="s2">&quot;unmapped_type&quot;</span> <span class="p">:</span> <span class="s2">&quot;string&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;missing&quot;</span> <span class="p">:</span> <span class="n">get_missing_items_position</span><span class="p">(</span><span class="n">sort</span><span class="p">[</span><span class="s2">&quot;sort_direction&quot;</span><span class="p">])</span>
+            <span class="p">}</span>
+        <span class="p">}</span>
+        <span class="k">for</span> <span class="n">sort</span> <span class="ow">in</span> <span class="n">sorts</span>
+    <span class="p">]</span>
+    <span class="k">return</span> <span class="n">elasticsearch_sorts</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.create_index">
+    <p>def <span class="ident">create_index</span>(</p><p>batches, index_names, refresh=True)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.create_index', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.create_index" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">create_index</span><span class="p">(</span><span class="n">batches</span><span class="p">,</span> <span class="n">index_names</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">()</span>
+    <span class="n">t</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+
+    <span class="k">for</span> <span class="n">index_name</span> <span class="ow">in</span> <span class="n">index_names</span><span class="p">:</span>
+        <span class="n">es</span><span class="o">.</span><span class="n">indices</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+        <span class="n">index_name</span><span class="p">,</span>
+        <span class="n">body</span><span class="o">=</span><span class="n">ELASTICSEARCH_INDEX_MAPPING</span><span class="p">,</span>
+        <span class="n">ignore</span><span class="o">=</span><span class="mi">400</span><span class="p">)</span>
+
+    <span class="n">bulk_items</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">batches</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">bid</span> <span class="o">=</span> <span class="n">batches</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;dataset&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">)</span>
+            <span class="n">es</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="n">index_names</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> 
+                     <span class="n">doc_type</span><span class="o">=</span><span class="n">BATCH_TYPE_NAME</span><span class="p">,</span> 
+                     <span class="nb">id</span><span class="o">=</span><span class="n">bid</span><span class="p">,</span> 
+                     <span class="n">body</span><span class="o">=</span><span class="n">batches</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
+                     <span class="n">refresh</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">counter</span><span class="p">,</span> <span class="n">item</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">batches</span><span class="p">):</span>
+                <span class="n">batch_doc</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;update&quot;</span><span class="p">:</span>
+                    <span class="p">{</span>
+                        <span class="s2">&quot;_index&quot;</span><span class="p">:</span> <span class="n">index_names</span><span class="p">[</span><span class="n">counter</span><span class="p">],</span>
+                        <span class="s2">&quot;_type&quot;</span><span class="p">:</span> <span class="n">BATCH_TYPE_NAME</span>
+                    <span class="p">}</span>
+                <span class="p">}</span>
+                <span class="k">if</span> <span class="n">item</span><span class="p">[</span><span class="s2">&quot;dataset&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;id&quot;</span><span class="p">,</span> <span class="bp">None</span><span class="p">):</span>
+                    <span class="n">batch_doc</span><span class="p">[</span><span class="s2">&quot;update&quot;</span><span class="p">][</span><span class="s2">&quot;_id&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">item</span><span class="p">[</span><span class="s2">&quot;dataset&quot;</span><span class="p">][</span><span class="s2">&quot;id&quot;</span><span class="p">])</span>
+                <span class="n">bulk_items</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">batch_doc</span><span class="p">)</span>
+                <span class="n">bulk_items</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;doc&quot;</span> <span class="p">:</span> <span class="n">item</span><span class="p">,</span> <span class="s2">&quot;doc_as_upsert&quot;</span> <span class="p">:</span> <span class="bp">True</span> <span class="p">})</span>
+            <span class="c1"># Data is not refreshed!</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">bulk</span><span class="p">(</span><span class="n">body</span><span class="o">=</span><span class="n">bulk_items</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">result</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.fix_data_types_for_index">
+    <p>def <span class="ident">fix_data_types_for_index</span>(</p><p>value)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Elasticsearch will not index dictionaries</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.fix_data_types_for_index', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.fix_data_types_for_index" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">fix_data_types_for_index</span><span class="p">(</span> <span class="n">value</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Elasticsearch will not index dictionaries&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="bp">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="bp">None</span>
+
+    <span class="k">if</span> <span class="ow">not</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">value</span><span class="p">):</span>
+        <span class="c1">#pick up empty strings etc but not false</span>
+
+        <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">if</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;True&quot;</span> <span class="ow">or</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;False&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">value</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+            <span class="k">return</span> <span class="n">value</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">None</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">dict</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s2">&quot;attachments&quot;</span> <span class="ow">in</span> <span class="n">value</span><span class="p">:</span>
+            <span class="c1">#file upload special case</span>
+            <span class="k">return</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">attachment</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;printName&quot;</span><span class="p">,</span><span class="s2">&quot;&quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">attachment</span> <span class="ow">in</span> <span class="n">value</span><span class="p">[</span><span class="s2">&quot;attachments&quot;</span><span class="p">]])</span>
+        <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+    <span class="k">if</span> <span class="nb">type</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="ow">is</span> <span class="nb">list</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">fix_data_types_for_index</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">value</span><span class="p">]</span>
+    <span class="k">return</span> <span class="nb">unicode</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.get_detail_data_elasticsearch">
+    <p>def <span class="ident">get_detail_data_elasticsearch</span>(</p><p>index, id)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.get_detail_data_elasticsearch', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.get_detail_data_elasticsearch" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_detail_data_elasticsearch</span><span class="p">(</span><span class="n">index</span><span class="p">,</span> <span class="nb">id</span><span class="p">):</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">()</span>
+    <span class="n">es_request</span> <span class="o">=</span> <span class="p">{</span>
+                        <span class="s2">&quot;query&quot;</span><span class="p">:{</span>
+                            <span class="s2">&quot;indices&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                                <span class="s2">&quot;indices&quot;</span> <span class="p">:</span> <span class="n">index</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">),</span> <span class="c1">#We ran out of space in a GET request to put all of the indices in, so just using a query indead</span>
+                                <span class="s2">&quot;query&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                                    <span class="s2">&quot;term&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;_id&quot;</span> <span class="p">:</span> <span class="nb">id</span><span class="p">},</span>
+                                <span class="p">},</span>
+                                <span class="s2">&quot;no_match_query&quot;</span> <span class="p">:</span> <span class="s2">&quot;none&quot;</span>
+                            <span class="p">}</span>
+                        <span class="p">},</span>
+
+
+                        <span class="s2">&quot;_source&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;include&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;*&quot;</span> <span class="p">],</span>
+                            <span class="s2">&quot;exclude&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;indexed_fields.*&quot;</span> <span class="p">]</span>
+                        <span class="p">}</span>
+                    <span class="p">}</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;_all&quot;</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">es_request</span><span class="p">,</span> <span class="n">ignore_unavailable</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;hits&quot;</span><span class="p">][</span><span class="s2">&quot;hits&quot;</span><span class="p">][</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;_source&quot;</span><span class="p">][</span><span class="s2">&quot;dataset&quot;</span><span class="p">]</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.get_es_fieldname">
+    <p>def <span class="ident">get_es_fieldname</span>(</p><p>pointer)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.get_es_fieldname', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.get_es_fieldname" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_es_fieldname</span><span class="p">(</span><span class="n">pointer</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pointer</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;indexed_fields_</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">m</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.get_list_data_elasticsearch">
+    <p>def <span class="ident">get_list_data_elasticsearch</span>(</p><p>queries, index, sorts=[], autocomplete=&#39;&#39;, autocomplete_field_path=&#39;&#39;, autocomplete_size=1000, textsearch=&#39;&#39;, offset=0, limit=10, batch_ids_by_project=None)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Build a query for elasticsearch by going through the input query dictionaries
+Also add autocomplete if required by creating an aggregation</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.get_list_data_elasticsearch', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.get_list_data_elasticsearch" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_list_data_elasticsearch</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> <span class="n">index</span><span class="p">,</span> <span class="n">sorts</span><span class="o">=</span><span class="p">[],</span> <span class="n">autocomplete</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">autocomplete_field_path</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">autocomplete_size</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">MAX_AUTOCOMPLETE_SIZE</span><span class="p">,</span> <span class="n">textsearch</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">offset</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">limit</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">batch_ids_by_project</span><span class="o">=</span><span class="bp">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Build a query for elasticsearch by going through the input query dictionaries</span>
+<span class="sd">    Also add autocomplete if required by creating an aggregation&quot;&quot;&quot;</span>
+    <span class="n">es</span> <span class="o">=</span> <span class="n">elasticsearch</span><span class="o">.</span><span class="n">Elasticsearch</span><span class="p">()</span>
+    <span class="n">queries</span> <span class="o">=</span> <span class="n">remove_existing_queries_for_agg</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> <span class="n">autocomplete_field_path</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">queries</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span>  <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">textsearch</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span>  <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">es_request</span> <span class="o">=</span> <span class="p">{</span>  
+                    <span class="s2">&quot;query&quot;</span><span class="p">:{</span>
+                        <span class="s2">&quot;indices&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                            <span class="s2">&quot;indices&quot;</span> <span class="p">:</span> <span class="n">index</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;,&quot;</span><span class="p">),</span> <span class="c1">#We ran out of space in a GET request to put all of the indices in, so just using a query indead</span>
+                            <span class="s2">&quot;query&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                                <span class="s2">&quot;bool&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                                    <span class="s2">&quot;filter&quot;</span> <span class="p">:</span> <span class="p">[</span>    
+                                           <span class="n">build_es_request</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> 
+                                            <span class="n">textsearch</span><span class="o">=</span><span class="n">textsearch</span><span class="p">,</span> 
+                                            <span class="n">batch_ids_by_project</span><span class="o">=</span><span class="n">batch_ids_by_project</span><span class="p">)</span>
+                                    <span class="p">]</span>
+                                <span class="p">}</span>
+                            <span class="p">},</span>
+                            <span class="s2">&quot;no_match_query&quot;</span> <span class="p">:</span> <span class="s2">&quot;none&quot;</span>
+                        <span class="p">}</span>
+                    <span class="p">},</span>
+                    <span class="s2">&quot;sort&quot;</span> <span class="p">:</span> <span class="n">build_sorts</span><span class="p">(</span><span class="n">sorts</span><span class="p">),</span>
+                    <span class="s2">&quot;_source&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;include&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;*&quot;</span> <span class="p">],</span>
+                        <span class="s2">&quot;exclude&quot;</span><span class="p">:</span> <span class="p">[</span> <span class="s2">&quot;dataset.bigimage&quot;</span> <span class="p">]</span>
+                    <span class="p">},</span>
+                <span class="p">}</span>
+    
+    <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">index</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="c1">#No projects are included in the query </span>
+        <span class="c1">#but we must return a graceful response</span>
+        <span class="k">return</span> <span class="p">{</span>
+                 <span class="s2">&quot;hits&quot;</span><span class="p">:</span>
+                    <span class="p">{</span><span class="s2">&quot;total&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> 
+                       <span class="s2">&quot;hits&quot;</span> <span class="p">:</span> <span class="p">[]},</span> 
+                    <span class="s2">&quot;aggregations&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;filtered_field_path&quot;</span><span class="p">:{</span><span class="s2">&quot;unique_count&quot;</span> <span class="p">:{</span><span class="s2">&quot;value&quot;</span><span class="p">:</span> <span class="mi">0</span><span class="p">},</span><span class="s2">&quot;field_path_terms&quot;</span> <span class="p">:{</span><span class="s2">&quot;buckets&quot;</span><span class="p">:[]}}}</span>
+                <span class="p">}</span>
+                
+
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;You must input a query&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">autocomplete_field_path</span><span class="p">:</span>
+        <span class="n">es_request</span><span class="p">[</span><span class="s2">&quot;aggs&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_nested_aggregation_for_field_path</span><span class="p">(</span><span class="n">autocomplete_field_path</span><span class="p">,</span> <span class="n">autocomplete</span><span class="o">=</span><span class="n">autocomplete</span><span class="p">,</span> <span class="n">autocomplete_size</span><span class="o">=</span><span class="n">autocomplete_size</span><span class="p">)</span>
+    <span class="n">es_request</span><span class="p">[</span><span class="s2">&quot;from&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">offset</span>
+    <span class="n">es_request</span><span class="p">[</span><span class="s2">&quot;size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">limit</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">es</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="s2">&quot;_all&quot;</span><span class="p">,</span> <span class="n">body</span><span class="o">=</span><span class="n">es_request</span><span class="p">,</span> <span class="n">ignore_unavailable</span><span class="o">=</span><span class="bp">True</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">autocomplete_field_path</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">bucket</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;aggregations&quot;</span><span class="p">][</span><span class="s2">&quot;filtered_field_path&quot;</span><span class="p">][</span><span class="s2">&quot;field_path_terms&quot;</span><span class="p">][</span><span class="s2">&quot;buckets&quot;</span><span class="p">]:</span>
+            <span class="c1">#Replace the key of the bucket with the first normal case version of it</span>
+            <span class="k">for</span> <span class="n">correct_case_bucket</span> <span class="ow">in</span> <span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;correct_case&quot;</span><span class="p">][</span><span class="s2">&quot;buckets&quot;</span><span class="p">]:</span>
+                <span class="c1">#If there is a list field there will be choices to choose between - we must pick the</span>
+                <span class="c1">#Choice where the keys are equal but the correct case bucket may have different case</span>
+                <span class="k">if</span> <span class="n">unzeropad</span><span class="p">(</span><span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">])</span> <span class="o">==</span> <span class="n">correct_case_bucket</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                    <span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">correct_case_bucket</span><span class="p">[</span><span class="s2">&quot;key&quot;</span><span class="p">]</span>
+
+            <span class="k">del</span> <span class="n">bucket</span><span class="p">[</span><span class="s2">&quot;correct_case&quot;</span><span class="p">]</span>
+
+    <span class="k">return</span> <span class="n">data</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.get_list_of_indicies">
+    <p>def <span class="ident">get_list_of_indicies</span>(</p><p>project_ids)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.get_list_of_indicies', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.get_list_of_indicies" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_list_of_indicies</span><span class="p">(</span><span class="n">project_ids</span><span class="p">):</span>
+    <span class="n">list_of_indices</span> <span class="o">=</span> <span class="p">[</span><span class="n">get_project_index_name</span><span class="p">(</span><span class="n">project_id</span><span class="p">)</span> <span class="k">for</span> <span class="n">project_id</span> <span class="ow">in</span> <span class="n">project_ids</span><span class="p">]</span>
+    <span class="k">return</span> <span class="s2">&quot;,&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">list_of_indices</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.get_main_index_name">
+    <p>def <span class="ident">get_main_index_name</span>(</p><p>)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.get_main_index_name', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.get_main_index_name" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_main_index_name</span><span class="p">():</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">__</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ES_PREFIX</span><span class="p">,</span> <span class="n">ES_MAIN_INDEX_NAME</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.get_missing_items_position">
+    <p>def <span class="ident">get_missing_items_position</span>(</p><p>direction)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.get_missing_items_position', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.get_missing_items_position" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_missing_items_position</span><span class="p">(</span><span class="n">direction</span><span class="p">):</span>
+    <span class="n">position_of_missing_items</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;asc&quot;</span> <span class="p">:</span> <span class="s2">&quot;_last&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;desc&quot;</span> <span class="p">:</span> <span class="s2">&quot;_first&quot;</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="n">position_of_missing_items</span><span class="p">[</span><span class="n">direction</span><span class="p">]</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.get_nested_aggregation_for_field_path">
+    <p>def <span class="ident">get_nested_aggregation_for_field_path</span>(</p><p>autocomplete_field_path, autocomplete=&#39;&#39;, autocomplete_size=1000)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Based upon an input term and field_path, generate an aggregation to group by that field returning zero padded numbers to get the order right</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.get_nested_aggregation_for_field_path', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.get_nested_aggregation_for_field_path" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_nested_aggregation_for_field_path</span><span class="p">(</span><span class="n">autocomplete_field_path</span><span class="p">,</span> <span class="n">autocomplete</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">autocomplete_size</span><span class="o">=</span><span class="n">settings</span><span class="o">.</span><span class="n">MAX_AUTOCOMPLETE_SIZE</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Based upon an input term and field_path, generate an aggregation to group by that field returning zero padded numbers to get the order right&quot;&quot;&quot;</span>
+    <span class="n">es_fname</span> <span class="o">=</span> <span class="n">get_es_fieldname</span><span class="p">(</span><span class="n">autocomplete_field_path</span> <span class="p">)</span>
+    <span class="n">sortable_fname</span> <span class="o">=</span> <span class="n">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">autocomplete_field_path</span> <span class="p">)</span>
+    <span class="n">base_agg</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s2">&quot;field_path_terms&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                    <span class="s2">&quot;terms&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                        <span class="s2">&quot;field&quot;</span> <span class="p">:</span> <span class="n">sortable_fname</span><span class="p">,</span>
+                        <span class="s2">&quot;size&quot;</span> <span class="p">:</span> <span class="n">autocomplete_size</span><span class="p">,</span>
+                         <span class="s2">&quot;order&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;_term&quot;</span> <span class="p">:</span> <span class="s2">&quot;asc&quot;</span> <span class="p">},</span>
+                         
+                    <span class="p">},</span>
+                    <span class="s2">&quot;aggs&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                                <span class="s2">&quot;correct_case&quot;</span><span class="p">:</span>
+                                    <span class="p">{</span>
+                                        <span class="s2">&quot;terms&quot;</span> <span class="p">:</span> <span class="p">{</span>
+                                            <span class="s2">&quot;field&quot;</span> <span class="p">:</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.raw&quot;</span> <span class="o">%</span> <span class="n">es_fname</span><span class="p">,</span>
+                                            <span class="s2">&quot;size&quot;</span> <span class="p">:</span> <span class="mi">1</span><span class="p">,</span>
+                                             <span class="s2">&quot;order&quot;</span> <span class="p">:</span> <span class="p">{</span> <span class="s2">&quot;_term&quot;</span> <span class="p">:</span> <span class="s2">&quot;asc&quot;</span> <span class="p">},</span>
+                                        <span class="p">}</span>
+                                    <span class="p">}</span>
+                    <span class="p">}</span>
+                <span class="p">},</span>
+                <span class="s2">&quot;unique_count&quot;</span><span class="p">:</span> <span class="p">{</span>
+                                    <span class="s2">&quot;cardinality&quot;</span> <span class="p">:</span> 
+                                    <span class="p">{</span>
+                                    <span class="s2">&quot;field&quot;</span> <span class="p">:</span> <span class="n">sortable_fname</span>
+                                    <span class="p">}</span>
+                <span class="p">}</span>
+            <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">autocomplete</span><span class="p">:</span>
+        <span class="c1">#If there is a search term, then, having applied a set of filters to the data (project, other search terms)</span>
+        <span class="c1">#We then try to apply a term filter to the data being aggregated for the search term being looked for</span>
+        <span class="n">query</span> <span class="o">=</span>  <span class="n">build_phase_prefix_query</span><span class="p">(</span><span class="n">autocomplete</span><span class="p">,</span> <span class="n">autocomplete_field_path</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">query</span> <span class="o">=</span> <span class="p">{</span> <span class="s2">&quot;match_all&quot;</span><span class="p">:</span> <span class="p">{}</span> <span class="p">}</span>
+
+    <span class="n">base_agg</span> <span class="o">=</span> <span class="p">{</span> 
+                <span class="s2">&quot;filtered_field_path&quot;</span><span class="p">:</span>
+                        <span class="p">{</span>
+                        <span class="s2">&quot;filter&quot;</span> <span class="p">:</span> <span class="n">query</span><span class="p">,</span>
+                        <span class="s2">&quot;aggs&quot;</span> <span class="p">:</span> <span class="n">base_agg</span>
+
+                        <span class="p">}</span>
+                <span class="p">}</span>
+                    
+  
+    <span class="k">return</span> <span class="n">base_agg</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.get_project_index_name">
+    <p>def <span class="ident">get_project_index_name</span>(</p><p>project_id)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.get_project_index_name', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.get_project_index_name" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_project_index_name</span><span class="p">(</span><span class="n">project_id</span><span class="p">):</span>
+    <span class="c1">#return get_main_index_name()</span>
+    <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">__</span><span class="si">%s</span><span class="s2">__project__</span><span class="si">%d</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">ES_PREFIX</span><span class="p">,</span> <span class="n">ES_MAIN_INDEX_NAME</span><span class="p">,</span> <span class="n">project_id</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.get_sortable_es_fieldname">
+    <p>def <span class="ident">get_sortable_es_fieldname</span>(</p><p>pointer)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.get_sortable_es_fieldname', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.get_sortable_es_fieldname" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">get_sortable_es_fieldname</span><span class="p">(</span><span class="n">pointer</span><span class="p">):</span>
+    <span class="n">m</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">md5</span><span class="p">()</span>
+    <span class="n">m</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">pointer</span><span class="p">)</span>
+    <span class="k">return</span> <span class="s2">&quot;sortable_fields_</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="n">m</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.index_dataset">
+    <p>def <span class="ident">index_dataset</span>(</p><p>batch_dicts, schema_list, index_names, refresh=True)</p>
+    </div>
+    
+
+    
+  
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.index_dataset', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.index_dataset" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">index_dataset</span><span class="p">(</span> <span class="n">batch_dicts</span><span class="p">,</span> <span class="n">schema_list</span><span class="p">,</span> <span class="n">index_names</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="bp">True</span><span class="p">):</span>
+    <span class="n">build_all_indexed_fields</span><span class="p">(</span><span class="n">batch_dicts</span><span class="p">,</span> <span class="n">schema_list</span><span class="p">)</span>
+    <span class="n">es_reindex</span> <span class="o">=</span> <span class="n">create_index</span><span class="p">(</span>
+                <span class="n">batch_dicts</span><span class="p">,</span> <span class="n">index_names</span><span class="p">,</span> <span class="n">refresh</span><span class="o">=</span><span class="n">refresh</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">es_reindex</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;errors&quot;</span><span class="p">):</span>
+        <span class="k">print</span> <span class="s2">&quot;ERRORS&quot;</span>
+        <span class="k">print</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">es_reindex</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="s2">&quot;indexing failed&quot;</span><span class="p">)</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.remove_existing_queries_for_agg">
+    <p>def <span class="ident">remove_existing_queries_for_agg</span>(</p><p>queries, autocomplete_field_path)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>We are trying to provide an aggregated autocomplete for a particular field
+Therefore if a query has already been applied to that field, we need to remove that subquery</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.remove_existing_queries_for_agg', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.remove_existing_queries_for_agg" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">remove_existing_queries_for_agg</span><span class="p">(</span><span class="n">queries</span><span class="p">,</span> <span class="n">autocomplete_field_path</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;We are trying to provide an aggregated autocomplete for a particular field</span>
+<span class="sd">    Therefore if a query has already been applied to that field, we need to remove that subquery&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="n">autocomplete_field_path</span><span class="p">:</span>
+        <span class="n">new_queries</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">q</span> <span class="ow">in</span> <span class="n">queries</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">q</span><span class="p">[</span><span class="s2">&quot;field_path&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">autocomplete_field_path</span><span class="p">:</span>
+                <span class="n">new_queries</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">q</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">new_queries</span>
+    <span class="k">return</span> <span class="n">queries</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.unzeropad">
+    <p>def <span class="ident">unzeropad</span>(</p><p>input_string)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Remove zero padding from integers and floats</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.unzeropad', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.unzeropad" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">unzeropad</span><span class="p">(</span><span class="n">input_string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Remove zero padding from integers and floats&quot;&quot;&quot;</span>
+    <span class="n">replace_up_to</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_string</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">input_string</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;0&quot;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">input_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                <span class="k">for</span> <span class="n">index</span><span class="p">,</span> <span class="n">char</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">input_string</span><span class="p">):</span>
+                    <span class="k">if</span> <span class="n">char</span> <span class="o">!=</span> <span class="s2">&quot;0&quot;</span><span class="p">:</span>
+                        <span class="n">replace_up_to</span> <span class="o">=</span> <span class="n">index</span>
+                        <span class="c1">#found the first non zero so break</span>
+                        <span class="k">break</span> 
+    <span class="k">return</span> <span class="n">input_string</span><span class="p">[</span><span class="n">replace_up_to</span><span class="p">:]</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+      
+  <div class="item">
+    <div class="name def" id="cbh_utils.elasticsearch_client.zeropad">
+    <p>def <span class="ident">zeropad</span>(</p><p>input_string)</p>
+    </div>
+    
+
+    
+  
+    <div class="desc"><p>Zero pad integers and floats to ensure that they can be sorted correctly</p></div>
+  <div class="source_cont">
+  <p class="source_link"><a href="javascript:void(0);" onclick="toggle('source-cbh_utils.elasticsearch_client.zeropad', this);">Show source &equiv;</a></p>
+  <div id="source-cbh_utils.elasticsearch_client.zeropad" class="source">
+    <div class="codehilite"><pre><span></span><span class="k">def</span> <span class="nf">zeropad</span><span class="p">(</span><span class="n">input_string</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Zero pad integers and floats to ensure that they can be sorted correctly&quot;&quot;&quot;</span>
+    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">input_string</span><span class="p">,</span> <span class="nb">basestring</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">input_string</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">:</span>
+            <span class="k">if</span> <span class="n">input_string</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                <span class="k">if</span> <span class="s2">&quot;.&quot;</span> <span class="ow">in</span> <span class="n">input_string</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">input_string</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                        <span class="n">data</span> <span class="o">=</span> <span class="n">input_string</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+                        
+                        <span class="k">return</span> <span class="s2">&quot;</span><span class="si">%s</span><span class="s2">.</span><span class="si">%s</span><span class="s2">&quot;</span> <span class="o">%</span> <span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">13</span><span class="p">),</span> <span class="n">data</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+                <span class="k">elif</span> <span class="n">input_string</span><span class="o">.</span><span class="n">isdigit</span><span class="p">():</span>
+                    <span class="k">return</span> <span class="n">input_string</span><span class="o">.</span><span class="n">zfill</span><span class="p">(</span><span class="mi">13</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">input_string</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+    <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">input_string</span><span class="p">,</span> <span class="s1">&#39;__iter__&#39;</span><span class="p">)</span> <span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;we expect a list here&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">zeropad</span><span class="p">(</span><span class="n">string</span><span class="p">)</span> <span class="k">for</span> <span class="n">string</span> <span class="ow">in</span> <span class="n">input_string</span><span class="p">]</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">input_string</span>
+</pre></div>
+
+  </div>
+</div>
+
+  </div>
+  
+
+
+  </section>
+
+    </article>
+  <div class="clear"> </div>
+  <footer id="footer">
+    <p>
+      Documentation generated by
+      <a href="https://github.com/BurntSushi/pdoc">pdoc 0.3.2</a>
+    </p>
+
+    <p>pdoc is in the public domain with the
+      <a href="http://unlicense.org">UNLICENSE</a></p>
+
+    <p>Design by <a href="http://nadh.in">Kailash Nadh</a></p>
+  </footer>
+</div>
+</body>
+</html>

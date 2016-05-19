@@ -125,6 +125,9 @@ from django.contrib.auth.models import User
 import six
 from tastypie.serializers import Serializer
 from cbh_core_api.tasks import remove_session_cached_projectlists
+from django.contrib.auth.models import User
+
+
 
 def build_content_type(format, encoding='utf-8'):
     """
@@ -398,7 +401,6 @@ class ChemregProjectResource(UserHydrate, ModelResource):
                                             'custom_field_config', blank=False, null=False, full=True, help_text="The single custom field config object attached to this project")
     valid_cache_get_keys = ['format', 'limit', 'project_key',
                             'schemaform']
-    assays_configured = fields.BooleanField(default=False, help_text="deprecated")
     created_by = fields.ForeignKey(
         "cbh_core_api.resources.UserResource", 'created_by', help_text="The user who created this Project")
     users_restricted_fields = fields.ListField(default=[], help_text="Possibly deprecated, was meant to list the restricted fields")
@@ -622,25 +624,6 @@ class CBHNoSerializedDictField(fields.ApiField):
     """
     dehydrated_type = 'dict'
     help_text = "A dictionary of data. Ex: {'price': 26.73, 'name': 'Daniel'}"
-
-    # def convert(self, value):
-       
-    #     data = dict(value)
-    #     for k, v in data.iteritems():
-    #         if isinstance(v, basestring):
-    #             if v:
-    #                 if v.startswith("[") and v.endswith("]"):
-    #                     try:
-    #                         data[k] = json.loads(v)
-    #                     except ValueError:
-    #                         pass
-    #                 if v[0] == u"{" and v[-1] == u"}":
-    #                     try:
-    #                         data[k] = json.loads(v)                        
-    #                     except ValueError:
-    #                         pass
-    #     return data
-
 
 
 
@@ -1270,7 +1253,6 @@ class InvitationResource(UserHydrate, ModelResource):
         return rc
 
 
-from django.contrib.auth.models import User
 
 class UserResource(ModelResource):
     '''Displays information about the User's privileges and personal data'''

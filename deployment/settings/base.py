@@ -49,7 +49,7 @@ INSTALLED_APPS = (
         'django_q',
         'cbh_tests',
           'cbh_datastore_model', #just to get rid of some things
-
+        'cbh_utils',
 
    )
 
