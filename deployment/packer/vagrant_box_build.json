@@ -4,7 +4,7 @@
   "type": "virtualbox-ovf",
   "source_path": "output-virtualbox-iso/packer-virtualbox-iso-1463655901.ovf",
   "ssh_username": "vagrant",
-  "ssh_password": "vagrant"
+  "ssh_password": "vagrant",       "headless": true
 }],
 "provisioners": [
    {
@@ -12,7 +12,7 @@
       "execute_command": "bash '{{.Path}}'",
       "override": {
         
-        "virtualbox-iso": {
+        "virtualbox-ovf": {
           "execute_command": "bash '{{.Path}}'",
           "scripts": [
             "build_vagrant_box_from_base_box.sh"

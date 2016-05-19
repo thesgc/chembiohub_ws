@@ -77,18 +77,7 @@
   ],
 
   "post-processors": [
-    {
-      "type": "compress"
-    },
-    {
-      "type": "vagrant",
-      "only": ["virtualbox-iso"],
-      "override": {
-        "virtualbox": {
-          "output": "ubuntu-14-04-x64-virtualbox.box"
-        }
-      }
-    }
+  
   ],
 
   "variables": {
