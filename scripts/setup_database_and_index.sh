@@ -3,7 +3,10 @@ set -e
 export ENV_NAME="$1"
 OLD_PATH="$PATH"
 
-sudo service supervisor restart
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl restart all
+
 sleep 10
 #source activate $ENV_NAME
 

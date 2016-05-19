@@ -56,23 +56,6 @@
           ]
         }
       }
-    },
-    {
-      "type": "shell",
-      "execute_command": "bash '{{.Path}}'",
-      "override": {
-        "amazon-ebs": {
-          "scripts": [
-            "db_and_index.sh"
-          ]
-        },
-        "virtualbox-iso": {
-          "execute_command": "bash '{{.Path}}'",
-          "scripts": [
-            "db_and_index_vagrant.sh"
-          ]
-        }
-      }
     }
   ],
 
