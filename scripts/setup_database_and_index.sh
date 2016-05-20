@@ -4,6 +4,7 @@ export ENV_NAME="$1"
 OLD_PATH="$PATH"
 mkdir -p /home/$2/anaconda2/envs/$ENV_NAME/var/postgressocket/
 
+sudo service supervisor start
 sudo supervisorctl reread
 sudo supervisorctl update
 sudo supervisorctl reload
