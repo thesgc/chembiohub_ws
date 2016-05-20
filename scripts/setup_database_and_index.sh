@@ -1,11 +1,10 @@
-set -e
+
  #Start postgres in foreground
 export ENV_NAME="$1"
 OLD_PATH="$PATH"
 mkdir -p /home/$2/anaconda2/envs/$ENV_NAME/var/postgressocket/
+
 sudo service supervisor restart
-
-
 sudo supervisorctl reread
 sudo supervisorctl update
 sudo supervisorctl restart all
@@ -13,6 +12,7 @@ sudo supervisorctl restart all
 printf "sleeping"
 
 sleep 10
+printf "finished sleeping"
 #source activate $ENV_NAME
 
 export CONDA_ENV_PATH=/home/$2/anaconda2/envs/$ENV_NAME
