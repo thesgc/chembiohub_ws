@@ -2,7 +2,7 @@
   "builders": [
    {
   "type": "virtualbox-ovf",
-  "source_path": "output-virtualbox-iso/packer-virtualbox-iso-1463655901.ovf",
+  "source_path": "output-virtualbox-iso/packer-virtualbox-iso-1463762806.ovf",
   "ssh_username": "vagrant",
   "ssh_password": "vagrant",       "headless": true
 }],
@@ -19,7 +19,22 @@
           ]
         }
       }
-    }],
+    },
+{
+      "type": "shell",
+      "execute_command": "bash '{{.Path}}'",
+      "override": {
+
+        "virtualbox-ovf": {
+          "execute_command": "bash '{{.Path}}'",
+          "scripts": [
+            "db_and_index_vagrant.sh"
+          ]
+        }
+      }
+    }
+
+],
  "post-processors": [
     {
       "type": "vagrant",
