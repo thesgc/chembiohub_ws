@@ -551,7 +551,6 @@ class CBHCompoundUploadResource(ModelResource):
             id, request.GET, request, bundledata=to_be_serialized)
         index_name = elasticsearch_client.get_temp_index_name(request, id)
         elasticsearch_client.get_action_totals(index_name, to_be_serialized)
-        to_be_serialized = self.alter_list_data_to_serialize(request, to_be_serialized, permanent_data=False)
         return self.create_response(request, to_be_serialized)
 
     def post_validate_list(self, request, **kwargs):
