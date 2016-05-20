@@ -2,7 +2,10 @@ sudo apt-get install -y openjdk-7-jre-headless
 wget -qO - https://packages.elastic.co/GPG-KEY-elasticsearch | sudo apt-key add -
 echo "deb http://packages.elastic.co/elasticsearch/2.x/debian stable main" | sudo tee -a /etc/apt/sources.list.d/elasticsearch-2.x.list
 sudo add-apt-repository ppa:chris-lea/node.js -y
-sudo apt-get update && sudo apt-get install elasticsearch nodejs
+sudo apt-get update
+sudo apt-get install elasticsearch  -y
+sudo apt-get install  nodejs -y
+
 sudo update-rc.d elasticsearch defaults 95 10
 sudo service elasticsearch start
 sudo add-apt-repository ppa:chris-lea/redis-server -y
