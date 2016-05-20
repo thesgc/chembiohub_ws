@@ -7,19 +7,6 @@
   "ssh_password": "vagrant",       "headless": true
 }],
 "provisioners": [
-   {
-      "type": "shell",
-      "execute_command": "bash '{{.Path}}'",
-      "override": {
-        
-        "virtualbox-ovf": {
-          "execute_command": "bash '{{.Path}}'",
-          "scripts": [
-            "build_vagrant_box_from_base_box.sh"
-          ]
-        }
-      }
-    },
 {
       "type": "shell",
       "execute_command": "bash '{{.Path}}'",
@@ -32,8 +19,23 @@
           ]
         }
       }
-    }
+    },
+ 
 
+
+  {
+      "type": "shell",
+      "execute_command": "bash '{{.Path}}'",
+      "override": {
+        
+        "virtualbox-ovf": {
+          "execute_command": "bash '{{.Path}}'",
+          "scripts": [
+            "build_vagrant_box_from_base_box.sh"
+          ]
+        }
+      }
+    }
 ],
  "post-processors": [
     {
