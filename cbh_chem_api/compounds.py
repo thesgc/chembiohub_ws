@@ -222,7 +222,6 @@ class CBHCompoundUploadResource(ModelResource):
         deserialized = self.deserialize(request, request.body, format=request.META.get(
             'CONTENT_TYPE', 'application/json'))
 
-        print time.time()
         deserialized = self.alter_deserialized_detail_data(
             request, deserialized)
 
@@ -249,7 +248,6 @@ class CBHCompoundUploadResource(ModelResource):
         bundle.data["saved"] = 0
         bundle.data["ignored"] = 0
         datasets = []
-        print time.time()
         for run in [0,1,2]:
             bundles = self.get_cached_temporary_batch_data(
                 mb.id,  {"query": '{"term" : {"properties.action.raw" : "New Batch"}}',"limit": limit, "offset": offset, "sorts": '[{"id": {"order": "desc"}}]'}, request)
@@ -275,14 +273,10 @@ class CBHCompoundUploadResource(ModelResource):
             if len(set_of_batches["objects"]) == 0:
                 hasMoreData = None
 
-        print time.time()
-        print "async"
         id = async_iter("cbh_chem_api.tasks.process_batch_list", [ds for ds in datasets])
         lists_of_batches = result(id, wait=100000)
         batches = [inner for outer in lists_of_batches for inner in outer]
-        print time.time()
         index_batches_in_new_index(batches)
-        print time.time()
         elasticsearch_client.delete_index(
             elasticsearch_client.get_temp_index_name(request, mb.id))
         
@@ -393,7 +387,6 @@ class CBHCompoundUploadResource(ModelResource):
 
     def validate_multi_batch(self, multi_batch, bundle, request, batches):
         """Generate a set of staticstics about a set of data that has been uploaded"""
-        print time.time()
         batches_not_errors = [batch for batch in batches if batch and not batch.warnings.get(
             "parseerror", None) and not batch.warnings.get("smilesParseError", None)]
 
@@ -412,8 +405,6 @@ class CBHCompoundUploadResource(ModelResource):
         text_file = open(filename, "w")
         text_file.write(sdf)
         text_file.close()
-        print "build file"
-        print time.time()
         from subprocess import PIPE, Popen
         p = Popen([settings.INCHI_BINARIES_LOCATION['1.02'],
                    "-STDIO",  filename], stdout=PIPE, stderr=PIPE)
@@ -428,8 +419,6 @@ class CBHCompoundUploadResource(ModelResource):
         error_locs = []
 
         #a[0] holds the generated inchis. a[1] holds all of the error and warning information (if any)
-        print "inchis"
-        print time.time()
         errorparts = a[1].split("\nError")
         if(len(errorparts) > 1):
             for i, errorp in enumerate(errorparts):
@@ -536,18 +525,14 @@ class CBHCompoundUploadResource(ModelResource):
         bundle.data["compoundstats"]["duplicatenew"] = len(duplicate_new)
         bundle.data["multiplebatch"] = multi_batch.pk
 
-        print "saving to es"
-        print time.time()
         fifty_batches_for_first_page = self.set_cached_temporary_batches(
             batches, multi_batch.id, request)
-        print time.time()
         multi_batch.uploaded_data = bundle.data
         multi_batch.save()
         #bundle.data["objects"] = fifty_batches_for_first_page
         index_name = elasticsearch_client.get_temp_index_name(
             request, multi_batch.id)
         elasticsearch_client.get_action_totals(index_name, bundle.data)
-        print time.time()
         return self.create_response(request, bundle, response_class=http.HttpAccepted)
 
     def get_part_processed_multiple_batch(self, request, **kwargs):
@@ -825,7 +810,8 @@ class CBHCompoundUploadResource(ModelResource):
                     raise BadRequest("file_too_large")
                 # read the smiles string value out of here, when we know which
                 # column it is.
-                multiple_batch.batch_count = df.index
+                
+                multiple_batch.batch_count = df.shape[0]
                 row_iterator = df.iterrows()
                 headers = list(df)
                 headers = [h.replace(".", "__") for h in headers]

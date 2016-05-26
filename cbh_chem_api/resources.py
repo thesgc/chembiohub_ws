@@ -473,7 +473,6 @@ class BaseCBHCompoundBatchResource(ModelResource):
 
         # Save FKs just in case.
         self.save_related(bundle)
-        print "got"
 
         # Save the main object.
         obj_id = self.create_identifier(bundle.obj)
@@ -559,7 +558,6 @@ class BaseCBHCompoundBatchResource(ModelResource):
             if not batch_result:
                 return HttpResponse('{"error": "Unable to process structure search"}', status=503)
             else:
-                print batch_result
                 batch_ids_by_project = batch_result[0]
         if request.GET.get("format", None) != "sdf" and request.GET.get("format", None) != "xlsx":
             data = elasticsearch_client.get_list_data_elasticsearch(queries,
@@ -684,8 +682,6 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
 
     def index_batch_list(self, request, batch_list, project_and_indexing_schemata, refresh=True):
         """Index a list or queryset of compound batches into the elasticsearch indices (one index per project)"""
-        print "indexing"
-        print time.time()
         request.GET = request.GET.copy()
         request.GET["limit"] = "10000"
         ids = {b.created_by_id  for b in batch_list}
@@ -696,14 +692,10 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         request.GET["id__in"] = ",".join(no_none)
         user_list = json.loads(UserResource().get_list(request).content)
         user_lookup = { u["resource_uri"]: u for u in user_list["objects"] }
-        print "indexing2"
-        print time.time()
         bundles = [
             self.full_dehydrate(self.build_bundle(obj=obj, request=request), for_list=True)
             for obj in batch_list
         ]
-        print "indexing3"
-        print time.time()
 
         #retrieve schemas which tell the elasticsearch request which fields to index for each object (we avoid deserializing a single custom field config more than once)
         #Now make the schema list parallel to the batches list
@@ -721,13 +713,9 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
             index_name = elasticsearch_client.get_project_index_name(batch["projectfull"]["id"])
             index_names.append(index_name)
             batch["userfull"] = user_lookup.get(batch["creator"], {"display_name" : "User Deleted"})
-        print "indexing4"
-        print time.time()
         batch_dicts = elasticsearch_client.index_dataset(batch_dicts, indexing_schemata, index_names, refresh=refresh)
         
         
-        print "indexing5"
-        print time.time()
             
 
     def reindex_elasticsearch(self, request, **kwargs):
