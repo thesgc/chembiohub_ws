@@ -367,7 +367,10 @@ def before_scenario(context, scenario):
 def after_scenario(context, scenario):
     # Tear down the scenario test environment.
     # context.runner.teardown_databases(context.old_db_config)
-
+    try:
+        os.remove("qclusterprocesslog.log")
+    except OSError:
+        pass
     context.api_client.client.logout()
     if hasattr(context, "django_q_process"):
         try:
