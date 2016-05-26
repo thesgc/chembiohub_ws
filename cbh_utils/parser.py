@@ -128,9 +128,11 @@ def parse_pandas_record(headers, obj, destination_field, row, fielderrors, heade
 def get_uncurated_fields_from_file(correct_file, fielderrors):
     data = correct_file.file.read().decode('string-escape').decode("utf-8", "ignore")
     data = data.replace("\r\n", "\n").replace("\r", "\n")
-    ctabs = data.split("$$$$")
+    ctabs = data.split("$$$$\n")
     uncurated = []
-    for ctab in ctabs:
+    length = len(ctabs)
+    ctab_parts = []
+    for index, ctab in enumerate(ctabs):
         pns = re.findall(r'> *<(.+)> *\S*\n+(.+)\n+',ctab)
         blinded_uncurated_fields = {}
         for key, value in pns:
@@ -138,7 +140,22 @@ def get_uncurated_fields_from_file(correct_file, fielderrors):
             test_specific_parse_errors(key,value, fielderrors)
 
         uncurated.append(blinded_uncurated_fields)
-    return (uncurated, ctabs)
+        if index  == length -1:
+            
+            if ctab.strip():
+                # The last item may not have a line break
+                # And therefore the dollars must be removed
+                ctabs[index] = ctab.split("$$$$")[0]
+            else:
+                # If the last item is empty it is not 
+                # a real ctab so skip it
+                ctabs = ctabs[:-1]
+                continue
+
+        ctab_part = ctab.split("END\n")[0] + "END"
+        ctab_parts.append(ctab_part)
+
+    return (uncurated, ctabs, ctab_parts)
 
 def test_specific_parse_errors(hdr, value, fielderrors):
     if hdr not in fielderrors["stringdate"]:

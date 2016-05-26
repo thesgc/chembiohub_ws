@@ -1,0 +1,1 @@
+ln -s /srv/chembiohub /home/vagrant/syw/code

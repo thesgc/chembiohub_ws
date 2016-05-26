@@ -29,6 +29,8 @@ AGG_TERMS_SEPARATOR = "|||"
 
 BATCH_TYPE_NAME = "hashbatches"
 import hashlib
+from copy import deepcopy
+
 
 ELASTICSEARCH_MAX_FIELD_LENGTH = 256
 
@@ -81,7 +83,7 @@ ELASTICSEARCH_INDEX_MAPPING = {
         },
         "mappings": {
             BATCH_TYPE_NAME: {
-                "dynamic": True,
+                "dynamic": False,
                 "_all": {"enabled": False},
                 "date_detection": False,
                 "properties":{
@@ -97,40 +99,8 @@ ELASTICSEARCH_INDEX_MAPPING = {
                     "excludes": [
                       "indexed_fields_*", "sortable_fields_*",
                     ]
-                  },
-                "dynamic_templates": [
-                    {
-                    "indexed_fields": {
-                        "match": "indexed_fields_*",
-                        "match_mapping_type": "string",
-                        "mapping": {
-                            "type": "string", 
-                            "index_options": "positions", 
-                            "index": "analyzed", 
-                            "omit_norms": True, 
-                            "analyzer" : "default_index",
-                            "type": "string", 
-                            "store": "no", 
-                            "fields": {
-                                    "raw": {"type": "string", "store": "no", "index": "not_analyzed", "ignore_above": ELASTICSEARCH_MAX_FIELD_LENGTH}
-                                }
-                            }
-                        }
-                    },
-                    {
-                    "sortable_fields": {
-                        "match": "sortable_fields_*",
-                        "match_mapping_type": "string",
-                        "mapping": {
-                            "type": "string", "store": "no", "analyzer" : "lowercasekeywordanalyzer", "index": "analyzed", "ignore_above": ELASTICSEARCH_MAX_FIELD_LENGTH
-                        }
-                    },
-                    }
-
-              
-               
-               
-                ]
+                  }
+                
                 
             }
         }
@@ -188,6 +158,7 @@ def get_sortable_es_fieldname(pointer):
 
 def build_indexed_fields(document, schema):
     to_index = {"dataset" : document}
+
     
     for field in schema:
         slashed_json_pointer = "/%s" % field["data"].replace(".", "/")
@@ -204,6 +175,32 @@ def build_indexed_fields(document, schema):
             to_index[sortable] = zeropad(value)
     return to_index
 
+def build_mapping_definitions(schema):
+    body = deepcopy(ELASTICSEARCH_INDEX_MAPPING)
+    
+    
+    for field in schema:
+        fieldname = get_es_fieldname(field["data"])
+        sortable = get_sortable_es_fieldname(field["data"])
+        body["mappings"][BATCH_TYPE_NAME]["properties"][fieldname] = {
+                            "type": "string", 
+                            "index_options": "positions", 
+                            "index": "analyzed", 
+                            "omit_norms": True, 
+                            "analyzer" : "default_index",
+                            "type": "string", 
+                            "store": "no", 
+                            "fields": {
+                                    "raw": {"type": "string", "store": "no", "index": "not_analyzed", "ignore_above": ELASTICSEARCH_MAX_FIELD_LENGTH}
+                                }
+                            }
+        body["mappings"][BATCH_TYPE_NAME]["properties"][sortable] = {
+                            "type": "string", "store": "no", "analyzer" : "lowercasekeywordanalyzer", "index": "analyzed", "ignore_above": ELASTICSEARCH_MAX_FIELD_LENGTH
+                        }
+    return body
+
+
+
 
 
 def build_all_indexed_fields(batch_dicts, schema_list):
@@ -215,29 +212,25 @@ def build_all_indexed_fields(batch_dicts, schema_list):
 
 
 def index_dataset( batch_dicts, schema_list, index_names, refresh=True):
+
     build_all_indexed_fields(batch_dicts, schema_list)
-    es_reindex = create_index(
-                batch_dicts, index_names, refresh=refresh)
+
+    es_reindex = add_data_to_index(
+                batch_dicts, index_names, schema_list, refresh=refresh)
     if es_reindex.get("errors"):
-        print "ERRORS"
-        print json.dumps(es_reindex)
+        print ("ERRORS")
+        print (json.dumps(es_reindex))
         raise Exception("indexing failed")
 
 
 
-def create_index(batches, index_names, refresh=True):
-    es = elasticsearch.Elasticsearch()
-    t = time.time()
-
-    for index_name in index_names:
-        es.indices.create(
-        index_name,
-        body=ELASTICSEARCH_INDEX_MAPPING,
-        ignore=400)
-
-    bulk_items = []
-    result = {}
+def add_data_to_index(batches, index_names, schema_list,  refresh=True):
+    
     if len(batches) > 0:
+        es = elasticsearch.Elasticsearch()
+
+        bulk_items = []
+        result = {}
         if len(batches) == 1:
             bid = batches[0]["dataset"].get("id", None)
             es.index(index=index_names[0], 
@@ -287,7 +280,6 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
         #We then join these ids queries on a per project basis
         match_these_ids_by_index = []
         for search_dict in batch_ids_by_project:
-            print search_dict
             index_names = [get_project_index_name(search_dict["project_id"]),]
 
             batch_ids = search_dict["batch_ids"]
@@ -303,7 +295,6 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
                                     "no_match_query" : "none"
                                 }
                             }
-            print index_query
             match_these_ids_by_index.append(index_query)
 
         #Each document should be in the specified ID list for the project it is in
@@ -564,7 +555,17 @@ def zeropad(input_string):
         return input_string
     
 
-
+def create_or_update_index(index_name, tabular_data_schema):
+    es = elasticsearch.Elasticsearch()
+    create_body = build_mapping_definitions(tabular_data_schema)
+    try:
+        es.indices.create(
+            index_name,
+            body=create_body)
+    except elasticsearch.exceptions.RequestError:
+        es.indices.put_mapping(doc_type=BATCH_TYPE_NAME,
+            index=index_name, 
+            body=create_body["mappings"][BATCH_TYPE_NAME])
 
 def unzeropad(input_string):
     """Remove zero padding from integers and floats"""

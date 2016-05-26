@@ -149,7 +149,6 @@ def _parseMolData(data):
              #check for overlapping molecules in the CTAB 
             SanitizeMol(x)
             Compute2DCoords(x)
-            print "testr"
     return data
 
 def _mols2imageStream(mols, f, format, size, legend, highlightMatch=None):
@@ -275,6 +274,7 @@ class CBHCompoundMultipleBatch(TimeStampedModel):
     uploaded_file = models.ForeignKey(
         "cbh_core_model.CBHFlowFile", null=True, blank=True, default=None, help_text="File that was uploaded to generate this multiple batch")
     saved = models.BooleanField(default=False, help_text="Whether this multiple batch has been saved or not")
+    batch_count = models.IntegerField(default=0)
 
 
 class CBHCompoundBatch(TimeStampedModel):

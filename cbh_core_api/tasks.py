@@ -18,6 +18,7 @@ def init_session(session_key):
     return engine.SessionStore(session_key)
 
 
+
 def remove_session_cached_projectlists():
     """
     Remove the session cached project lists from all sessions

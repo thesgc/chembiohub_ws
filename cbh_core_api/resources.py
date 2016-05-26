@@ -127,7 +127,7 @@ from tastypie.serializers import Serializer
 from cbh_core_api.tasks import remove_session_cached_projectlists
 from django.contrib.auth.models import User
 
-
+from cbh_utils import elasticsearch_client
 
 def build_content_type(format, encoding='utf-8'):
     """
@@ -544,7 +544,7 @@ class ChemregProjectResource(UserHydrate, ModelResource):
         return bundle
 
 
-    def alter_detail_data_to_serialize(self, request, bundle):
+    def alter_detail_data_to_serialize(self, request, bundle, tabular_data_schema=False):
         """
         Currently does not do all the things done by alter list data and perhaps better not to
         as this function is used to update a project 
@@ -566,7 +566,6 @@ class ChemregProjectResource(UserHydrate, ModelResource):
         return bundle
 
    
-
 
 
     def create_response(
@@ -601,9 +600,61 @@ class ChemregProjectResource(UserHydrate, ModelResource):
                 if "projects_list_cache" in request.session:
                     del request.session["projects_list_cache"]
             remove_session_cached_projectlists()
+
+            create_or_update_project_index(data.obj.id)
         return rc
+    
+def create_or_update_project_index(project_id):
+    project_json_with_tabular_schema = get_schemata([project_id,])
+    for pd in project_json_with_tabular_schema:
+        #There is only one pd!
+        pass
+    index_name = elasticsearch_client.get_project_index_name(project_id)
+    elasticsearch_client.create_or_update_index(index_name, pd["tabular_data_schema"]["for_indexing"])
 
 
+def get_schemata(project_ids, fieldlist_name="indexing", request=None):
+    if project_ids is None:
+        project_ids = get_model("cbh_core_model","Project").objects.filter().values_list("id", flat=True)
+    crp = ChemregProjectResource()
+    request_factory = RequestFactory()
+    user = get_user_model().objects.filter(is_superuser=True)[0]
+    
+ 
+    for pid in project_ids:
+        req = request_factory.get("/")
+        if request:
+
+            #Ensures that the restricted fields are obeyed if downloading data
+            #Note that we cannot use the request raw because it will try to export XLSX because
+            #of the way that tastypie works
+            req.user = request.user
+        else:
+            #If this request is coming from the reindex_all_compounds request then we need to
+            #Ensure that a superuser is aganst the request so we have access to all fields
+            req.user = user
+        req.GET = req.GET.copy()
+        req.GET["tabular_data_schema"] = True
+
+        data = crp.get_detail(req, pk=pid)
+
+        projdata = json.loads(data.content)
+        projdata["tabular_data_schema"]["for_%s" % fieldlist_name] = [ projdata["tabular_data_schema"]["schema"][field] 
+                                  for field in projdata["tabular_data_schema"]["included_in_tables"][fieldlist_name]["default"]]
+        yield projdata
+
+
+def get_indexing_schemata(project_ids, fieldlist_name="indexing"):
+    """Get a cached version of the project schemata in the right format 
+    for elasticsearch indexing or for retrieving the Excel backup of the data"""
+
+    proj_datasets = get_schemata(project_ids, fieldlist_name="indexing")
+        #Do the dict lookups now to avoid multiple times later
+    projdatadict = {}
+    for projdata in proj_datasets:
+        projdatadict[projdata["resource_uri"]] = projdata
+
+    return projdatadict
 
 class NoCustomFieldsChemregProjectResource(ChemregProjectResource):
     """A class for use in related resources in cases where 

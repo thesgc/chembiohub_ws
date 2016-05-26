@@ -1,7 +1,7 @@
 """
 nearly deprecated old inteface to the compounds API
 """
-
+from cbh_chem_api.resources import index_batches_in_new_index
 from tastypie.resources import ALL
 from tastypie.resources import ALL_WITH_RELATIONS
 from tastypie.resources import ModelResource
@@ -19,12 +19,13 @@ import copy
 import elasticsearch_client
 from difflib import SequenceMatcher as fuzzymatch
 import re
+import math
 try:
     from rdkit import Chem
 except ImportError:
     Chem = None
 from tastypie.exceptions import BadRequest
-
+from django_q.tasks import async_iter, result
 try:
     from chembl_compatibility.models import MoleculeDictionary
     from chembl_compatibility.models import CompoundMols
@@ -61,6 +62,7 @@ from cbh_utils.parser import parse_pandas_record, parse_sdf_record, apply_json_p
 from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate
 import time
 from cbh_chem_api.tasks import process_batch_list
+import itertools
 
 def build_content_type(format, encoding='utf-8'):
     """
@@ -72,6 +74,10 @@ def build_content_type(format, encoding='utf-8'):
 
 
 
+def chunks(l, n):
+    """Yield successive n-sized chunks from l."""
+    for i in range(0, len(l), n):
+        yield l[i:i+n]
 
 class CBHCompoundUploadResource(ModelResource):
     """Old CBHCompoundBatch resource now only used for bulk data uploads"""
@@ -216,6 +222,7 @@ class CBHCompoundUploadResource(ModelResource):
         deserialized = self.deserialize(request, request.body, format=request.META.get(
             'CONTENT_TYPE', 'application/json'))
 
+        print time.time()
         deserialized = self.alter_deserialized_detail_data(
             request, deserialized)
 
@@ -231,7 +238,8 @@ class CBHCompoundUploadResource(ModelResource):
         id = bundle.data["multiplebatch"]
         mb = CBHCompoundMultipleBatch.objects.get(pk=id)
         project = Serializer().serialize(mb)
-        limit = 20
+        #split the data into 3 parts
+        limit = math.ceil(float(mb.batch_count)/3.0)
         offset = 0
         batches = []
         hasMoreData = True
@@ -241,7 +249,8 @@ class CBHCompoundUploadResource(ModelResource):
         bundle.data["saved"] = 0
         bundle.data["ignored"] = 0
         datasets = []
-        while hasMoreData:
+        print time.time()
+        for run in [0,1,2]:
             bundles = self.get_cached_temporary_batch_data(
                 mb.id,  {"query": '{"term" : {"properties.action.raw" : "New Batch"}}',"limit": limit, "offset": offset, "sorts": '[{"id": {"order": "desc"}}]'}, request)
            # allowing setting of headers to be fale during saving of drawn molecule
@@ -265,11 +274,15 @@ class CBHCompoundUploadResource(ModelResource):
             offset += limit
             if len(set_of_batches["objects"]) == 0:
                 hasMoreData = None
-        
 
-        processed = [process_batch_list(ds) for ds in datasets]
-
-
+        print time.time()
+        print "async"
+        id = async_iter("cbh_chem_api.tasks.process_batch_list", [ds for ds in datasets])
+        lists_of_batches = result(id, wait=100000)
+        batches = [inner for outer in lists_of_batches for inner in outer]
+        print time.time()
+        index_batches_in_new_index(batches)
+        print time.time()
         elasticsearch_client.delete_index(
             elasticsearch_client.get_temp_index_name(request, mb.id))
         
@@ -380,6 +393,7 @@ class CBHCompoundUploadResource(ModelResource):
 
     def validate_multi_batch(self, multi_batch, bundle, request, batches):
         """Generate a set of staticstics about a set of data that has been uploaded"""
+        print time.time()
         batches_not_errors = [batch for batch in batches if batch and not batch.warnings.get(
             "parseerror", None) and not batch.warnings.get("smilesParseError", None)]
 
@@ -398,6 +412,8 @@ class CBHCompoundUploadResource(ModelResource):
         text_file = open(filename, "w")
         text_file.write(sdf)
         text_file.close()
+        print "build file"
+        print time.time()
         from subprocess import PIPE, Popen
         p = Popen([settings.INCHI_BINARIES_LOCATION['1.02'],
                    "-STDIO",  filename], stdout=PIPE, stderr=PIPE)
@@ -412,6 +428,8 @@ class CBHCompoundUploadResource(ModelResource):
         error_locs = []
 
         #a[0] holds the generated inchis. a[1] holds all of the error and warning information (if any)
+        print "inchis"
+        print time.time()
         errorparts = a[1].split("\nError")
         if(len(errorparts) > 1):
             for i, errorp in enumerate(errorparts):
@@ -518,15 +536,18 @@ class CBHCompoundUploadResource(ModelResource):
         bundle.data["compoundstats"]["duplicatenew"] = len(duplicate_new)
         bundle.data["multiplebatch"] = multi_batch.pk
 
-        
+        print "saving to es"
+        print time.time()
         fifty_batches_for_first_page = self.set_cached_temporary_batches(
             batches, multi_batch.id, request)
+        print time.time()
         multi_batch.uploaded_data = bundle.data
         multi_batch.save()
         #bundle.data["objects"] = fifty_batches_for_first_page
         index_name = elasticsearch_client.get_temp_index_name(
             request, multi_batch.id)
         elasticsearch_client.get_action_totals(index_name, bundle.data)
+        print time.time()
         return self.create_response(request, bundle, response_class=http.HttpAccepted)
 
     def get_part_processed_multiple_batch(self, request, **kwargs):
@@ -577,6 +598,8 @@ class CBHCompoundUploadResource(ModelResource):
         # first assume smiles
         allmols = [(obj, Chem.MolFromSmiles(str(obj))) for obj in objects]
         # Next test for inchi
+        multiple_batch = CBHCompoundMultipleBatch.objects.create(
+            project=bundle.data["project"], batch_count=len(allmols))
         for index, m in enumerate(allmols):
             if m[1] is None:
                 inchimol = Chem.MolFromInchi(
@@ -587,8 +610,7 @@ class CBHCompoundUploadResource(ModelResource):
             if(m[1]):
                 Compute2DCoords(m[1])
         batches = []
-        multiple_batch = CBHCompoundMultipleBatch.objects.create(
-            project=bundle.data["project"])
+        
         for mol2 in allmols:
             if mol2[1]:
                 b = CBHCompoundBatch.objects.from_rd_mol(
@@ -656,7 +678,7 @@ class CBHCompoundUploadResource(ModelResource):
         errors = []
         batches = []
         multiple_batch = CBHCompoundMultipleBatch.objects.create(
-            project=bundle.data["project"])
+            project=bundle.data["project"], batch_count=1)
         try:
             b = CBHCompoundBatch.objects.from_rd_mol(
                 mol, project=bundle.data["project"], orig_ctab=ctab)
@@ -682,6 +704,8 @@ class CBHCompoundUploadResource(ModelResource):
     def preprocess_sdf_file(self, file_obj, request):
         """Read the input SDF file and add some extra information to it"""
         pass
+
+
 
     def post_validate_files(self, request, **kwargs):
         """Receive a CBHFlowFile ID which points at an uploaded SDF, XLSX or CDX file
@@ -711,6 +735,10 @@ class CBHCompoundUploadResource(ModelResource):
         fielderrors["number"] = set([])
         fielderrors["integer"] = set([])
         structure_col = bundle.data.get("struccol", "")
+        multiple_batch = CBHCompoundMultipleBatch.objects.create(
+                project=bundle.data["project"],
+                uploaded_file=correct_file
+            )
         if (".cdx" in correct_file.extension):
             mols = [mol for mol in readfile(
                 str(correct_file.extension[1:]), str(correct_file.file.name), )]
@@ -732,7 +760,7 @@ class CBHCompoundUploadResource(ModelResource):
                            # "Formula",
                            "Equivalents",
                            "Measured Mass"]
-
+            multiple_batch.batch_count = len(mols)
             for pybelmol in mols:
                 molfile = pybelmol.write("mdl")
                 if molfile.strip() and molfile != "*":
@@ -770,41 +798,18 @@ class CBHCompoundUploadResource(ModelResource):
             if (correct_file.extension == ".sdf"):
                 # read in the file
                 self.preprocess_sdf_file(correct_file.file, request)
-                suppl = Chem.ForwardSDMolSupplier(correct_file.file)
-                mols = [mo for mo in suppl]
-                if(len(mols) > 10000):
-                    raise BadRequest("file_too_large")
-                # read the headers from the first molecule
-
                 headers = get_all_sdf_headers(correct_file.file.name)
-                uncurated, ctabs = get_uncurated_fields_from_file(correct_file, fielderrors)
-                
-                for index, mol in enumerate(mols):
-                    if mol is None:
-                        b = CBHCompoundBatch.objects.blinded(
-                            project=bundle.data["project"])
-                        b.warnings["parseerror"] = "true"
-                        b.properties["action"] = "Ignore"
+                uncurated, ctabs, ctab_parts = get_uncurated_fields_from_file(correct_file, fielderrors)
+                multiple_batch.batch_count = len(ctabs)
+                args = [(index, arguments[0], arguments[1], arguments[2], bundle.data["project"]) for index, arguments in enumerate(itertools.izip( ctabs, ctab_parts,  uncurated))]
+                #split data into 3 parts
+                list_size = math.ceil(float(len(args))/3.0)
 
-                        b.uncurated_fields = uncurated[index]
-                        errors.append(
-                                {"index": index+1,  "message": "No structure found"})
-                    else:
-                        try:
-                            b = CBHCompoundBatch.objects.from_rd_mol(
-                                mol, orig_ctab=ctabs[index], project=bundle.data["project"])
-                        except Exception, e:
-                            b = CBHCompoundBatch.objects.blinded(
-                            project=bundle.data["project"])
-                            b.warnings["parseerror"] = "true"
-                            b.properties["action"] = "Ignore"
-                            errors.append(
-                                    {"index": index+1,  "message": str(e)})
-                       
-                        b.uncurated_fields = uncurated[index]
-
-                    batches.append(b)
-
+                arg_chunks = chunks(args, list_size)
+                id = async_iter('cbh_chem_api.tasks.get_batch_from_sdf_chunks', [c for c in arg_chunks])
+                lists_of_batches =  result(id, wait=1000000)
+                batches = [inner for outer in lists_of_batches for inner in outer]
+                    
             elif(correct_file.extension in (".xls", ".xlsx")):
                 # we need to know which column contains structural info - this needs to be defined on the mapping page and passed here
                 # read in the specified structural column
@@ -820,6 +825,7 @@ class CBHCompoundUploadResource(ModelResource):
                     raise BadRequest("file_too_large")
                 # read the smiles string value out of here, when we know which
                 # column it is.
+                multiple_batch.batch_count = df.index
                 row_iterator = df.iterrows()
                 headers = list(df)
                 headers = [h.replace(".", "__") for h in headers]
@@ -842,44 +848,25 @@ class CBHCompoundUploadResource(ModelResource):
                                     max_score = score
                                     automapped_structure = True
                 
-                for index, row in row_iterator:
-                    
-                    if structure_col:
-                        smiles_str = row[structure_col]
-                        try:
-                            struc = Chem.MolFromSmiles(smiles_str)
-                            if struc:
-                                Compute2DCoords(struc)
-                                b = CBHCompoundBatch.objects.from_rd_mol(
-                                    struc, smiles=smiles_str, project=bundle.data["project"], reDraw=True)
-                                b.blinded_batch_id = None
-                            else:
-                                raise Exception("Smiles not processed")
 
-                        except Exception, e:
-                            b = CBHCompoundBatch.objects.blinded(
-                                project=bundle.data["project"])
-                            b.original_smiles = smiles_str
-                            b.warnings["parseerror"] = "true"
-                            b.properties["action"] = "Ignore"
-                    else:
-                        b = CBHCompoundBatch.objects.blinded(
-                            project=bundle.data["project"])
+                
 
-                    if dict(b.uncurated_fields) == {}:
-                            # Only rebuild the uncurated fields if this has not
-                            # been done before
-                        parse_pandas_record(
-                                headers, b, "uncurated_fields", row, fielderrors, headerswithdata)
+                args = [(index, row, structure_col, bundle.data["project"]) for index, row in row_iterator]
+                id = async_iter('cbh_chem_api.tasks.get_batch_from_xls_row', args)
+                batches =  result(id, wait=100000)
                    
-                    batches.append(b)
+
+                for b in batches:
+                    if dict(b.uncurated_fields) == {}:
+                    # Only rebuild the uncurated fields if this has not
+                    # been done before
+                        parse_pandas_record(
+                            headers, b, "uncurated_fields", row, fielderrors, headerswithdata)
+                   
                 headers = [hdr for hdr in headers if hdr in headerswithdata]
             else:
                 raise BadRequest("file_format_error")
-        multiple_batch = CBHCompoundMultipleBatch.objects.create(
-                project=bundle.data["project"],
-                uploaded_file=correct_file
-            )
+        
         for b in batches:
             if b:
                 b.multiple_batch_id = multiple_batch.pk

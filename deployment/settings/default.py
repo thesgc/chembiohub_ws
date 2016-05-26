@@ -139,7 +139,7 @@ for app in INSTALLED_APPS:
 
 Q_CLUSTER = {
     'name': 'DJRedis',
-    'workers': 12,
+    'workers': 4,
     'timeout': 90,
     'django_redis': ENV_NAME,
     'catch_up' : False

@@ -15,7 +15,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from tastypie.authorization import Authorization
 from tastypie import fields
 from cbh_core_api.authorization import ProjectAuthorization
-from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate, CBHNoSerializedDictField,  ChemregProjectResource, ChemRegCustomFieldConfigResource, NoCustomFieldsChemregProjectResource
+from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate, CBHNoSerializedDictField,  ChemregProjectResource, ChemRegCustomFieldConfigResource, NoCustomFieldsChemregProjectResource, get_indexing_schemata, get_schemata
 from cbh_core_model.models import Project
 from cbh_utils import elasticsearch_client
 import json 
@@ -684,7 +684,8 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
 
     def index_batch_list(self, request, batch_list, project_and_indexing_schemata, refresh=True):
         """Index a list or queryset of compound batches into the elasticsearch indices (one index per project)"""
-        
+        print "indexing"
+        print time.time()
         request.GET = request.GET.copy()
         request.GET["limit"] = "10000"
         ids = {b.created_by_id  for b in batch_list}
@@ -695,10 +696,14 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
         request.GET["id__in"] = ",".join(no_none)
         user_list = json.loads(UserResource().get_list(request).content)
         user_lookup = { u["resource_uri"]: u for u in user_list["objects"] }
+        print "indexing2"
+        print time.time()
         bundles = [
             self.full_dehydrate(self.build_bundle(obj=obj, request=request), for_list=True)
             for obj in batch_list
         ]
+        print "indexing3"
+        print time.time()
 
         #retrieve schemas which tell the elasticsearch request which fields to index for each object (we avoid deserializing a single custom field config more than once)
         #Now make the schema list parallel to the batches list
@@ -716,8 +721,13 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
             index_name = elasticsearch_client.get_project_index_name(batch["projectfull"]["id"])
             index_names.append(index_name)
             batch["userfull"] = user_lookup.get(batch["creator"], {"display_name" : "User Deleted"})
-        
+        print "indexing4"
+        print time.time()
         batch_dicts = elasticsearch_client.index_dataset(batch_dicts, indexing_schemata, index_names, refresh=refresh)
+        
+        
+        print "indexing5"
+        print time.time()
             
 
     def reindex_elasticsearch(self, request, **kwargs):
@@ -751,48 +761,7 @@ def add_cached_projects_to_batch_list(batch_dicts, project_and_indexing_schemata
     return (batch_dicts, schemata_for_indexing)
 
 
-def get_schemata(project_ids, fieldlist_name="indexing", request=None):
-    if project_ids is None:
-        project_ids = get_model("cbh_core_model","Project").objects.filter().values_list("id", flat=True)
-    crp = ChemregProjectResource()
-    request_factory = RequestFactory()
-    user = get_user_model().objects.filter(is_superuser=True)[0]
-    
- 
-    for pid in project_ids:
-        req = request_factory.get("/")
-        if request:
 
-            #Ensures that the restricted fields are obeyed if downloading data
-            #Note that we cannot use the request raw because it will try to export XLSX because
-            #of the way that tastypie works
-            req.user = request.user
-        else:
-            #If this request is coming from the reindex_all_compounds request then we need to
-            #Ensure that a superuser is aganst the request so we have access to all fields
-            req.user = user
-        req.GET = req.GET.copy()
-        req.GET["tabular_data_schema"] = True
-
-        data = crp.get_detail(req, pk=pid)
-
-        projdata = json.loads(data.content)
-        projdata["tabular_data_schema"]["for_%s" % fieldlist_name] = [ projdata["tabular_data_schema"]["schema"][field] 
-                                  for field in projdata["tabular_data_schema"]["included_in_tables"][fieldlist_name]["default"]]
-        yield projdata
-
-
-def get_indexing_schemata(project_ids, fieldlist_name="indexing"):
-    """Get a cached version of the project schemata in the right format 
-    for elasticsearch indexing or for retrieving the Excel backup of the data"""
-
-    proj_datasets = get_schemata(project_ids, fieldlist_name="indexing")
-        #Do the dict lookups now to avoid multiple times later
-    projdatadict = {}
-    for projdata in proj_datasets:
-        projdatadict[projdata["resource_uri"]] = projdata
-
-    return projdatadict
 
         
 
@@ -804,7 +773,7 @@ def index_batches_in_new_index(batches, project_and_indexing_schemata=None):
         project_and_indexing_schemata = get_indexing_schemata({ batch.project_id  for batch in batches })
         #This should be none for cases apart from the bulk index operation
         #Therefore we can run the structure indexing at this point too.
-        index_new_compounds()
+        id = async("cbh_chembl_model_extension.models.index_new_compounds",)
     IndexingCBHCompoundBatchResource().index_batch_list(request, batches, project_and_indexing_schemata)
 
 
