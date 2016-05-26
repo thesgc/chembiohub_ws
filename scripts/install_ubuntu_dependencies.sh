@@ -10,16 +10,19 @@ sudo apt-get install  nodejs -y
 
 sudo update-rc.d elasticsearch defaults 95 10
 sudo service elasticsearch start
-sudo add-apt-repository ppa:chris-lea/redis-server -y
-sudo apt-get update
+
 sudo apt-get install --reinstall make -y
 sudo apt-get install --reinstall make -y
-sudo apt-get install -y redis-server  ruby gem ruby-dev unzip fabric git apache2 libapache2-mod-proxy-html  libxml2-dev supervisor  tcl8.5 software-properties-common python-software-properties 
-sudo update-rc.d redis-server defaults
-sudo service redis-server start
+sudo apt-get install -y  ruby gem ruby-dev unzip fabric git apache2 libapache2-mod-proxy-html  libxml2-dev supervisor  tcl8.5 software-properties-common python-software-properties 
+
 
 if [ "$USER" != "travis" ]
     then
+    sudo add-apt-repository ppa:chris-lea/redis-server -y
+    sudo apt-get update
+    sudo apt-get install -y redis-server
+    sudo update-rc.d redis-server defaults
+    sudo service redis-server start
     sudo a2enmod proxy proxy_http headers expires rewrite
     sudo gem install compass
     sudo npm install -g bower grunt-cli coffee-script
