@@ -15,7 +15,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from tastypie.authorization import Authorization
 from tastypie import fields
 from cbh_core_api.authorization import ProjectAuthorization
-from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate, CBHNoSerializedDictField,  ChemregProjectResource, ChemRegCustomFieldConfigResource, NoCustomFieldsChemregProjectResource, get_indexing_schemata, get_schemata
+from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate, CBHNoSerializedDictField,  ChemregProjectResource, ChemRegCustomFieldConfigResource, NoCustomFieldsChemregProjectResource, get_indexing_schemata, get_schemata, create_or_update_project_index
 from cbh_core_model.models import Project
 from cbh_utils import elasticsearch_client
 import json 
@@ -728,6 +728,7 @@ class IndexingCBHCompoundBatchResource(BaseCBHCompoundBatchResource):
             from django.core.paginator import Paginator
             paginator = Paginator(batches, 2000) # chunks of 1000
             #Get all schemata for all projects 
+            create_or_update_project_index(pid)
             indexing_schemata = get_indexing_schemata([pid])
             for page in range(1, paginator.num_pages +1):
         

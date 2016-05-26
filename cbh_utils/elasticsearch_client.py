@@ -252,9 +252,9 @@ def add_data_to_index(batches, index_names, schema_list,  refresh=True):
                 bulk_items.append(batch_doc)
                 bulk_items.append({"doc" : item, "doc_as_upsert" : True })
             # Data is not refreshed!
-            result = es.bulk(body=bulk_items, refresh=True)
+            return es.bulk(body=bulk_items, refresh=True)
 
-    return result
+    return {}
 
 
 
