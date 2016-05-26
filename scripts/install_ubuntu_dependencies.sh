@@ -18,12 +18,15 @@ sudo apt-get install -y  ruby gem ruby-dev unzip fabric git apache2 libapache2-m
 
 if [ "$USER" != "travis" ]
     then
-    sudo add-apt-repository ppa:chris-lea/redis-server -y
-    sudo apt-get update
-    sudo apt-get install -y redis-server
-    sudo update-rc.d redis-server defaults
+    
     sudo service redis-server start
     sudo a2enmod proxy proxy_http headers expires rewrite
     sudo gem install compass
     sudo npm install -g bower grunt-cli coffee-script
+    sudo add-apt-repository ppa:chris-lea/redis-server -y
+    sudo apt-get update
+    sudo apt-get install -y redis-server
+    sudo update-rc.d redis-server defaults
 fi
+
+sudo service redis-server start
