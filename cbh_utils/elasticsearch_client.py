@@ -147,13 +147,13 @@ def fix_data_types_for_index( value):
 
 def get_es_fieldname(pointer):
     m = hashlib.md5()
-    m.update(pointer)
-    return "indexed_fields_%s" % m.hexdigest()
+    m.update(pointer.encode("utf8"))
+    return u"indexed_fields_%s" % m.hexdigest()
 
 def get_sortable_es_fieldname(pointer):
     m = hashlib.md5()
-    m.update(pointer)
-    return "sortable_fields_%s" % m.hexdigest()
+    m.update(pointer.encode("utf8"))
+    return u"sortable_fields_%s" % m.hexdigest()
 
 
 def build_indexed_fields(document, schema):
