@@ -1,6 +1,7 @@
 Feature: A user can upload a file and save compounds
 
     Scenario: A flow file can be uploaded for use in compounds
+        Given I start the qcluster
         Given I create a project as before
         When I refresh the user object
         Then I can list the projects on the system
@@ -9,6 +10,7 @@ Feature: A user can upload a file and save compounds
         Then The flow file response contains the identifier I gave the file
 
     Scenario Outline: Data in a file can be previewed based on 20+ examples
+        Given I start the qcluster
         Given I create a project as before
         When I refresh the user object
         Then I can list the projects on the system

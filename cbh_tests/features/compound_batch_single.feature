@@ -1,6 +1,7 @@
 Feature: A user can save a compound with and without a structure and can clone a compound by removing the IDs and re submitting
 
     Scenario: A compound batch is created from a drawing
+        Given I start the qcluster
         Given I create a project as before
         When I refresh the user object
         Given I have a compound batch with no structure
@@ -15,6 +16,7 @@ Feature: A user can save a compound with and without a structure and can clone a
 
 
     Scenario: A compound batch with structure has a UOx ID  in the uuid field
+        Given I start the qcluster
         Given I have loaded the fixtures for project types
         Given testuser
         Given testuser has the cbh_core_model.add_project permission
@@ -27,6 +29,7 @@ Feature: A user can save a compound with and without a structure and can clone a
         Then the created compound batch has a multiple_batch_id
 
     Scenario: An inventory record is created
+        Given I start the qcluster
         Given I create a project as before
         When I refresh the user object
         Given I have a compound batch with no structure
@@ -41,6 +44,7 @@ Feature: A user can save a compound with and without a structure and can clone a
 
 
     Scenario: I can request a single compound batch via the get detail api
+        Given I start the qcluster
         Given I create a compound batch from a drawing as before
         When I request the compound batch with ID 1 from the get_detail api
         Then the batch response is OK

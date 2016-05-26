@@ -380,7 +380,6 @@ def after_scenario(context, scenario):
             pass
     from django.db import connection
     connection.close()
-    from subprocess import call
 
 
 

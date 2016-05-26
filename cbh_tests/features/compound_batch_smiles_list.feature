@@ -1,11 +1,13 @@
 Feature: A user can register a list of SMILES strings
 
     Scenario: A user can validate a SMILES list
+        Given I start the qcluster
         Given I set up the SMILES data
         When I validate propane butane benzene and ethyl benzene via SMILES
         Then the response from post validate list is accepted
 
     Scenario: A user can save a SMILES list
+        Given I start the qcluster
         Given I set up the SMILES data
         When I validate propane butane benzene and ethyl benzene via SMILES
         Then the response from post validate list is accepted
