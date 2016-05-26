@@ -255,109 +255,6 @@ class CustomFieldConfig(TimeStampedModel):
         return self.name.replace(u" ", u"__space__")
 
 
-class DataFormConfig(TimeStampedModel):
-
-    '''deprecated Shared configuration object - all projects can see this and potentially use it
-    Object name comes from a concatentaion of all of the levels of custom field config
-    '''
-    created_by = models.ForeignKey("auth.User")
-    human_added = models.NullBooleanField(default=True)
-    parent = models.ForeignKey(
-        'self', related_name='children', default=None, null=True, blank=True)
-
-    l0 = models.ForeignKey("cbh_core_model.CustomFieldConfig",
-                           related_name="l0",
-                           help_text="The first level in the hierarchy of the form you are trying to create. For example, if curating industries, companies,  employees , teams and departments, l0 would be industries.")
-    l1 = models.ForeignKey("cbh_core_model.CustomFieldConfig",
-                           related_name="l1",
-                           null=True,
-                           blank=True,
-                           default=None,
-                           help_text="The second level in the hierarchy of the form you are trying to create. For example, if curating industries, companies,  employees , teams and departments, l1 would be companies.")
-    l2 = models.ForeignKey("cbh_core_model.CustomFieldConfig",
-                           related_name="l2", null=True, blank=True, default=None,
-                           help_text="The third level in the hierarchy of the form you are trying to create. For example, if curating industries, companies,  employees , teams and departments, l2 would be departments.")
-    l3 = models.ForeignKey("cbh_core_model.CustomFieldConfig",
-                           related_name="l3",
-                           null=True,
-                           blank=True,
-                           default=None,
-                           help_text="The forth level in the hierarchy of the form you are trying to create. For example, if curating industries, companies,  employees , teams and departments, l3 would be teams.")
-    l4 = models.ForeignKey("cbh_core_model.CustomFieldConfig",
-                           related_name="l4",
-                           null=True,
-                           blank=True,
-                           default=None,
-                           help_text="The fifth level in the hierarchy of the form you are trying to create. For example, if curating industries, companies,  employees , teams and departments, l4 would be employees.")
-
-    def __unicode__(self):
-        string = ""
-        if self.l0:
-            string += self.l0.__unicode__()
-        if self.l1:
-            string += " >> " + self.l1.__unicode__()
-        if self.l2:
-            string += " >> " + self.l2.__unicode__()
-        if self.l3:
-            string += " >> " + self.l3.__unicode__()
-        if self.l4:
-            string += " >> " + self.l4.__unicode__()
-        return string
-
-    class Meta:
-        unique_together = (('l0', 'l1', 'l2', 'l3', 'l4'),)
-        ordering = ('l0', 'l1', 'l2', 'l3', 'l4')
-
-    def last_level(self):
-        last_level = ""
-        if self.l4_id is not None:
-            return "l4"
-        if self.l3_id is not None:
-            return "l3"
-        if self.l2_id is not None:
-            return "l2"
-        if self.l1_id is not None:
-            return "l1"
-        if self.l0_id is not None:
-            return "l0"
-        return last_level
-
-    def get_all_ancestor_objects(obj, request, tree_builder={}, uri_stub=""):
-        levels = ["l0", "l1", "l2", "l3", "l4"]
-        levels = ["%s_id" % l for l in levels]
-        used_levels = []
-        for lev in levels:
-            if getattr(obj, lev) is not None and lev != "%s_id" % obj.last_level():
-                used_levels.append(lev)
-
-        filters = []
-        for i in range(1, len(used_levels)+1):
-            level_name = used_levels[i-1]
-            level_filters = {lev: getattr(obj, lev) for lev in used_levels[:i]}
-            filters.insert(0, level_filters)
-
-        for index, filter_set in enumerate(filters):
-            defaults = {lev: None for lev in levels}
-            new_filters = defaults.update(filter_set)
-
-            defaults["defaults"] = {"created_by_id": request.user.id,
-                                    "human_added": False}
-            new_object, created = DataFormConfig.objects.get_or_create(
-                **defaults)
-            if not obj.parent_id:
-                obj.parent_id = new_object.id
-                obj.save()
-#
-
-            permitted_child_array = tree_builder.get(
-                "%s/%d" % (uri_stub, new_object.id), [])
-            permitted_child_array.append(obj)
-            tree_builder[
-                "%s/%d" % (uri_stub, new_object.id)] = list(set(permitted_child_array))
-
-            obj = new_object
-            if index == len(filters) - 1:
-                tree_builder["root"] = [obj]
 
 
 class Project(TimeStampedModel, ProjectPermissionMixin):
@@ -399,7 +296,8 @@ def sync_permissions(sender, instance, created, **kwargs):
         #Iterate all of the project permissions associated with this instance and update the user friendly name for those permissions
         proj_ct = ContentType.objects.get_for_model(instance)
         for perm_name in PROJECT_PERMISSIONS:
-            perms = Permission.objects.filter(codename=get_permission_codename(instance.id, perm_name[0]), 
+            perms = Permission.objects.filter(
+                codename=get_permission_codename(instance.id, perm_name[0]), 
                 content_type=proj_ct)
             for perm in perms:
                 perm.name = get_permission_name(instance.name, perm_name[0])

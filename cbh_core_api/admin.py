@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 """Admin classes for ChemBio Hub Platofrm"""
 from django.contrib import admin
-from cbh_core_model.models import Project, PinnedCustomField, CustomFieldConfig, SkinningConfig, ProjectType, DataFormConfig
+from cbh_core_model.models import Project, PinnedCustomField, CustomFieldConfig, SkinningConfig, ProjectType
 
 from django.contrib.admin import ModelAdmin
 
@@ -35,15 +35,6 @@ class GrappelliSortableHiddenMixin(object):
         if db_field.name == self.sortable_field_name:
             kwargs["widget"] = HiddenInput()
         return super(GrappelliSortableHiddenMixin, self).formfield_for_dbfield(db_field, **kwargs)
-
-
-class DataFormConfigAdmin(CreatedByAdmin, ModelAdmin):
-    "deprecated"
-    exclude = ["created_by", "parent"]
-
-    def save_model(self, request, obj, form, change):
-        super(DataFormConfigAdmin, self).save_model(request, obj, form, change)
-        obj.get_all_ancestor_objects(request)
 
 
 class PinnedCustomFieldAdmin(ModelAdmin):
@@ -133,7 +124,6 @@ admin.site.register(CustomFieldConfig, CustomFieldConfigAdmin)
 admin.site.register(Project, ProjectAdmin)
 admin.site.register(ProjectType, ProjectTypeAdmin)
 admin.site.register(SkinningConfig, SingletonModelAdmin)
-admin.site.register(DataFormConfig, DataFormConfigAdmin)
 admin.site.register(PinnedCustomField, PinnedCustomFieldAdmin)
 
 #FlowFile relocation

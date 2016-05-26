@@ -265,17 +265,6 @@ edit_form /schema - an angular schema form element that can be used to edit this
 
         return self.create_response(request, self.build_schema())
 
-    def get_namespace(self, bundle):
-        '''
-        deprecated
-            Hook to return the dotted path to this field based on the level and the name of the field
-            The level name is formatted in the dehydrate method of the DataFormConfigResource
-        '''
-        return "{level}.project_data.%s" % (bundle.obj.get_space_replaced_name)
-
-    def get_namespace_for_action_key(self, bundle, action_type):
-        """deprecated"""
-        return action_type
 
 
     def dehydrate_edit_form(self, bundle):
