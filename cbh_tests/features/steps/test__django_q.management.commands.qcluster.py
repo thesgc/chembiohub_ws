@@ -21,7 +21,7 @@ def step(context):
     while True:
         context.logfile.flush()
         counter += 1
-        if(counter > 10):
+        if(counter > 60):
             raise Exception("Qcluster did not start")
         with open(context.qfilename, "r") as b:
             if  "running." in b.read():
