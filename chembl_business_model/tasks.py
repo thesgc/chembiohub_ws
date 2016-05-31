@@ -1,6 +1,5 @@
 __author__ = 'mnowotka'
 
-from celery import shared_task
 from rdkit import Chem
 from rdkit.Chem import Draw
 from rdkit.Chem import Crippen
@@ -36,11 +35,11 @@ MoleculeDictionaryDefaults = dict(map(lambda x: (x.name, x.default if x.default 
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-iterateModelRecordsTask = shared_task(iterateModelRecords)
+iterateModelRecordsTask = None
 
 #-----------------------------------------------------------------------------------------------------------------------
 
-iterateSomeModelRecordsTask = shared_task(iterateNModelRecords)
+iterateSomeModelRecordsTask = None
 
 #-----------------------------------------------------------------------------------------------------------------------
 
