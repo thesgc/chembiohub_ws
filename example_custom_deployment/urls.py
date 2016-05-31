@@ -1,9 +1,9 @@
 from django.conf import settings
 
 
-from deployment.urls import urlpatterns as orignalpatterns
+from deployment.urls_v2 import urlpatterns as orignalpatterns
 
-from cbh_chembl_ws_extension.urls import api_name
+from cbh_chem_api.urls import api_name
 from tastypie.api import Api
 from example_custom_deployment.resources import AlteredCompoundBatchResource
 

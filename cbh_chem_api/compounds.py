@@ -250,7 +250,7 @@ class CBHCompoundUploadResource(ModelResource):
         datasets = []
         for run in [0,1,2]:
             bundles = self.get_cached_temporary_batch_data(
-                mb.id,  {"query": '{"term" : {"properties.action.raw" : "New Batch"}}',"limit": limit, "offset": offset, "sorts": '[{"id": {"order": "desc"}}]'}, request)
+                mb.id,  {"query": '{"term" : {"properties.action.raw" : "New Batch"}}',"limit": limit, "offset": offset, "sorts": '[{"id": {"order": "asc"}}]'}, request)
            # allowing setting of headers to be fale during saving of drawn molecule
             if bundle.data["headers"]:
                 for d in bundles["objects"]:
@@ -277,10 +277,10 @@ class CBHCompoundUploadResource(ModelResource):
         #lists_of_batches = result(id, wait=100000)
         lists_of_batches = [process_batch_list(ds) for ds in datasets]
         batches = [inner for outer in lists_of_batches for inner in outer]
+        self.alter_batch_data_after_save( batches , mb.uploaded_file.file , request, mb)
         index_batches_in_new_index(batches)
         elasticsearch_client.delete_index(
             elasticsearch_client.get_temp_index_name(request, mb.id))
-        
         self.after_save_and_index_hook(request, id, mb.project.project_key)
 
         return self.create_response(request, bundle, response_class=http.HttpCreated)
@@ -782,7 +782,7 @@ class CBHCompoundUploadResource(ModelResource):
 
         else:
             if (correct_file.extension == ".sdf"):
-                # read in the file
+                # read in the filepalter_batch_data_after_save(self, batch_list, python_file_obj, request, multi_batch):
                 self.preprocess_sdf_file(correct_file.file, request)
                 headers = get_all_sdf_headers(correct_file.file.name)
                 uncurated, ctabs, ctab_parts = get_uncurated_fields_from_file(correct_file, fielderrors)

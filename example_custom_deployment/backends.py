@@ -1,15 +1,15 @@
 from django.conf import settings
-from django.contrib.auth.models import User, check_password, Group
+from django.contrib.auth.models import User,  Group
 from django.contrib.auth.backends import ModelBackend
 
 import cx_Oracle
 
 def test_login_on_external_system(username, password):
-    
+
     """
     replace return True with the appropriate login code for your system
     """
-  
+
     try: 
     	conn = cx_Oracle.connect(username + '/' + password + '@sgcdata/ELN')
 	conn.close()
