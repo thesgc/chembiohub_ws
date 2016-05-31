@@ -273,6 +273,7 @@ def build_phase_prefix_query(phrase, field_path):
 
 
 def build_es_request(queries, textsearch="", batch_ids_by_project=None):
+    print queries
     must_clauses = []
     if batch_ids_by_project:
         #The postgres backend has converted the chemical search

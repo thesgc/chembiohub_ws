@@ -277,15 +277,16 @@ class CBHCompoundUploadResource(ModelResource):
         #lists_of_batches = result(id, wait=100000)
         lists_of_batches = [process_batch_list(ds) for ds in datasets]
         batches = [inner for outer in lists_of_batches for inner in outer]
-        self.alter_batch_data_after_save( batches , mb.uploaded_file.file , request, mb)
+        if mb.uploaded_file:
+            self.alter_batch_data_after_save( batches , mb.uploaded_file.file , request, mb)
         index_batches_in_new_index(batches)
         elasticsearch_client.delete_index(
             elasticsearch_client.get_temp_index_name(request, mb.id))
-        self.after_save_and_index_hook(request, id, mb.project.project_key)
+        self.after_save_and_index_hook(request, id, mb.project_id)
 
         return self.create_response(request, bundle, response_class=http.HttpCreated)
 
-    def after_save_and_index_hook(self, request, multi_batch_id, project_key):
+    def after_save_and_index_hook(self, request, multi_batch_id, project_id):
         """Hook used to perform operations on data that has been saved"""
         pass
 
