@@ -7,10 +7,8 @@ amqp
 anyjson
 args
 behave
-celery
 clint
 defusedxml
-django-celery
 django-cors-headers
 django-extensions==1.4.0
 django-grappelli==2.8.1
