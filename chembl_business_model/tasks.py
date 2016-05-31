@@ -1,5 +1,5 @@
 __author__ = 'mnowotka'
-
+shared_task = None
 from rdkit import Chem
 from rdkit.Chem import Draw
 from rdkit.Chem import Crippen
