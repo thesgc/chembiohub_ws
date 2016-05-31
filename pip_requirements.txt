@@ -3,7 +3,6 @@ netifaces
 fuzzywuzzy
 BeautifulSoup
 django==1.9
-amqp
 anyjson
 args
 behave
