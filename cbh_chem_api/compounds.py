@@ -61,7 +61,7 @@ from cbh_utils.parser import parse_pandas_record, parse_sdf_record, apply_json_p
 # from tastypie.utils.mime import build_content_type
 from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate
 import time
-from cbh_chem_api.tasks import process_batch_list, get_batch_from_sdf_chunks
+from cbh_chem_api.tasks import process_batch_list, get_batch_from_sdf_chunks, get_batch_from_xls_row
 import itertools
 
 def build_content_type(format, encoding='utf-8'):
