@@ -1,6 +1,10 @@
 #!/bin/bash
 
-CONDATEST=$(type conda | grep -c conda)
+if hash conda 2>/dev/null;then
+    CONDATEST="1"
+else
+    CONDATEST="0"
+fi
 
 set -e
 
@@ -8,7 +12,7 @@ export ENV_NAME=$1
 OLD_PATH="$PATH"
 OPERATING_SYSTEM=$2
 
-if [ -f "/home/vagrant/anaconda2" ]
+if [ -f "/home/$USER/anaconda2" ]
 then
 CONDATEST="1"
 fi

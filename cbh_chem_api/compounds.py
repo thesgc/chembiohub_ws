@@ -843,7 +843,7 @@ class CBHCompoundUploadResource(ModelResource):
                 args = [(index, row, structure_col, bundle.data["project"]) for index, row in row_iterator]
                 #id = async_iter('cbh_chem_api.tasks.get_batch_from_xls_row', args)
                 #batches =  result(id, wait=100000)
-                batches = [get_batch_from_xls_row(arg_set) for arg_set in args]
+                batches = [get_batch_from_xls_row(*arg_set) for arg_set in args]
 
                 for b in batches:
                     if dict(b.uncurated_fields) == {}:
