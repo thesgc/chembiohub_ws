@@ -275,7 +275,7 @@ class CBHCompoundUploadResource(ModelResource):
 
         #id = async_iter("cbh_chem_api.tasks.process_batch_list", [ds for ds in datasets])
         #lists_of_batches = result(id, wait=100000)
-        lists_of_batches = process_batch_list([ds for ds in datasets])
+        lists_of_batches = [process_batch_list(ds) for ds in datasets]
         batches = [inner for outer in lists_of_batches for inner in outer]
         index_batches_in_new_index(batches)
         elasticsearch_client.delete_index(
@@ -791,11 +791,12 @@ class CBHCompoundUploadResource(ModelResource):
                 #split data into 3 parts
                 list_size = math.ceil(float(len(args))/3.0)
 
-                arg_chunks = chunks(args, list_size)
+                #arg_chunks = chunks(args, list_size)
                 #id = async_iter('cbh_chem_api.tasks.get_batch_from_sdf_chunks', [c for c in arg_chunks])
                 #lists_of_batches =  result(id, wait=1000000)
-                lists_of_batches = get_batch_from_sdf_chunks([c for c in arg_chunks])
-                batches = [inner for outer in lists_of_batches for inner in outer]
+                #lists_of_batches = get_batch_from_sdf_chunks([c for c in arg_chunks])
+                #batches = [inner for outer in lists_of_batches for inner in outer]
+                batches = get_batch_from_sdf_chunks(args) 
                     
             elif(correct_file.extension in (".xls", ".xlsx")):
                 # we need to know which column contains structural info - this needs to be defined on the mapping page and passed here
@@ -842,7 +843,7 @@ class CBHCompoundUploadResource(ModelResource):
                 args = [(index, row, structure_col, bundle.data["project"]) for index, row in row_iterator]
                 #id = async_iter('cbh_chem_api.tasks.get_batch_from_xls_row', args)
                 #batches =  result(id, wait=100000)
-                batches = get_batch_from_xls_row(args)
+                batches = [get_batch_from_xls_row(arg_set) for arg_set in args]
 
                 for b in batches:
                     if dict(b.uncurated_fields) == {}:
