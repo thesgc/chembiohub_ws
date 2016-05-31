@@ -109,23 +109,10 @@ redirect_stderr=true
 
 
 " 
-    printf "$SUPERVISOR" > /tmp/uwsgi
 
-    POSTGRES="[program:${ENV_NAME}_postgresql]
-command=$CONDA_ENV_PATH/bin/postgres  -D  $CONDA_ENV_PATH/var/postgresdata  -c  listen_addresses=''  -c  unix_socket_directories=$CONDA_ENV_PATH/var/postgressocket -c fsync=off -c synchronous_commit=off -c full_page_writes=off -c shared_buffers=1024MB  -c work_mem=256MB
-user=$USERSUB
-autorestart=true" 
-    printf "$POSTGRES" > /tmp/postgres
+EXCLAM='!'
 
-
-    sudo mv /tmp/uwsgi "/etc/supervisor/conf.d/${ENV_NAME}_uwsgi_supervisor.conf"
-
-    sudo mv /tmp/postgres "/etc/supervisor/conf.d/${ENV_NAME}_postgres_supervisor.conf"
-
-  #REDO APACHE
-    EXCLAM='!'
-
-    APACHE="<VirtualHost *:80>
+APACHE="<VirtualHost *:80>
     <Directory $(pwd)/deployment/static/>
      Options Indexes FollowSymLinks
      AllowOverride None
@@ -145,20 +132,23 @@ autorestart=true"
 
     </VirtualHost>"
 
+    printf "$SUPERVISOR" > /tmp/uwsgi
+
+    POSTGRES="[program:${ENV_NAME}_postgresql]
+command=$CONDA_ENV_PATH/bin/postgres  -D  $CONDA_ENV_PATH/var/postgresdata  -c  listen_addresses=''  -c  unix_socket_directories=$CONDA_ENV_PATH/var/postgressocket -c fsync=off -c synchronous_commit=off -c full_page_writes=off -c shared_buffers=1024MB  -c work_mem=256MB
+user=$USERSUB
+autorestart=true" 
+    printf "$POSTGRES" > /tmp/postgres
+
+printf "$APACHE" > /tmp/apache
+
+
+
+  #REDO APACHE
+
+
 fi
 
-
-#if [ $2 == "Ubuntu" ]
- #then
-    #sudo service supervisor restart
-
-#fi
-
-if [ "$OPERATING_SYSTEM" == "Centos" ]
- then
-    sudo service supervisord restart
-
-fi
 
 
 
@@ -176,31 +166,19 @@ psql  -h $CONDA_ENV_PATH/var/postgressocket -c "create extension if not exists h
 
 createdb -h $CONDA_ENV_PATH/var/postgressocket/ ${ENV_NAME}_db -T template1
 
-else
-if [ "$OPERATING_SYSTEM" == "Ubuntu" ]
+fi
+
+if [[ "$OPERATING_SYSTEM" == "Ubuntu" ]] && [[ "$USER" == "vagrant" ]];
  then
-    sudo service supervisor restart
-    printf "$APACHE" > /tmp/apache
+    sudo mv /tmp/uwsgi "/etc/supervisor/conf.d/${ENV_NAME}_uwsgi_supervisor.conf"
+    sudo mv /tmp/postgres "/etc/supervisor/conf.d/${ENV_NAME}_postgres_supervisor.conf"
     sudo mv /tmp/apache /etc/apache2/sites-available/${ENV_NAME}_chembiohub.conf
+    sudo service supervisor restart
     sudo a2ensite ${ENV_NAME}_chembiohub.conf
     sudo  a2dissite 000-default
     sudo service apache2 reload
 fi
 
 
-
-
-if [  "$OPERATING_SYSTEM"  == "Centos" ]
-then
-    sudo service supervisord restart
-    printf "$APACHE" > /etc/httpd/conf.d/$ENV_NAME_chembiohub.conf
-    sudo /etc/init.d/httpd graceful
-fi
-
-
-
-
-
-fi
 
 
