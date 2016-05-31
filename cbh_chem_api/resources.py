@@ -343,7 +343,7 @@ class BaseCBHCompoundBatchResource(ModelResource):
                 qrep["id"] = i+1
                 query_reps.append(qrep)
 
-            schem = [{"data": "id", "knownBy" : "Row"}, {"data": "fieldn", "knownBy" : "Col"}] + [{"data": qtype["value"], "knownBy" : qtype["name"]} for qtype in settings.CBH_QUERY_TYPES]
+            schem = [{"data": "id", "export_name" : "Row"}, {"data": "fieldn", "export_name" : "Column"}] + [{"data": qtype["value"], "export_name" : qtype["name"]} for qtype in settings.CBH_QUERY_TYPES]
             query_summary = {
                     "name" : "_Query Used",
                     "objects" : query_reps,
@@ -443,14 +443,6 @@ class BaseCBHCompoundBatchResource(ModelResource):
 
             if related_obj:
                 setattr(bundle.obj, field_object.attribute, related_obj)
-
-
-
-
-
-
-
-
 
 
 

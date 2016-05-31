@@ -206,6 +206,7 @@ edit_form /schema - an angular schema form element that can be used to edit this
         return {
             "data" : "custom_fields.%s" % bundle.obj.name,
             "knownBy" : bundle.obj.name,
+            "export_name" : bundle.obj.name,
             "renderer_named" : "customFieldRenderer",
             "className" : "htCenter htMiddle ",
             "editable" : True, # flags the field as editable so edit links appear in it

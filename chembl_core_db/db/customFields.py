@@ -82,6 +82,10 @@ class BlobField(six.with_metaclass(models.SubfieldBase, models.TextField)):
                 return Blob(base64.b64decode(value))
             except UnicodeDecodeError:
                 return Blob(value)
+            except TypeError:
+                #This field type is only used to disguise an RDKit object anyway
+                #If I do this it allows me to delete the object
+                return None
         return Blob(value)
 
 #-----------------------------------------------------------------------------------------------------------------------

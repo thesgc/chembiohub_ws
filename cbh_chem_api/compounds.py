@@ -61,7 +61,7 @@ from cbh_utils.parser import parse_pandas_record, parse_sdf_record, apply_json_p
 # from tastypie.utils.mime import build_content_type
 from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate
 import time
-from cbh_chem_api.tasks import process_batch_list
+from cbh_chem_api.tasks import process_batch_list, get_batch_from_sdf_chunks
 import itertools
 
 def build_content_type(format, encoding='utf-8'):
@@ -273,8 +273,9 @@ class CBHCompoundUploadResource(ModelResource):
             if len(set_of_batches["objects"]) == 0:
                 hasMoreData = None
 
-        id = async_iter("cbh_chem_api.tasks.process_batch_list", [ds for ds in datasets])
-        lists_of_batches = result(id, wait=100000)
+        #id = async_iter("cbh_chem_api.tasks.process_batch_list", [ds for ds in datasets])
+        #lists_of_batches = result(id, wait=100000)
+        lists_of_batches = process_batch_list([ds for ds in datasets])
         batches = [inner for outer in lists_of_batches for inner in outer]
         index_batches_in_new_index(batches)
         elasticsearch_client.delete_index(
@@ -791,8 +792,9 @@ class CBHCompoundUploadResource(ModelResource):
                 list_size = math.ceil(float(len(args))/3.0)
 
                 arg_chunks = chunks(args, list_size)
-                id = async_iter('cbh_chem_api.tasks.get_batch_from_sdf_chunks', [c for c in arg_chunks])
-                lists_of_batches =  result(id, wait=1000000)
+                #id = async_iter('cbh_chem_api.tasks.get_batch_from_sdf_chunks', [c for c in arg_chunks])
+                #lists_of_batches =  result(id, wait=1000000)
+                lists_of_batches = get_batch_from_sdf_chunks([c for c in arg_chunks])
                 batches = [inner for outer in lists_of_batches for inner in outer]
                     
             elif(correct_file.extension in (".xls", ".xlsx")):
@@ -838,9 +840,9 @@ class CBHCompoundUploadResource(ModelResource):
                 
 
                 args = [(index, row, structure_col, bundle.data["project"]) for index, row in row_iterator]
-                id = async_iter('cbh_chem_api.tasks.get_batch_from_xls_row', args)
-                batches =  result(id, wait=100000)
-                   
+                #id = async_iter('cbh_chem_api.tasks.get_batch_from_xls_row', args)
+                #batches =  result(id, wait=100000)
+                batches = get_batch_from_xls_row(args)
 
                 for b in batches:
                     if dict(b.uncurated_fields) == {}:

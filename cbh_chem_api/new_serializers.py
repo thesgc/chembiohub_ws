@@ -79,11 +79,11 @@ def fix_column_types(df, schema):
     """Convert the columns in the dataframe to numerical types if appropriate"""
     for field in schema:
         if field.get("field_type", None) == "number":
-            df[field["knownBy"]] = df[field["knownBy"]].astype(float)
+            df[field["export_name"]] = df[field["export_name"]].astype(float)
         if field.get("field_type", None) == "integer":
-            df[field["knownBy"]] = df[field["knownBy"]].astype(int)
+            df[field["export_name"]] = df[field["export_name"]].astype(int)
         # if field.get("field_type", None) == "date":
-        #     df[field["knownBy"]] = pd.to_datetime(df[field["knownBy"]], coerce=True)
+        #     df[field["export_name"]] = pd.to_datetime(df[field["export_name"]], coerce=True)
 
 def add_images_or_other_objects(col, column_schema, worksheet, objects, format, writer):
     """Generate and save images against a given column in the worksheet"""
@@ -149,13 +149,13 @@ class CBHCompoundBatchSerializer( Serializer):
                 else:
                     for col, column_schema in enumerate(projectsheet["schema"]):
                     #     write_excel_column(column_schema, projectsheet["objects"], worksheet, col)
-                        jsondef[column_schema["knownBy"]] = get_column(column_schema, projectsheet["objects"], "xlsx")
+                        jsondef[column_schema["export_name"]] = get_column(column_schema, projectsheet["objects"], "xlsx")
                     
                     df = pd.DataFrame(jsondef)
                     
 
                     df.fillna('', inplace=True)
-                    df = df[[col["knownBy"] for col in projectsheet["schema"]]]
+                    df = df[[col["export_name"] for col in projectsheet["schema"]]]
                     if not empty:
                         fix_column_types(df, projectsheet["schema"])
 
@@ -173,7 +173,7 @@ class CBHCompoundBatchSerializer( Serializer):
                     format2.set_bottom(2)
                     worksheet.set_row(0, 30, format2)
                     for col, schem in enumerate(projectsheet["schema"]):
-                        worksheet.write(0,col, schem["knownBy"] )
+                        worksheet.write(0,col, schem["export_name"] )
                     for col, column_schema in enumerate(projectsheet["schema"]):
                         add_images_or_other_objects(col, 
                                                         column_schema, 
@@ -222,11 +222,11 @@ class CBHCompoundBatchSerializer( Serializer):
             else:
                 sdf_cols = [column_schema for column_schema in projectsheet["schema"] if column_schema["data"] != "image"]
                 for col, column_schema in enumerate(sdf_cols):
-                    jsondef[column_schema["knownBy"]] = get_column(column_schema, projectsheet["objects"], "sdf")
+                    jsondef[column_schema["export_name"]] = get_column(column_schema, projectsheet["objects"], "sdf")
                 
                 df = pd.DataFrame(jsondef)
                 df.fillna('', inplace=True)
-                df = df[[col["knownBy"] for col in sdf_cols]]
+                df = df[[col["export_name"] for col in sdf_cols]]
 
                 row_iterator = df.iterrows()
                 headers = list(df)
