@@ -63,7 +63,7 @@ class AlteredCompoundBatchResource(CBHCompoundUploadResource):
 	def after_save_and_index_hook(self, request, multi_batch_id, project_id):
 		logger.info('Writing out files to share')
 		try:
-            extra_queries = {'query_type': 'pick_from_list', 'field_path': 'multiple_batch_id','pick_from_list': [str(multiple_batch_id)]}
+            extra_queries = [{'query_type': 'pick_from_list', 'field_path': 'multiple_batch_id','pick_from_list': [str(multiple_batch_id)]}]
 			logger.info('Running Excel fetch')
 			# Get Excel 
 			newrequest = copy(request)
@@ -188,7 +188,7 @@ class AlteredCompoundBatchResource(CBHCompoundUploadResource):
 		fielderrors["integer"] = set([])
 		uncurated_data = get_uncurated_fields_from_file(python_file_obj, fielderrors)[0]
 
-	for index, batch in enumerate(batch_list):
+		for index, batch in enumerate(batch_list):
 			#This assumes project is set up with exactly right custom fields
 			batch.custom_fields = uncurated_data[index]
 			batch.save()
