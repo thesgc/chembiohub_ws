@@ -41,7 +41,7 @@ def validate_file_object_externally(python_file_obj):
 		process = subprocess.Popen(cmd_args, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 		output = process.communicate()
 	except error:
-	logger.info(output[0])
+		logger.info(output[0])
 
 		logger.info('An error ocurred running the registration code' + error)
 		raise BadRequest('An unexpected error has occurred')
@@ -49,11 +49,11 @@ def validate_file_object_externally(python_file_obj):
 	m = re.search('<Error>([^<]+)',output[0])
 	if not m is None:
 		error = m.group(1)
-	logger.info('Raising exception ' + error)
+		logger.info('Raising exception ' + error)
 		raise BadRequest('An error has occurred ' + error)
 	else:
-	m = re.search('<Success>', output[0])
-	logger.info(output[0])
+		m = re.search('<Success>', output[0])
+		logger.info(output[0])
 
 	if m is None:
 		logger.info('Something has gone wrong registering compounds')
@@ -63,17 +63,16 @@ class AlteredCompoundBatchResource(CBHCompoundUploadResource):
 	def after_save_and_index_hook(self, request, multi_batch_id, project_id):
 		logger.info('Writing out files to share')
 		try:
-            extra_queries = [{'query_type': 'pick_from_list', 'field_path': 'multiple_batch_id','pick_from_list': [str(multiple_batch_id)]}]
+        	    	extra_queries = [{'query_type': 'pick_from_list', 'field_path': 'multiple_batch_id','pick_from_list': [str(multi_batch_id)]}]
 			logger.info('Running Excel fetch')
 			# Get Excel 
 			newrequest = copy(request)
 			newrequest.GET = request.GET.copy()
 			newrequest.GET["format"] = "xlsx"
-			newrequest.GET["multiple_batch_id"] = multi_batch_id
 			newrequest.GET["offset"] = 0
 			newrequest.GET["limit"] = 10000
 			newrequest.GET["pids"] = str(project_id)
-			file_resp = BaseCBHCompoundBatchResource().get_list(newrequest2, extra_queries=extra_queries)
+			file_resp = BaseCBHCompoundBatchResource().get_list(newrequest, extra_queries=extra_queries)
 
 			# Fetch username
 			username = request.user.username
@@ -83,15 +82,14 @@ class AlteredCompoundBatchResource(CBHCompoundUploadResource):
 			newrequest2 = copy(request)
 			newrequest2.GET = request.GET.copy()
 			newrequest2.GET['FORMAT'] = 'json'
-			newrequest2.GET["multiple_batch_id"] = multi_batch_id
 			newrequest2.GET["offset"] = 0
 			newrequest2.GET["limit"] = 10000
 			newrequest2.GET["pids"] = str(project_id)
-			file_resp = BaseCBHCompoundBatchResource().get_list(newrequest2, extra_queries=extra_queries)
-			ser_json = resp._container[0]
+			resp = BaseCBHCompoundBatchResource().get_list(newrequest2, extra_queries=extra_queries)
+			ser_json = resp.content
 			json_object = json.loads(ser_json)
 
-			global_prefix = json_object["objects"][0]["customFields"]["RequestedGlobalId"]
+			global_prefix = json_object["objects"][0]["custom_fields"]["RequestedGlobalId"]
 
 			# Fetch prefix		
 
@@ -105,9 +103,9 @@ class AlteredCompoundBatchResource(CBHCompoundUploadResource):
 			logger.info('Working out Excel file name')
 			while(True):
 				if(not os.path.exists(excel_path)):
-				break
+					break
 				else:
-				i += 1
+					i += 1
 
 				if(i == 2):
 					excel_path = excel_path + '_'
@@ -123,7 +121,6 @@ class AlteredCompoundBatchResource(CBHCompoundUploadResource):
 			newrequest = copy(request)
 			newrequest.GET = request.GET.copy()
 			newrequest.GET["format"] = "sdf"
-			newrequest.GET["multiple_batch_id"] = multi_batch_id
 			newrequest.GET["offset"] = 0
 			newrequest.GET["limit"] = 10000
 			newrequest.GET["pids"] = str(project_id)
@@ -138,9 +135,9 @@ class AlteredCompoundBatchResource(CBHCompoundUploadResource):
 			logger.info('Working out SDF file name')
 			while(True):
 				if(not os.path.exists(sdf_path)):
-				break
+					break
 				else:
-				i += 1
+					i += 1
 
 				if(i == 2):
 					sdf_path = sdf_path + '_'
@@ -169,17 +166,17 @@ class AlteredCompoundBatchResource(CBHCompoundUploadResource):
 
 		m = re.search('<Error>([^<]+)',output[0])
 		if not m is None:
-		logger.info(output[0])
+			logger.info(output[0])
 			error = m.group(1)
-		logger.info('Raising exception ' + error)
+			logger.info('Raising exception ' + error)
 			raise BadRequest('An error has occurred ' + error)
 		else:
-		m = re.search('<Success>', output[0])
+			m = re.search('<Success>', output[0])
 			logger.info(output[0])
 
 			if m is None:
-			logger.info('Something has gone wrong registering compounds')
-			raise BadRequest('An unexpected error has occurred')
+				logger.info('Something has gone wrong registering compounds')
+				raise BadRequest('An unexpected error has occurred')
 
 		add_external_ids_to_file_object(python_file_obj)
 		fielderrors = {}
