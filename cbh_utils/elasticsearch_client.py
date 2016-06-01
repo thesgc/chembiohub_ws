@@ -57,7 +57,7 @@ ELASTICSEARCH_INDEX_MAPPING = {
                     "char_filter" : {
                         "special_char_space_out" :{ # put spaces around special characters so they can still be indexed
                             "type":"pattern_replace",
-                            "pattern":"([()\[\].,\-\+])",
+                            "pattern":"([()\[\].,\-\+\"])",
                             "replacement":" $1 "
                         },
                        
@@ -323,7 +323,9 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
         new_query = None
 
         if query["query_type"] == 'phrase':
+
             new_query = build_phase_prefix_query(query["phrase"], query["field_path"])
+            print(new_query)
             
         
         elif query["query_type"] == 'pick_from_list': 

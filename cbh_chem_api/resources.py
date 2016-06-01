@@ -616,7 +616,15 @@ class CBHCompoundBatchResource(BaseCBHCompoundBatchResource):
     
     def get_list(self, request, **kwargs):
         """Request data where the project is not of the saved search type"""
-        return super(CBHCompoundBatchResource, self).get_list(request, extra_queries=[{"query_type": "pick_from_list", "field_path" : "projectfull.project_type.saved_search_project_type", "pick_from_list" : ["false"] }])
+        return super(CBHCompoundBatchResource, self).get_list(request, 
+                                                              extra_queries=[
+                                                                             {"query_type": "pick_from_list", 
+                                                                              "field_path" : "projectfull.project_type.saved_search_project_type", 
+                                                                              "pick_from_list" : ["false"] },
+                                                                              {"query_type": "pick_from_list", 
+                                                                              "field_path" : "projectfull.project_type.plate_map_project_type", 
+                                                                              "pick_from_list" : ["false"] }
+                                                                            ])
 
 
 
@@ -632,6 +640,18 @@ class CBHSavedSearchResource(BaseCBHCompoundBatchResource):
 
         return super(CBHSavedSearchResource, self).get_list(request, extra_queries=[{"query_type": "pick_from_list", "field_path" : "projectfull.project_type.saved_search_project_type", "pick_from_list" : ["true"] }])
 
+
+class CBHPlateMapResource(BaseCBHCompoundBatchResource):
+    """Implementation of the compound batch API used for saved search objects,
+    filter out non saved searches form this list"""
+    class Meta(BaseCBHCompoundBatchResource.Meta):
+        resource_name = 'cbh_plate_map'
+
+
+    def get_list(self, request, **kwargs):
+        """Request data where the project is of the saved search type"""
+
+        return super(CBHPlateMapResource, self).get_list(request, extra_queries=[{"query_type": "pick_from_list", "field_path" : "projectfull.project_type.plate_map_project_type", "pick_from_list" : ["true"] }])
 
 
 

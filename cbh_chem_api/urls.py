@@ -40,6 +40,7 @@ api.register(CBHFlowFileDownloadResource())
 admin.autodiscover()
 api.register(CBHSavedSearchResource())
 api.register(CBHChemicalSearchResource())
+api.register(CBHPlateMapResource())
 
 
 from django.contrib.auth.decorators import login_required
