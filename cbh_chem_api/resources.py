@@ -25,7 +25,7 @@ from tastypie.exceptions import Unauthorized, BadRequest
 from tastypie.utils.mime import determine_format, build_content_type
 from base64 import b64decode, b64encode
 import time
-from cbh_chem_api.new_serializers import CBHCompoundBatchSerializer
+from cbh_chem_api.serializers import CBHCompoundBatchSerializer
 from django_q.tasks import async_iter, result
 from django.core.cache import caches
 from tastypie.utils import dict_strip_unicode_keys

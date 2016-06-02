@@ -456,7 +456,7 @@ def step(context):
     "multiplebatch":None,
     "type":"file",
     "fileextension":context.current_file_extension,
-    "projectKey": project_key,
+    "project_key": project_key,
     "struccol":"",
     "state":"validate"}
     from django.conf import settings

@@ -273,7 +273,6 @@ def build_phase_prefix_query(phrase, field_path):
 
 
 def build_es_request(queries, textsearch="", batch_ids_by_project=None):
-    print queries
     must_clauses = []
     if batch_ids_by_project:
         #The postgres backend has converted the chemical search
@@ -604,3 +603,191 @@ def get_detail_data_elasticsearch(index, id):
     data = es.search("_all", body=es_request, ignore_unavailable=True)
 
     return data["hits"]["hits"][0]["_source"]["dataset"]
+
+
+
+
+
+
+
+
+
+
+"""
+deprecated soon - the original elasticsearch client for compound batches, now only used for the indexing of
+new data in a temporary index
+"""
+from django.conf import settings
+import elasticsearch
+import json
+import time
+try:
+    ES_PREFIX = settings.ES_PREFIX
+except AttributeError:
+    ES_PREFIX = "dev"
+ES_MAIN_INDEX_NAME = "chemreg_chemical_index"
+
+
+def get_temp_index_name(session_key, multi_batch_id):
+    """Generate an index name for a particular multiple batch"""
+    index_name = "%s__temp_multi_batch__%s__%s" % (
+        ES_PREFIX, session_key, str(multi_batch_id))
+    return index_name
+
+
+def delete_index(index_name):
+    """Delete an index permanently by name"""
+    es = elasticsearch.Elasticsearch()
+    return es.indices.delete(index_name,  ignore=[400, 404])
+
+
+def get_action_totals(index_name,  bundledata):
+    """
+    Use elasticsearch aggregations to find the stats required for the preview 
+    UI when uploading a set of compounds or inventory items
+    """
+    es_request_body = {
+        "size": 0,
+        "query": {"match_all": {}},
+        "aggs": {
+            "actions": {
+                "terms": {"field": "properties.action.raw"}
+            }
+        }
+    }
+    es = elasticsearch.Elasticsearch()
+
+    result = es.search(index_name, body=es_request_body)
+    bundledata["savestats"] = {"ignoring": 0, "newbatches": 0}
+    for buck in result["aggregations"]["actions"]["buckets"]:
+        if buck.get("key", "") == "new batch":
+            bundledata["savestats"]["newbatches"] = buck.get("doc_count", 0)
+        if buck.get("key", "") == "ignore":
+            bundledata["savestats"]["ignoring"] = buck.get("doc_count", 0)
+    return bundledata
+
+
+def get_from_temp_index(index_name, es_request_body, bundledata):
+    """Perform a search request against the elasticsearch index specified"""
+    es = elasticsearch.Elasticsearch()
+    result = es.search(index_name, body=es_request_body)
+    data = []
+    for hit in result["hits"]["hits"]:
+        data.append(hit["_source"])
+
+    bundledata["meta"] = {"totalCount": result["hits"]["total"]}
+    bundledata["objects"] = data
+    if result.get("aggregations", None):
+        bundledata["aggregations"] = [res["key"]
+            for res in result["aggregations"]["autocomplete"]["buckets"]]
+
+    return bundledata
+
+
+
+
+
+
+
+def create_temporary_index(batches, index_name):
+    """Index data in the old format, now mostly deprecated except for the file upload preview"""
+    es = elasticsearch.Elasticsearch()
+    t = time.time()
+    store_type = "niofs"
+
+    create_body = {
+        "settings": {
+            "index.store.type": store_type,
+            "analysis" : {
+                    "analyzer" : {
+                        "default_index" : {
+                            "tokenizer" : "whitespace",
+                            "filter" : [
+                                "lowercase"
+                            ],
+                            "char_filter" : [
+                                "html_strip"
+                            ]
+                        },
+                     "lowercasekeywordanalyzer" : {
+                            "tokenizer" : "keyword",
+                            "filter" : [
+                                "lowercase"
+                            ]
+                        },
+                    
+                    }
+                },
+        },
+        "mappings": {
+            "_default_": {
+                "_all": {"enabled": False},
+                "date_detection": False,
+                
+                "properties":{
+                    "created": {
+                        "type" : "string",
+                        "index": "not_analyzed"
+                    },
+                },
+                "dynamic_templates": [{
+                    "ignored_fields": {
+                        "match": "ctab|std_ctab|canonical_smiles|original_smiles",
+                        "match_mapping_type": "string",
+                        "mapping": {
+                            "type": "string", "store": "no", "include_in_all": False, "index" : "no"
+                        }
+                    }
+                },
+                {
+                    "uncurated_fields": {
+                        "match": "uncurated_fields.*|image|bigimage",
+                        "match_mapping_type": "string",
+                        "mapping": {
+                            "type": "string", "index": "no", "include_in_all": False
+                        }
+                    }
+                },
+                {
+                    "string_fields": {
+                        "match": "*",
+                        "match_mapping_type": "string",
+                        "mapping": {
+                            "type": "string", 
+                            "store": "no", 
+                            "index_options": "positions", 
+                            "index": "analyzed", 
+                            "omit_norms": True, 
+                            "analyzer" : "default_index",
+                            "fields": {
+                                "raw": {"type": "string", "store": "no","analyzer" : "lowercasekeywordanalyzer", "index": "analyzed", "ignore_above": 256}
+                            }
+                        }
+                    }
+                }
+                ]
+            }
+        }
+    }
+
+    es.indices.create(
+        index_name,
+        body=create_body,
+        ignore=400)
+
+    bulk_items = []
+    if len(batches) > 0:
+        for item in batches:
+            bulk_items.append({
+                "index":
+                {
+                    "_id": str(item["id"]),
+                    "_index": index_name,
+                    "_type": "batches"
+                }
+            })
+            bulk_items.append(item)
+        # Data is not refreshed!
+        return es.bulk(body=bulk_items, refresh=True)
+    return {}
+

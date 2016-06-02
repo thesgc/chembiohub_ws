@@ -16,7 +16,7 @@ from pybel import readfile, readstring
 import re
 import shortuuid
 import copy
-import elasticsearch_client
+from cbh_utils import elasticsearch_client
 from difflib import SequenceMatcher as fuzzymatch
 import re
 import math
@@ -38,7 +38,6 @@ except AttributeError:
     WS_DEBUG = False
 from cbh_core_api.authorization import ProjectAuthorization
 from cbh_core_api.resources import ChemregProjectResource, ChemRegCustomFieldConfigResource, NoCustomFieldsChemregProjectResource
-from cbh_chem_api.serializers import CBHCompoundBatchSerializer, CBHCompoundBatchElasticSearchSerializer, get_key_from_field_name
 from tastypie.utils import dict_strip_unicode_keys
 from tastypie.serializers import Serializer
 from tastypie import fields
@@ -50,10 +49,10 @@ from tastypie.paginator import Paginator
 from cbh_core_model.models import CBHFlowFile
 import pandas as pd
 from django.db.models import Max, Q
-from tastypie.serializers import Serializer
 from tastypie.authentication import SessionAuthentication
 import chemdraw_reaction
 from django.contrib.auth import get_user_model
+from django.http import HttpRequest
 from rdkit.Chem.AllChem import Compute2DCoords
 from django.db.models import Prefetch
 import dateutil.parser
@@ -150,7 +149,7 @@ class CBHCompoundUploadResource(ModelResource):
         authorization = ProjectAuthorization()
         include_resource_uri = False
         always_return_data = True
-        serializer = CBHCompoundBatchSerializer()
+        serializer = Serializer()
         allowed_methods = ['get', 'post', 'put', 'patch']
         default_format = 'application/json'
         authentication = SessionAuthentication()
@@ -221,7 +220,7 @@ class CBHCompoundUploadResource(ModelResource):
         """Save the data which has been cached in Elasticsearch"""
         deserialized = self.deserialize(request, request.body, format=request.META.get(
             'CONTENT_TYPE', 'application/json'))
-
+        session_key = request.COOKIES[settings.SESSION_COOKIE_NAME]
         deserialized = self.alter_deserialized_detail_data(
             request, deserialized)
 
@@ -250,7 +249,7 @@ class CBHCompoundUploadResource(ModelResource):
         datasets = []
         for run in [0,1,2]:
             bundles = self.get_cached_temporary_batch_data(
-                mb.id,  {"query": '{"term" : {"properties.action.raw" : "New Batch"}}',"limit": limit, "offset": offset, "sorts": '[{"id": {"order": "asc"}}]'}, request)
+                mb.id,  {"query": '{"term" : {"properties.action.raw" : "new batch"}}',"limit": limit, "offset": offset, "sorts": '[{"id": {"order": "asc"}}]'}, session_key)
            # allowing setting of headers to be fale during saving of drawn molecule
             if bundle.data["headers"]:
                 for d in bundles["objects"]:
@@ -349,13 +348,13 @@ class CBHCompoundUploadResource(ModelResource):
             self.authorized_create_detail(
                 self.get_object_list(bundle.request), bundle)
         multi_batch_id = bundle.data["multiplebatch"]
-        es_serializer = CBHCompoundBatchElasticSearchSerializer()
-        es_ready_updates = [es_serializer.to_es_ready_data(dictdata,
-                                                           options={"underscorize": True}) for dictdata in bundle.data["objects"]]
+        es_ready_updates = bundle.data["objects"]
+
         index_name = elasticsearch_client.get_temp_index_name(
-            request, multi_batch_id)
+            request.COOKIES[settings.SESSION_COOKIE_NAME], multi_batch_id)
+
         elasticsearch_client.create_temporary_index(
-            es_ready_updates, request, index_name)
+            es_ready_updates, index_name)
         elasticsearch_client.get_action_totals(index_name, bundle.data)
         return self.create_response(request, bundle, response_class=http.HttpAccepted)
 
@@ -387,7 +386,7 @@ class CBHCompoundUploadResource(ModelResource):
         mb.save()
         return self.create_response(request, bundle, response_class=http.HttpAccepted)
 
-    def validate_multi_batch(self, multi_batch, bundle, request, batches):
+    def validate_multi_batch(self, multi_batch, bundle, session_key, batches):
         """Generate a set of staticstics about a set of data that has been uploaded"""
         batches_not_errors = [batch for batch in batches if batch and not batch.warnings.get(
             "parseerror", None) and not batch.warnings.get("smilesParseError", None)]
@@ -410,6 +409,7 @@ class CBHCompoundUploadResource(ModelResource):
         from subprocess import PIPE, Popen
         p = Popen([settings.INCHI_BINARIES_LOCATION['1.02'],
                    "-STDIO",  filename], stdout=PIPE, stderr=PIPE)
+
         a = p.communicate()
         inchis = {}
 
@@ -506,10 +506,10 @@ class CBHCompoundUploadResource(ModelResource):
                     duplicate_new.add(batch.standard_inchi_key)
 
         for batch in batches_with_structures:
-            if batch.warnings.get("nostructure") == True:
-                del batch.warnings["nostructure"]
+            if batch.warnings.get("withoutstructure") == True:
+                del batch.warnings["withoutstructure"]
         for batch in blinded_data:
-            batch.warnings["nostructure"] = True
+            batch.warnings["withoutstructure"] = True
         bundle.data["batchstats"] = {}
         bundle.data["batchstats"]["withstructure"] = len(
             batches_with_structures)
@@ -527,15 +527,17 @@ class CBHCompoundUploadResource(ModelResource):
         bundle.data["compoundstats"]["duplicatenew"] = len(duplicate_new)
         bundle.data["multiplebatch"] = multi_batch.pk
 
-        fifty_batches_for_first_page = self.set_cached_temporary_batches(
-            batches, multi_batch.id, request)
-        multi_batch.uploaded_data = bundle.data
-        multi_batch.save()
+        self.set_cached_temporary_batches(
+            batches, multi_batch.id, session_key)
+        
         #bundle.data["objects"] = fifty_batches_for_first_page
         index_name = elasticsearch_client.get_temp_index_name(
-            request, multi_batch.id)
+            session_key, multi_batch.id)
         elasticsearch_client.get_action_totals(index_name, bundle.data)
-        return self.create_response(request, bundle, response_class=http.HttpAccepted)
+        multi_batch.uploaded_data = bundle.data
+        multi_batch.save()
+
+        
 
     def get_part_processed_multiple_batch(self, request, **kwargs):
         """
@@ -545,7 +547,7 @@ class CBHCompoundUploadResource(ModelResource):
         # TODO: Uncached for now. Invalidation that works for everyone may be
         #       impossible.
         bundle = self.build_bundle(request=request)
-
+        session_key = request.COOKIES[settings.SESSION_COOKIE_NAME]
         # self.authorized_create_detail(self.get_object_list(bundle.request), bundle)
         if(kwargs.get("multi_batch", None)):
             mb = kwargs.get("multi_batch")
@@ -556,8 +558,8 @@ class CBHCompoundUploadResource(ModelResource):
 
         to_be_serialized = mb.uploaded_data
         to_be_serialized = self.get_cached_temporary_batch_data(
-            id, request.GET, request, bundledata=to_be_serialized)
-        index_name = elasticsearch_client.get_temp_index_name(request, id)
+            id, request.GET, session_key, bundledata=to_be_serialized)
+        index_name = elasticsearch_client.get_temp_index_name(session_key, id)
         elasticsearch_client.get_action_totals(index_name, to_be_serialized)
         return self.create_response(request, to_be_serialized)
 
@@ -566,6 +568,7 @@ class CBHCompoundUploadResource(ModelResource):
         When a list of SMILES patterns are submitted, save them to elasticsearhc and
         call the normal validate multi batch function to give the normal statistics page
         """
+        session_key = request.COOKIES[settings.SESSION_COOKIE_NAME]
         deserialized = self.deserialize(request, request.body, format=request.META.get(
             'CONTENT_TYPE', 'application/json'))
 
@@ -614,7 +617,8 @@ class CBHCompoundUploadResource(ModelResource):
 
         bundle.data["current_batch"] = multiple_batch.pk
         bundle.data["headers"] = []
-        return self.validate_multi_batch(multiple_batch, bundle, request, batches)
+        self.validate_multi_batch(multiple_batch, bundle, session_key, batches)
+        return self.create_response(request, bundle, response_class=http.HttpAccepted)
 
     def post_validate_drawn(self, request, **kwargs):
         """
@@ -623,7 +627,7 @@ class CBHCompoundUploadResource(ModelResource):
         """
         deserialized = self.deserialize(request, request.body, format=request.META.get(
             'CONTENT_TYPE', 'application/json'))
-
+        session_key = request.COOKIES[settings.SESSION_COOKIE_NAME]
         deserialized = self.alter_deserialized_detail_data(
             request, deserialized)
         bundle = self.build_bundle(
@@ -669,6 +673,7 @@ class CBHCompoundUploadResource(ModelResource):
         try:
             b = CBHCompoundBatch.objects.from_rd_mol(
                 mol, project=bundle.data["project"], orig_ctab=ctab)
+
             batches.append(b)
         except Exception, e:
             b = CBHCompoundBatch.objects.blinded(
@@ -686,7 +691,8 @@ class CBHCompoundUploadResource(ModelResource):
         bundle.data["current_batch"] = multiple_batch.pk
         bundle.data["errors"] = errors
         bundle.data["headers"] = False
-        return self.validate_multi_batch(multiple_batch, bundle, request, batches)
+        self.validate_multi_batch(multiple_batch, bundle, session_key, batches)
+        return self.create_response(request, bundle, response_class=http.HttpAccepted)
 
     def preprocess_sdf_file(self, file_obj, request):
         """Read the input SDF file and add some extra information to it"""
@@ -916,92 +922,38 @@ class CBHCompoundUploadResource(ModelResource):
                     }
                 })
 
-        return self.validate_multi_batch(multiple_batch, bundle, request, batches)
+        self.validate_multi_batch(multiple_batch, bundle, session_key, batches)
+        return self.create_response(request, bundle, response_class=http.HttpAccepted)
 
-
-    def create_response(self, request, data, response_class=HttpResponse, **response_kwargs):
-        """
-        Extracts the common "which-format/serialize/return-response" cycle.
-        Mostly a useful shortcut/hook.
-        """
-        
-        desired_format = self.determine_format(request)
-        serialized = self.serialize(
-            request, data, desired_format, options=self.Meta.ordrered_ftk)
-        rc = response_class(content=serialized, content_type=build_content_type(
-            desired_format), **response_kwargs)
-        if(desired_format == 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'):
-            rc['Content-Disposition'] = 'attachment; filename=export_from_chembiohub_chemreg%d.xlsx' % int(time.time())
-        elif(desired_format == 'chemical/x-mdl-sdfile'):
-            rc['Content-Disposition'] = 'attachment; filename=export_from_chembiohub_chemreg%d.sdf' % int(time.time())
-        return rc
 
     def dehydrate(self, bundle):
         """Tidy up the data adding timestamp etc, now mostly deprecated"""
         # try:
-        data = bundle.obj.related_molregno
-        user = None
 
-        for names in self.Meta.fieldnames:
-            if not bundle.obj.blinded_batch_id:
-                try:
-                    bundle.data[names[1]] = deepgetattr(data, names[0], None)
-                except(AttributeError):
-                    bundle.data[names[1]] = ""
-            else:
-                if names[1] == "chemblId":
-                    bundle.data[names[1]] = bundle.obj.blinded_batch_id
-                else:
-                    bundle.data[names[1]] = ""
-        if bundle.obj.created_by:
-          #user = User.objects.get(username=bundle.obj.created_by)
-            User = get_user_model()
-            try:
-                user = User.objects.get(username=bundle.obj.created_by)
-            except ObjectDoesNotExist:
-                try:
-                    user = User.objects.get(first_name=bundle.obj.created_by.split[" "][
-                                            0], last_name=bundle.obj.created_by.split[" "][1])
-                except:
-                    user = None
         mynames = [ "uncurated_fields", "warnings", "properties", "custom_fields",]
         for name in mynames:
             bundle.data[name] = json.loads(bundle.data[name])
             
-        #bundle.data["created_by"] = user.__dict__
-        if user != None:
-            if user.first_name:
-                bundle.data["created_by"] = "%s %s" % (
-                    user.first_name, user.last_name)
-            else:
-                bundle.data["created_by"] = user.username
-        else:
-            bundle.data["created_by"] = bundle.obj.created_by
-        bundle.data["timestamp"] = str(bundle.data["created"])[0:10]
-        # except:
-        #    pass
+       
         return bundle
 
-    def batches_to_es_ready(self, batches, request, non_chem_data_only=None):
+    def batches_to_es_ready(self, batches, non_chem_data_only=None):
         """Convert the data to be ready to submit to elasticsearch"""
         batch_dicts = []
         index = 1
-        es_serializer = CBHCompoundBatchElasticSearchSerializer()
         for batch in batches:
             if batch:
                 if(not batch.id):
                     batch.id = index
-                bun = self.build_bundle(obj=batch, request=request)
+                bun = self.build_bundle(obj=batch, request=HttpRequest())
                 bun = self.full_dehydrate(bun, for_list=True)
                 if bun.data["project"] == '':
                     bun.data[
                         "project"] = '/%s/cbh_projects/%d' % (settings.WEBSERVICES_NAME, bun.obj.project_id)
                 if non_chem_data_only:
-                    ready = es_serializer.to_es_ready_non_chemical_data(
-                        bun.data, options={"underscorize": True})
+                    ready = bun.data
                 else:
-                    ready = es_serializer.to_es_ready_data(
-                        bun.data, options={"underscorize": True})
+                    ready = bun.data
 
                 batch_dicts.append(ready)
             else:
@@ -1018,14 +970,13 @@ class CBHCompoundUploadResource(ModelResource):
             index += 1
         return batch_dicts
 
-    def set_cached_temporary_batches(self, batches, multi_batch_id, request):
+    def set_cached_temporary_batches(self, batches, multi_batch_id, session_key):
         """Index the new data when a new bulk upload is done"""
-        es_serializer = CBHCompoundBatchElasticSearchSerializer()
-        batch_dicts = self.batches_to_es_ready(batches, request)
+        batch_dicts = self.batches_to_es_ready(batches)
         index_name = elasticsearch_client.get_temp_index_name(
-            request, multi_batch_id)
+            session_key, multi_batch_id)
         elasticsearch_client.create_temporary_index(
-            batch_dicts, request, index_name)
+            batch_dicts,  index_name)
         # Now get rid of my ES preparation again
 
     def get_cached_temporary_batches(self, bundles, request, bundledata={}):
@@ -1050,7 +1001,7 @@ class CBHCompoundUploadResource(ModelResource):
         return bundles
 
    
-    def get_cached_temporary_batch_data(self, multi_batch_id, get_data, request, bundledata={}):
+    def get_cached_temporary_batch_data(self, multi_batch_id, get_data, session_key, bundledata={}):
         """make the batch data into models so it can be serialized properly"""
         es_request = {
             "from": get_data.get("offset", 0),
@@ -1059,11 +1010,9 @@ class CBHCompoundUploadResource(ModelResource):
             "sort": json.loads(get_data.get("sorts", '[{"id": {"order": "asc"}}]'))
         }
         index = elasticsearch_client.get_temp_index_name(
-            request, multi_batch_id)
-        es_serializer = CBHCompoundBatchElasticSearchSerializer()
-        bundledata = elasticsearch_client.get(index, es_request, bundledata)
-        bundledata["objects"] = [
-            es_serializer.to_python_ready_data(d) for d in bundledata["objects"]]
+            session_key, multi_batch_id)
+        bundledata = elasticsearch_client.get_from_temp_index(index, es_request, bundledata)
+        
         return bundledata
 
     def get_object_list(self, request):

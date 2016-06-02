@@ -63,7 +63,7 @@ class AlteredCompoundBatchResource(CBHCompoundUploadResource):
 	def after_save_and_index_hook(self, request, multi_batch_id, project_id):
 		logger.info('Writing out files to share')
 		try:
-        	    	extra_queries = [{'query_type': 'pick_from_list', 'field_path': 'multiple_batch_id','pick_from_list': [str(multi_batch_id)]}]
+			extra_queries = [{'query_type': 'pick_from_list', 'field_path': 'multiple_batch_id','pick_from_list': [str(multi_batch_id)]}]
 			logger.info('Running Excel fetch')
 			# Get Excel 
 			newrequest = copy(request)
