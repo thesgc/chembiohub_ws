@@ -17,7 +17,6 @@ import re
 import shortuuid
 import copy
 from cbh_utils import elasticsearch_client
-from difflib import SequenceMatcher as fuzzymatch
 import re
 import math
 try:
@@ -60,8 +59,10 @@ from cbh_utils.parser import parse_pandas_record, parse_sdf_record, apply_json_p
 # from tastypie.utils.mime import build_content_type
 from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate
 import time
-from cbh_chem_api.tasks import process_batch_list, get_batch_from_sdf_chunks, get_batch_from_xls_row
+from cbh_chem_api.tasks import process_batch_list, get_batch_from_sdf_chunks, get_batch_from_xls_row, process_file_request, validate_multi_batch
 import itertools
+from tastypie.http import  HttpConflict
+
 
 def build_content_type(format, encoding='utf-8'):
     """
@@ -85,65 +86,9 @@ class CBHCompoundUploadResource(ModelResource):
     creator = SimpleResourceURIField(UserResource, 'created_by_id', null=True, readonly=True)
 
     class Meta:
-        filtering = {
-            "std_ctab": ALL_WITH_RELATIONS,
-            "ctab": ALL,
-            "multiple_batch_id": ALL_WITH_RELATIONS,
-            "project": ALL_WITH_RELATIONS,
-            "with_substructure": ALL_WITH_RELATIONS,
-            "similar_to": ALL_WITH_RELATIONS,
-            "flexmatch": ALL_WITH_RELATIONS,
-            "created": ['gte', 'lte'],
-            "created_by": ALL_WITH_RELATIONS,
-            "excludes": ALL_WITH_RELATIONS,
-        }
+        
         always_return_data = True
         prefix = "related_molregno"
-        fieldnames = [('chembl_id', 'chemblId'),
-                      ('pref_name', 'preferredCompoundName'),
-                      ('max_phase', 'knownDrug'),
-                      ('compoundproperties.med_chem_friendly',
-                       'medChemFriendly'),
-                      ('compoundproperties.ro3_pass', 'passesRuleOfThree'),
-                      ('compoundproperties.full_molformula',
-                       'molecularFormula'),
-                      ('compoundstructures.canonical_smiles', 'smiles'),
-                      ('compoundstructures.standard_inchi_key', 'stdInChiKey'),
-                      ('compoundproperties.molecular_species', 'species'),
-                      ('compoundproperties.num_ro5_violations',
-                       'numRo5Violations'),
-                      ('compoundproperties.rtb', 'rotatableBonds'),
-                      ('compoundproperties.mw_freebase', 'molecularWeight'),
-                      ('compoundproperties.alogp', 'alogp'),
-                      ('compoundproperties.acd_logp', 'acdLogp'),
-                      ('compoundproperties.acd_logd', 'acdLogd'),
-                      ('compoundproperties.acd_most_apka', 'acdAcidicPka'),
-                      ('compoundproperties.acd_most_bpka', 'acdBasicPka'),
-                      ('compoundproperties.full_molformula', 'fullMolformula'),
-                      ('project.name', 'Project'),
-                        ('multiple_batch_id', 'Upload ID')
-
-                      ]
-                         
-        fields_to_keep = {
-                          'Project': 'Project',
-                            'chemblId': 'UOx ID',
-                          'id': 'Batch ID',
-                          'canonical_smiles': 'SMILES',
-                          'created_by': 'Added By',
-                          'standard_inchi': 'Std InChi',
-                          'molecularWeight': 'Mol Weight',
-                          'molecularFormula': 'Mol Formula',
-                          'custom_fields': 'custom_fields',
-                          'multiple_batch_id' : 'Upload ID' }
-        ordrered_ftk = OrderedDict([('chemblId', 'UOx ID'),
-                                    ('canonical_smiles', 'SMILES'),
-                                    ('knownDrug', 'Known Drug'),
-                                    ('medChemFriendly', 'MedChem Friendly'),
-                                    ('standard_inchi', 'Std InChi'),
-                                    ('molecularWeight', 'Mol Weight'),
-                                    ('acdLogp', 'alogp')])
-
         queryset = CBHCompoundBatch.objects.all()
         resource_name = 'cbh_compound_batches'
         authorization = ProjectAuthorization()
@@ -155,12 +100,7 @@ class CBHCompoundUploadResource(ModelResource):
         authentication = SessionAuthentication()
         paginator_class = Paginator
         # elasticsearch config items
-        es_index_name = "chemreg_chemical_index"
 
-
-
-
- 
 
 
     def alter_deserialized_list_data(self, request, deserialized):
@@ -315,22 +255,7 @@ class CBHCompoundUploadResource(ModelResource):
             elasticsearch_client.get_temp_index_name(request, mb.id))
         return self.create_response(request, bundle, response_class=http.HttpAccepted)
 
-    def convert_custom_field(self, uncurated_value, field_schema):
-        """Tidy up the custom field values"""
-        curated_value = uncurated_value
-        if field_schema.get("format", "") == "yyyy-mm-dd":
-            if uncurated_value:
-
-                curated_value = dateutil.parser.parse(
-                    uncurated_value).strftime("%Y-%m-%d")
-        elif (field_schema.get("field_type", "") == PinnedCustomField.UISELECTTAGS):
-
-            curated_value = json.dumps(uncurated_value.split(","))
-        elif (field_schema.get("field_type", "") == PinnedCustomField.INTEGER):
-            curated_value = int(uncurated_value)
-        elif (field_schema.get("field_type", "") in [PinnedCustomField.NUMBER, PinnedCustomField.PERCENTAGE]):
-            curated_value = float(uncurated_value)
-        return curated_value
+   
 
     def update_temp_batches(self, request, **kwargs):
         '''Update a set of molecules into elasticsearch (used in ChemBio Hub to set the action field to ignore or new batch)'''
@@ -386,156 +311,7 @@ class CBHCompoundUploadResource(ModelResource):
         mb.save()
         return self.create_response(request, bundle, response_class=http.HttpAccepted)
 
-    def validate_multi_batch(self, multi_batch, bundle, session_key, batches):
-        """Generate a set of staticstics about a set of data that has been uploaded"""
-        batches_not_errors = [batch for batch in batches if batch and not batch.warnings.get(
-            "parseerror", None) and not batch.warnings.get("smilesParseError", None)]
-
-        if (len(batches) == 0):
-            raise BadRequest("no_data")
-        for b in batches_not_errors:
-            b.properties["action"] = "New Batch"
-        batches_with_structures = [
-            batch for batch in batches_not_errors if not batch.blinded_batch_id]
-        blinded_data = [
-            batch for batch in batches_not_errors if batch.blinded_batch_id]
-        sdfstrings = [batch.ctab for batch in batches_with_structures]
-        sdf = "\n".join(sdfstrings)
-
-        filename = "/tmp/" + shortuuid.ShortUUID().random()
-        text_file = open(filename, "w")
-        text_file.write(sdf)
-        text_file.close()
-        from subprocess import PIPE, Popen
-        p = Popen([settings.INCHI_BINARIES_LOCATION['1.02'],
-                   "-STDIO",  filename], stdout=PIPE, stderr=PIPE)
-
-        a = p.communicate()
-        inchis = {}
-
-        #PB - there is an assumption here that everything that has a structure will generate an inChi without issue. This is not the case.
-        #Where a molecule does not generate an inchi, there will be a key error looking up the inchi in inchiparts, as anything that cannot 
-        #generate an inchi will be missing from inchiparts, i.e. 50 structures with 1 error will have 49 entries in inchiparts, and this 
-        #will in turn bin the whole file - not great when we can handle erroring structures elsewhere
-
-        error_locs = []
-
-        #a[0] holds the generated inchis. a[1] holds all of the error and warning information (if any)
-        errorparts = a[1].split("\nError")
-        if(len(errorparts) > 1):
-            for i, errorp in enumerate(errorparts):
-                #split on 'structure #', then get the number given
-                if(i > 0):
-                    splits = errorp.split('structure #')
-
-                    error_loc = splits[1].split('.')[0]
-                    #convert to number, put this number in an errors list
-                    error_locs.append(error_loc)
-
-        err_batches = []
-        #for the errors found, remove from non-error lists and flag as erroring
-        for error_no in error_locs:
-            error_no_int = int(float(error_no)) - 1
-
-            #find structures at the position indicated - 1 (for 0-indexed list)
-            err_batch = batches_with_structures[error_no_int]
-            err_batches.append(err_batch)
- 
-        #we can't remove these while looping through err_locs as it messes up the list order and gives arrayindex exceptions
-        for err_batch in err_batches:
-
-            #remove from batches_with_structures and batches_not_errors
-            batches_with_structures.remove(err_batch)
-            batches_not_errors.remove(err_batch)
-
-            #flag this batch as erroring due to inability to generate anything for the standard_inchi_key field
-            batches_index = batches.index(err_batch)
-            batches[batches_index].warnings["inchicreationerror"] = "true"
-            batches[batches_index].properties["action"] = "Ignore"
-
-
-        inchiparts = a[0].split("\nStructure:")
-
-        for i, inch in enumerate(inchiparts):
-            parts = inch.split("\n")
-            if len(parts) == 1:
-                continue
-            ints = [s for s in parts[0].split() if s.isdigit()]
-            part = "".join(ints)
-            inchis[part] = parts[1]
-        if not bundle.data.get("fileerrors"):
-            bundle.data["fileerrors"] = []
-        new_uploaded_data = []
-        already_found = set([])
-        duplicates = set([])
-        for i, batch in enumerate(batches_with_structures):
-            if (str(i+1) in error_locs):
-                batch.standard_inchi = None
-            else: 
-                batch.standard_inchi = inchis[str(i+1)]
-            batch.validate(temp_props=False)
-            if batch.standard_inchi_key in already_found:
-                # setting this in case we change it later
-                duplicates.add(batch.standard_inchi_key)
-            else:
-                already_found.add(batch.standard_inchi_key)
-
-            new_uploaded_data.append(batch)
-        already_in_db = MoleculeDictionary.objects.filter(project=bundle.data[
-                                                          "project"], structure_type="MOL", structure_key__in=already_found).values_list("structure_key", flat=True)
-        already_in_db = set(already_in_db)
-
-        bundle.data["new"] = 0
-        new_data = set([])
-        duplicate_overlaps = set([])
-        duplicate_new = set([])
-        for batch in batches_with_structures:
-            if batch.standard_inchi_key in duplicates:
-                batch.warnings["duplicate"] = True
-            if batch.standard_inchi_key in already_in_db:
-                batch.warnings["overlap"] = True
-                if batch.standard_inchi_key in duplicates:
-                    batch.warnings["duplicate"] = True
-                    duplicate_overlaps.add(batch.standard_inchi_key)
-            else:
-                batch.warnings["new"] = True
-
-                new_data.add(batch.standard_inchi_key)
-                if batch.standard_inchi_key in duplicates:
-                    batch.warnings["duplicate"] = True
-                    duplicate_new.add(batch.standard_inchi_key)
-
-        for batch in batches_with_structures:
-            if batch.warnings.get("withoutstructure") == True:
-                del batch.warnings["withoutstructure"]
-        for batch in blinded_data:
-            batch.warnings["withoutstructure"] = True
-        bundle.data["batchstats"] = {}
-        bundle.data["batchstats"]["withstructure"] = len(
-            batches_with_structures)
-        bundle.data["batchstats"]["parseerrors"] = len(batches) - len(batches_not_errors) + len(
-            [b for b in batches_not_errors if b.warnings.get("parseerror", False) == "true"])
-        bundle.data["batchstats"]["withoutstructure"] = len(blinded_data)
-        bundle.data["batchstats"]["total"] = len(batches)
-        bundle.data["compoundstats"] = {}
-        bundle.data["compoundstats"]["total"] = len(
-            already_in_db) + len(new_data)
-        bundle.data["compoundstats"]["overlaps"] = len(already_in_db)
-        bundle.data["compoundstats"]["new"] = len(new_data)
-        bundle.data["compoundstats"][
-            "duplicateoverlaps"] = len(duplicate_overlaps)
-        bundle.data["compoundstats"]["duplicatenew"] = len(duplicate_new)
-        bundle.data["multiplebatch"] = multi_batch.pk
-
-        self.set_cached_temporary_batches(
-            batches, multi_batch.id, session_key)
-        
-        #bundle.data["objects"] = fifty_batches_for_first_page
-        index_name = elasticsearch_client.get_temp_index_name(
-            session_key, multi_batch.id)
-        elasticsearch_client.get_action_totals(index_name, bundle.data)
-        multi_batch.uploaded_data = bundle.data
-        multi_batch.save()
+    
 
         
 
@@ -618,7 +394,7 @@ class CBHCompoundUploadResource(ModelResource):
 
         bundle.data["current_batch"] = multiple_batch.pk
         bundle.data["headers"] = []
-        self.validate_multi_batch(multiple_batch, bundle, session_key, batches)
+        validate_multi_batch(self, multiple_batch, bundle.data, session_key, batches)
         return self.create_response(request, bundle, response_class=http.HttpAccepted)
 
     def post_validate_drawn(self, request, **kwargs):
@@ -649,23 +425,6 @@ class CBHCompoundUploadResource(ModelResource):
         #for each of the supplied custom fields, use set prop to replicate how this would be if it was an sd file.
         prj_data_fields = bundle.data.get('custom_fields',{})
         sup_data_fields = bundle.data.get('supplementary_fields',[])
-        if(mol):
-            for k1, v1 in prj_data_fields.iteritems():
-                if(isinstance(v1, list)):
-                    v1str = ""
-                    for item in v1:
-                        v1str = v1str + ", " + item.encode('ascii', 'ignore')
-                    mol.SetProp(k1.encode('ascii', 'ignore'), v1str)
-                #not a unicode string? Don't try and ascii encode the result, 
-                #just add it as a value converted to a string (which SetProp expects)
-                elif(isinstance(v1, basestring) != True):
-                    mol.SetProp(k1.encode('ascii', 'ignore'), str(v1))
-                else:
-                    mol.SetProp(k1.encode('ascii', 'ignore'), v1.encode('ascii', 'ignore'))
-
-            for field in sup_data_fields:
-                mol.SetProp(field['name'].encode('ascii', 'ignore'), field['value'].encode('ascii', 'ignore'))
-        
         allmols = [ mol ]
         errors = []
         batches = []
@@ -692,7 +451,7 @@ class CBHCompoundUploadResource(ModelResource):
         bundle.data["current_batch"] = multiple_batch.pk
         bundle.data["errors"] = errors
         bundle.data["headers"] = False
-        self.validate_multi_batch(multiple_batch, bundle, session_key, batches)
+        validate_multi_batch(self, multiple_batch, bundle.data, session_key, batches)
         return self.create_response(request, bundle, response_class=http.HttpAccepted)
 
     def preprocess_sdf_file(self, file_obj, request):
@@ -723,212 +482,27 @@ class CBHCompoundUploadResource(ModelResource):
             identifier="%s-%s" % (session_key, file_name))
         bundledata = bundle.data
         creator_user = request.user
-
-        batches = []
-        headers = []
-        errors = []
-        fielderrors = {}
-        fielderrors["stringdate"] = set([])
-        fielderrors["number"] = set([])
-        fielderrors["integer"] = set([])
-        structure_col = bundledata.get("struccol", "")
-        multiple_batch = CBHCompoundMultipleBatch.objects.create(
-                project=bundledata["project"],
-                uploaded_file=correct_file
-            )
-        if (".cdx" in correct_file.extension):
-            mols = [mol for mol in readfile(
-                str(correct_file.extension[1:]), str(correct_file.file.name), )]
-            rxn = None
-            index = 0
-            if correct_file.extension == '.cdxml':
-                # Look for a stoichiometry table in the reaction file
-                rxn = chemdraw_reaction.parse(str(correct_file.file.name))
-                headers = ["%Completion",
-                           "%Yield",
-                           "Expected Moles",
-                           "Product Moles",
-                           "Expected Mass",
-                           "Product Mass",
-                           "MW",
-                           "role",
-                           "Purity",
-                           "Limit Moles",
-                           # "Formula",
-                           "Equivalents",
-                           "Measured Mass"]
-            multiple_batch.batch_count = len(mols)
-            for pybelmol in mols:
-                molfile = pybelmol.write("mdl")
-                if molfile.strip() and molfile != "*":
-                    rd_mol = Chem.MolFromMolBlock(molfile, sanitize=False)
-                    '''
-                    Pybel can read some hypervalent molecules that RDKit cannot read
-                    Therefore currently these molecules are outputted as images and sent back to the front end
-                    https://www.mail-archive.com/rdkit-discuss@lists.sourceforge.net/msg04466.html
-                    '''
-                    if rd_mol:
-                        smiles = Chem.MolToSmiles(rd_mol)
-                        if smiles.strip():
-                            try:
-                                b = CBHCompoundBatch.objects.from_rd_mol(
-                                    rd_mol, orig_ctab=molfile, smiles=smiles, project=bundledata["project"])
-                            except Exception, e:
-                                b = None
-                                index = index - 1
-                            if b:
-                                if rxn:
-                                    # Here we set the uncurated fields equal to
-                                    # the reaction data extracted from Chemdraw
-                                    b.uncurated_fields = rxn.get(
-                                        pybelmol.title, {})
-                                batches.append(b)
-                            else:
-                                errors.append({"index": index+1, "image": pybelmol.write(
-                                    "svg"), "message": "Unable to produce inchi from this molecule"})
-                    else:
-                        errors.append({"index": index+1, "image": pybelmol.write(
-                            "svg"), "message": "Invalid valency or other error parsing this molecule"})
-                    index += 1
-
-        else:
-            if (correct_file.extension == ".sdf"):
-                # read in the filepalter_batch_data_after_save(self, batch_list, python_file_obj, request, multi_batch):
-                self.preprocess_sdf_file(correct_file.file, request)
-                headers = get_all_sdf_headers(correct_file.file.name)
-                uncurated, ctabs, ctab_parts = get_uncurated_fields_from_file(correct_file, fielderrors)
-                multiple_batch.batch_count = len(ctabs)
-                args = [(index, arguments[0], arguments[1], arguments[2], bundledata["project"]) for index, arguments in enumerate(itertools.izip( ctabs, ctab_parts,  uncurated))]
-                #split data into 3 parts
-                list_size = math.ceil(float(len(args))/3.0)
-
-                #arg_chunks = chunks(args, list_size)
-                #id = async_iter('cbh_chem_api.tasks.get_batch_from_sdf_chunks', [c for c in arg_chunks])
-                #lists_of_batches =  result(id, wait=1000000)
-                #lists_of_batches = get_batch_from_sdf_chunks([c for c in arg_chunks])
-                #batches = [inner for outer in lists_of_batches for inner in outer]
-                batches = get_batch_from_sdf_chunks(args) 
-                    
-            elif(correct_file.extension in (".xls", ".xlsx")):
-                # we need to know which column contains structural info - this needs to be defined on the mapping page and passed here
-                # read in the specified structural column
-
-                headerswithdata = set([])
-
-                df = None
-                try:
-                    df = pd.read_excel(correct_file.file)
-                except IndexError:
-                    raise BadRequest("no_headers")
-                if len(df.index) > 2000:
-                    raise BadRequest("file_too_large")
-                # read the smiles string value out of here, when we know which
-                # column it is.
-                
-                multiple_batch.batch_count = df.shape[0]
-                row_iterator = df.iterrows()
-                headers = list(df)
-                headers = [h.replace(".", "__") for h in headers]
-                df.columns = headers
-                # Only automap on the first attempt at mapping the smiles
-                    # column
-                if not structure_col and not bundledata.get("headers", None):
-                    max_score = 0
-                    for header in headers:
-                        # fuzzy matching for smiles - this should also
-                        # match things like "canonical_smiles"
-                        hdr = re.sub('[^0-9a-zA-Z]+', ' ', header)
-                        for h in hdr.split(" "):
-                            h = h.strip()
-                            if h:
-                                score = fuzzymatch(
-                                    a="smiles", b=h.lower()).ratio()
-                                if score > max_score and score > 0.9:
-                                    structure_col = header
-                                    max_score = score
-                                    automapped_structure = True
-                
-
-                
-
-                args = [(index, row, structure_col, bundledata["project"]) for index, row in row_iterator]
-                #id = async_iter('cbh_chem_api.tasks.get_batch_from_xls_row', args)
-                #batches =  result(id, wait=100000)
-                batches = [get_batch_from_xls_row(*arg_set) for arg_set in args]
-
-                for b in batches:
-                    if dict(b.uncurated_fields) == {}:
-                    # Only rebuild the uncurated fields if this has not
-                    # been done before
-                        parse_pandas_record(
-                            headers, b, "uncurated_fields", row, fielderrors, headerswithdata)
-                   
-                headers = [hdr for hdr in headers if hdr in headerswithdata]
-            else:
-                raise BadRequest("file_format_error")
-        
-        for b in batches:
-            if b:
-                b.multiple_batch_id = multiple_batch.pk
-                b.created_by = creator_user.username
-                b.created_by_id = creator_user.id
-
-        bundledata["fileerrors"] = errors
-        bundledata["automapped"] = 0
         cfr = ChemRegCustomFieldConfigResource()
         jsondata = json.loads(cfr.get_detail(request,
             pk=bundledata["project"].custom_field_config_id).content)
         schemaform = [field["edit_form"]["form"][0] for field in jsondata["project_data_fields"]]
-        if not bundledata.get("headers", None):
-            bundledata["headers"] = []
-            for header in headers:
-                copyto = ""
-                automapped = False
-                operations = []
-                if header == structure_col:
-                    copyto = "SMILES for chemical structures"
-                    if automapped_structure:
-                        automapped = True
-                else:
-                    form = copy.deepcopy(schemaform)
-                    copyto = ""
-                    max_score = 0
-                    for form_item in form:
-                        score = fuzzymatch(
-                            a=form_item["key"].lower(), b=header.lower()).ratio()
-                        if score > max_score and score > 0.9:
-                            matched_item = form_item
-                            copyto = matched_item["key"]
-                            automapped = True
-                            if(matched_item.get("field_type", "") == "uiselecttags"):
-                                operations.append(
-                                    {"op": "split", "path": "/uncurated_fields/" + header})
-                                operations.append(
-                                    {"op": "move", "path": "/custom_fields/" + matched_item["key"], "from": "/uncurated_fields/" + header})
-                            else:
-                                operation = {
-                                    "op": "move", "path": "/custom_fields/" + matched_item["key"], "from": "/uncurated_fields/" + header}
-                                operations.append(operation)
-                                if(matched_item.get("format", "") == "date"):
-                                    operations.append(
-                                        {"op": "convertdate", "path": "/custom_fields/" + matched_item["key"]})
-                            #set the max score so less well matched content than this is ignored
-                            max_score = score
+        if (correct_file.extension == ".sdf"):
+            # read in the filepalter_batch_data_after_save(self, batch_list, python_file_obj, request, multi_batch):
+            self.preprocess_sdf_file(correct_file.file, request)
+        multiple_batch = CBHCompoundMultipleBatch.objects.create(
+            project=bundledata["project"],
+            uploaded_file=correct_file
+        )
+        bundle.data["current_batch"] = multiple_batch.pk
+        multiple_batch, bundledata, batches = process_file_request(multiple_batch,
+                             bundledata, 
+                             creator_user,
+                             schemaform,
+                             correct_file)
 
-                bundledata["headers"].append({
-                    "name": header,
-                    "automapped": automapped,
-                    "copyto": copyto,
-                    "operations": operations,
-                    "fieldErrors": {
-                        "stringdate": header in fielderrors["stringdate"],
-                        "integer": header in fielderrors["integer"],
-                        "number": header in fielderrors["number"]
-                    }
-                })
+        
+        validate_multi_batch(self, multiple_batch, bundledata, session_key, batches)
         bundle.data = bundledata
-
-        self.validate_multi_batch(multiple_batch, bundle, session_key, batches)
         return self.create_response(request, bundle, response_class=http.HttpAccepted)
 
 
@@ -1037,14 +611,4 @@ def deepgetattr(obj, attr, ex):
     
 
 
-def get_all_sdf_headers(filename):
-    """Use the unix tools grep, cut, sort and uniq to pull out a set of headers from a file"""
-    from subprocess import Popen, PIPE
-    from shlex import split
-    p1 = Popen(split('grep "^>" %s' % filename), stdout=PIPE)
-    p2 = Popen(split('cut -d "<" -f2'), stdin=p1.stdout, stdout=PIPE)
-    p3 = Popen(split('cut -d ">" -f1'), stdin=p2.stdout, stdout=PIPE)
-    p4 = Popen(split('sort'), stdin=p3.stdout, stdout=PIPE)
-    p5 = Popen(split('uniq'), stdin=p4.stdout, stdout=PIPE)
-    out = p5.communicate()
-    return [i for i in out[0].split("\n") if i]
+
