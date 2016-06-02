@@ -742,7 +742,7 @@ TABULAR_DATA_SETTINGS = {
         "end" : []
                 },
     "indexing" : {
-        "start" :["project_counter","uuid", "projectfull.name", "properties.archived","projectfull.project_type.saved_search_project_type"],
+        "start" :["project_counter","uuid", "projectfull.name", "properties.archived","projectfull.project_type.saved_search_project_type", "projectfull.project_type.plate_map_project_type", "custom_fields.wells"],
         "end" : ["userfull.display_name" ,"timestamp" , "id" , "multiple_batch_id","canonical_smiles" ,
         "standard_inchi" ,
         "standard_inchi_key" ,
@@ -763,6 +763,24 @@ TABULAR_DATA_SETTINGS = {
             "noSort": True,
             "knownBy": "Is a saved search",
             "data": "projectfull.project_type.saved_search_project_type",
+            "searchFormType" : "pick_from_list",
+            "renderer_named": "archivedRenderer",
+            "editable": False,
+            "className": "htCenter htMiddle ",
+        },
+        "projectfull.project_type.plate_map_project_type" : {
+            "noSort": True,
+            "knownBy": "Is a saved search",
+            "data": "projectfull.project_type.plate_map_project_type",
+            "searchFormType" : "pick_from_list",
+            "renderer_named": "archivedRenderer",
+            "editable": False,
+            "className": "htCenter htMiddle ",
+        },
+         "custom_fields.wells" : {
+            "noSort": True,
+            "knownBy": "Has wells assigned",
+            "data": "custom_fields.wells",
             "searchFormType" : "pick_from_list",
             "renderer_named": "archivedRenderer",
             "editable": False,
