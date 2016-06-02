@@ -371,6 +371,13 @@ def after_scenario(context, scenario):
         os.remove("qclusterprocesslog.log")
     except OSError:
         pass
+
+    try:
+        context.django_q_process.send_signal(SIGINT)
+        context.django_q_process.wait()
+        context.logfile.flush()
+    except:
+        pass
     context.api_client.client.logout()
     
     from django.db import connection

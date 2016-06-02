@@ -13,6 +13,8 @@ Feature: A user can save a compound with and without a structure and can clone a
         then the response from post validate drawn is accepted
         when I take the response from post validate drawn and post it to multi batch save
         then the response from multi batch save is created
+        When I stop the qcluster
+        Then I see the right qcluster output
 
 
     Scenario: A compound batch with structure has a UOx ID  in the uuid field
@@ -27,6 +29,8 @@ Feature: A user can save a compound with and without a structure and can clone a
         When I list compound batches in the system
         Then the created compound batch has a uox id in the uuid field
         Then the created compound batch has a multiple_batch_id
+        When I stop the qcluster
+        Then I see the right qcluster output
 
     Scenario: An inventory record is created
         Given I start the qcluster
@@ -41,6 +45,8 @@ Feature: A user can save a compound with and without a structure and can clone a
         When I list compound batches in the system
         Then the created compound batch has a uox id in the uuid field
         Then the created compound batch has a multiple_batch_id
+        When I stop the qcluster
+        Then I see the right qcluster output
 
 
     Scenario: I can request a single compound batch via the get detail api
@@ -48,6 +54,8 @@ Feature: A user can save a compound with and without a structure and can clone a
         Given I create a compound batch from a drawing as before
         When I request the compound batch with ID 1 from the get_detail api
         Then the batch response is OK
+        When I stop the qcluster
+        Then I see the right qcluster output
 
 
 
