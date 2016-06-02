@@ -8,6 +8,8 @@ Feature: A user can upload a file and save compounds
         Then the upload URL from the first project in the list points to the right place
         When I upload eight_member_ring.xlsx to flowfiles
         Then The flow file response contains the identifier I gave the file
+        When I stop the qcluster
+        Then I see the right qcluster output
 
     Scenario Outline: Data in a file can be previewed based on 20+ examples
         Given I start the qcluster
@@ -19,6 +21,8 @@ Feature: A user can upload a file and save compounds
         Then The flow file response contains the identifier I gave the file
         When I validate the compounds file
         Then the response from post validate files is accepted
+        When I stop the qcluster
+        Then I see the right qcluster output
 
         Examples: CDXML
         |filename|

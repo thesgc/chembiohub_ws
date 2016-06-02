@@ -372,15 +372,7 @@ def after_scenario(context, scenario):
     except OSError:
         pass
     context.api_client.client.logout()
-    if hasattr(context, "django_q_process"):
-        try:
-            #If the task has failed for some reason we still need to shut down the django q process
-            from signal import SIGINT
-            context.django_q_process.send_signal(SIGINT)
-            context.django_q_process.wait()
-            context.logfile.flush()
-        except Exception:
-            pass
+    
     from django.db import connection
     connection.close()
 

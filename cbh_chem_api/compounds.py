@@ -613,6 +613,7 @@ class CBHCompoundUploadResource(ModelResource):
                 b.original_smiles = mol2[0]
             b.multiple_batch_id = multiple_batch.pk
             b.created_by = bundle.request.user.username
+            b.created_by_id = bundle.request.user.id
             batches.append(b)
 
         bundle.data["current_batch"] = multiple_batch.pk
@@ -720,6 +721,9 @@ class CBHCompoundUploadResource(ModelResource):
         session_key = request.COOKIES[settings.SESSION_COOKIE_NAME]
         correct_file = CBHFlowFile.objects.get(
             identifier="%s-%s" % (session_key, file_name))
+        bundledata = bundle.data
+        creator_user = request.user
+
         batches = []
         headers = []
         errors = []
@@ -727,9 +731,9 @@ class CBHCompoundUploadResource(ModelResource):
         fielderrors["stringdate"] = set([])
         fielderrors["number"] = set([])
         fielderrors["integer"] = set([])
-        structure_col = bundle.data.get("struccol", "")
+        structure_col = bundledata.get("struccol", "")
         multiple_batch = CBHCompoundMultipleBatch.objects.create(
-                project=bundle.data["project"],
+                project=bundledata["project"],
                 uploaded_file=correct_file
             )
         if (".cdx" in correct_file.extension):
@@ -768,7 +772,7 @@ class CBHCompoundUploadResource(ModelResource):
                         if smiles.strip():
                             try:
                                 b = CBHCompoundBatch.objects.from_rd_mol(
-                                    rd_mol, orig_ctab=molfile, smiles=smiles, project=bundle.data["project"])
+                                    rd_mol, orig_ctab=molfile, smiles=smiles, project=bundledata["project"])
                             except Exception, e:
                                 b = None
                                 index = index - 1
@@ -794,7 +798,7 @@ class CBHCompoundUploadResource(ModelResource):
                 headers = get_all_sdf_headers(correct_file.file.name)
                 uncurated, ctabs, ctab_parts = get_uncurated_fields_from_file(correct_file, fielderrors)
                 multiple_batch.batch_count = len(ctabs)
-                args = [(index, arguments[0], arguments[1], arguments[2], bundle.data["project"]) for index, arguments in enumerate(itertools.izip( ctabs, ctab_parts,  uncurated))]
+                args = [(index, arguments[0], arguments[1], arguments[2], bundledata["project"]) for index, arguments in enumerate(itertools.izip( ctabs, ctab_parts,  uncurated))]
                 #split data into 3 parts
                 list_size = math.ceil(float(len(args))/3.0)
 
@@ -828,7 +832,7 @@ class CBHCompoundUploadResource(ModelResource):
                 df.columns = headers
                 # Only automap on the first attempt at mapping the smiles
                     # column
-                if not structure_col and not bundle.data.get("headers", None):
+                if not structure_col and not bundledata.get("headers", None):
                     max_score = 0
                     for header in headers:
                         # fuzzy matching for smiles - this should also
@@ -847,7 +851,7 @@ class CBHCompoundUploadResource(ModelResource):
 
                 
 
-                args = [(index, row, structure_col, bundle.data["project"]) for index, row in row_iterator]
+                args = [(index, row, structure_col, bundledata["project"]) for index, row in row_iterator]
                 #id = async_iter('cbh_chem_api.tasks.get_batch_from_xls_row', args)
                 #batches =  result(id, wait=100000)
                 batches = [get_batch_from_xls_row(*arg_set) for arg_set in args]
@@ -866,16 +870,17 @@ class CBHCompoundUploadResource(ModelResource):
         for b in batches:
             if b:
                 b.multiple_batch_id = multiple_batch.pk
-                b.created_by = bundle.request.user.username
+                b.created_by = creator_user.username
+                b.created_by_id = creator_user.id
 
-        bundle.data["fileerrors"] = errors
-        bundle.data["automapped"] = 0
+        bundledata["fileerrors"] = errors
+        bundledata["automapped"] = 0
         cfr = ChemRegCustomFieldConfigResource()
         jsondata = json.loads(cfr.get_detail(request,
-            pk=bundle.data["project"].custom_field_config_id).content)
+            pk=bundledata["project"].custom_field_config_id).content)
         schemaform = [field["edit_form"]["form"][0] for field in jsondata["project_data_fields"]]
-        if not bundle.data.get("headers", None):
-            bundle.data["headers"] = []
+        if not bundledata.get("headers", None):
+            bundledata["headers"] = []
             for header in headers:
                 copyto = ""
                 automapped = False
@@ -910,7 +915,7 @@ class CBHCompoundUploadResource(ModelResource):
                             #set the max score so less well matched content than this is ignored
                             max_score = score
 
-                bundle.data["headers"].append({
+                bundledata["headers"].append({
                     "name": header,
                     "automapped": automapped,
                     "copyto": copyto,
@@ -921,6 +926,7 @@ class CBHCompoundUploadResource(ModelResource):
                         "number": header in fielderrors["number"]
                     }
                 })
+        bundle.data = bundledata
 
         self.validate_multi_batch(multiple_batch, bundle, session_key, batches)
         return self.create_response(request, bundle, response_class=http.HttpAccepted)
