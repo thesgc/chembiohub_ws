@@ -494,14 +494,16 @@ class CBHCompoundUploadResource(ModelResource):
             uploaded_file=correct_file
         )
         bundle.data["current_batch"] = multiple_batch.pk
-        multiple_batch, bundledata, batches = process_file_request(multiple_batch,
+        process_file_request(self,
+                             multiple_batch,
                              bundledata, 
                              creator_user,
                              schemaform,
-                             correct_file)
+                             correct_file,
+                             session_key)
 
         
-        validate_multi_batch(self, multiple_batch, bundledata, session_key, batches)
+        
         bundle.data = bundledata
         return self.create_response(request, bundle, response_class=http.HttpAccepted)
 

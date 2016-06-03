@@ -21,12 +21,16 @@ import shortuuid
 from django.conf import settings
 from cbh_chembl_model_extension.models import MoleculeDictionary
 from cbh_utils import elasticsearch_client
+from pybel import readfile, readstring
 
-def process_file_request(multiple_batch,
+
+def process_file_request(cbr_instance,
+                         multiple_batch,
                          bundledata, 
                          creator_user,
                          schemaform,
-                         correct_file):
+                         correct_file,
+                         session_key):
     batches = []
     headers = []
     errors = []
@@ -127,6 +131,7 @@ def process_file_request(multiple_batch,
             row_iterator = df.iterrows()
             headers = list(df)
             headers = [h.replace(".", "__") for h in headers]
+            headers = [h.replace("/", "__") for h in headers]
             df.columns = headers
             # Only automap on the first attempt at mapping the smiles
                 # column
@@ -222,7 +227,8 @@ def process_file_request(multiple_batch,
                 }
             })
 
-    return (multiple_batch, bundledata,  batches)
+    validate_multi_batch(cbr_instance, multiple_batch, bundledata, session_key, batches)
+
     
 def validate_multi_batch(cbr_instance, multi_batch, bundledata, session_key, batches):
     """Generate a set of staticstics about a set of data that has been uploaded"""
@@ -374,6 +380,7 @@ def validate_multi_batch(cbr_instance, multi_batch, bundledata, session_key, bat
     elasticsearch_client.get_action_totals(index_name, bundledata)
     multi_batch.uploaded_data = bundledata
     multi_batch.save()
+
 
 
 
