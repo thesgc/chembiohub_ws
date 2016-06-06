@@ -59,7 +59,7 @@ from cbh_utils.parser import parse_pandas_record, parse_sdf_record, apply_json_p
 # from tastypie.utils.mime import build_content_type
 from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate
 import time
-from cbh_chem_api.tasks import process_batch_list, get_batch_from_sdf_chunks, get_batch_from_xls_row, process_file_request, validate_multi_batch
+from cbh_chem_api.tasks import  get_batch_from_sdf_chunks, get_batch_from_xls_row, process_file_request, validate_multi_batch
 import itertools
 from tastypie.http import  HttpConflict
 

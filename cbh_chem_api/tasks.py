@@ -484,7 +484,7 @@ def save_multiple_batch(
 
     from cbh_chem_api.compounds  import CBHCompoundUploadResource
     cbr_instance = CBHCompoundUploadResource()
-    
+
     limit = math.ceil(float(multiple_batch.batch_count)/2.0)
     offset = 0
     batches = []
@@ -493,7 +493,7 @@ def save_multiple_batch(
 
     datasets = []
     for run in range(0,3):
-        datasets.append((cbr_instance, 
+        datasets.append(( 
                         multiple_batch, 
                         creator_user, 
                         session_key,
@@ -516,13 +516,16 @@ def save_multiple_batch(
 
 
 
-def process_batch_list(cbr_instance, 
-                        multiple_batch, 
+def process_batch_list(multiple_batch, 
                         creator_user, 
                         session_key,
                         limit, 
                         offset):
     """Generate the structure and dictionary for a list of compound batches"""
+    from cbh_chem_api.compounds  import CBHCompoundUploadResource
+    cbr_instance = CBHCompoundUploadResource() 
+
+
     bundles = cbr_instance.get_cached_temporary_batch_data(
         multiple_batch.id,  {"query": '{"term" : {"properties.action.raw" : "new batch"}}',"limit": limit, "offset": offset, "sorts": '[{"id": {"order": "asc"}}]'}, session_key)
    # allowing setting of headers to be fale during saving of drawn molecule
