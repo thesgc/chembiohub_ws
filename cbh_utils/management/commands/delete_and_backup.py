@@ -70,6 +70,10 @@ def backup_attachments(projects_list, directory):
             os.makedirs(files_path)
         except OSError:
             pass
+        try:
+            os.makedirs(uploads_path)
+        except OSError:
+            pass
         for cbh_file in CBHFlowFile.objects.filter(project=proj):
             #Make a new unique filename for the item
             if cbh_file.cbhcompoundmultiplebatch_set.count() == 0:
@@ -170,9 +174,7 @@ class Command(BaseCommand):
                         to_delete.append(proj)
                         message += "%d:\t%s" % ( proj.id, proj.name,)
                         message += " (and %d compound batches)\n" % CBHCompoundBatch.objects.filter(project=proj).count()
-                    else:
-                        print proj.id
-                        print pid
+                    
             message += "Type DELETE and hit enter to say yes\n"
             delete = input(message)
             if delete == "DELETE":
