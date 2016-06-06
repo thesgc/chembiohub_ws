@@ -3,7 +3,7 @@ Background task functions which are called from elsewhere using function signatu
 Tasks are run using django_q
 """
 
-
+import re
 from cbh_chembl_model_extension.models import generate_structure_and_dictionary, CBHCompoundBatch
 from chembl_business_model.models import CompoundMols
 from django.contrib.postgres.aggregates import ArrayAgg
@@ -22,7 +22,14 @@ from django.conf import settings
 from cbh_chembl_model_extension.models import MoleculeDictionary
 from cbh_utils import elasticsearch_client
 from pybel import readfile, readstring
+from django_q.tasks import async_iter, result, async
+from cbh_chem_api.resources import index_batches_in_new_index
 
+
+def chunks(l, n):
+    """Yield successive n-sized chunks from l."""
+    for i in range(0, len(l), n):
+        yield l[i:i+n]
 
 def process_file_request(cbr_instance,
                          multiple_batch,
@@ -97,19 +104,18 @@ def process_file_request(cbr_instance,
 
     else:
         if (correct_file.extension == ".sdf"):
-            headers = get_all_sdf_headers(correct_file.file.name)
+            headers = get_all_sdf_headers(correct_file.path)
             uncurated, ctabs, ctab_parts = get_uncurated_fields_from_file(correct_file, fielderrors)
             multiple_batch.batch_count = len(ctabs)
             args = [(index, arguments[0], arguments[1], arguments[2], bundledata["project"]) for index, arguments in enumerate(itertools.izip( ctabs, ctab_parts,  uncurated))]
             #split data into 3 parts
-            list_size = math.ceil(float(len(args))/3.0)
+            list_size = math.ceil(float(len(args))/2.0)
 
-            #arg_chunks = chunks(args, list_size)
-            #id = async_iter('cbh_chem_api.tasks.get_batch_from_sdf_chunks', [c for c in arg_chunks])
-            #lists_of_batches =  result(id, wait=1000000)
-            #lists_of_batches = get_batch_from_sdf_chunks([c for c in arg_chunks])
-            #batches = [inner for outer in lists_of_batches for inner in outer]
-            batches = get_batch_from_sdf_chunks(args) 
+            arg_chunks = [c for c in chunks(args, list_size)]
+            id = async_iter("cbh_chem_api.tasks.get_batch_from_sdf_chunks", arg_chunks)
+            lists_of_batches =  result(id, wait=1000000)
+            batches = [inner for outer in lists_of_batches for inner in outer]
+            # batches = get_batch_from_sdf_chunks(args) 
                 
         elif(correct_file.extension in (".xls", ".xlsx")):
             # we need to know which column contains structural info - this needs to be defined on the mapping page and passed here
@@ -118,12 +124,9 @@ def process_file_request(cbr_instance,
             headerswithdata = set([])
 
             df = None
-            try:
-                df = pd.read_excel(correct_file.file)
-            except IndexError:
-                raise BadRequest("no_headers")
-            if len(df.index) > 2000:
-                raise BadRequest("file_too_large")
+            df = pd.read_excel(correct_file.file)
+            
+
             # read the smiles string value out of here, when we know which
             # column it is.
             
@@ -151,13 +154,15 @@ def process_file_request(cbr_instance,
                                 max_score = score
                                 automapped_structure = True
             
-
-            
-
             args = [(index, row, structure_col, bundledata["project"]) for index, row in row_iterator]
-            #id = async_iter('cbh_chem_api.tasks.get_batch_from_xls_row', args)
-            #batches =  result(id, wait=100000)
-            batches = [get_batch_from_xls_row(*arg_set) for arg_set in args]
+
+            list_size = math.ceil(float(len(args))/2.0)
+
+            arg_chunks = [c for c in chunks(args, list_size)]
+            id = async_iter("cbh_chem_api.tasks.get_batch_from_xls_chunks", arg_chunks)
+            lists_of_batches =  result(id, wait=1000000)
+            batches = [inner for outer in lists_of_batches for inner in outer]
+
 
             for b in batches:
                 if dict(b.uncurated_fields) == {}:
@@ -167,8 +172,7 @@ def process_file_request(cbr_instance,
                         headers, b, "uncurated_fields", row, fielderrors, headerswithdata)
                
             headers = [hdr for hdr in headers if hdr in headerswithdata]
-        else:
-            raise BadRequest("file_format_error")
+            
     
     for b in batches:
         if b:
@@ -228,15 +232,15 @@ def process_file_request(cbr_instance,
             })
 
     validate_multi_batch(cbr_instance, multiple_batch, bundledata, session_key, batches)
+    return True
 
     
-def validate_multi_batch(cbr_instance, multi_batch, bundledata, session_key, batches):
+def validate_multi_batch(cbr_instance, multiple_batch, bundledata, session_key, batches):
     """Generate a set of staticstics about a set of data that has been uploaded"""
     batches_not_errors = [batch for batch in batches if batch and not batch.warnings.get(
         "parseerror", None) and not batch.warnings.get("smilesParseError", None)]
 
-    if (len(batches) == 0):
-        raise BadRequest("no_data")
+
     for b in batches_not_errors:
         b.properties["action"] = "New Batch"
     batches_with_structures = [
@@ -369,26 +373,19 @@ def validate_multi_batch(cbr_instance, multi_batch, bundledata, session_key, bat
     bundledata["compoundstats"][
         "duplicateoverlaps"] = len(duplicate_overlaps)
     bundledata["compoundstats"]["duplicatenew"] = len(duplicate_new)
-    bundledata["multiplebatch"] = multi_batch.pk
+    bundledata["multiplebatch"] = multiple_batch.pk
+
 
     cbr_instance.set_cached_temporary_batches(
-        batches, multi_batch.id, session_key)
+        batches, multiple_batch.id, session_key)
     
     #bundledata["objects"] = fifty_batches_for_first_page
     index_name = elasticsearch_client.get_temp_index_name(
-        session_key, multi_batch.id)
+        session_key, multiple_batch.id)
     elasticsearch_client.get_action_totals(index_name, bundledata)
-    multi_batch.uploaded_data = bundledata
-    multi_batch.save()
+    multiple_batch.uploaded_data = bundledata
+    multiple_batch.save()
 
-
-
-
-def process_batch_list(batch_list):
-    """Generate the structure and dictionary for a list of compound batches"""
-    batches = [generate_structure_and_dictionary(batch) for batch in batch_list]
-    
-    return batches
 
 
 
@@ -422,6 +419,13 @@ def get_batch_from_sdf(index, sdf_data, ctab_part, uncur, project):
         b.uncurated_fields = uncur
     return b
 
+
+
+def get_batch_from_xls_chunks(args_list):
+    batches = []
+    for args in args_list:
+        batches.append(get_batch_from_xls_row(*args))
+    return batches
 
 def get_batch_from_xls_row(index, row, structure_col, project):
     if structure_col:
@@ -469,5 +473,73 @@ def get_structure_search_for_projects(project_ids, search_type, smiles):
 
     return batch_ids
 
+
+
+def save_multiple_batch(cbr_instance, 
+                        multiple_batch, 
+                        creator_user, 
+                        session_key):
+
+    limit = math.ceil(float(multiple_batch.batch_count)/2.0)
+    offset = 0
+    batches = []
+    hasMoreData = True
+    
+
+    datasets = []
+    for run in range(0,3):
+        datasets.append((cbr_instance, 
+                        multiple_batch, 
+                        creator_user, 
+                        session_key,
+                        limit, 
+                        offset))
+        offset += limit
+    id = async_iter("cbh_chem_api.tasks.process_batch_list", datasets)
+    lists_of_batches = result(id, wait=1000000)
+    batches = [inner for outer in lists_of_batches for inner in outer]
+    if multiple_batch.uploaded_file:
+        cbr_instance.alter_batch_data_after_save( batches , multiple_batch.uploaded_file.file , multiple_batch)
+    index_batches_in_new_index(batches)
+    elasticsearch_client.delete_index(
+        elasticsearch_client.get_temp_index_name(session_key, multiple_batch.id))
+    print multiple_batch.project_id
+    #cbr_instance.after_save_and_index_hook(request, id, multiple_batch.project_id)
+    return True
+
+
+
+
+
+def process_batch_list(cbr_instance, 
+                        multiple_batch, 
+                        creator_user, 
+                        session_key,
+                        limit, 
+                        offset):
+    """Generate the structure and dictionary for a list of compound batches"""
+    bundles = cbr_instance.get_cached_temporary_batch_data(
+        multiple_batch.id,  {"query": '{"term" : {"properties.action.raw" : "new batch"}}',"limit": limit, "offset": offset, "sorts": '[{"id": {"order": "asc"}}]'}, session_key)
+   # allowing setting of headers to be fale during saving of drawn molecule
+    if multiple_batch.uploaded_data["headers"]:
+        for d in bundles["objects"]:
+            cbr_instance.patch_dict(d, copy.deepcopy(multiple_batch.uploaded_data["headers"]))
+    set_of_batches = cbr_instance.get_cached_temporary_batches(
+        bundles, None,  bundledata=multiple_batch.uploaded_data)
+    for batch in set_of_batches["objects"]:
+        if(batch.obj.properties.get("action", "") == "New Batch"):
+            batch.obj.created_by = creator_user.username
+            batch.obj.created_by_id = creator_user.id
+            batch.obj.id = None
+            batch.obj.multiple_batch_id = multiple_batch.id
+
+            # batch.multi_batch_id = id
+    batches = [b.obj for b in set_of_batches["objects"]]
+
+    
+
+    batches = [generate_structure_and_dictionary(batch) for batch in batches]
+    
+    return batches
 
 

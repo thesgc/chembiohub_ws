@@ -376,6 +376,11 @@ def after_scenario(context, scenario):
         context.django_q_process.send_signal(SIGINT)
         context.django_q_process.wait()
         context.logfile.flush()
+        with open(context.qfilename, "r") as b:
+            if  "has stopped." in b.read():
+                pass
+            else:
+                raise Exception("qcluster did not stop")
     except:
         pass
     context.api_client.client.logout()

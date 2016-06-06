@@ -222,7 +222,10 @@ def index_dataset( batch_dicts, schema_list, index_names, refresh=True):
         print (json.dumps(es_reindex))
         raise Exception("indexing failed")
 
-
+def chunks(l, n):
+    """Yield successive n-sized chunks from l."""
+    for i in range(0, len(l), n):
+        yield l[i:i+n]
 
 def add_data_to_index(batches, index_names, schema_list,  refresh=True):
     
@@ -252,7 +255,12 @@ def add_data_to_index(batches, index_names, schema_list,  refresh=True):
                 bulk_items.append(batch_doc)
                 bulk_items.append({"doc" : item, "doc_as_upsert" : True })
             # Data is not refreshed!
-            return es.bulk(body=bulk_items, refresh=True)
+            bulk_chunks = [c for c in chunks(bulk_items, 200)]
+            for index, bulk_chunk in enumerate(bulk_chunks):
+                ref = False
+                if index == len(bulk_chunks) - 1:
+                    ref = True
+                es.bulk(body=bulk_chunk, refresh=ref)
 
     return {}
 
@@ -608,26 +616,12 @@ def get_detail_data_elasticsearch(index, id):
 
 
 
+TEMP_INDEX_TYPE = "temp_index_type"
 
 
 
 
 
-
-
-"""
-deprecated soon - the original elasticsearch client for compound batches, now only used for the indexing of
-new data in a temporary index
-"""
-from django.conf import settings
-import elasticsearch
-import json
-import time
-try:
-    ES_PREFIX = settings.ES_PREFIX
-except AttributeError:
-    ES_PREFIX = "dev"
-ES_MAIN_INDEX_NAME = "chemreg_chemical_index"
 
 
 def get_temp_index_name(session_key, multi_batch_id):
@@ -722,7 +716,7 @@ def create_temporary_index(batches, index_name):
                 },
         },
         "mappings": {
-            "_default_": {
+            TEMP_INDEX_TYPE: {
                 "_all": {"enabled": False},
                 "date_detection": False,
                 
@@ -730,6 +724,10 @@ def create_temporary_index(batches, index_name):
                     "created": {
                         "type" : "string",
                         "index": "not_analyzed"
+                    },
+                    "id": {
+                        "type" : "integer",
+                        "index": "analyzed"
                     },
                 },
                 "dynamic_templates": [{
@@ -774,8 +772,7 @@ def create_temporary_index(batches, index_name):
 
     es.indices.create(
         index_name,
-        body=create_body,
-        ignore=400)
+        body=create_body)
 
     bulk_items = []
     if len(batches) > 0:
@@ -785,11 +782,16 @@ def create_temporary_index(batches, index_name):
                 {
                     "_id": str(item["id"]),
                     "_index": index_name,
-                    "_type": "batches"
+                    "_type": TEMP_INDEX_TYPE
                 }
             })
             bulk_items.append(item)
-        # Data is not refreshed!
-        return es.bulk(body=bulk_items, refresh=True)
+        bulk_chunks = [c for c in chunks(bulk_items, 200)]
+        for index, bulk_chunk in enumerate(bulk_chunks):
+            ref = False
+            if index == len(bulk_chunks) - 1:
+                ref = True
+            es.bulk(body=bulk_chunk, refresh=ref)
+        return 
     return {}
 

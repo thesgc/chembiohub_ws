@@ -273,8 +273,9 @@ class CBHCompoundMultipleBatch(TimeStampedModel):
     uploaded_data = PickledObjectField(help_text="Now used to store the headers from the file used to generate the multiple batch, picke use perhaps can be improved or is deprecated")
     uploaded_file = models.ForeignKey(
         "cbh_core_model.CBHFlowFile", null=True, blank=True, default=None, help_text="File that was uploaded to generate this multiple batch")
-    saved = models.BooleanField(default=False, help_text="Whether this multiple batch has been saved or not")
     batch_count = models.IntegerField(default=0)
+    task_id_for_save = models.CharField(max_length=50, null=True, blank=True, default=None,)
+    
 
 
 class CBHCompoundBatch(TimeStampedModel):

@@ -1,7 +1,6 @@
 """
 nearly deprecated old inteface to the compounds API
 """
-from cbh_chem_api.resources import index_batches_in_new_index
 from tastypie.resources import ALL
 from tastypie.resources import ALL_WITH_RELATIONS
 from tastypie.resources import ModelResource
@@ -17,14 +16,15 @@ import re
 import shortuuid
 import copy
 from cbh_utils import elasticsearch_client
-import re
 import math
+from tastypie.exceptions import ImmediateHttpResponse
+
 try:
     from rdkit import Chem
 except ImportError:
     Chem = None
 from tastypie.exceptions import BadRequest
-from django_q.tasks import async_iter, result
+from django_q.tasks import async_iter, result, async
 try:
     from chembl_compatibility.models import MoleculeDictionary
     from chembl_compatibility.models import CompoundMols
@@ -74,10 +74,7 @@ def build_content_type(format, encoding='utf-8'):
 
 
 
-def chunks(l, n):
-    """Yield successive n-sized chunks from l."""
-    for i in range(0, len(l), n):
-        yield l[i:i+n]
+
 
 class CBHCompoundUploadResource(ModelResource):
     """Old CBHCompoundBatch resource now only used for bulk data uploads"""
@@ -175,61 +172,27 @@ class CBHCompoundUploadResource(ModelResource):
         
         id = bundle.data["multiplebatch"]
         mb = CBHCompoundMultipleBatch.objects.get(pk=id)
-        project = Serializer().serialize(mb)
-        #split the data into 3 parts
-        limit = math.ceil(float(mb.batch_count)/3.0)
-        offset = 0
-        batches = []
-        hasMoreData = True
-        mb.saved = True
-        mb.created_by = request.user.username
-        mb.save()
-        bundle.data["saved"] = 0
-        bundle.data["ignored"] = 0
-        datasets = []
-        for run in [0,1,2]:
-            bundles = self.get_cached_temporary_batch_data(
-                mb.id,  {"query": '{"term" : {"properties.action.raw" : "new batch"}}',"limit": limit, "offset": offset, "sorts": '[{"id": {"order": "asc"}}]'}, session_key)
-           # allowing setting of headers to be fale during saving of drawn molecule
-            if bundle.data["headers"]:
-                for d in bundles["objects"]:
-                    self.patch_dict(d, copy.deepcopy(bundle.data["headers"]))
-            set_of_batches = self.get_cached_temporary_batches(
-                bundles, request,  bundledata=bundle.data)
-            for batch in set_of_batches["objects"]:
-                if(batch.obj.properties.get("action", "") == "New Batch"):
-                    batch.obj.created_by = request.user.username
-                    batch.obj.created_by_id = request.user.id
-                    batch.obj.id = None
-                    batch.obj.multiple_batch_id = id
+        creator_user = request.user
+        if not bundle.data.get("task_id_for_save", None):
 
-                    # batch.multi_batch_id = id
-                    bundle.data["saved"] += 1
-            datasets.append([b.obj for b in set_of_batches["objects"]])
+            mb.created_by = creator_user.username
 
+            bundle.data["task_id_for_save"] = async('cbh_chem_api.tasks.save_multiple_batch', self, mb, creator_user, session_key)
+           
+            
+        
+        res = result(bundle.data["task_id_for_save"], wait=100)
+        if res is True:
+            return self.create_response(request, bundle, response_class=http.HttpCreated)
+        return self.create_response(request, bundle, response_class=http.HttpAccepted)
+        
 
-            offset += limit
-            if len(set_of_batches["objects"]) == 0:
-                hasMoreData = None
-
-        #id = async_iter("cbh_chem_api.tasks.process_batch_list", [ds for ds in datasets])
-        #lists_of_batches = result(id, wait=100000)
-        lists_of_batches = [process_batch_list(ds) for ds in datasets]
-        batches = [inner for outer in lists_of_batches for inner in outer]
-        if mb.uploaded_file:
-            self.alter_batch_data_after_save( batches , mb.uploaded_file.file , request, mb)
-        index_batches_in_new_index(batches)
-        elasticsearch_client.delete_index(
-            elasticsearch_client.get_temp_index_name(request, mb.id))
-        self.after_save_and_index_hook(request, id, mb.project_id)
-
-        return self.create_response(request, bundle, response_class=http.HttpCreated)
 
     def after_save_and_index_hook(self, request, multi_batch_id, project_id):
         """Hook used to perform operations on data that has been saved"""
         pass
 
-    def alter_batch_data_after_save(self, batch_list, python_file_object,request, multi_batch):
+    def alter_batch_data_after_save(self, batch_list, python_file_object, multi_batch):
         """Actually edit the data just after it has been saved"""
         pass
 
@@ -241,6 +204,7 @@ class CBHCompoundUploadResource(ModelResource):
 
         deserialized = self.alter_deserialized_detail_data(
             request, deserialized)
+        session_key = request.COOKIES[settings.SESSION_COOKIE_NAME]
         bundle = self.build_bundle(
             data=dict_strip_unicode_keys(deserialized), request=request)
         if bundle.obj.pk:
@@ -252,7 +216,7 @@ class CBHCompoundUploadResource(ModelResource):
         id = bundle.data["multiplebatch"]
         mb = CBHCompoundMultipleBatch.objects.get(pk=id)
         elasticsearch_client.delete_index(
-            elasticsearch_client.get_temp_index_name(request, mb.id))
+            elasticsearch_client.get_temp_index_name(session_key, mb.id))
         return self.create_response(request, bundle, response_class=http.HttpAccepted)
 
    
@@ -331,6 +295,11 @@ class CBHCompoundUploadResource(ModelResource):
         else:
             id = request.GET.get("current_batch")
             mb = CBHCompoundMultipleBatch.objects.get(pk=id)
+
+        if not mb.uploaded_data:
+            #The uploaded data field will be set once the data is fully processed
+            raise ImmediateHttpResponse(HttpConflict("data_not_yet_ready"))
+
 
         to_be_serialized = mb.uploaded_data
         to_be_serialized = self.get_cached_temporary_batch_data(
@@ -480,6 +449,19 @@ class CBHCompoundUploadResource(ModelResource):
         session_key = request.COOKIES[settings.SESSION_COOKIE_NAME]
         correct_file = CBHFlowFile.objects.get(
             identifier="%s-%s" % (session_key, file_name))
+
+        if(correct_file.extension in (".xls", ".xlsx")):
+            # we need to know which column contains structural info - this needs to be defined on the mapping page and passed here
+            # read in the specified structural column
+
+            df = None
+            try:
+                df = pd.read_excel(correct_file.file)
+            except IndexError:
+                raise BadRequest("no_headers")
+        if(correct_file.extension not in (".xls", ".xlsx", ".sdf", ".cdxml")):
+            raise BadRequest("file_format_error")
+        print correct_file.file.name
         bundledata = bundle.data
         creator_user = request.user
         cfr = ChemRegCustomFieldConfigResource()
@@ -494,15 +476,16 @@ class CBHCompoundUploadResource(ModelResource):
             uploaded_file=correct_file
         )
         bundle.data["current_batch"] = multiple_batch.pk
-        process_file_request(self,
-                             multiple_batch,
-                             bundledata, 
-                             creator_user,
-                             schemaform,
-                             correct_file,
-                             session_key)
+        bundle.data["multiplebatch"] = multiple_batch.pk
+        id = async("cbh_chem_api.tasks.process_file_request", self,
+                                                               multiple_batch,
+                                                               bundledata, 
+                                                               creator_user,
+                                                               schemaform,
+                                                               correct_file,
+                                                               session_key)
 
-        
+        # res = result(id, wait=20000)
         
         bundle.data = bundledata
         return self.create_response(request, bundle, response_class=http.HttpAccepted)
@@ -597,9 +580,6 @@ class CBHCompoundUploadResource(ModelResource):
         
         return bundledata
 
-    def get_object_list(self, request):
-        """where to add select related etc."""
-        return super(CBHCompoundUploadResource, self).get_object_list(request)
 
 
 def deepgetattr(obj, attr, ex):

@@ -18,7 +18,7 @@ def step_impl(context):
         When I submit the compound to POST validate drawn
         then the response from post validate drawn is accepted
         when I take the response from post validate drawn and post it to multi batch save
-        then the response from multi batch save is created""")
+        then I can post to multi batch save and the response will eventually be created""")
 
 
 @given(u'I save propane butane benzene and ethyl benzene via SMILES')
@@ -28,11 +28,21 @@ def step(context):
         When I validate propane butane benzene and ethyl benzene via SMILES
         Then the response from post validate list is accepted
         When I take the response from post validate drawn and post it to multi batch save
-        then the response from multi batch save is created
+        then I can post to multi batch save and the response will eventually be created
         When I list compound batches in the system
         Then 4 compound batches have been created
     """)
 
+@then(u'I request the multiple batch data until the response is OK')
+def step_impl(context):
+    status = 409
+    while status != 200:
+        from django.conf import settings
+        url = "/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches/get_part_processed_multiple_batch?current_batch=1" 
+        resp = context.api_client.get(url, format='json')
+        status = resp.status_code
+        context.test_case.assertTrue(status in [200, 409])
+    context.test_case.assertTrue(status==200)
 
 @then(u'I get a chemical search id in the response')
 def step_impl(context):
@@ -329,14 +339,23 @@ def step_impl(context):
         When I submit the compound to POST validate drawn
         then the response from post validate drawn is accepted
         when I take the response from post validate drawn and post it to multi batch save
-        then the response from multi batch save is created
+        then I can post to multi batch save and the response will eventually be created
         """)
 
 
-@then(u'the response from multi batch save is created')
+@then(u'I can post to multi batch save and the response will eventually be created')
 def step_impl(context):
+    status = 202
+
+    while status == 202:
+        from django.conf import settings
+        data_to_post = json.loads(context.multibatch_response.content)
+        context.multibatch_response = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches/multi_batch_save/", format='json', data= data_to_post)
+        import time
+        status = context.multibatch_response.status_code
+        time.sleep(1)
+
     context.test_case.assertHttpCreated(context.multibatch_response)
-    print (context.multibatch_response.content)
 
 
 

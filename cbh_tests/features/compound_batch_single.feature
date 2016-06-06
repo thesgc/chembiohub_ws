@@ -12,7 +12,7 @@ Feature: A user can save a compound with and without a structure and can clone a
         When I submit the compound to POST validate drawn
         then the response from post validate drawn is accepted
         when I take the response from post validate drawn and post it to multi batch save
-        then the response from multi batch save is created
+        then I can post to multi batch save and the response will eventually be created
         When I stop the qcluster
         Then I see the right qcluster output
 

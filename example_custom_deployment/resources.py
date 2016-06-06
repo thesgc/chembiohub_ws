@@ -152,7 +152,7 @@ class AlteredCompoundBatchResource(CBHCompoundUploadResource):
 			logger.info('An error has occurred' + e.__doc__ + '/' + e.message)
 		logger.info('Export done')
 
-	def alter_batch_data_after_save(self, batch_list, python_file_obj, request, multi_batch):
+	def alter_batch_data_after_save(self, batch_list, python_file_obj, multi_batch):
 		"""Take the original sdf file and run an external process with it such that new data can be written across 
 		after save of the data into ChemBioHub"""
 
