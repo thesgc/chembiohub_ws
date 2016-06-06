@@ -21,6 +21,7 @@ Feature: A user can upload a file and save compounds
         Then The flow file response contains the identifier I gave the file
         When I validate the compounds file
         Then the response from post validate files is accepted
+        Then I request the multiple batch data until the response is OK 
         When I stop the qcluster
         Then I see the right qcluster output
 
