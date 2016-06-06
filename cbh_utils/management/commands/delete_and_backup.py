@@ -111,7 +111,14 @@ def backup_permissions(projects_list, directory):
 
 
 def delete_projects(projects_list):
-    pass
+    for proj in projects_list:
+        from django.contrib.auth.models import User, Permission
+        from cbh_core_model.models import PROJECT_PERMISSIONS, PERMISSION_CODENAME_SEPARATOR
+        for perm_type, irrel, irel2 in PROJECT_PERMISSIONS:
+            perm = Permission.objects.get(codename="%d%s%s" % (proj.id, PERMISSION_CODENAME_SEPARATOR, perm_type) )
+            perm.delete()
+        proj.custom_field_config.all().delete()
+        proj.delete()
 
 
 
@@ -159,7 +166,7 @@ class Command(BaseCommand):
                 backup_attachments(to_delete, directory)
                 backup_projects(to_delete, directory)
                 backup_compounds(to_delete, directory)
-
+                delete_projects(to_delete)
             else:
                 print ("Delete not confirmed, exiting")
 
