@@ -115,7 +115,7 @@ def backup_permissions(projects_list, directory):
 def delete_projects(projects_list):
     for proj in projects_list:
         from django.contrib.auth.models import User, Permission
-        from cbh_core_model.models import PROJECT_PERMISSIONS, PERMISSION_CODENAME_SEPARATOR
+        from cbh_core_model.models import PROJECT_PERMISSIONS, PERMISSION_CODENAME_SEPARATOR, CustomFieldConfig
         index_name = elasticsearch_client.get_project_index_name(proj.id)
         elasticsearch_client.delete_index(index_name)
 
@@ -127,7 +127,7 @@ def delete_projects(projects_list):
                 pass
         try:
             proj.custom_field_config.delete()
-        except Permission.DoesNotExist:
+        except CustomFieldConfig.DoesNotExist:
             pass
         proj.delete()
 
