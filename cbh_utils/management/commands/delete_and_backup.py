@@ -88,7 +88,10 @@ def backup_permissions(projects_list, directory):
         from django.db.models import Q
         from cbh_core_model.models import PROJECT_PERMISSIONS, PERMISSION_CODENAME_SEPARATOR
         for perm_type, irrel, irel2 in PROJECT_PERMISSIONS:
-            perm = Permission.objects.get(codename="%d%s%s" % (proj.id, PERMISSION_CODENAME_SEPARATOR, perm_type) )
+            try:
+                perm = Permission.objects.get(codename="%d%s%s" % (proj.id, PERMISSION_CODENAME_SEPARATOR, perm_type) )
+            except Permission.DoesNotExist:
+                continue
             users = User.objects.filter(Q(groups__permissions=perm) | Q(user_permissions=perm) ).distinct()
             project_path = "%s/%d__%s/" % (directory, proj.id, proj.name )
             try:
