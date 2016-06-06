@@ -53,7 +53,7 @@ def step_impl(context):
             pass
         else:
             raise Exception("qcluster did not stop")
-    if os.path.exists(context.qfilename):
-        os.remove(context.qfilename)
+
+
 
 
