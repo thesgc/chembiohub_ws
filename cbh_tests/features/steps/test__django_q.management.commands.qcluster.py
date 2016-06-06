@@ -41,9 +41,9 @@ def step(context):
     context.django_q_process.send_signal(SIGINT)
     context.django_q_process.wait()
     context.logfile.flush()
+    time.sleep(1)
     context.logfile.close()
-    if os.path.exists(context.qfilename):
-        os.remove(context.qfilename)
+    
 
 
 @then(u'I see the right qcluster output')
@@ -53,5 +53,7 @@ def step_impl(context):
             pass
         else:
             raise Exception("qcluster did not stop")
+    if os.path.exists(context.qfilename):
+        os.remove(context.qfilename)
 
 
