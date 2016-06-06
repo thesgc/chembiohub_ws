@@ -177,7 +177,7 @@ class CBHCompoundUploadResource(ModelResource):
 
             mb.created_by = creator_user.username
 
-            bundle.data["task_id_for_save"] = async('cbh_chem_api.tasks.save_multiple_batch', self, mb, creator_user, session_key)
+            bundle.data["task_id_for_save"] = async('cbh_chem_api.tasks.save_multiple_batch',  mb, creator_user, session_key)
            
             
         
@@ -477,7 +477,7 @@ class CBHCompoundUploadResource(ModelResource):
         )
         bundle.data["current_batch"] = multiple_batch.pk
         bundle.data["multiplebatch"] = multiple_batch.pk
-        id = async("cbh_chem_api.tasks.process_file_request", self,
+        id = async("cbh_chem_api.tasks.process_file_request", 
                                                                multiple_batch,
                                                                bundledata, 
                                                                creator_user,

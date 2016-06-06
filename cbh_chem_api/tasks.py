@@ -31,13 +31,15 @@ def chunks(l, n):
     for i in range(0, len(l), n):
         yield l[i:i+n]
 
-def process_file_request(cbr_instance,
+def process_file_request(
                          multiple_batch,
                          bundledata, 
                          creator_user,
                          schemaform,
                          correct_file,
                          session_key):
+    from cbh_chem_api.compounds  import CBHCompoundUploadResource
+    cbr_instance = CBHCompoundUploadResource()
     batches = []
     headers = []
     errors = []
@@ -475,11 +477,14 @@ def get_structure_search_for_projects(project_ids, search_type, smiles):
 
 
 
-def save_multiple_batch(cbr_instance, 
+def save_multiple_batch( 
                         multiple_batch, 
                         creator_user, 
                         session_key):
 
+    from cbh_chem_api.compounds  import CBHCompoundUploadResource
+    cbr_instance = CBHCompoundUploadResource()
+    
     limit = math.ceil(float(multiple_batch.batch_count)/2.0)
     offset = 0
     batches = []
