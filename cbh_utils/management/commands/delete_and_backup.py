@@ -7,7 +7,6 @@ from django.contrib.auth import get_user_model
 from django.test import RequestFactory
 import shutil
 from cbh_utils import elasticsearch_client
-from django.core.exceptions import ObjectDoesNotExist
 
 
 def backup_projects(projects_list, directory):
@@ -124,11 +123,11 @@ def delete_projects(projects_list):
             try:
                 perm = Permission.objects.get(codename="%d%s%s" % (proj.id, PERMISSION_CODENAME_SEPARATOR, perm_type) )
                 perm.delete()
-            except ObjectDoesNotExist:
+            except Permission.DoesNotExist:
                 pass
         try:
             proj.custom_field_config.delete()
-        except ObjectDoesNotExist:
+        except Permission.DoesNotExist:
             pass
         proj.delete()
 
