@@ -41,6 +41,9 @@ def step(context):
     context.django_q_process.send_signal(SIGINT)
     context.django_q_process.wait()
     context.logfile.flush()
+    context.logfile.close()
+    if os.path.exists(context.qfilename):
+        os.remove(context.qfilename)
 
 
 @then(u'I see the right qcluster output')
