@@ -123,11 +123,11 @@ def delete_projects(projects_list):
             try:
                 perm = Permission.objects.get(codename="%d%s%s" % (proj.id, PERMISSION_CODENAME_SEPARATOR, perm_type) )
                 perm.delete()
-            except Permission.DoesNotExist:
+            except :
                 pass
         try:
             proj.custom_field_config.delete()
-        except CustomFieldConfig.DoesNotExist:
+        except:
             pass
         proj.delete()
 
