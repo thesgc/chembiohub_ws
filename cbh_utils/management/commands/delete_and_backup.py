@@ -6,6 +6,7 @@ import os
 from django.contrib.auth import get_user_model
 from django.test import RequestFactory
 import shutil
+from cbh_utils import elasticsearch_client
 
 def backup_projects(projects_list, directory):
     from cbh_core_api.resources import ChemregProjectResource
@@ -114,10 +115,13 @@ def delete_projects(projects_list):
     for proj in projects_list:
         from django.contrib.auth.models import User, Permission
         from cbh_core_model.models import PROJECT_PERMISSIONS, PERMISSION_CODENAME_SEPARATOR
+        index_name = elasticsearch_client.get_project_index_name(proj.id)
+        elasticsearch_client.delete_index(index_name)
+
         for perm_type, irrel, irel2 in PROJECT_PERMISSIONS:
             perm = Permission.objects.get(codename="%d%s%s" % (proj.id, PERMISSION_CODENAME_SEPARATOR, perm_type) )
             perm.delete()
-        proj.custom_field_config.all().delete()
+        proj.custom_field_config.delete()
         proj.delete()
 
 
