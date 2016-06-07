@@ -368,7 +368,6 @@ def generate_structure_and_dictionary(batch):
     """
     Adding the structure data to a compound batch object
     """
-    print batch.__dict__
     chirality="1"
     if batch.id:
         print "not updating"
@@ -410,7 +409,6 @@ def generate_structure_and_dictionary(batch):
                                                                  # chirality=chirality,
                                                                  structure_key=batch.standard_inchi_key)
                     except ObjectDoesNotExist:
-                        print "got here"
                         uox_id = generate_uox_id()
                         rnd = random.randint(-1000000000, -2)
                         uox_id_lookup = ChemblIdLookup.objects.create(
