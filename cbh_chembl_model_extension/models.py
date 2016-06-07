@@ -210,8 +210,7 @@ class CBHCompoundBatchManager(models.Manager):
 
     def blinded(self, project=None):
         '''Generate a batch with a blinded id'''
-        blinded_batch_id = "EMPTY_ID"
-        return CBHCompoundBatch(project=project, blinded_batch_id=blinded_batch_id)
+        return CBHCompoundBatch(project=project)
 
     def from_rd_mol(self, rd_mol, orig_ctab=None, smiles="", project=None, reDraw=None):
         '''Clean up the structures that come in from Smiles or from XLS or SDFs'''
@@ -343,6 +342,7 @@ class CBHCompoundBatch(TimeStampedModel):
     def validate(self, temp_props=True):
         """Could now just use standardise, deprecated"""
         self.standardise()
+        set_images(self)
 
     def standardise(self):
         """Ensure Inchi etc was generated correctly"""
@@ -368,6 +368,7 @@ def generate_structure_and_dictionary(batch):
     """
     Adding the structure data to a compound batch object
     """
+    print batch.__dict__
     chirality="1"
     if batch.id:
         print "not updating"
@@ -408,7 +409,7 @@ def generate_structure_and_dictionary(batch):
                                                                  # chirality=chirality,
                                                                  structure_key=batch.standard_inchi_key)
                     except ObjectDoesNotExist:
-
+                        print "got here"
                         uox_id = generate_uox_id()
                         rnd = random.randint(-1000000000, -2)
                         uox_id_lookup = ChemblIdLookup.objects.create(

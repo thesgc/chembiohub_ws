@@ -135,8 +135,6 @@ class CBHCompoundUploadResource(ModelResource):
 
             url(r"^(?P<resource_name>%s)/validate_list/?$" % self._meta.resource_name,
                 self.wrap_view('post_validate_list'), name="api_validate_compound_list"),
-            url(r"^(?P<resource_name>%s)/validate_drawn/?$" % self._meta.resource_name,
-                self.wrap_view('post_validate_drawn'), name="api_validate_compound_drawn"),
             url(r"^(?P<resource_name>%s)/multi_batch_save/?$" % self._meta.resource_name,
                 self.wrap_view('multi_batch_save'), name="multi_batch_save"),
             url(r"^(?P<resource_name>%s)/multi_batch_custom_fields/?$" % self._meta.resource_name,
@@ -181,7 +179,7 @@ class CBHCompoundUploadResource(ModelResource):
            
             
         
-        res = result(bundle.data["task_id_for_save"], wait=100)
+        res = result(bundle.data["task_id_for_save"], wait=300)
         if res is True:
             return self.create_response(request, bundle, response_class=http.HttpCreated)
         return self.create_response(request, bundle, response_class=http.HttpAccepted)
@@ -366,63 +364,7 @@ class CBHCompoundUploadResource(ModelResource):
         validate_multi_batch(self, multiple_batch, bundle.data, session_key, batches)
         return self.create_response(request, bundle, response_class=http.HttpAccepted)
 
-    def post_validate_drawn(self, request, **kwargs):
-        """
-        Turn a drawn molfile via chemdoodle into a processable 
-        rdkit mol to be used by the rest of the architecture
-        """
-        deserialized = self.deserialize(request, request.body, format=request.META.get(
-            'CONTENT_TYPE', 'application/json'))
-        session_key = request.COOKIES[settings.SESSION_COOKIE_NAME]
-        deserialized = self.alter_deserialized_detail_data(
-            request, deserialized)
-        bundle = self.build_bundle(
-            data=dict_strip_unicode_keys(deserialized), request=request)
-        if bundle.obj.pk:
-            self.authorized_update_detail(
-                self.get_object_list(bundle.request), bundle)
-        else:
-            self.authorized_create_detail(
-                self.get_object_list(bundle.request), bundle)
-        #now get the SDfile from the request
-        ctab = bundle.data.get('sketch', '')
-        # first assume ctab
-        # allmols = [(obj, Chem.MolFromSmiles(str(obj))) for obj in objects]
-        # we need to make allmols a single-entry list in order to use the rst of the architecture
-
-        mol = Chem.MolFromMolBlock(ctab)
-        #for each of the supplied custom fields, use set prop to replicate how this would be if it was an sd file.
-        prj_data_fields = bundle.data.get('custom_fields',{})
-        sup_data_fields = bundle.data.get('supplementary_fields',[])
-        allmols = [ mol ]
-        errors = []
-        batches = []
-        multiple_batch = CBHCompoundMultipleBatch.objects.create(
-            project=bundle.data["project"], batch_count=1)
-        try:
-            b = CBHCompoundBatch.objects.from_rd_mol(
-                mol, project=bundle.data["project"], orig_ctab=ctab)
-
-            batches.append(b)
-        except Exception, e:
-            b = CBHCompoundBatch.objects.blinded(
-                            project=bundle.data["project"])
-            b.warnings["parseerror"] = "true"
-            b.properties["action"] = "Ignore"
-            errors.append(
-                    {"message": str(e)})
-        b.custom_fields = prj_data_fields
-        b.uncurated_fields = {}
-        #iterate the supplementary fields
-        for field in sup_data_fields:
-            b.uncurated_fields[field['name'].encode('ascii', 'ignore')] = field['value'].encode('ascii', 'ignore')
-        batches.append(b)
-        bundle.data["current_batch"] = multiple_batch.pk
-        bundle.data["errors"] = errors
-        bundle.data["headers"] = False
-        validate_multi_batch(self, multiple_batch, bundle.data, session_key, batches)
-        return self.create_response(request, bundle, response_class=http.HttpAccepted)
-
+    
     def preprocess_sdf_file(self, file_obj, request):
         """Read the input SDF file and add some extra information to it"""
         pass

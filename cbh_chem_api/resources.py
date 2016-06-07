@@ -4,7 +4,7 @@ It provides the webservices to add, search for and index CBHCompoundBatch object
 
 """
 from chembl_business_model.models.compounds import CompoundProperties, MoleculeDictionary
-from cbh_chembl_model_extension.models import CBHCompoundBatch, generate_uox_id, index_new_compounds
+from cbh_chembl_model_extension.models import CBHCompoundBatch, generate_uox_id, index_new_compounds, generate_structure_and_dictionary
 from tastypie.resources import ALL
 from tastypie.resources import ALL_WITH_RELATIONS
 from tastypie.resources import ModelResource, Resource
@@ -268,7 +268,7 @@ class BaseCBHCompoundBatchResource(ModelResource):
         """Hydrate functions are run before save of a new or updated model instance
         This one ensures that the blinded batch id is filled in in cases where an inventory item 
         with no ModelculeDictionary attribute (related_molregno)""" 
-        if bundle.data.get("blinded_batch_id", "") == u"EMPTY_ID":
+        if bundle.data.get("ctab", "") == "":
             uox_id = generate_uox_id()
             bundle.data["blinded_batch_id"] = uox_id
             bundle.obj.blinded_batch_id = uox_id
@@ -444,6 +444,9 @@ class BaseCBHCompoundBatchResource(ModelResource):
             if related_obj:
                 setattr(bundle.obj, field_object.attribute, related_obj)
 
+    def is_valid(self, bundle):
+        if bundle.obj.ctab:
+            bundle.obj.validate()
 
 
     def save(self, bundle, skip_errors=False):
@@ -465,14 +468,18 @@ class BaseCBHCompoundBatchResource(ModelResource):
 
         # Save FKs just in case.
         self.save_related(bundle)
+        if bundle.obj.ctab:
+            generate_structure_and_dictionary(bundle.obj)
 
         # Save the main object.
         obj_id = self.create_identifier(bundle.obj)
 
         if obj_id not in bundle.objects_saved or bundle.obj._state.adding:
             bundle.obj.save()
+            
             bundle.objects_saved.add(obj_id)
-
+        
+            
         # Now pick up the M2M bits.
         m2m_bundle = self.hydrate_m2m(bundle)
         self.save_m2m(m2m_bundle)

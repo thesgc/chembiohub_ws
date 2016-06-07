@@ -282,7 +282,7 @@ def build_phase_prefix_query(phrase, field_path):
 
 def build_es_request(queries, textsearch="", batch_ids_by_project=None):
     must_clauses = []
-    if batch_ids_by_project:
+    if batch_ids_by_project is not None:
         #The postgres backend has converted the chemical search
         #Into a list of ids by project
         #We then join these ids queries on a per project basis
@@ -310,7 +310,14 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
                 "should" : match_these_ids_by_index
             }
         }
-        must_clauses.append(by_index_batch_id_query)
+        if len(match_these_ids_by_index) > 0:
+            must_clauses.append(by_index_batch_id_query)
+        else:
+            must_clauses.append({   "bool" :{
+                "must_not" : {"match_all": {}}
+                }
+            })
+
 
 
 
@@ -333,7 +340,6 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
         if query["query_type"] == 'phrase':
 
             new_query = build_phase_prefix_query(query["phrase"], query["field_path"])
-            print(new_query)
             
         
         elif query["query_type"] == 'pick_from_list': 
