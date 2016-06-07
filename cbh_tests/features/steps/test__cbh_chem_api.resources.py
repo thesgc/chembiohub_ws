@@ -11,14 +11,10 @@ def step_impl(context):
         Given I create a project as before
         When I refresh the user object
         Given I have a compound batch with no structure
-        and I add a valid molfile to my compound data and call it sketch
+        and I add a valid molfile to my compound data and call it ctab
         and I add the project key to the compound data
-        and I set the type of the request to sketch
-        and I set the state to validate
-        When I submit the compound to POST validate drawn
-        then the response from post validate drawn is accepted
-        when I take the response from post validate drawn and post it to multi batch save
-        then I can post to multi batch save and the response will eventually be created""")
+        When I submit the compound by POST request
+        Then a compound batch is created""")
 
 
 @given(u'I save propane butane benzene and ethyl benzene via SMILES')
@@ -27,6 +23,7 @@ def step(context):
         Given I set up the SMILES data
         When I validate propane butane benzene and ethyl benzene via SMILES
         Then the response from post validate list is accepted
+        Then I request the multiple batch data until the response is OK
         When I take the response from post validate drawn and post it to multi batch save
         then I can post to multi batch save and the response will eventually be created
         When I list compound batches in the system
@@ -227,13 +224,6 @@ def proj_create(context):
     context.test_case.assertHttpCreated(context.saved_search_response)
 
 
-
-@given(u'I add the blinded batch id as EMPTY_ID')
-def step_impl(context):
-    project_json = json.loads(context.project_response.content)
-    context.saved_search_data["blinded_batch_id"] =  "EMPTY_ID"
-
-
 @given(u'I add the project key')
 def step_impl(context):
     project_json = json.loads(context.project_response.content)
@@ -254,7 +244,6 @@ def step_impl(context):
         Then the project is created
         When I refresh the user object
         Given A URL to redirect the user to and a GET request URL and an alias and description for my saved search
-        and I add the blinded batch id as EMPTY_ID
         When I send the search by POST request
         Then The saved search response is created
 
@@ -279,31 +268,7 @@ def step(context):
     context.post_data["restricted"] = "foo"
 
 
-@given(u'I set the type of the request to sketch')
-def step(context):
-    context.post_data["type"] = "sketch"
 
-
-
-@given(u'I add the blinded batch id to my compound POST data as EMPTY_ID')
-def step_impl(context):
-    project_json = json.loads(context.project_response.content)
-    context.post_data["blinded_batch_id"] =  "EMPTY_ID"
-
-
-
-
-@when(u'I submit the compound to POST validate drawn')
-def step_impl(context):
-    from django.conf import settings
-    resp = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches/validate_drawn/", format='json', data=context.post_data)
-    context.val_response = resp
-
-@then(u'the response from post validate drawn is accepted')
-def step_impl(context):
-    context.test_case.assertHttpAccepted(context.val_response )
-    print (context.val_response)
-    context.valdata = json.loads(context.val_response.content)
 
 
 @then(u'the response from post validate list is accepted')
@@ -319,11 +284,6 @@ def step(context):
     context.test_case.assertEquals(len(data), 4)
 
 
-@when(u'I take the response from post validate drawn and post it to multi batch save')
-def step_impl(context):
-    from django.conf import settings
-    resp = context.api_client.post("/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches/multi_batch_save/", format='json', data=context.valdata )
-    context.multibatch_response = resp
 
 
 @given(u"A compound batch is created from a drawing as before")
@@ -332,14 +292,13 @@ def step_impl(context):
         Given I create a project as before
         When I refresh the user object
         Given I have a compound batch with no structure
-        and I add a valid molfile to my compound data and call it sketch
+        and I add a valid molfile to my compound data and call it ctab
         and I add the project key to the compound data
-        and I set the type of the request to sketch
         and I set the state to validate
         When I submit the compound to POST validate drawn
         then the response from post validate drawn is accepted
         Then I request the multiple batch data until the response is OK 
-        when I take the response from post validate drawn and post it to multi batch save
+
         then I can post to multi batch save and the response will eventually be created
         """)
 
@@ -424,9 +383,9 @@ def step_impl(context):
 
 
 
-@given('I add a valid molfile to my compound data and call it sketch')
+@given('I add a valid molfile to my compound data and call it ctab')
 def step(context):
-    context.post_data["sketch"] = """
+    context.post_data["ctab"] = """
 
 
   8  8  0  0  0  0            999 V2000

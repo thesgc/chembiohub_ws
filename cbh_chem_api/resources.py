@@ -264,15 +264,6 @@ class BaseCBHCompoundBatchResource(ModelResource):
         return rc
 
 
-    def hydrate_blinded_batch_id(self, bundle):
-        """Hydrate functions are run before save of a new or updated model instance
-        This one ensures that the blinded batch id is filled in in cases where an inventory item 
-        with no ModelculeDictionary attribute (related_molregno)""" 
-        if bundle.data.get("ctab", "") == "":
-            uox_id = generate_uox_id()
-            bundle.data["blinded_batch_id"] = uox_id
-            bundle.obj.blinded_batch_id = uox_id
-        return bundle
 
 
     def dehydrate_properties(self, bundle):
@@ -468,8 +459,8 @@ class BaseCBHCompoundBatchResource(ModelResource):
 
         # Save FKs just in case.
         self.save_related(bundle)
-        if bundle.obj.ctab:
-            generate_structure_and_dictionary(bundle.obj)
+
+        generate_structure_and_dictionary(bundle.obj)
 
         # Save the main object.
         obj_id = self.create_identifier(bundle.obj)

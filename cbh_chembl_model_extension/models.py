@@ -374,7 +374,8 @@ def generate_structure_and_dictionary(batch):
         print "not updating"
         # currently we dont update existing compound records
     else:
-        if batch.blinded_batch_id:
+        if not batch.ctab:
+            #blinded compound
 
             uox_id = generate_uox_id()
             batch.blinded_batch_id = uox_id

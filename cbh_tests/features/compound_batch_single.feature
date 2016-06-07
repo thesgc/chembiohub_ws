@@ -5,15 +5,10 @@ Feature: A user can save a compound with and without a structure and can clone a
         Given I create a project as before
         When I refresh the user object
         Given I have a compound batch with no structure
-        and I add a valid molfile to my compound data and call it sketch
+        and I add a valid molfile to my compound data and call it ctab
         and I add the project key to the compound data
-        and I set the type of the request to sketch
-        and I set the state to validate
-        When I submit the compound to POST validate drawn
-        then the response from post validate drawn is accepted
-        Then I request the multiple batch data until the response is OK 
-        when I take the response from post validate drawn and post it to multi batch save
-        then I can post to multi batch save and the response will eventually be created
+        When I submit the compound by POST request
+        Then a compound batch is created
         When I stop the qcluster
         Then I see the right qcluster output
 
@@ -38,7 +33,6 @@ Feature: A user can save a compound with and without a structure and can clone a
         Given I create a project as before
         When I refresh the user object
         Given I have a compound batch with no structure
-        and I add the blinded batch id to my compound POST data as EMPTY_ID
         and I add the project primary key to the compound data
         When I submit the compound by POST request
         Then a compound batch is created
