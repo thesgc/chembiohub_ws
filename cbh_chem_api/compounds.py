@@ -374,7 +374,7 @@ class CBHCompoundUploadResource(ModelResource):
             return
         time.sleep(0.1)
         tries += 1
-        if tries > 10000:
+        if tries > 1000:
             return
         return self.get_file_name_test(file_obj)
 
@@ -395,10 +395,11 @@ class CBHCompoundUploadResource(ModelResource):
         self.authorized_create_detail(
             self.get_object_list(bundle.request), bundle)
         file_name = bundle.data['file_name']
-        self.get_file_name_test(correct_file.file)
+        
         session_key = request.COOKIES[settings.SESSION_COOKIE_NAME]
         correct_file = CBHFlowFile.objects.get(
             identifier="%s-%s" % (session_key, file_name))
+        self.get_file_name_test(correct_file.file)
 
         if(correct_file.extension in (".xls", ".xlsx")):
             # we need to know which column contains structural info - this needs to be defined on the mapping page and passed here
