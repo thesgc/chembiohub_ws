@@ -322,7 +322,7 @@ def before_scenario(context, scenario):
             "createdb dev_db -h %s -T template1" % host, shell=True)
 
     call(
-        "pg_restore -Fc -h %s -d dev_db < %s" % (host, context.commit_based_filename), shell=True)
+        "pg_restore -Fc -e -h %s -d dev_db < %s" % (host, context.commit_based_filename), shell=True)
 
     django.setup()
 

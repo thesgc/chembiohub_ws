@@ -6,7 +6,7 @@ Feature: A user can save a compound with and without a structure and can clone a
         When I refresh the user object
         Given I have a compound batch with no structure
         and I add a valid molfile to my compound data and call it ctab
-        and I add the project key to the compound data
+        and I add the project primary key to the compound data
         When I submit the compound by POST request
         Then a compound batch is created
         When I stop the qcluster
@@ -21,7 +21,7 @@ Feature: A user can save a compound with and without a structure and can clone a
         When I log in testuser
         When I list compound batches in the system
         then I see no compound batches
-        Given A compound batch is created from a drawing as before
+        Given I create a compound batch from a drawing as before
         When I list compound batches in the system
         Then the created compound batch has a uox id in the uuid field
         Then the created compound batch has a multiple_batch_id

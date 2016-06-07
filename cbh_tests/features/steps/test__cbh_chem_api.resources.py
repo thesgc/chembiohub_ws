@@ -8,11 +8,11 @@ from django.db import IntegrityError
 @given(u'I create a compound batch from a drawing as before')
 def step_impl(context):
     context.execute_steps(u"""
-        Given I create a project as before
+       Given I create a project as before
         When I refresh the user object
         Given I have a compound batch with no structure
         and I add a valid molfile to my compound data and call it ctab
-        and I add the project key to the compound data
+        and I add the project primary key to the compound data
         When I submit the compound by POST request
         Then a compound batch is created""")
 
@@ -24,7 +24,6 @@ def step(context):
         When I validate propane butane benzene and ethyl benzene via SMILES
         Then the response from post validate list is accepted
         Then I request the multiple batch data until the response is OK
-        When I take the response from post validate drawn and post it to multi batch save
         then I can post to multi batch save and the response will eventually be created
         When I list compound batches in the system
         Then 4 compound batches have been created
@@ -37,6 +36,7 @@ def step_impl(context):
         from django.conf import settings
         url = "/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches/get_part_processed_multiple_batch?current_batch=1" 
         resp = context.api_client.get(url, format='json')
+        context.multibatch_response = resp
         status = resp.status_code
         context.test_case.assertTrue(status in [200, 409])
     context.test_case.assertTrue(status==200)
