@@ -246,9 +246,9 @@ def validate_multi_batch(cbr_instance, multiple_batch, bundledata, session_key, 
     for b in batches_not_errors:
         b.properties["action"] = "New Batch"
     batches_with_structures = [
-        batch for batch in batches_not_errors if not batch.blinded_batch_id]
+        batch for batch in batches_not_errors if batch.ctab]
     blinded_data = [
-        batch for batch in batches_not_errors if batch.blinded_batch_id]
+        batch for batch in batches_not_errors if not batch.ctab]
     sdfstrings = [batch.ctab for batch in batches_with_structures]
     sdf = "\n".join(sdfstrings)
 

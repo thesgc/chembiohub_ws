@@ -369,7 +369,14 @@ class CBHCompoundUploadResource(ModelResource):
         """Read the input SDF file and add some extra information to it"""
         pass
 
-
+    def get_file_name_test(self, file_obj, tries=0):
+        if file_obj.name:
+            return
+        time.sleep(0.1)
+        tries += 1
+        if tries > 10000:
+            return
+        return self.get_file_name_test(file_obj)
 
     def post_validate_files(self, request, **kwargs):
         """Receive a CBHFlowFile ID which points at an uploaded SDF, XLSX or CDX file
@@ -388,6 +395,7 @@ class CBHCompoundUploadResource(ModelResource):
         self.authorized_create_detail(
             self.get_object_list(bundle.request), bundle)
         file_name = bundle.data['file_name']
+        self.get_file_name_test(correct_file.file)
         session_key = request.COOKIES[settings.SESSION_COOKIE_NAME]
         correct_file = CBHFlowFile.objects.get(
             identifier="%s-%s" % (session_key, file_name))

@@ -12,3 +12,4 @@ LOGIN_REDIRECT_URL = '/#/projects/list'
 
 
 REDIS_FOR_ID_GENERATOR = ENV_NAME
+

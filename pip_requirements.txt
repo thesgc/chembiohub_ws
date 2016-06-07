@@ -34,7 +34,7 @@ xmltodict
 XlsxWriter
 gunicorn
 django-redis
-django_q
+git+https://github.com/thesgc/django-q.git#egg=e12800a58c085ce3bcb431456f9836cd939a4186
 elasticsearch==2.2.0
 jsonpatch
 inflection
