@@ -52,7 +52,7 @@ ELASTICSEARCH_INDEX_MAPPING = {
         "settings": {
             "index.store.type": "niofs",
             "index.max_result_window" : 10000000,
-
+            "number_of_shards" : 1,
             "analysis" : {
                     "char_filter" : {
                         "special_char_space_out" :{ # put spaces around special characters so they can still be indexed
@@ -698,6 +698,7 @@ def create_temporary_index(batches, index_name):
 
     create_body = {
         "settings": {
+             "number_of_shards" : 1,
             "index.store.type": store_type,
             "analysis" : {
                     "analyzer" : {
