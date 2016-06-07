@@ -622,7 +622,6 @@ def get_detail_data_elasticsearch(index, id):
 
 
 
-TEMP_INDEX_TYPE = "temp_index_type"
 
 
 
@@ -722,7 +721,7 @@ def create_temporary_index(batches, index_name):
                 },
         },
         "mappings": {
-            TEMP_INDEX_TYPE: {
+            index_name: {
                 "_all": {"enabled": False},
                 "date_detection": False,
                 
@@ -788,7 +787,7 @@ def create_temporary_index(batches, index_name):
                 {
                     "_id": str(item["id"]),
                     "_index": index_name,
-                    "_type": TEMP_INDEX_TYPE
+                    "_type": index_name
                 }
             })
             bulk_items.append(item)
