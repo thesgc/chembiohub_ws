@@ -82,7 +82,12 @@ ELASTICSEARCH_INDEX_MAPPING = {
                 },
         },
         "mappings": {
-            BATCH_TYPE_NAME: {
+            
+        }
+    }
+
+
+DEFAULT_COLUMN_MAPPING = {
                 "dynamic": False,
                 "_all": {"enabled": False},
                 "date_detection": False,
@@ -103,8 +108,6 @@ ELASTICSEARCH_INDEX_MAPPING = {
                 
                 
             }
-        }
-    }
 
 def get_main_index_name():
     return "%s__%s" % (ES_PREFIX, ES_MAIN_INDEX_NAME)
@@ -175,14 +178,15 @@ def build_indexed_fields(document, schema):
             to_index[sortable] = zeropad(value)
     return to_index
 
-def build_mapping_definitions(schema):
+def build_mapping_definitions(schema, index_name):
     body = deepcopy(ELASTICSEARCH_INDEX_MAPPING)
+    colmapping = deepcopy(DEFAULT_COLUMN_MAPPING)
     
-    
+    body["mappings"][index_name] = colmapping
     for field in schema:
         fieldname = get_es_fieldname(field["data"])
         sortable = get_sortable_es_fieldname(field["data"])
-        body["mappings"][BATCH_TYPE_NAME]["properties"][fieldname] = {
+        body["mappings"][index_name]["properties"][fieldname] = {
                             "type": "string", 
                             "index_options": "positions", 
                             "index": "analyzed", 
@@ -194,7 +198,7 @@ def build_mapping_definitions(schema):
                                     "raw": {"type": "string", "store": "no", "index": "not_analyzed", "ignore_above": ELASTICSEARCH_MAX_FIELD_LENGTH}
                                 }
                             }
-        body["mappings"][BATCH_TYPE_NAME]["properties"][sortable] = {
+        body["mappings"][index_name]["properties"][sortable] = {
                             "type": "string", "store": "no", "analyzer" : "lowercasekeywordanalyzer", "index": "analyzed", "ignore_above": ELASTICSEARCH_MAX_FIELD_LENGTH
                         }
     return body
@@ -237,7 +241,7 @@ def add_data_to_index(batches, index_names, schema_list,  refresh=True):
         if len(batches) == 1:
             bid = batches[0]["dataset"].get("id", None)
             es.index(index=index_names[0], 
-                     doc_type=BATCH_TYPE_NAME, 
+                     doc_type=index_names[0], 
                      id=bid, 
                      body=batches[0],
                      refresh=True)
@@ -247,7 +251,7 @@ def add_data_to_index(batches, index_names, schema_list,  refresh=True):
                     "update":
                     {
                         "_index": index_names[counter],
-                        "_type": BATCH_TYPE_NAME
+                        "_type": index_names[counter]
                     }
                 }
                 if item["dataset"].get("id", None):
@@ -296,7 +300,7 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
                                     "indices": index_names,
                                     "query": {
                                         "ids" : {
-                                            "type" : BATCH_TYPE_NAME,
+                                            # "type" : BATCH_TYPE_NAME,
                                             "values" : [str(id) for id in batch_ids]
                                         }
                                     },
@@ -573,15 +577,15 @@ def zeropad(input_string):
 
 def create_or_update_index(index_name, tabular_data_schema):
     es = elasticsearch.Elasticsearch()
-    create_body = build_mapping_definitions(tabular_data_schema)
+    create_body = build_mapping_definitions(tabular_data_schema, index_name)
     try:
         es.indices.create(
             index_name,
             body=create_body)
     except elasticsearch.exceptions.RequestError:
-        es.indices.put_mapping(doc_type=BATCH_TYPE_NAME,
+        es.indices.put_mapping(doc_type=index_name,
             index=index_name, 
-            body=create_body["mappings"][BATCH_TYPE_NAME])
+            body=create_body["mappings"][index_name])
 
 def unzeropad(input_string):
     """Remove zero padding from integers and floats"""

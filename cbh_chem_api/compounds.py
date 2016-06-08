@@ -267,7 +267,7 @@ class CBHCompoundUploadResource(ModelResource):
         processSmiles = False
         # if structure_col and structure_col != mb.uploaded_data.get("structure_col", ""):
         #     processSmiles =  True
-        index_name = elasticsearch_client.get_temp_index_name(request, mb.id)
+        index_name = elasticsearch_client.get_temp_index_name(request.COOKIES[settings.SESSION_COOKIE_NAME], mb.id)
         elasticsearch_client.get_action_totals(index_name, bundle.data)
         mb.uploaded_data = bundle.data
         mb.save()

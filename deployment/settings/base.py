@@ -758,6 +758,7 @@ TABULAR_DATA_SETTINGS = {
             "data" : "project_counter",
             "editable": False,
             "className": "htCenter htMiddle ",
+            "setWidth" : 120,
         },
         "projectfull.project_type.saved_search_project_type" : {
             "noSort": True,
@@ -794,6 +795,7 @@ TABULAR_DATA_SETTINGS = {
             "renderer_named": "archivedRenderer",
             "editable": True,
             "className": "htCenter htMiddle ",
+
         },
         "clone": {
             "noSort": True,
@@ -803,6 +805,7 @@ TABULAR_DATA_SETTINGS = {
             "renderer_named": "cloneRenderer",
             "editable": False,
             "className": "htCenter htMiddle ",
+            "setWidth" : 120,
         },
         "image" : {
             "noSort": True,
@@ -812,7 +815,8 @@ TABULAR_DATA_SETTINGS = {
             "renderer_named": "coverRenderer",
             "editable": False,
             "className": "htCenter htMiddle ",
-            "field_type": "b64png"
+            "field_type": "b64png",
+            "setWidth" : 100,
         },
         "id" : {
             "sortOrder": "none",
@@ -829,7 +833,8 @@ TABULAR_DATA_SETTINGS = {
             "knownBy": "Info",
             "searchFormType" : "upload_info",
             "data": "originalSmiles",
-            "renderer_named": "infoRenderer"
+            "renderer_named": "infoRenderer",
+            "setWidth": 400
         }, 
         "properties.action" : {
             "sortOrder": "none",
@@ -900,6 +905,7 @@ TABULAR_DATA_SETTINGS = {
             "editable": False,
             "field_type"  : "string",
             "className": "htCenter htMiddle ",
+            "setWidth": 400
         },
         "standard_inchi" :{
             "noSort": True,
@@ -909,8 +915,10 @@ TABULAR_DATA_SETTINGS = {
             "editable": False,
             "field_type"  : "string",
             "className": "htCenter htMiddle ",
+            "setWidth" : 600,
         },
         "standard_inchi_key" :{
+
             "noSort": True,
             "knownBy": "Standard InChI Key",
             "data": "standard_inchi_key",
