@@ -55,7 +55,7 @@ from django.http import HttpRequest
 from rdkit.Chem.AllChem import Compute2DCoords
 from django.db.models import Prefetch
 import dateutil.parser
-from cbh_utils.parser import parse_pandas_record, parse_sdf_record, apply_json_patch, get_uncurated_fields_from_file
+from cbh_utils.parser import parse_pandas_record, parse_sdf_record, apply_json_patch, get_uncurated_fields_from_file, get_sdf_count
 # from tastypie.utils.mime import build_content_type
 from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate
 import time
@@ -182,6 +182,8 @@ class CBHCompoundUploadResource(ModelResource):
         res = result(bundle.data["task_id_for_save"], wait=300)
         if res is True:
             return self.create_response(request, bundle, response_class=http.HttpCreated)
+        if (isinstance(res, basestring)):
+            raise Exception(res)
         return self.create_response(request, bundle, response_class=http.HttpAccepted)
         
 
@@ -294,6 +296,11 @@ class CBHCompoundUploadResource(ModelResource):
             id = request.GET.get("current_batch")
             mb = CBHCompoundMultipleBatch.objects.get(pk=id)
 
+        task_id = request.session.get("mb_inprogress_%d" % mb.id)
+
+        res = result(task_id, wait=300)
+        if isinstance(res, basestring):
+            raise Exception(res)
         if not mb.uploaded_data:
             #The uploaded data field will be set once the data is fully processed
             raise ImmediateHttpResponse(HttpConflict("data_not_yet_ready"))
@@ -400,7 +407,10 @@ class CBHCompoundUploadResource(ModelResource):
         correct_file = CBHFlowFile.objects.get(
             identifier="%s-%s" % (session_key, file_name))
         self.get_file_name_test(correct_file.file)
-
+        multiple_batch = CBHCompoundMultipleBatch.objects.create(
+            project=bundledata["project"],
+            uploaded_file=correct_file
+        )
         if(correct_file.extension in (".xls", ".xlsx")):
             # we need to know which column contains structural info - this needs to be defined on the mapping page and passed here
             # read in the specified structural column
@@ -408,6 +418,9 @@ class CBHCompoundUploadResource(ModelResource):
             df = None
             try:
                 df = pd.read_excel(correct_file.file)
+                multiple_batch.batch_count = df.shape[0]
+                multiple_batch.save()
+                bundle.data["total_processing"] = multiple_batch.batch_count
             except IndexError:
                 raise BadRequest("no_headers")
         if(correct_file.extension not in (".xls", ".xlsx", ".sdf", ".cdxml")):
@@ -422,10 +435,10 @@ class CBHCompoundUploadResource(ModelResource):
         if (correct_file.extension == ".sdf"):
             # read in the filepalter_batch_data_after_save(self, batch_list, python_file_obj, request, multi_batch):
             self.preprocess_sdf_file(correct_file.file, request)
-        multiple_batch = CBHCompoundMultipleBatch.objects.create(
-            project=bundledata["project"],
-            uploaded_file=correct_file
-        )
+            multiple_batch.batch_count = get_sdf_count(correct_file)
+            multiple_batch.save()
+            bundle.data["total_processing"] = multiple_batch.batch_count
+        
         bundle.data["current_batch"] = multiple_batch.pk
         bundle.data["multiplebatch"] = multiple_batch.pk
         id = async("cbh_chem_api.tasks.process_file_request", 
@@ -437,6 +450,8 @@ class CBHCompoundUploadResource(ModelResource):
                                                                session_key)
 
         # res = result(id, wait=20000)
+
+        request.session["mb_inprogress_%d" % multiple_batch.id] = id
         
         bundle.data = bundledata
         return self.create_response(request, bundle, response_class=http.HttpAccepted)

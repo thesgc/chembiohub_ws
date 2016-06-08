@@ -134,7 +134,11 @@ def parse_pandas_record(headers, obj, destination_field, row, fielderrors, heade
     # Set excel fields as uncurated
     setattr(obj, destination_field, custom_fields)
 
-
+def get_sdf_count(correct_file):
+    data = correct_file.file.read().decode('string-escape').decode("utf-8", "ignore")
+    data = data.replace("\r\n", "\n").replace("\r", "\n")
+    ctabs = data.split("$$$$\n")
+    return len(ctabs)
 
 def get_uncurated_fields_from_file(correct_file, fielderrors):
     data = correct_file.file.read().decode('string-escape').decode("utf-8", "ignore")

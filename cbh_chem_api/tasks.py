@@ -109,6 +109,7 @@ def process_file_request(
             headers = get_all_sdf_headers(correct_file.path)
             uncurated, ctabs, ctab_parts = get_uncurated_fields_from_file(correct_file, fielderrors)
             multiple_batch.batch_count = len(ctabs)
+            multiple_batch.save()
             args = [(index, arguments[0], arguments[1], arguments[2], bundledata["project"]) for index, arguments in enumerate(itertools.izip( ctabs, ctab_parts,  uncurated))]
             #split data into 3 parts
             list_size = math.ceil(float(len(args))/2.0)
@@ -116,7 +117,13 @@ def process_file_request(
             arg_chunks = [c for c in chunks(args, list_size)]
             id = async_iter("cbh_chem_api.tasks.get_batch_from_sdf_chunks", arg_chunks)
             lists_of_batches =  result(id, wait=1000000)
+            for batchlist in lists_of_batches:
+                if isinstance(batchlist, basestring):
+                    
+                    raise Exception(batchlist)
             batches = [inner for outer in lists_of_batches for inner in outer]
+
+
             # batches = get_batch_from_sdf_chunks(args) 
                 
         elif(correct_file.extension in (".xls", ".xlsx")):
@@ -132,7 +139,7 @@ def process_file_request(
             # read the smiles string value out of here, when we know which
             # column it is.
             
-            multiple_batch.batch_count = df.shape[0]
+            
             row_iterator = df.iterrows()
             headers = list(df)
             headers = [h.replace(".", "__") for h in headers]
@@ -163,8 +170,11 @@ def process_file_request(
             arg_chunks = [c for c in chunks(args, list_size)]
             id = async_iter("cbh_chem_api.tasks.get_batch_from_xls_chunks", arg_chunks)
             lists_of_batches =  result(id, wait=1000000)
+            for batchlist in lists_of_batches:
+                if isinstance(batchlist, basestring):
+                    raise Exception(batchlist)
             batches = [inner for outer in lists_of_batches for inner in outer]
-
+          
 
             for b in batches:
                 if dict(b.uncurated_fields) == {}:
@@ -391,6 +401,7 @@ def validate_multi_batch(cbr_instance, multiple_batch, bundledata, session_key, 
 
 
 
+
 def get_batch_from_sdf_chunks(lists):
     batches = []
     for args in lists:
@@ -398,7 +409,6 @@ def get_batch_from_sdf_chunks(lists):
     return batches
 
 def get_batch_from_sdf(index, sdf_data, ctab_part, uncur, project):
-    
     mol = Chem.MolFromMolBlock(ctab_part)
     if mol is None:
         b = CBHCompoundBatch.objects.blinded(
