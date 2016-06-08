@@ -139,7 +139,7 @@ def process_file_request(
             # read the smiles string value out of here, when we know which
             # column it is.
             
-            
+
             row_iterator = df.iterrows()
             headers = list(df)
             headers = [h.replace(".", "__") for h in headers]
@@ -176,12 +176,12 @@ def process_file_request(
             batches = [inner for outer in lists_of_batches for inner in outer]
           
 
-            for b in batches:
+            for b, args in itertools.izip(batches, args):
                 if dict(b.uncurated_fields) == {}:
                 # Only rebuild the uncurated fields if this has not
                 # been done before
                     parse_pandas_record(
-                        headers, b, "uncurated_fields", row, fielderrors, headerswithdata)
+                        headers, b, "uncurated_fields", args[1], fielderrors, headerswithdata)
                
             headers = [hdr for hdr in headers if hdr in headerswithdata]
             
@@ -436,7 +436,10 @@ def get_batch_from_sdf(index, sdf_data, ctab_part, uncur, project):
 def get_batch_from_xls_chunks(args_list):
     batches = []
     for args in args_list:
-        batches.append(get_batch_from_xls_row(*args))
+        index, row, structure_col, project = args
+        
+        batch = get_batch_from_xls_row(index, row, structure_col, project)
+        batches.append(batch)
     return batches
 
 def get_batch_from_xls_row(index, row, structure_col, project):
