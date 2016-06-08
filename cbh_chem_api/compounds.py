@@ -177,9 +177,10 @@ class CBHCompoundUploadResource(ModelResource):
 
             bundle.data["task_id_for_save"] = async('cbh_chem_api.tasks.save_multiple_batch',  mb, creator_user, session_key)
            
-            
+        print bundle.data["task_id_for_save"]
         
         res = result(bundle.data["task_id_for_save"], wait=300)
+        print res
         if res is True:
             return self.create_response(request, bundle, response_class=http.HttpCreated)
         if (isinstance(res, basestring)):
@@ -296,11 +297,11 @@ class CBHCompoundUploadResource(ModelResource):
             id = request.GET.get("current_batch")
             mb = CBHCompoundMultipleBatch.objects.get(pk=id)
 
-        task_id = request.session.get("mb_inprogress_%d" % mb.id)
-
-        res = result(task_id, wait=300)
-        if isinstance(res, basestring):
-            raise Exception(res)
+        task_id = request.session.get("mb_inprogress_%d" % mb.id, None)
+        if task_id:
+            res = result(task_id, wait=300)
+            if isinstance(res, basestring):
+                raise Exception(res)
         if not mb.uploaded_data:
             #The uploaded data field will be set once the data is fully processed
             raise ImmediateHttpResponse(HttpConflict("data_not_yet_ready"))
@@ -408,7 +409,7 @@ class CBHCompoundUploadResource(ModelResource):
             identifier="%s-%s" % (session_key, file_name))
         self.get_file_name_test(correct_file.file)
         multiple_batch = CBHCompoundMultipleBatch.objects.create(
-            project=bundledata["project"],
+            project=bundle.data["project"],
             uploaded_file=correct_file
         )
         if(correct_file.extension in (".xls", ".xlsx")):
