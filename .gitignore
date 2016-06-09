@@ -16,6 +16,7 @@ develop-eggs/
 dist/
 downloads/
 eggs/
+vagrant/code
 lib/
 lib64/
 parts/
@@ -24,6 +25,7 @@ var/
 .idea/
 charms/
 *.egg-info/
+vagrant/.vagrant/
 .installed.cfg
 *.egg
 deployment/packer/packer_cache/

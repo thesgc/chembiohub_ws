@@ -180,7 +180,7 @@ class CBHCompoundUploadResource(ModelResource):
                 bundle.data["task_id_for_save"] = async('cbh_chem_api.tasks.save_multiple_batch',  mb, creator_user, session_key)
                
             
-            res = result(bundle.data["task_id_for_save"], wait=300)
+            res = result(bundle.data["task_id_for_save"], wait=10)
             if res is True:
                 return self.create_response(request, bundle, response_class=http.HttpCreated)
             if (isinstance(res, basestring)):
@@ -303,7 +303,7 @@ class CBHCompoundUploadResource(ModelResource):
 
         task_id = request.session.get("mb_inprogress_%d" % mb.id, None)
         if task_id:
-            res = result(task_id, wait=300)
+            res = result(task_id, wait=10)
             if isinstance(res, basestring):
                 raise Exception(res)
         if not mb.uploaded_data:
@@ -466,7 +466,6 @@ class CBHCompoundUploadResource(ModelResource):
                                                                correct_file,
                                                                session_key)
 
-        # res = result(id, wait=20000)
 
         request.session["mb_inprogress_%d" % multiple_batch.id] = id
         

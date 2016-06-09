@@ -112,16 +112,9 @@ def process_file_request(
             multiple_batch.save()
             args = [(index, arguments[0], arguments[1], arguments[2], bundledata["project"]) for index, arguments in enumerate(itertools.izip( ctabs, ctab_parts,  uncurated))]
             #split data into 3 parts
-            list_size = math.ceil(float(len(args))/2.0)
 
-            arg_chunks = [c for c in chunks(args, list_size)]
-            id = async_iter("cbh_chem_api.tasks.get_batch_from_sdf_chunks", arg_chunks)
-            lists_of_batches =  result(id, wait=1000000)
-            for batchlist in lists_of_batches:
-                if isinstance(batchlist, basestring):
-                    
-                    raise Exception(batchlist)
-            batches = [inner for outer in lists_of_batches for inner in outer]
+            
+            batches = get_batch_from_sdf_chunks(args)
 
 
             # batches = get_batch_from_sdf_chunks(args) 
@@ -165,16 +158,7 @@ def process_file_request(
             
             args = [(index, row, structure_col, bundledata["project"]) for index, row in row_iterator]
 
-            list_size = math.ceil(float(len(args))/2.0)
-
-            arg_chunks = [c for c in chunks(args, list_size)]
-            id = async_iter("cbh_chem_api.tasks.get_batch_from_xls_chunks", arg_chunks)
-            lists_of_batches =  result(id, wait=1000000)
-            for batchlist in lists_of_batches:
-                if isinstance(batchlist, basestring):
-                    raise Exception(batchlist)
-            batches = [inner for outer in lists_of_batches for inner in outer]
-          
+            batches = get_batch_from_xls_chunks(args)
 
             for b, args in itertools.izip(batches, args):
                 if dict(b.uncurated_fields) == {}:
@@ -498,14 +482,14 @@ def save_multiple_batch(
     from cbh_chem_api.compounds  import CBHCompoundUploadResource
     cbr_instance = CBHCompoundUploadResource()
 
-    limit = math.ceil(float(multiple_batch.batch_count)/2.0)
+    limit = 100
     offset = 0
     batches = []
     hasMoreData = True
     
 
     datasets = []
-    for run in range(0,3):
+    for run in range(0,math.ceil(float(multiple_batch.batch_count)/100.0)):
         datasets.append(( 
                         multiple_batch, 
                         creator_user, 
@@ -513,8 +497,8 @@ def save_multiple_batch(
                         limit, 
                         offset))
         offset += limit
-    id = async_iter("cbh_chem_api.tasks.process_batch_list", datasets)
-    lists_of_batches = result(id, wait=1000000)
+
+    lists_of_batches = [process_batch_list(*ds) for ds in datasets]
     batches = [inner for outer in lists_of_batches for inner in outer]
     if multiple_batch.uploaded_file:
         cbr_instance.alter_batch_data_after_save( batches , multiple_batch.uploaded_file.file , multiple_batch)
