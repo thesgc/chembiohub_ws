@@ -59,7 +59,7 @@ from cbh_utils.parser import parse_pandas_record, parse_sdf_record, apply_json_p
 # from tastypie.utils.mime import build_content_type
 from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate
 import time
-from cbh_chem_api.tasks import  get_batch_from_sdf_chunks, get_batch_from_xls_row, process_file_request, validate_multi_batch
+from cbh_chem_api.tasks import  get_batch_from_sdf_chunks, get_batch_from_xls_row, process_file_request, validate_multi_batch, clean_up_multi_batch
 import itertools
 from tastypie.http import  HttpConflict
 
@@ -153,6 +153,7 @@ class CBHCompoundUploadResource(ModelResource):
 
     def multi_batch_save(self, request, **kwargs):
         """Save the data which has been cached in Elasticsearch"""
+        
         deserialized = self.deserialize(request, request.body, format=request.META.get(
             'CONTENT_TYPE', 'application/json'))
         session_key = request.COOKIES[settings.SESSION_COOKIE_NAME]
@@ -171,23 +172,26 @@ class CBHCompoundUploadResource(ModelResource):
         id = bundle.data["multiplebatch"]
         mb = CBHCompoundMultipleBatch.objects.get(pk=id)
         creator_user = request.user
-        if not bundle.data.get("task_id_for_save", None):
+        try:
+            if not bundle.data.get("task_id_for_save", None):
 
-            mb.created_by = creator_user.username
+                mb.created_by = creator_user.username
 
-            bundle.data["task_id_for_save"] = async('cbh_chem_api.tasks.save_multiple_batch',  mb, creator_user, session_key)
-           
-        print bundle.data["task_id_for_save"]
-        
-        res = result(bundle.data["task_id_for_save"], wait=300)
-        print res
-        if res is True:
-            return self.create_response(request, bundle, response_class=http.HttpCreated)
-        if (isinstance(res, basestring)):
-            raise Exception(res)
-        return self.create_response(request, bundle, response_class=http.HttpAccepted)
-        
+                bundle.data["task_id_for_save"] = async('cbh_chem_api.tasks.save_multiple_batch',  mb, creator_user, session_key)
+               
+            
+            res = result(bundle.data["task_id_for_save"], wait=300)
+            if res is True:
+                return self.create_response(request, bundle, response_class=http.HttpCreated)
+            if (isinstance(res, basestring)):
+                raise Exception(res)
+            return self.create_response(request, bundle, response_class=http.HttpAccepted)
+        except:
+            print "cleaning up due error during save transaction"
+            clean_up_multi_batch(mb, session_key)
+            raise
 
+    
 
     def after_save_and_index_hook(self, request, multi_batch_id, project_id):
         """Hook used to perform operations on data that has been saved"""

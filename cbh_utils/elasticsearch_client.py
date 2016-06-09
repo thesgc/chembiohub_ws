@@ -492,6 +492,12 @@ def remove_existing_queries_for_agg(queries, autocomplete_field_path):
         return new_queries
     return queries
 
+def delete_document(index_name, id):
+    es = elasticsearch.Elasticsearch()
+    es.delete(index_name, index_name, id)
+
+
+
 
 def get_list_data_elasticsearch(queries, index, sorts=[], autocomplete="", autocomplete_field_path="", autocomplete_size=settings.MAX_AUTOCOMPLETE_SIZE, textsearch="", offset=0, limit=10, batch_ids_by_project=None):
     """Build a query for elasticsearch by going through the input query dictionaries

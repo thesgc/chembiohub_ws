@@ -252,7 +252,13 @@ class BaseCBHCompoundBatchResource(ModelResource):
                     batches.append(b.obj)
             else:
                 batches.append(data.obj)
-            index_batches_in_new_index(batches)
+            try:
+                index_batches_in_new_index(batches)
+            except:
+                #There has been an error in indexing therefore cleanup
+                session_key = request.COOKIES[settings.SESSION_COOKIE_NAME]
+                clean_up_multi_batch(data.obj.multiple_batch, session_key)
+                raise
 
         serialized = self.serialize(request, data, desired_format)
         rc = response_class(content=serialized, content_type=build_content_type(
@@ -438,6 +444,7 @@ class BaseCBHCompoundBatchResource(ModelResource):
     def is_valid(self, bundle):
         if bundle.obj.ctab:
             bundle.obj.validate()
+
 
 
     def save(self, bundle, skip_errors=False):

@@ -7,10 +7,11 @@ from django.contrib.auth import get_user_model
 from django.test import RequestFactory
 import shutil
 from cbh_utils import elasticsearch_client
-
+from cbh_core_api.tasks import remove_session_cached_projectlists
 
 def backup_projects(projects_list, directory):
-    from cbh_core_api.resources import ChemregProjectResource
+    from cbh_core_api.resources import ChemregProjectResource, ChemRegCustomFieldConfigResource
+    cfcres = ChemRegCustomFieldConfigResource()
     projres = ChemregProjectResource()
     request_factory = RequestFactory()
     user = get_user_model().objects.filter(is_superuser=True)[0]
@@ -26,6 +27,19 @@ def backup_projects(projects_list, directory):
         path_to_write_json = project_path + "project.json"
         with open(path_to_write_json, "w") as text_file:
             text_file.write(json_content)
+
+        request = request_factory.get("/")
+        request.user = user
+        request.GET = request.GET.copy()
+        request.GET["format"] = "xlsx"
+        resp = cfcres.get_detail(request, pk=proj.custom_field_config_id)
+        path_to_write_xlsx = project_path + "fields.xlsx"
+        with open(path_to_write_xlsx, 'wb') as f:
+            f.write(resp._container[0])
+
+        
+
+
 
 
 def backup_compounds(projects_list, directory):
@@ -77,10 +91,15 @@ def backup_attachments(projects_list, directory):
         for cbh_file in CBHFlowFile.objects.filter(project=proj):
             #Make a new unique filename for the item
             if cbh_file.cbhcompoundmultiplebatch_set.count() == 0:
-                shutil.copy2(cbh_file.full_path, files_path + backup_filename(cbh_file.id, cbh_file.original_filename ))
+                try:
+                    shutil.copy2(cbh_file.full_path, files_path + backup_filename(cbh_file.id, cbh_file.original_filename ))
+                except IOError:
+                    print "No such file %s" % cbh_file.full_path
             else:
-                shutil.copy2(cbh_file.full_path, uploads_path + backup_filename(cbh_file.id, cbh_file.original_filename ))
-
+                try:
+                    shutil.copy2(cbh_file.full_path, uploads_path + backup_filename(cbh_file.id, cbh_file.original_filename ))
+                except IOError:
+                    print "No such file %s" % cbh_file.full_path
 
 def backup_permissions(projects_list, directory):
     from cbh_core_api.resources import UserResource
@@ -132,10 +151,8 @@ def delete_projects(projects_list):
                 perm.delete()
             except :
                 pass
-        try:
-            proj.custom_field_config.delete()
-        except:
-            pass
+        
+        print proj.name
         proj.delete()
 
 
@@ -183,6 +200,7 @@ class Command(BaseCommand):
                 backup_projects(to_delete, directory)
                 backup_compounds(to_delete, directory)
                 delete_projects(to_delete)
+                remove_session_cached_projectlists()
             else:
                 print ("Delete not confirmed, exiting")
 

@@ -521,13 +521,25 @@ def save_multiple_batch(
     index_batches_in_new_index(batches)
     elasticsearch_client.delete_index(
         elasticsearch_client.get_temp_index_name(session_key, multiple_batch.id))
-    print multiple_batch.project_id
-    #cbr_instance.after_save_and_index_hook(request, id, multiple_batch.project_id)
+    cbr_instance.after_save_and_index_hook(request, multiple_batch.id, multiple_batch.project_id)
     return True
 
 
 
+def clean_up_multi_batch( mb, session_key):
+    """make no assumptions - any data related 
+    to this multi batch id must be deleted"""
+    CBHCompoundBatch.objects.filter(multiple_batch_id=mb.id).delete()
 
+    index_name = elasticsearch_client.get_project_index_name(mb.project_id)
+    content = elasticsearch_client.get_list_data_elasticsearch([{"pick_from_list": [str(mb.id)],
+                                                                "field_path" :"multiple_batch_id",
+                                                                "query_type" : "pick_from_list"
+                                                                }], 
+                                                                index_name,
+                                                                limit = 10000)
+    for hit in content["hits"]["hits"]:
+        elasticsearch_client.delete_document(index_name, hit["_id"])
 
 def process_batch_list(multiple_batch, 
                         creator_user, 

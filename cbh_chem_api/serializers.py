@@ -159,9 +159,10 @@ class CBHCompoundBatchSerializer( Serializer):
                     if not empty:
                         fix_column_types(df, projectsheet["schema"])
 
-                    df.to_excel(writer, sheet_name=projectsheet["name"], index=False,)
-                    worksheet = writer.sheets[projectsheet["name"]]
-                    
+                    sname =  (projectsheet["name"][:25] + '..') if len(projectsheet["name"]) > 25 else projectsheet["name"]
+                    df.to_excel(writer, sheet_name=sname, index=False,)
+                    worksheet = writer.sheets[sname]
+
                     format = workbook.add_format()
                     format.set_text_wrap()
                     format.set_font_name('Cantarell')
