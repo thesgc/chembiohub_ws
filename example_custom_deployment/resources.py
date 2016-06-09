@@ -60,7 +60,11 @@ def validate_file_object_externally(python_file_obj):
 		raise BadRequest('An unexpected error has occurred')
 
 class AlteredCompoundBatchResource(CBHCompoundUploadResource):
-	def after_save_and_index_hook(self, request, multi_batch_id, project_id):
+	def after_save_and_index_hook(self, multi_batch_id, project_id):
+		request_factory = RequestFactory()
+    	user = get_user_model().objects.filter(is_superuser=True)[0]
+    	request = request_factory.get("/")
+        request.user = user
 		logger.info('Writing out files to share')
 		try:
 			extra_queries = [{'query_type': 'pick_from_list', 'field_path': 'multiple_batch_id','pick_from_list': [str(multi_batch_id)]}]

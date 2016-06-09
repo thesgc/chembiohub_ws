@@ -36,7 +36,7 @@ try:
 except AttributeError:
     WS_DEBUG = False
 from cbh_core_api.authorization import ProjectAuthorization
-from cbh_core_api.resources import ChemregProjectResource, ChemRegCustomFieldConfigResource, NoCustomFieldsChemregProjectResource
+from cbh_core_api.resources import ChemregProjectResource, ChemRegCustomFieldConfigResource, NoCustomFieldsChemregProjectResource, SkinningConfig
 from tastypie.utils import dict_strip_unicode_keys
 from tastypie.serializers import Serializer
 from tastypie import fields
@@ -193,7 +193,7 @@ class CBHCompoundUploadResource(ModelResource):
 
     
 
-    def after_save_and_index_hook(self, request, multi_batch_id, project_id):
+    def after_save_and_index_hook(self, multi_batch_id, project_id):
         """Hook used to perform operations on data that has been saved"""
         pass
 
@@ -428,9 +428,7 @@ class CBHCompoundUploadResource(ModelResource):
                 bundle.data["total_processing"] = multiple_batch.batch_count
             except IndexError:
                 raise BadRequest("no_headers")
-        if(correct_file.extension not in (".xls", ".xlsx", ".sdf", ".cdxml")):
-            raise BadRequest("file_format_error")
-        print correct_file.file.name
+
         bundledata = bundle.data
         creator_user = request.user
         cfr = ChemRegCustomFieldConfigResource()
@@ -444,6 +442,20 @@ class CBHCompoundUploadResource(ModelResource):
             multiple_batch.save()
             bundle.data["total_processing"] = multiple_batch.batch_count
         
+        skinconfig = SkinningConfig.objects.all()[0]
+        if jsondata["project_type"]["show_compounds"]:
+            if correct_file.extension not in (".xls", ".xlsx", ".sdf", ".cdxml"):
+                raise BadRequest("file_format_error")
+            if multiple_batch.batch_count > skinconfig.max_non_chem_upload_size:
+                raise BadRequest("file_too_large")
+
+        else:
+            if correct_file.extension not in (".xls", ".xlsx",):
+                raise BadRequest("file_format_error")
+            if multiple_batch.batch_count > skinconfig.max_chem_upload_size:
+                raise BadRequest("file_too_large")
+
+
         bundle.data["current_batch"] = multiple_batch.pk
         bundle.data["multiplebatch"] = multiple_batch.pk
         id = async("cbh_chem_api.tasks.process_file_request", 

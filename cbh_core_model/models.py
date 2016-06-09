@@ -373,6 +373,8 @@ class SkinningConfig(SingletonModel):
     enable_smiles_input = models.NullBooleanField(default=True, help_text="Whether the SMILES input field should be enabled when adding multiple compounds")
     data_manager_email = models.CharField(max_length=100, default="", help_text="Email address for support requests")
     data_manager_name = models.CharField(max_length=100, default="", help_text="Name of support requests manager")
+    max_non_chem_upload_size = models.IntegerField(default=50000)
+    max_chem_upload_size = models.IntegerField(default=5000)
     def __unicode__(self):
         return u"Skinning Configuration"
 

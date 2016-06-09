@@ -521,7 +521,7 @@ def save_multiple_batch(
     index_batches_in_new_index(batches)
     elasticsearch_client.delete_index(
         elasticsearch_client.get_temp_index_name(session_key, multiple_batch.id))
-    cbr_instance.after_save_and_index_hook(request, multiple_batch.id, multiple_batch.project_id)
+    cbr_instance.after_save_and_index_hook(multiple_batch.id, multiple_batch.project_id)
     return True
 
 
