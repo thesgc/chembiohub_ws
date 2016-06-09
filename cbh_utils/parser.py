@@ -138,6 +138,9 @@ def get_sdf_count(correct_file):
     data = correct_file.file.read().decode('string-escape').decode("utf-8", "ignore")
     data = data.replace("\r\n", "\n").replace("\r", "\n")
     ctabs = data.split("$$$$\n")
+    if len(ctabs) > 1:
+        if not ctabs[-1].strip():
+            return len(ctabs) -1
     return len(ctabs)
 
 def get_uncurated_fields_from_file(correct_file, fielderrors):

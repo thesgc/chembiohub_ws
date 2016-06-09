@@ -443,7 +443,7 @@ class CBHCompoundUploadResource(ModelResource):
             bundle.data["total_processing"] = multiple_batch.batch_count
         
         skinconfig = SkinningConfig.objects.all()[0]
-        if jsondata["project_type"]["show_compounds"]:
+        if bundle.data["project"].project_type.show_compounds:
             if correct_file.extension not in (".xls", ".xlsx", ".sdf", ".cdxml"):
                 raise BadRequest("file_format_error")
             if multiple_batch.batch_count > skinconfig.max_non_chem_upload_size:
