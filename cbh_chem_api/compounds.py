@@ -302,12 +302,9 @@ class CBHCompoundUploadResource(ModelResource):
             mb = CBHCompoundMultipleBatch.objects.get(pk=id)
 
         task_id = request.session.get("mb_inprogress_%d" % mb.id, None)
-        from django_q.models import Task
-        print Task.get_task(task_id)
+
         if task_id:
-            print task_id
             res = result(task_id, wait=10)
-            print res
             if isinstance(res, basestring):
                 raise Exception(res)
         if not mb.uploaded_data:
