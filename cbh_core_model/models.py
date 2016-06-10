@@ -732,7 +732,7 @@ class CBHFlowFile(models.Model):
     ]
 
     # identification and file details
-    identifier = models.SlugField(max_length=255, unique=True, db_index=True, help_text="String identifier built using the name and session id of the file for security so other sessions cannot access the file")
+    identifier = models.SlugField(max_length=1024, unique=True, db_index=True, help_text="String identifier built using the name and session id of the file for security so other sessions cannot access the file")
     original_filename = models.CharField(max_length=200, help_text="The original filename of the file")
     total_size = models.IntegerField(default=0, help_text="Size in bytes")
     total_chunks = models.IntegerField(default=0, help_text="Number of chunks the file was split up into to upload")

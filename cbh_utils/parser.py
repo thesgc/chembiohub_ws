@@ -13,7 +13,7 @@ def get_all_sdf_headers(filename):
     """Use the unix tools grep, cut, sort and uniq to pull out a set of headers from a file"""
     from subprocess import Popen, PIPE
     from shlex import split
-    p1 = Popen(split('grep "^>" %s' % filename), stdout=PIPE)
+    p1 = Popen(split('grep "^>" "%s"' % filename), stdout=PIPE)
     p2 = Popen(split('cut -d "<" -f2'), stdin=p1.stdout, stdout=PIPE)
     p3 = Popen(split('cut -d ">" -f1'), stdin=p2.stdout, stdout=PIPE)
     p4 = Popen(split('sort'), stdin=p3.stdout, stdout=PIPE)

@@ -59,7 +59,7 @@ from cbh_utils.parser import parse_pandas_record, parse_sdf_record, apply_json_p
 # from tastypie.utils.mime import build_content_type
 from cbh_core_api.resources import SimpleResourceURIField, UserResource, UserHydrate
 import time
-from cbh_chem_api.tasks import  get_batch_from_sdf_chunks, get_batch_from_xls_row, process_file_request, validate_multi_batch, clean_up_multi_batch
+from cbh_chem_api.tasks import save_multiple_batch, get_batch_from_sdf_chunks, get_batch_from_xls_row, process_file_request, validate_multi_batch, clean_up_multi_batch
 import itertools
 from tastypie.http import  HttpConflict
 
@@ -173,14 +173,19 @@ class CBHCompoundUploadResource(ModelResource):
         mb = CBHCompoundMultipleBatch.objects.get(pk=id)
         creator_user = request.user
         try:
-            if not bundle.data.get("task_id_for_save", None):
+            if mb.batch_count < 100:
+                #if small batch just do it syncronously
+                res = save_multiple_batch(mb, creator_user, session_key)
+            else:
 
-                mb.created_by = creator_user.username
+                if not bundle.data.get("task_id_for_save", None):
 
-                bundle.data["task_id_for_save"] = async('cbh_chem_api.tasks.save_multiple_batch',  mb, creator_user, session_key)
-               
-            
-            res = result(bundle.data["task_id_for_save"], wait=10)
+                    mb.created_by = creator_user.username
+
+                    bundle.data["task_id_for_save"] = async('cbh_chem_api.tasks.save_multiple_batch',  mb, creator_user, session_key)
+                   
+                
+                res = result(bundle.data["task_id_for_save"], wait=10)
             if res is True:
                 return self.create_response(request, bundle, response_class=http.HttpCreated)
             if (isinstance(res, basestring)):
@@ -309,7 +314,7 @@ class CBHCompoundUploadResource(ModelResource):
                 raise Exception(res)
         if not mb.uploaded_data:
             #The uploaded data field will be set once the data is fully processed
-            raise ImmediateHttpResponse(HttpConflict("data_not_yet_ready"))
+            return self.create_response(request, {}, response_class=http.HttpAccepted)
 
 
         to_be_serialized = mb.uploaded_data
@@ -459,6 +464,17 @@ class CBHCompoundUploadResource(ModelResource):
 
         bundle.data["current_batch"] = multiple_batch.pk
         bundle.data["multiplebatch"] = multiple_batch.pk
+        if multiple_batch.batch_count < 100:
+            process_file_request(multiple_batch,
+                                 bundledata, 
+                                                               creator_user,
+                                                               schemaform,
+                                                               correct_file,
+                                                               session_key)
+            return self.create_response(request, bundle, response_class=http.HttpCreated)
+
+
+
         id = async("cbh_chem_api.tasks.process_file_request", 
                                                                multiple_batch,
                                                                bundledata, 
@@ -466,6 +482,7 @@ class CBHCompoundUploadResource(ModelResource):
                                                                schemaform,
                                                                correct_file,
                                                                session_key)
+
 
 
         request.session["mb_inprogress_%d" % multiple_batch.id] = id
