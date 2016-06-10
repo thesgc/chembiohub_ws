@@ -135,13 +135,14 @@ def parse_pandas_record(headers, obj, destination_field, row, fielderrors, heade
     setattr(obj, destination_field, custom_fields)
 
 def get_sdf_count(correct_file):
-    data = correct_file.file.read().decode('string-escape').decode("utf-8", "ignore")
-    data = data.replace("\r\n", "\n").replace("\r", "\n")
-    ctabs = data.split("$$$$\n")
-    if len(ctabs) > 1:
-        if not ctabs[-1].strip():
-            return len(ctabs) -1
-    return len(ctabs)
+
+    from subprocess import Popen, PIPE
+    from shlex import split
+    p1 = Popen(split('grep -c "\$\$\$\$" "%s"' % correct_file.file.name), stdout=PIPE)
+    out = p1.communicate()
+    print out
+    return int(out[0].strip())
+    
 
 def get_uncurated_fields_from_file(correct_file, fielderrors):
     data = correct_file.file.read().decode('string-escape').decode("utf-8", "ignore")
