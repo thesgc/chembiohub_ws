@@ -31,14 +31,14 @@ def step(context):
 
 @then(u'I request the multiple batch data until the response is OK')
 def step_impl(context):
-    status = 409
+    status = 202
     while status != 200:
         from django.conf import settings
         url = "/" + settings.WEBSERVICES_NAME + "/cbh_compound_batches/get_part_processed_multiple_batch?current_batch=1" 
         resp = context.api_client.get(url, format='json')
         context.multibatch_response = resp
         status = resp.status_code
-        context.test_case.assertTrue(status in [200, 409])
+        context.test_case.assertTrue(status in [200, 202])
     context.test_case.assertTrue(status==200)
 
 @then(u'I get a chemical search id in the response')

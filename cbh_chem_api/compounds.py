@@ -471,7 +471,7 @@ class CBHCompoundUploadResource(ModelResource):
                                                                schemaform,
                                                                correct_file,
                                                                session_key)
-            return self.create_response(request, bundle, response_class=http.HttpCreated)
+            return self.create_response(request, bundle, response_class=http.HttpAccepted)
 
 
 
