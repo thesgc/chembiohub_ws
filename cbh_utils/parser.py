@@ -9,7 +9,18 @@ A parser object to work with our custom field configs and uncurated fields
 
 '''
 
-
+def get_all_sdf_headers(filename):
+    """Use the unix tools grep, cut, sort and uniq to pull out a set of headers from a file"""
+    from subprocess import Popen, PIPE
+    from shlex import split
+    p1 = Popen(split('grep "^>" "%s"' % filename), stdout=PIPE)
+    p2 = Popen(split('cut -d "<" -f2'), stdin=p1.stdout, stdout=PIPE)
+    p3 = Popen(split('cut -d ">" -f1'), stdin=p2.stdout, stdout=PIPE)
+    p4 = Popen(split('sort'), stdin=p3.stdout, stdout=PIPE)
+    p5 = Popen(split('uniq'), stdin=p4.stdout, stdout=PIPE)
+    out = p5.communicate()
+    return [i for i in out[0].split("\n") if i]
+    
 class CovertDateOperation(jsonpatch.PatchOperation):
 
     """Ensures that a data point is formatted correctly for a date field"""
@@ -123,7 +134,15 @@ def parse_pandas_record(headers, obj, destination_field, row, fielderrors, heade
     # Set excel fields as uncurated
     setattr(obj, destination_field, custom_fields)
 
+def get_sdf_count(correct_file):
 
+    from subprocess import Popen, PIPE
+    from shlex import split
+    p1 = Popen(split('grep -c "\$\$\$\$" "%s"' % correct_file.file.name), stdout=PIPE)
+    out = p1.communicate()
+    print out
+    return int(out[0].strip())
+    
 
 def get_uncurated_fields_from_file(correct_file, fielderrors):
     data = correct_file.file.read().decode('string-escape').decode("utf-8", "ignore")

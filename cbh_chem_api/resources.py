@@ -4,7 +4,7 @@ It provides the webservices to add, search for and index CBHCompoundBatch object
 
 """
 from chembl_business_model.models.compounds import CompoundProperties, MoleculeDictionary
-from cbh_chembl_model_extension.models import CBHCompoundBatch, generate_uox_id, index_new_compounds
+from cbh_chembl_model_extension.models import CBHCompoundBatch, generate_uox_id, index_new_compounds, generate_structure_and_dictionary
 from tastypie.resources import ALL
 from tastypie.resources import ALL_WITH_RELATIONS
 from tastypie.resources import ModelResource, Resource
@@ -25,7 +25,7 @@ from tastypie.exceptions import Unauthorized, BadRequest
 from tastypie.utils.mime import determine_format, build_content_type
 from base64 import b64decode, b64encode
 import time
-from cbh_chem_api.new_serializers import CBHCompoundBatchSerializer
+from cbh_chem_api.serializers import CBHCompoundBatchSerializer
 from django_q.tasks import async_iter, result
 from django.core.cache import caches
 from tastypie.utils import dict_strip_unicode_keys
@@ -252,7 +252,13 @@ class BaseCBHCompoundBatchResource(ModelResource):
                     batches.append(b.obj)
             else:
                 batches.append(data.obj)
-            index_batches_in_new_index(batches)
+            try:
+                index_batches_in_new_index(batches)
+            except:
+                #There has been an error in indexing therefore cleanup
+                session_key = request.COOKIES[settings.SESSION_COOKIE_NAME]
+                clean_up_multi_batch(data.obj.multiple_batch, session_key)
+                raise
 
         serialized = self.serialize(request, data, desired_format)
         rc = response_class(content=serialized, content_type=build_content_type(
@@ -264,15 +270,6 @@ class BaseCBHCompoundBatchResource(ModelResource):
         return rc
 
 
-    def hydrate_blinded_batch_id(self, bundle):
-        """Hydrate functions are run before save of a new or updated model instance
-        This one ensures that the blinded batch id is filled in in cases where an inventory item 
-        with no ModelculeDictionary attribute (related_molregno)""" 
-        if bundle.data.get("blinded_batch_id", "") == u"EMPTY_ID":
-            uox_id = generate_uox_id()
-            bundle.data["blinded_batch_id"] = uox_id
-            bundle.obj.blinded_batch_id = uox_id
-        return bundle
 
 
     def dehydrate_properties(self, bundle):
@@ -444,6 +441,10 @@ class BaseCBHCompoundBatchResource(ModelResource):
             if related_obj:
                 setattr(bundle.obj, field_object.attribute, related_obj)
 
+    def is_valid(self, bundle):
+        if bundle.obj.ctab:
+            bundle.obj.validate()
+
 
 
     def save(self, bundle, skip_errors=False):
@@ -466,13 +467,17 @@ class BaseCBHCompoundBatchResource(ModelResource):
         # Save FKs just in case.
         self.save_related(bundle)
 
+        generate_structure_and_dictionary(bundle.obj)
+
         # Save the main object.
         obj_id = self.create_identifier(bundle.obj)
 
         if obj_id not in bundle.objects_saved or bundle.obj._state.adding:
             bundle.obj.save()
+            
             bundle.objects_saved.add(obj_id)
-
+        
+            
         # Now pick up the M2M bits.
         m2m_bundle = self.hydrate_m2m(bundle)
         self.save_m2m(m2m_bundle)
@@ -616,7 +621,15 @@ class CBHCompoundBatchResource(BaseCBHCompoundBatchResource):
     
     def get_list(self, request, **kwargs):
         """Request data where the project is not of the saved search type"""
-        return super(CBHCompoundBatchResource, self).get_list(request, extra_queries=[{"query_type": "pick_from_list", "field_path" : "projectfull.project_type.saved_search_project_type", "pick_from_list" : ["false"] }])
+        return super(CBHCompoundBatchResource, self).get_list(request, 
+                                                              extra_queries=[
+                                                                             {"query_type": "pick_from_list", 
+                                                                              "field_path" : "projectfull.project_type.saved_search_project_type", 
+                                                                              "pick_from_list" : ["false"] },
+                                                                              {"query_type": "pick_from_list", 
+                                                                              "field_path" : "projectfull.project_type.plate_map_project_type", 
+                                                                              "pick_from_list" : ["false"] }
+                                                                            ])
 
 
 
@@ -632,6 +645,18 @@ class CBHSavedSearchResource(BaseCBHCompoundBatchResource):
 
         return super(CBHSavedSearchResource, self).get_list(request, extra_queries=[{"query_type": "pick_from_list", "field_path" : "projectfull.project_type.saved_search_project_type", "pick_from_list" : ["true"] }])
 
+
+class CBHPlateMapResource(BaseCBHCompoundBatchResource):
+    """Implementation of the compound batch API used for saved search objects,
+    filter out non saved searches form this list"""
+    class Meta(BaseCBHCompoundBatchResource.Meta):
+        resource_name = 'cbh_plate_map'
+
+
+    def get_list(self, request, **kwargs):
+        """Request data where the project is of the saved search type"""
+
+        return super(CBHPlateMapResource, self).get_list(request, extra_queries=[{"query_type": "pick_from_list", "field_path" : "projectfull.project_type.plate_map_project_type", "pick_from_list" : ["true"] }])
 
 
 

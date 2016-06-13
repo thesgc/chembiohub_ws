@@ -44,7 +44,7 @@ class UploadView(View):
 
         # identifier is a combination of session key and flow identifier
         # create a new identifier which uses the project ID also
-        self.identifier = ('%s-%s' % (request.session.session_key, self.flowIdentifier))[:255]
+        self.identifier = ('%s-%s' % (request.session.session_key, self.flowIdentifier))[:1024]
         return super(UploadView, self).dispatch(request, *args, **kwargs)
 
     def get(self, *args, **kwargs):

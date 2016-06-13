@@ -160,16 +160,26 @@ def _mols2imageStream(mols, f, format, size, legend, highlightMatch=None):
     kek = True
     if mols[0].HasProp("_drawingBondsWedged"):
         kek=False
+
     fit = False
     options = DrawingOptions() 
     subim = (size,size)
     if size >150:
         subim = (size *2,size *2)
+
         options.coordScale = 3
         options.bondLineWidth = 3.6
         options.dblBondOffset = 0.435
         options.atomLabelFontSize = 60
+        if kek:
+            options.bondLineWidth = 4.5
+            options.dblBondOffset = 0.6
+            options.atomLabelFontSize = 150
+
         fit = True
+    elif kek:
+        options.dblBondOffset = 0.4
+
         
     image = Draw.MolsToGridImage(mols,molsPerRow=min(len(mols),4),subImgSize=subim,
                                      kekulize=kek,highlightAtomLists=highlights, fitImage=fit,
@@ -210,8 +220,7 @@ class CBHCompoundBatchManager(models.Manager):
 
     def blinded(self, project=None):
         '''Generate a batch with a blinded id'''
-        blinded_batch_id = "EMPTY_ID"
-        return CBHCompoundBatch(project=project, blinded_batch_id=blinded_batch_id)
+        return CBHCompoundBatch(project=project)
 
     def from_rd_mol(self, rd_mol, orig_ctab=None, smiles="", project=None, reDraw=None):
         '''Clean up the structures that come in from Smiles or from XLS or SDFs'''
@@ -273,8 +282,9 @@ class CBHCompoundMultipleBatch(TimeStampedModel):
     uploaded_data = PickledObjectField(help_text="Now used to store the headers from the file used to generate the multiple batch, picke use perhaps can be improved or is deprecated")
     uploaded_file = models.ForeignKey(
         "cbh_core_model.CBHFlowFile", null=True, blank=True, default=None, help_text="File that was uploaded to generate this multiple batch")
-    saved = models.BooleanField(default=False, help_text="Whether this multiple batch has been saved or not")
     batch_count = models.IntegerField(default=0)
+    task_id_for_save = models.CharField(max_length=50, null=True, blank=True, default=None,)
+    
 
 
 class CBHCompoundBatch(TimeStampedModel):
@@ -342,6 +352,7 @@ class CBHCompoundBatch(TimeStampedModel):
     def validate(self, temp_props=True):
         """Could now just use standardise, deprecated"""
         self.standardise()
+        set_images(self)
 
     def standardise(self):
         """Ensure Inchi etc was generated correctly"""
@@ -372,7 +383,8 @@ def generate_structure_and_dictionary(batch):
         print "not updating"
         # currently we dont update existing compound records
     else:
-        if batch.blinded_batch_id:
+        if not batch.ctab:
+            #blinded compound
 
             uox_id = generate_uox_id()
             batch.blinded_batch_id = uox_id
@@ -407,7 +419,6 @@ def generate_structure_and_dictionary(batch):
                                                                  # chirality=chirality,
                                                                  structure_key=batch.standard_inchi_key)
                     except ObjectDoesNotExist:
-
                         uox_id = generate_uox_id()
                         rnd = random.randint(-1000000000, -2)
                         uox_id_lookup = ChemblIdLookup.objects.create(

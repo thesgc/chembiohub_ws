@@ -60,10 +60,14 @@ def validate_file_object_externally(python_file_obj):
 		raise BadRequest('An unexpected error has occurred')
 
 class AlteredCompoundBatchResource(CBHCompoundUploadResource):
-	def after_save_and_index_hook(self, request, multi_batch_id, project_id):
+	def after_save_and_index_hook(self, multi_batch_id, project_id):
+		request_factory = RequestFactory()
+    	user = get_user_model().objects.filter(is_superuser=True)[0]
+    	request = request_factory.get("/")
+        request.user = user
 		logger.info('Writing out files to share')
 		try:
-        	    	extra_queries = [{'query_type': 'pick_from_list', 'field_path': 'multiple_batch_id','pick_from_list': [str(multi_batch_id)]}]
+			extra_queries = [{'query_type': 'pick_from_list', 'field_path': 'multiple_batch_id','pick_from_list': [str(multi_batch_id)]}]
 			logger.info('Running Excel fetch')
 			# Get Excel 
 			newrequest = copy(request)
@@ -152,7 +156,7 @@ class AlteredCompoundBatchResource(CBHCompoundUploadResource):
 			logger.info('An error has occurred' + e.__doc__ + '/' + e.message)
 		logger.info('Export done')
 
-	def alter_batch_data_after_save(self, batch_list, python_file_obj, request, multi_batch):
+	def alter_batch_data_after_save(self, batch_list, python_file_obj, multi_batch):
 		"""Take the original sdf file and run an external process with it such that new data can be written across 
 		after save of the data into ChemBioHub"""
 

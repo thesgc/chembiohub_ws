@@ -18,11 +18,13 @@ def step(context):
 
     context.django_q_process = subprocess.Popen(cmd, stderr=context.logfile, stdout=context.logfile, shell=True)
     counter = 0
+    time.sleep(1)
     while True:
         context.logfile.flush()
         counter += 1
-        if(counter > 60):
-            raise Exception("Qcluster did not start")
+        if(counter > 300):
+            #assume it is running anyway
+            break
         with open(context.qfilename, "r") as b:
             if  "running." in b.read():
                 break
@@ -40,6 +42,9 @@ def step(context):
     context.django_q_process.send_signal(SIGINT)
     context.django_q_process.wait()
     context.logfile.flush()
+    time.sleep(1)
+    context.logfile.close()
+    
 
 
 @then(u'I see the right qcluster output')
@@ -49,5 +54,7 @@ def step_impl(context):
             pass
         else:
             raise Exception("qcluster did not stop")
+
+
 
 

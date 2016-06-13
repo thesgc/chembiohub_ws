@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
-"""
-Original serializer module for CBHCompoundbatchResource
-Currently in the process of being deprecated"""
-import cStringIO
+"""This module provides extra serializers to convert data into SDF or XLSX from the new search api
+unfinished refactoring"""
+from StringIO import StringIO
 
 from tastypie.serializers import Serializer
 
@@ -20,351 +19,244 @@ from cbh_core_api.resources import get_key_from_field_name
 from cbh_core_api import parser as coreparser
 
 from tastypie.exceptions import ImmediateHttpResponse, BadRequest
+from jsonpointer import resolve_pointer
+import xlsxwriter
 
-def flatten_dict(d, base=None):
-    """Converts a dictionary of dictionaries or lists into a simple
-    dictionary.
+SDF_TEMPLATE = u">  <{name}>\n{value}\n\n"
 
-    For example the following dictionary
+EMPTY_FILE_DESCRIPTION = "No files"
+# Adding hyperlinks is not really possible because the Excel format only really
+ATTACHMENT_TEMPLATE = ' {base_url}{url} {printName}'
+#EXCEL_FORMAT  = '=HYPERLINK("{base_url}/#/searchv2/{doc_id}", "{number} files Ctrl + click to view/download")'
 
-    foobar = {'key1': 'value1',
-              'key2': {'skey1': 'svalue1'},
-              'key3': ['svalue2', 'svalue3']}
+EXCEL_FORMAT  = '{base_url}/#/searchv2/{doc_id}'
 
-    gets converted to
+def prepare_file_output(input_data, schema, export_type, doc_id):
 
-    foobar = {'key1': 'value1',
-              'key2.skey1': 'svalue1',
-              'key3.0': 'svalue2',
-              'key3.1': 'svalue3'}
+    if isinstance(input_data, dict):
+        list_of_attachments = input_data.get("attachments", [])
+        if len(list_of_attachments) > 0:
+            if export_type == "xlsx":
+                return EXCEL_FORMAT.format(**{"base_url": schema.get("base_url", ""),
+                                              "number" : len(list_of_attachments),
+                                              "doc_id" : doc_id})
+            output_list = []
+            for attachment in list_of_attachments:
+                attachment["base_url"] = schema.get("base_url", "")
+                output = ATTACHMENT_TEMPLATE.format(**attachment)
+                output_list.append(output)
+            return ", \n".join(output_list)
+                 
+    return EMPTY_FILE_DESCRIPTION
 
-    """
-    new_dict = {}
-    for key, value in d.iteritems():
-        if isinstance(value, dict):
-            new_base = ''
-            if base:
-                new_base = '%s.' % base
-            new_base += key
-            new_dict.update(flatten_dict(value, base=new_base))
-        elif isinstance(value, list):
-            new_base = ''
-            if base:
-                new_base += '%s.' % base
-            new_base += '%s' % key
-            i = 0
-            for item in value:
-                new_base_index = new_base + '.%d' % i
-                if isinstance(item, dict):
-                    new_dict.update(flatten_dict(item, base=new_base_index))
-                else:
-                    new_dict.update({new_base_index: item})
-                i += 1
-        elif base:
-            new_dict.update({'%s.%s' % (base, key): value})
+
+def prepare_output(document, schema, export_type, slashed_json_pointer):
+    
+    input_data =  resolve_pointer(document,slashed_json_pointer, default='')
+
+    if isinstance(input_data, basestring):
+        return unicode(input_data)
+    elif isinstance(input_data, list):
+        return ", ".join([unicode(datum) for dataum in input_data])
+    elif isinstance(input_data, dict):
+        doc_id = document.get("id", "")        
+        return prepare_file_output(input_data, schema, export_type, doc_id)
+    return unicode(input_data)
+
+
+
+
+def get_column( schema,documents, export_type):
+    """Pull out the JSON pointer's value from the JSON doc"""
+
+    slashed_json_pointer = "/%s" % schema["data"].replace(".", "/")
+    return [prepare_output(document, schema, export_type, slashed_json_pointer) for document in documents]
+           
+            
+        
+
+def fix_column_types(df, schema):
+    """Convert the columns in the dataframe to numerical types if appropriate"""
+    for field in schema:
+        if field.get("field_type", None) == "number":
+            df[field["export_name"]] = df[field["export_name"]].astype(float)
+        if field.get("field_type", None) == "integer":
+            df[field["export_name"]] = df[field["export_name"]].astype(int)
+        # if field.get("field_type", None) == "date":
+        #     df[field["export_name"]] = pd.to_datetime(df[field["export_name"]], coerce=True)
+
+def add_images_or_other_objects(col, column_schema, worksheet, objects, format, writer):
+    """Generate and save images against a given column in the worksheet"""
+    if column_schema.get("field_type", None) == "b64png":
+        coldata = get_column(column_schema, objects, "xlsx")
+        files = []
+        for i, imagestring in enumerate(coldata):
+            row_to_write = i+1
+            worksheet.write_string(row_to_write, col, "")
+            if len(imagestring) > 10:
+                
+                filename = '/tmp/' + str(objects[i]["id"]) +'.png'
+                with open(filename, 'wb') as f:
+                    f.write(base64.b64decode(imagestring))
+                worksheet.set_row(row_to_write, 104, format)
+                
+                worksheet.insert_image(row_to_write, col, filename, {"x_offset": 6, "y_offset": 10, "x_scale": 1.29245283, "y_scale": 1.330188679})
+                files.append(filename)
+            else:
+                worksheet.set_row(row_to_write, None, format)
+
+
+
+class CBHCompoundBatchSerializer( Serializer):
+    """Main serializer for CBHCompoundBatches, providing functions to output data as SDF or XLSX"""
+    formats = ['json', 'jsonp', 'xml', 'yaml', 'html', 'csv', 'xlsx', 'sdf']
+    content_types = {'json': 'application/json',
+                     'jsonp': 'text/javascript',
+                     'xml': 'application/xml',
+                     'yaml': 'text/yaml',
+                     'html': 'text/html',
+                     'csv': 'text/csv',
+                     'xlsx': 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                     'sdf': 'chemical/x-mdl-sdfile'}
+
+
+
+
+    def to_xlsx(self, data, options=None):
+        '''write excel file from the project by project data produced by the CBHCompoundbatchResource'''
+        output = StringIO()
+
+        project_records = self.to_simple(data, {})
+        writer = pd.ExcelWriter('temp.xlsx', engine='xlsxwriter' , options={'encoding':'utf-8'})
+        writer.book.filename = output
+        if isinstance(data, dict):
+            if data.get("traceback", False):
+                # worksheet = workbook.add_worksheet("Error")
+                # worksheet.write(0,0,data["traceback"])
+                print data
+
         else:
-            new_dict.update({key: value})
-
-    return new_dict
-
-
-
-class CBHCompoundBatchSerializer(Serializer):
-    # formats = ['json']
-    # content_types = {
-    #     'json': 'application/json',
-    # }
-
-    def to_json(self, data, options=None):
-        # Changes underscore_separated names to camelCase names to go from
-        # python convention to javacsript convention
-        data = self.to_simple(data, options)
-
-        def underscoreToCamel(match):
-            return match.group()[0] + match.group()[2].upper()
-
-        def camelize(data):
-            if isinstance(data, dict):
-                new_dict = {}
-                for key, value in data.items():
-                    new_key = re.sub(r"[a-z]_[a-z]", underscoreToCamel, key)
-                    if new_key in ["customFields", "uncuratedFields"]:
-
-                        for k, v in value.iteritems():
-                            if isinstance(v, basestring):
-                                if v.startswith("[") and v.endswith("]"):
-                                    try:
-                                        value[k] = json.loads(v)
-                                        continue
-                                    except:
-                                        pass
-                                elif "." in v:
-                                    try:
-                                        value[k] = float(v)
-                                        continue
-                                    except:
-                                        pass
-                                else:
-                                    try:
-                                        value[k] = int(v)
-                                        continue
-                                    except:
-                                        pass
-                                value[k] = v
-                        new_dict[new_key] = value
-                    elif new_key in ["projectfull"]:
-                        new_dict[key] = value
-
-                    else:
-                        new_dict[new_key] = camelize(value)
-                return new_dict
-            if isinstance(data, (list, tuple)):
-                for i in range(len(data)):
-                    data[i] = camelize(data[i])
-                return data
-            return data
-
-        camelized_data = camelize(data)
-        for key, value in camelized_data.iteritems():
-            try:
-                dictd = json.loads(value)
-                if isinstance(dictd, dict):
-                    camelized_data[key] = dictd
-            except:
-                pass
-        return json.dumps(camelized_data, sort_keys=True)
-
-    def from_json(self, content):
-        # Changes camelCase names to underscore_separated names to go from
-        # javascript convention to python convention
-        data = json.loads(content)
-
-        def camelToUnderscore(match):
-            return match.group()[0] + "_" + match.group()[1].lower()
-
-        def underscorize(data):
-            if isinstance(data, dict):
-                new_dict = {}
-                for key, value in data.items():
-                    new_key = re.sub(r"[a-z][A-Z]", camelToUnderscore, key)
-                    if new_key in ["custom_fields", "uncurated_fields", "compoundstats", "batchstats", "warnings", "properties"]:
-                        new_dict[new_key] = value
-
-                    else:
-                        new_dict[new_key] = underscorize(value)
-                return new_dict
-            if isinstance(data, (list, tuple)):
-                for i in range(len(data)):
-                    data[i] = underscorize(data[i])
-                return data
-            return data
-
-        underscored_data = underscorize(data)
-
-        return underscored_data
-
-
-
-
-def convert_query(data):
-    if isinstance(data, dict):
-        new_dict = {}
-        for key, value in data.items():
-            new_key = get_key_from_field_name(key)
-            new_key = new_key.replace("uncuratedFields", "uncurated_fields")
-            new_key = new_key.replace("customFields", "custom_fields")
-
-            new_dict[new_key] = convert_query(value)
-        return new_dict
-    if isinstance(data, (list, tuple)):
-        for i in range(len(data)):
-            data[i] = convert_query(data[i])
-        return data
-    return data
-
-
-def whitespaced(string):
-    if string:
-        s = re.sub('[^0-9a-zA-Z]+', ' ', unicode(string))
-        return ' %s' % s
-    else:
-        return ""
-
-
-def get_agg(field_name, field_value):
-    return '%s|%s|%s|%s' % (field_name,
-                            field_value,
-                            whitespaced(field_name),
-                            whitespaced(field_value))
-
-
-class CBHCompoundBatchElasticSearchSerializer(Serializer):
-    formats = ['json']
-    content_types = {
-        'json': 'application/json',
-    }
-
-    def convert_query(self, es_request):
-
-        def camelToUnderscore(match):
-            return match.group()[0] + "_" + match.group()[1].lower()
-
-        es_request["query"] = convert_query(es_request["query"])
-        es_request["sort"] = convert_query(es_request["sort"])
-        newsort = []
-        for item in es_request["sort"]:
-            newItem = {}
-            for sort, direction in item.items():
-                if ("." in sort):
-                    newItem[sort + "___sortable"] = direction
+            workbook = writer.book
+            for projectsheet in project_records:
+                # worksheet = workbook.add_worksheet(projectsheet["name"])
+                # write_excel_headers(projectsheet["schema"], worksheet)
+                jsondef = {}
+                empty = False
+                if len(projectsheet["objects"])== 0:
+                    #Add a single default object to an empty dataframe to stop the bug in the writer
+                    
+                    empty = True
                 else:
-                    new_key = re.sub(r"[a-z][A-Z]", camelToUnderscore, sort)
-                    if new_key != "id":
-                        new_key += ".raw"
-                    newItem[new_key] = direction
-            newsort.append(newItem)
-        es_request["sort"] = newsort
+                    for col, column_schema in enumerate(projectsheet["schema"]):
+                    #     write_excel_column(column_schema, projectsheet["objects"], worksheet, col)
+                        jsondef[column_schema["export_name"]] = get_column(column_schema, projectsheet["objects"], "xlsx")
+                    
+                    df = pd.DataFrame(jsondef)
+                    
 
-    def handle_data_from_django_hstore(self, value):
-        '''Hstore passes data in the wrong format'''
-        for k, v in value.iteritems():
-            if isinstance(v, basestring):
-                if v.startswith("[") and v.endswith("]"):
-                    try:
-                        value[k] = json.loads(v)
-                        continue
-                    except:
-                        pass
-                # elif "." in v:
-                #     try:
-                #         value[k] = float(v)
-                #         continue
-                #     except:
-                #         pass
-                # else:
-                #     try:
-                #         value[k] = int(v)
-                #         continuecompound_stats
-                #     except:
-                #         pass
-                value[k] = unicode(v)
+                    df.fillna('', inplace=True)
+                    df = df[[col["export_name"] for col in projectsheet["schema"]]]
+                    if not empty:
+                        fix_column_types(df, projectsheet["schema"])
+
+                    sname =  (projectsheet["name"][:25] + '..') if len(projectsheet["name"]) > 25 else projectsheet["name"]
+                    df.to_excel(writer, sheet_name=sname, index=False,)
+                    worksheet = writer.sheets[sname]
+
+                    format = workbook.add_format()
+                    format.set_text_wrap()
+                    format.set_font_name('Cantarell')
+                    
+                    format2 = workbook.add_format({'bold': False})
+                    format2.set_font_name('Cantarell')
+                    format2.set_align('vcenter')
+                    format2.set_align('center')
+                    format2.set_bottom(2)
+                    worksheet.set_row(0, 30, format2)
+                    for col, schem in enumerate(projectsheet["schema"]):
+                        worksheet.write(0,col, schem["export_name"] )
+                    for col, column_schema in enumerate(projectsheet["schema"]):
+                        add_images_or_other_objects(col, 
+                                                        column_schema, 
+                                                        worksheet,
+                                                        projectsheet["objects"], 
+                                                        format,
+                                                        writer)    
+                    widths = coreparser.get_widths(df)
+                    for index, width in enumerate(widths):
+                        if width > 150:
+                            width = 150
+                        elif width < 15:
+                            width = 15
+                        worksheet.set_column(index, index, width, format)
+            writer.save()
+        
+       
+        # for fi in list(set(files)):
+        #     os.remove(fi)
+        return output.getvalue()
 
 
 
+    def to_sdf(self, data, options=None):
+        ''' SDF converter'''
+        project_records = self.to_simple(data, {})
 
-    def to_es_ready_data(self, data, options=None):
-        options = options or {}
-        data = self.to_simple(data, options)
-        data['custom_field_list'] = []
-        self.handle_data_from_django_hstore(data["custom_fields"])
+        if isinstance(data, dict):
+            if data.get("traceback", False):
+                # worksheet = workbook.add_worksheet("Error")
+                # worksheet.write(0,0,data["traceback"])
+                print data
 
-        for key, value in data["custom_fields"].items():
-            if not key.endswith("___sortable"):
-                if type(value) == list:
-                    for val in value:
-                        if val:
-                            val = val.replace(u"\n|\r", " ")
-                            data['custom_field_list'].append(
-                                {'name': key,
-                                 'value': val,
-                                 'searchable_name': key.split(" ")[0].lower(),
-                                 'aggregation': get_agg(key, val)}
+        mol_strings = []
+
+        for projectsheet in project_records:
+            # worksheet = workbook.add_worksheet(projectsheet["name"])
+            # write_excel_headers(projectsheet["schema"], worksheet)
+            
+            jsondef = {}
+            empty = False
+            if len(projectsheet["objects"])== 0:
+                #Add a single default object to an empty dataframe to stop the bug in the writer
+                
+                empty = True
+            else:
+                sdf_cols = [column_schema for column_schema in projectsheet["schema"] if column_schema["data"] != "image"]
+                for col, column_schema in enumerate(sdf_cols):
+                    jsondef[column_schema["export_name"]] = get_column(column_schema, projectsheet["objects"], "sdf")
+                
+                df = pd.DataFrame(jsondef)
+                df.fillna('', inplace=True)
+                df = df[[col["export_name"] for col in sdf_cols]]
+
+                row_iterator = df.iterrows()
+                headers = list(df)
+                for index, row in row_iterator:
+                    ctab = projectsheet["objects"][index]["ctab"]
+                    if not ctab:
+                        ctab = "\n\n\nM  END\n"
+                    mol_str  = ctab.replace("RDKit          2D\n", "Generated by ChemBio Hub ChemiReg http://chembiohub.ox.ac.uk/chemireg\n").split("END")[0]
+                    properties = []
+                    for field in headers:
+                        try:
+                            properties.append(
+                                SDF_TEMPLATE.format(
+                                    **{"name": unicode(field), "value": unicode(row[field])}
+                                )
                             )
-                else:
-                    if value:
-                        value = value.replace(u"\n|\r", " ")
-                        data['custom_field_list'].append(
-                            {'name': key,
-                             'value': value,
-                             'searchable_name': key.split(" ")[0].lower(),
-                             'aggregation': get_agg(key, value)})
+                        except Exception as e:
+                            import traceback
+                            import sys
+                            print(traceback.format_exception(*sys.exc_info()))
 
-        for key, value in data.items():
-            if key in ["custom_fields", "uncurated_fields"]:
-                if options and options.get("underscorize", False):
-                    data[key] = self.underscorize_fields(value)
-                self.handle_data_from_django_hstore(value)
-        return data
 
-    def to_es_ready_non_chemical_data(self, data, options=None):
-        options = options or {}
-        newdata = {}
-
-        data = self.to_simple(data, options)
-
-        newdata = copy.deepcopy(data)
-        newdata['custom_field_list'] = []
-        self.handle_data_from_django_hstore(data["custom_fields"])
-
-        for key, value in data["custom_fields"].items():
-            if not key.endswith("___sortable"):
-                if type(value) == list:
-                    for val in value:
-                        if val:
-                            v = val.replace('\n', ' ').replace('\r', '')
-                            agg = '%s|%s' % (key, v)
-                            newdata['custom_field_list'].append(
-                                {'name': key, 'value': v, 'searchable_name': key.split(" ")[0].lower(), 'aggregation': agg})
-                else:
-                    if value:
-                        v = value.replace('\n', ' ').replace('\r', '')
-                        agg = '%s|%s' % (key, v)
-
-                        newdata['custom_field_list'].append(
-                            {'name': key, 'value': v, 'searchable_name': key.split(" ")[0].lower(), 'aggregation': agg})
-
-        # newdata['custom_field_list'].append({'name': "Project", 'value':newdata['project'], 'searchable_name': 'project', 'aggregation': '%s|%s' % ('Project', newdata['project']) })
-        # newdata['custom_field_list'].append({'name': "Upload Id", 'value':newdata['multiple_batch_id'], 'searchable_name': 'upload', 'aggregation': '%s|%d' % ('Upload', newdata['multiple_batch_id']) })
-
-        for key, value in data.items():
-            if key in ["custom_fields", "uncurated_fields"]:
-                if options and options.get("underscorize", False):
-                    newdata[key] = self.underscorize_fields(value)
-                self.handle_data_from_django_hstore(value)
-        return newdata
-
-    def to_python_ready_data(self, data, options=None):
-        options = options or {}
-        data = self.to_simple(data, options)
-        data.pop("custom_field_list", False)
-        for key, value in data.items():
-            if key in ["custom_fields", "uncurated_fields"]:
-                data[key] = self.deunderscorize_fields(value)
-        return data
-
-    def to_json(self, data, options=None):
-        self.to_es_ready_data(data, options=options)
-        return json.dumps(data, sort_keys=True)
-
-    def make_sortable_data(self, value):
-        "Zero pad an integers or floats"
-        if type(value) is list:
-            return [self.make_sortable_data(item) for item in value]
-        if isinstance(value, basestring):
-            value = value.strip()
-            if value.replace(".", "", 1).isdigit():
-                splitup = value.split(".")
-                if len(splitup) == 2:
-                    return "%s.%s" % (splitup[0].zfill(14) , splitup[1] )
-                return value.zfill(14)
-        return value
+                    mol_strings.append("".join([mol_str, "END\n"] + properties))
+        return "$$$$\n".join(mol_strings) + "$$$$"
 
 
 
-    def underscorize_fields(self, dictionary):
-        data = {
-            get_key_from_field_name(key): value
-            for key, value in dictionary.items()
-        }
-        for key, value in data.items():
-            data[key + "___sortable"] = self.make_sortable_data(value)
-        return data
 
 
-    def deunderscorize_fields(self, dictionary):
-        return {
-            get_field_name_from_key(key): value
-            for key, value in dictionary.items() if not key.endswith("___sortable")
-        }
+
 
 

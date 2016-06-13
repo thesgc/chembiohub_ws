@@ -742,7 +742,7 @@ TABULAR_DATA_SETTINGS = {
         "end" : []
                 },
     "indexing" : {
-        "start" :["project_counter","uuid", "projectfull.name", "properties.archived","projectfull.project_type.saved_search_project_type"],
+        "start" :["project_counter","uuid", "projectfull.name", "properties.archived","projectfull.project_type.saved_search_project_type", "projectfull.project_type.plate_map_project_type", "custom_fields.wells"],
         "end" : ["userfull.display_name" ,"timestamp" , "id" , "multiple_batch_id","canonical_smiles" ,
         "standard_inchi" ,
         "standard_inchi_key" ,
@@ -758,11 +758,30 @@ TABULAR_DATA_SETTINGS = {
             "data" : "project_counter",
             "editable": False,
             "className": "htCenter htMiddle ",
+            "setWidth" : 120,
         },
         "projectfull.project_type.saved_search_project_type" : {
             "noSort": True,
             "knownBy": "Is a saved search",
             "data": "projectfull.project_type.saved_search_project_type",
+            "searchFormType" : "pick_from_list",
+            "renderer_named": "archivedRenderer",
+            "editable": False,
+            "className": "htCenter htMiddle ",
+        },
+        "projectfull.project_type.plate_map_project_type" : {
+            "noSort": True,
+            "knownBy": "Is a saved search",
+            "data": "projectfull.project_type.plate_map_project_type",
+            "searchFormType" : "pick_from_list",
+            "renderer_named": "archivedRenderer",
+            "editable": False,
+            "className": "htCenter htMiddle ",
+        },
+         "custom_fields.wells" : {
+            "noSort": True,
+            "knownBy": "Has wells assigned",
+            "data": "custom_fields.wells",
             "searchFormType" : "pick_from_list",
             "renderer_named": "archivedRenderer",
             "editable": False,
@@ -776,6 +795,7 @@ TABULAR_DATA_SETTINGS = {
             "renderer_named": "archivedRenderer",
             "editable": True,
             "className": "htCenter htMiddle ",
+
         },
         "clone": {
             "noSort": True,
@@ -785,6 +805,7 @@ TABULAR_DATA_SETTINGS = {
             "renderer_named": "cloneRenderer",
             "editable": False,
             "className": "htCenter htMiddle ",
+            "setWidth" : 120,
         },
         "image" : {
             "noSort": True,
@@ -794,7 +815,8 @@ TABULAR_DATA_SETTINGS = {
             "renderer_named": "coverRenderer",
             "editable": False,
             "className": "htCenter htMiddle ",
-            "field_type": "b64png"
+            "field_type": "b64png",
+            "setWidth" : 100,
         },
         "id" : {
             "sortOrder": "none",
@@ -811,7 +833,8 @@ TABULAR_DATA_SETTINGS = {
             "knownBy": "Info",
             "searchFormType" : "upload_info",
             "data": "originalSmiles",
-            "renderer_named": "infoRenderer"
+            "renderer_named": "infoRenderer",
+            "setWidth": 400
         }, 
         "properties.action" : {
             "sortOrder": "none",
@@ -882,6 +905,7 @@ TABULAR_DATA_SETTINGS = {
             "editable": False,
             "field_type"  : "string",
             "className": "htCenter htMiddle ",
+            "setWidth": 400
         },
         "standard_inchi" :{
             "noSort": True,
@@ -891,8 +915,10 @@ TABULAR_DATA_SETTINGS = {
             "editable": False,
             "field_type"  : "string",
             "className": "htCenter htMiddle ",
+            "setWidth" : 600,
         },
         "standard_inchi_key" :{
+
             "noSort": True,
             "knownBy": "Standard InChI Key",
             "data": "standard_inchi_key",

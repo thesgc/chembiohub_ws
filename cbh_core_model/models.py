@@ -375,8 +375,13 @@ class SkinningConfig(SingletonModel):
     enable_supplementary_data = models.NullBooleanField(default=True, help_text="Enabling the upload of supplementary data")
     data_manager_email = models.CharField(max_length=100, default="", help_text="Email address for support requests")
     data_manager_name = models.CharField(max_length=100, default="", help_text="Name of support requests manager")
+<<<<<<< HEAD
     login_page_title = models.CharField(max_length=300, default="Welcome to ChemBio Hub Platform", help_text="Text to use as the login page title")
     login_page_subtitle = models.CharField(max_length=300, default="Home of ChemiReg, InvReg and AssayReg", help_text="Text to use as the login page subtitle")
+=======
+    max_non_chem_upload_size = models.IntegerField(default=50000)
+    max_chem_upload_size = models.IntegerField(default=5000)
+>>>>>>> 015242bd1e3ac8c77b64b04c3b16b4ba326d29ea
     def __unicode__(self):
         return u"Skinning Configuration"
 
@@ -734,7 +739,7 @@ class CBHFlowFile(models.Model):
     ]
 
     # identification and file details
-    identifier = models.SlugField(max_length=255, unique=True, db_index=True, help_text="String identifier built using the name and session id of the file for security so other sessions cannot access the file")
+    identifier = models.SlugField(max_length=1024, unique=True, db_index=True, help_text="String identifier built using the name and session id of the file for security so other sessions cannot access the file")
     original_filename = models.CharField(max_length=200, help_text="The original filename of the file")
     total_size = models.IntegerField(default=0, help_text="Size in bytes")
     total_chunks = models.IntegerField(default=0, help_text="Number of chunks the file was split up into to upload")

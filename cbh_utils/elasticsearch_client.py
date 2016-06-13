@@ -52,12 +52,12 @@ ELASTICSEARCH_INDEX_MAPPING = {
         "settings": {
             "index.store.type": "niofs",
             "index.max_result_window" : 10000000,
-
+            "number_of_shards" : 1,
             "analysis" : {
                     "char_filter" : {
                         "special_char_space_out" :{ # put spaces around special characters so they can still be indexed
                             "type":"pattern_replace",
-                            "pattern":"([()\[\].,\-\+])",
+                            "pattern":"([()\[\].,\-\+\"])",
                             "replacement":" $1 "
                         },
                        
@@ -82,7 +82,12 @@ ELASTICSEARCH_INDEX_MAPPING = {
                 },
         },
         "mappings": {
-            BATCH_TYPE_NAME: {
+            
+        }
+    }
+
+
+DEFAULT_COLUMN_MAPPING = {
                 "dynamic": False,
                 "_all": {"enabled": False},
                 "date_detection": False,
@@ -103,8 +108,6 @@ ELASTICSEARCH_INDEX_MAPPING = {
                 
                 
             }
-        }
-    }
 
 def get_main_index_name():
     return "%s__%s" % (ES_PREFIX, ES_MAIN_INDEX_NAME)
@@ -175,14 +178,15 @@ def build_indexed_fields(document, schema):
             to_index[sortable] = zeropad(value)
     return to_index
 
-def build_mapping_definitions(schema):
+def build_mapping_definitions(schema, index_name):
     body = deepcopy(ELASTICSEARCH_INDEX_MAPPING)
+    colmapping = deepcopy(DEFAULT_COLUMN_MAPPING)
     
-    
+    body["mappings"][index_name] = colmapping
     for field in schema:
         fieldname = get_es_fieldname(field["data"])
         sortable = get_sortable_es_fieldname(field["data"])
-        body["mappings"][BATCH_TYPE_NAME]["properties"][fieldname] = {
+        body["mappings"][index_name]["properties"][fieldname] = {
                             "type": "string", 
                             "index_options": "positions", 
                             "index": "analyzed", 
@@ -194,7 +198,7 @@ def build_mapping_definitions(schema):
                                     "raw": {"type": "string", "store": "no", "index": "not_analyzed", "ignore_above": ELASTICSEARCH_MAX_FIELD_LENGTH}
                                 }
                             }
-        body["mappings"][BATCH_TYPE_NAME]["properties"][sortable] = {
+        body["mappings"][index_name]["properties"][sortable] = {
                             "type": "string", "store": "no", "analyzer" : "lowercasekeywordanalyzer", "index": "analyzed", "ignore_above": ELASTICSEARCH_MAX_FIELD_LENGTH
                         }
     return body
@@ -222,7 +226,10 @@ def index_dataset( batch_dicts, schema_list, index_names, refresh=True):
         print (json.dumps(es_reindex))
         raise Exception("indexing failed")
 
-
+def chunks(l, n):
+    """Yield successive n-sized chunks from l."""
+    for i in range(0, len(l), n):
+        yield l[i:i+n]
 
 def add_data_to_index(batches, index_names, schema_list,  refresh=True):
     
@@ -234,7 +241,7 @@ def add_data_to_index(batches, index_names, schema_list,  refresh=True):
         if len(batches) == 1:
             bid = batches[0]["dataset"].get("id", None)
             es.index(index=index_names[0], 
-                     doc_type=BATCH_TYPE_NAME, 
+                     doc_type=index_names[0], 
                      id=bid, 
                      body=batches[0],
                      refresh=True)
@@ -244,7 +251,7 @@ def add_data_to_index(batches, index_names, schema_list,  refresh=True):
                     "update":
                     {
                         "_index": index_names[counter],
-                        "_type": BATCH_TYPE_NAME
+                        "_type": index_names[counter]
                     }
                 }
                 if item["dataset"].get("id", None):
@@ -252,7 +259,12 @@ def add_data_to_index(batches, index_names, schema_list,  refresh=True):
                 bulk_items.append(batch_doc)
                 bulk_items.append({"doc" : item, "doc_as_upsert" : True })
             # Data is not refreshed!
-            return es.bulk(body=bulk_items, refresh=True)
+            bulk_chunks = [c for c in chunks(bulk_items, 200)]
+            for index, bulk_chunk in enumerate(bulk_chunks):
+                ref = False
+                if index == len(bulk_chunks) - 1:
+                    ref = True
+                es.bulk(body=bulk_chunk, refresh=ref)
 
     return {}
 
@@ -273,9 +285,8 @@ def build_phase_prefix_query(phrase, field_path):
 
 
 def build_es_request(queries, textsearch="", batch_ids_by_project=None):
-    print queries
     must_clauses = []
-    if batch_ids_by_project:
+    if batch_ids_by_project is not None:
         #The postgres backend has converted the chemical search
         #Into a list of ids by project
         #We then join these ids queries on a per project basis
@@ -289,7 +300,7 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
                                     "indices": index_names,
                                     "query": {
                                         "ids" : {
-                                            "type" : BATCH_TYPE_NAME,
+                                            # "type" : BATCH_TYPE_NAME,
                                             "values" : [str(id) for id in batch_ids]
                                         }
                                     },
@@ -303,7 +314,14 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
                 "should" : match_these_ids_by_index
             }
         }
-        must_clauses.append(by_index_batch_id_query)
+        if len(match_these_ids_by_index) > 0:
+            must_clauses.append(by_index_batch_id_query)
+        else:
+            must_clauses.append({   "bool" :{
+                "must_not" : {"match_all": {}}
+                }
+            })
+
 
 
 
@@ -324,6 +342,7 @@ def build_es_request(queries, textsearch="", batch_ids_by_project=None):
         new_query = None
 
         if query["query_type"] == 'phrase':
+
             new_query = build_phase_prefix_query(query["phrase"], query["field_path"])
             
         
@@ -473,6 +492,12 @@ def remove_existing_queries_for_agg(queries, autocomplete_field_path):
         return new_queries
     return queries
 
+def delete_document(index_name, id):
+    es = elasticsearch.Elasticsearch()
+    es.delete(index_name, index_name, id)
+
+
+
 
 def get_list_data_elasticsearch(queries, index, sorts=[], autocomplete="", autocomplete_field_path="", autocomplete_size=settings.MAX_AUTOCOMPLETE_SIZE, textsearch="", offset=0, limit=10, batch_ids_by_project=None):
     """Build a query for elasticsearch by going through the input query dictionaries
@@ -558,15 +583,15 @@ def zeropad(input_string):
 
 def create_or_update_index(index_name, tabular_data_schema):
     es = elasticsearch.Elasticsearch()
-    create_body = build_mapping_definitions(tabular_data_schema)
+    create_body = build_mapping_definitions(tabular_data_schema, index_name)
     try:
         es.indices.create(
             index_name,
             body=create_body)
     except elasticsearch.exceptions.RequestError:
-        es.indices.put_mapping(doc_type=BATCH_TYPE_NAME,
+        es.indices.put_mapping(doc_type=index_name,
             index=index_name, 
-            body=create_body["mappings"][BATCH_TYPE_NAME])
+            body=create_body["mappings"][index_name])
 
 def unzeropad(input_string):
     """Remove zero padding from integers and floats"""
@@ -604,3 +629,185 @@ def get_detail_data_elasticsearch(index, id):
     data = es.search("_all", body=es_request, ignore_unavailable=True)
 
     return data["hits"]["hits"][0]["_source"]["dataset"]
+
+
+
+
+
+
+
+
+
+
+def get_temp_index_name(session_key, multi_batch_id):
+    """Generate an index name for a particular multiple batch"""
+    index_name = "%s__temp_multi_batch__%s__%s" % (
+        ES_PREFIX, session_key, str(multi_batch_id))
+    return index_name
+
+
+def delete_index(index_name):
+    """Delete an index permanently by name"""
+    es = elasticsearch.Elasticsearch()
+    return es.indices.delete(index_name,  ignore=[400, 404])
+
+
+def get_action_totals(index_name,  bundledata):
+    """
+    Use elasticsearch aggregations to find the stats required for the preview 
+    UI when uploading a set of compounds or inventory items
+    """
+    es_request_body = {
+        "size": 0,
+        "query": {"match_all": {}},
+        "aggs": {
+            "actions": {
+                "terms": {"field": "properties.action.raw"}
+            }
+        }
+    }
+    es = elasticsearch.Elasticsearch()
+
+    result = es.search(index_name, body=es_request_body)
+    bundledata["savestats"] = {"ignoring": 0, "newbatches": 0}
+    for buck in result["aggregations"]["actions"]["buckets"]:
+        if buck.get("key", "") == "new batch":
+            bundledata["savestats"]["newbatches"] = buck.get("doc_count", 0)
+        if buck.get("key", "") == "ignore":
+            bundledata["savestats"]["ignoring"] = buck.get("doc_count", 0)
+    return bundledata
+
+
+def get_from_temp_index(index_name, es_request_body, bundledata):
+    """Perform a search request against the elasticsearch index specified"""
+    es = elasticsearch.Elasticsearch()
+    result = es.search(index_name, body=es_request_body)
+    data = []
+    for hit in result["hits"]["hits"]:
+        data.append(hit["_source"])
+
+    bundledata["meta"] = {"totalCount": result["hits"]["total"]}
+    bundledata["objects"] = data
+    if result.get("aggregations", None):
+        bundledata["aggregations"] = [res["key"]
+            for res in result["aggregations"]["autocomplete"]["buckets"]]
+
+    return bundledata
+
+
+
+
+
+
+
+def create_temporary_index(batches, index_name):
+    """Index data in the old format, now mostly deprecated except for the file upload preview"""
+    es = elasticsearch.Elasticsearch()
+    t = time.time()
+    store_type = "niofs"
+
+    create_body = {
+        "settings": {
+             "number_of_shards" : 1,
+            "index.store.type": store_type,
+            "analysis" : {
+                    "analyzer" : {
+                        "default_index" : {
+                            "tokenizer" : "whitespace",
+                            "filter" : [
+                                "lowercase"
+                            ],
+                            "char_filter" : [
+                                "html_strip"
+                            ]
+                        },
+                     "lowercasekeywordanalyzer" : {
+                            "tokenizer" : "keyword",
+                            "filter" : [
+                                "lowercase"
+                            ]
+                        },
+                    
+                    }
+                },
+        },
+        "mappings": {
+            index_name: {
+                "_all": {"enabled": False},
+                "date_detection": False,
+                
+                "properties":{
+                    "created": {
+                        "type" : "string",
+                        "index": "not_analyzed"
+                    },
+                    "id": {
+                        "type" : "integer",
+                        "index": "analyzed"
+                    },
+                },
+                "dynamic_templates": [{
+                    "ignored_fields": {
+                        "match": "ctab|std_ctab|canonical_smiles|original_smiles",
+                        "match_mapping_type": "string",
+                        "mapping": {
+                            "type": "string", "store": "no", "include_in_all": False, "index" : "no"
+                        }
+                    }
+                },
+                {
+                    "uncurated_fields": {
+                        "match": "uncurated_fields.*|image|bigimage",
+                        "match_mapping_type": "string",
+                        "mapping": {
+                            "type": "string", "index": "no", "include_in_all": False
+                        }
+                    }
+                },
+                {
+                    "string_fields": {
+                        "match": "*",
+                        "match_mapping_type": "string",
+                        "mapping": {
+                            "type": "string", 
+                            "store": "no", 
+                            "index_options": "positions", 
+                            "index": "analyzed", 
+                            "omit_norms": True, 
+                            "analyzer" : "default_index",
+                            "fields": {
+                                "raw": {"type": "string", "store": "no","analyzer" : "lowercasekeywordanalyzer", "index": "analyzed", "ignore_above": 256}
+                            }
+                        }
+                    }
+                }
+                ]
+            }
+        }
+    }
+
+    es.indices.create(
+        index_name,
+        body=create_body)
+
+    bulk_items = []
+    if len(batches) > 0:
+        for item in batches:
+            bulk_items.append({
+                "index":
+                {
+                    "_id": str(item["id"]),
+                    "_index": index_name,
+                    "_type": index_name
+                }
+            })
+            bulk_items.append(item)
+        bulk_chunks = [c for c in chunks(bulk_items, 200)]
+        for index, bulk_chunk in enumerate(bulk_chunks):
+            ref = False
+            if index == len(bulk_chunks) - 1:
+                ref = True
+            es.bulk(body=bulk_chunk, refresh=ref)
+        return 
+    return {}
+

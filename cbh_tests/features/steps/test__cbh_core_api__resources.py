@@ -54,7 +54,7 @@ def step(context):
     counter = 0
     for key, value in context.tabular_schema["included_in_tables"].items():
         for fieldname in value["default"]:
-            if fieldname.startswith("custom_fields"):
+            if fieldname.startswith("custom_fields") and fieldname != "custom_fields.wells":
                 proj_spec = context.tabular_schema["schema"][fieldname]["project_specific_schema"]
                 context.test_case.assertTrue("1" in proj_spec)
                 counter += 1
