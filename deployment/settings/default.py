@@ -102,11 +102,7 @@ LOGGING = {
         },
     },
     'handlers': {
-        # 'sentry': {
-        #      'level': 'ERROR',
-        #      'class': 'raven.contrib.django.raven_compat.handlers.SentryHandler',
-        #  },
-        'console': {
+        'console': {                           #Logging is sent out to standard out 
             'level': 'DEBUG',
             'class': 'logging.StreamHandler',
             'formatter': 'simple'
@@ -124,10 +120,7 @@ LOGGING = {
     }
 
 
-# Set your DSN value
-RAVEN_CONFIG = {
-     'dsn': 'http://799d9560a5a24a6abc5383e8a4435111:ebc6d747d1654709b812974757213e85@163.1.63.22/2',
- }
+
 
 for app in INSTALLED_APPS:
     LOGGING["loggers"][app] = {
