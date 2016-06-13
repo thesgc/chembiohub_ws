@@ -375,18 +375,14 @@ class SkinningConfig(SingletonModel):
     enable_supplementary_data = models.NullBooleanField(default=True, help_text="Enabling the upload of supplementary data")
     data_manager_email = models.CharField(max_length=100, default="", help_text="Email address for support requests")
     data_manager_name = models.CharField(max_length=100, default="", help_text="Name of support requests manager")
-
     login_page_title = models.CharField(max_length=300, default="Welcome to ChemBio Hub Platform", help_text="Text to use as the login page title")
     login_page_subtitle = models.CharField(max_length=300, default="Home of ChemiReg, InvReg and AssayReg", help_text="Text to use as the login page subtitle")
-
     max_non_chem_upload_size = models.IntegerField(default=50000)
     max_chem_upload_size = models.IntegerField(default=5000)
-
     maintenance_warning = models.NullBooleanField(default=True, help_text="Whether a maintenance warning should be displayed")
     maintenance_warning_message = models.CharField(max_length=300, default="", help_text="Message to show users to warn them of upcoming maintenance")
     maintenance_warning_start = models.DateTimeField(auto_now=False, auto_now_add=False, help_text="The start time of the maintenance warning message")
     maintenance_warning_end = models.DateTimeField(auto_now=False, auto_now_add=False, help_text="The end time of the maintenance warning message")
-
 
     def __unicode__(self):
         return u"Skinning Configuration"
