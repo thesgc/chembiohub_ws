@@ -917,6 +917,11 @@ class Login( CSRFExemptMixin, FormView):
     template_name = "cbh_chem_api/login.html"
     logout = None
 
+    def get_context_data(self, **kwargs):
+        context = super(Login, self).get_context_data(**kwargs)
+        context["skinningconfig"] = SkinningConfig.objects.all()[0]
+        return context
+	
     def get(self, request, *args, **kwargs):
         """
         Ensure that the webauth is setup if required 

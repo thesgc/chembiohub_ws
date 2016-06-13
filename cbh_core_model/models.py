@@ -371,8 +371,12 @@ class SkinningConfig(SingletonModel):
         max_length=50, null=True, blank=False, default='result', help_text="What search results on the system should be called (not really used, could be deprecated)")
     file_errors_from_backend = models.NullBooleanField(default=False, help_text="Whether the error message on file upload should be the exception message from the back end")
     enable_smiles_input = models.NullBooleanField(default=True, help_text="Whether the SMILES input field should be enabled when adding multiple compounds")
+    enable_add_multiple = models.NullBooleanField(default=True, help_text="Enabling the upload of multiple items")
+    enable_supplementary_data = models.NullBooleanField(default=True, help_text="Enabling the upload of supplementary data")
     data_manager_email = models.CharField(max_length=100, default="", help_text="Email address for support requests")
     data_manager_name = models.CharField(max_length=100, default="", help_text="Name of support requests manager")
+    login_page_title = models.CharField(max_length=300, default="Welcome to ChemBio Hub Platform", help_text="Text to use as the login page title")
+    login_page_subtitle = models.CharField(max_length=300, default="Home of ChemiReg, InvReg and AssayReg", help_text="Text to use as the login page subtitle")
     def __unicode__(self):
         return u"Skinning Configuration"
 
