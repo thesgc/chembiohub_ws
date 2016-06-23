@@ -9,12 +9,6 @@ TASTYPIE_CANNED_ERROR = "An internal server error occurred. Please contact ChEMB
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(__file__)))
 
 
-other_paths = [
-"legacy_migrations/",
-]
-
-for path in other_paths:
-    sys.path.insert(0, BASE_DIR + "/" + path)
 
 
 INSTALLED_APPS = (
@@ -38,17 +32,14 @@ INSTALLED_APPS = (
   'chembl_business_model', 
          'cbh_core_api',
 
-       'flowjs',
        'cbh_core_model',
   'cbh_chembl_model_extension',    
   'cbh_chem_api',
-  'cbh_chembl_id_generator',
 
             'tastypie',
 
         'django_q',
         'cbh_tests',
-          'cbh_datastore_model', #just to get rid of some things
         'cbh_utils',
 
    )

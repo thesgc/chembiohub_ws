@@ -124,9 +124,12 @@ class CBHFlowFileResource(ModelResource):
         Here we take the identifier from the front end and 
         combine with the user's session id to pull out the original object in a secure way
         """
+        print "applic"
+        print applicable_filters
         if applicable_filters.get("identifier", None):
             applicable_filters["identifier"] = "%s-%s" % (
                 bundle.request.COOKIES.get(settings.SESSION_COOKIE_NAME, "None"), applicable_filters["identifier"])
+            print applicable_filters["identifier"]
         return super(CBHFlowFileResource, self).obj_get(bundle, **applicable_filters)
 
 #this is used to make the download request
@@ -155,6 +158,7 @@ class CBHFlowFileDownloadResource(ModelResource):
         Should return a HttpResponse (200 OK).
         Guess the mimetype of the file and return it as an attachment object
         """
+
         basic_bundle = self.build_bundle(request=request)
 
         obj = self.obj_get(basic_bundle, **kwargs)

@@ -1150,7 +1150,8 @@ class ProjectTypeResource(ModelResource):
         authentication = SessionAuthentication()
         filtering = {
             "saved_search_project_type": ALL,
-            "plate_map_project_type": ALL
+            "plate_map_project_type": ALL,
+            "name": ALL
         }
 
 

@@ -11,10 +11,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='dataformconfig',
-            name='human_added',
-            field=models.NullBooleanField(default=True),
-            preserve_default=True,
-        ),
+        
     ]

@@ -11,10 +11,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='project',
-            name='enabled_forms',
-            field=models.ManyToManyField(to='cbh_core_model.DataFormConfig'),
-            preserve_default=True,
-        ),
+        
     ]

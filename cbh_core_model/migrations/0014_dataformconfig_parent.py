@@ -11,11 +11,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AddField(
-            model_name='dataformconfig',
-            name='parent',
-            field=models.ForeignKey(
-                default=None, blank=True, to='cbh_core_model.DataFormConfig', null=True),
-            preserve_default=True,
-        ),
+      
     ]

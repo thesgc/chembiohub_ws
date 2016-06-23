@@ -12,7 +12,6 @@ from django.conf import settings
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('flowjs', '__first__'),
         ('chembl_business_model', '0001_initial'),
         migrations.swappable_dependency(settings.AUTH_USER_MODEL),
     ]
@@ -66,8 +65,7 @@ class Migration(migrations.Migration):
                     default=None, max_length=50, null=True, db_index=True, blank=True)),
                 ('uploaded_data', picklefield.fields.PickledObjectField(
                     editable=False)),
-                ('uploaded_file', models.OneToOneField(
-                    null=True, default=None, blank=True, to='flowjs.FlowFile')),
+                
             ],
             options={
                 'ordering': ('-modified', '-created'),
@@ -133,8 +131,8 @@ class Migration(migrations.Migration):
                 ('project_key', models.SlugField(
                     null=True, default=None, blank=True, unique=True)),
                 ('created_by', models.ForeignKey(to=settings.AUTH_USER_MODEL)),
-                ('custom_field_config', models.OneToOneField(
-                    related_name='project', to='cbh_chembl_model_extension.CustomFieldConfig')),
+                # ('custom_field_config', models.OneToOneField(
+                #     related_name='project', to='cbh_chembl_model_extension.CustomFieldConfig')),
             ],
             options={
                 'get_latest_by': 'created',

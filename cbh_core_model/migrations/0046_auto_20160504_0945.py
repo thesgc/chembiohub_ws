@@ -139,11 +139,7 @@ class Migration(migrations.Migration):
             name='custom_field_config',
             field=models.ForeignKey(blank=True, default=None, help_text=b'Custom field config object which is linked to this project', null=True, on_delete=django.db.models.deletion.CASCADE, related_name='project', to='cbh_core_model.CustomFieldConfig'),
         ),
-        migrations.AlterField(
-            model_name='project',
-            name='enabled_forms',
-            field=models.ManyToManyField(blank=True, help_text=b'deprecated field not used for anything', to='cbh_core_model.DataFormConfig'),
-        ),
+        
         migrations.AlterField(
             model_name='project',
             name='is_default',

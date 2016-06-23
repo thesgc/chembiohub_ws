@@ -255,46 +255,6 @@ class CustomFieldConfig(TimeStampedModel):
         return self.name.replace(u" ", u"__space__")
 
 
-class DataFormConfig(TimeStampedModel):
-
-    '''deprecated Shared configuration object - all projects can see this and potentially use it
-    Object name comes from a concatentaion of all of the levels of custom field config
-    '''
-    created_by = models.ForeignKey("auth.User")
-    human_added = models.NullBooleanField(default=True)
-    parent = models.ForeignKey(
-        'self', related_name='children', default=None, null=True, blank=True)
-
-    l0 = models.ForeignKey("cbh_core_model.CustomFieldConfig",
-                           related_name="l0",
-                           help_text="The first level in the hierarchy of the form you are trying to create. For example, if curating industries, companies,  employees , teams and departments, l0 would be industries.")
-    l1 = models.ForeignKey("cbh_core_model.CustomFieldConfig",
-                           related_name="l1",
-                           null=True,
-                           blank=True,
-                           default=None,
-                           help_text="The second level in the hierarchy of the form you are trying to create. For example, if curating industries, companies,  employees , teams and departments, l1 would be companies.")
-    l2 = models.ForeignKey("cbh_core_model.CustomFieldConfig",
-                           related_name="l2", null=True, blank=True, default=None,
-                           help_text="The third level in the hierarchy of the form you are trying to create. For example, if curating industries, companies,  employees , teams and departments, l2 would be departments.")
-    l3 = models.ForeignKey("cbh_core_model.CustomFieldConfig",
-                           related_name="l3",
-                           null=True,
-                           blank=True,
-                           default=None,
-                           help_text="The forth level in the hierarchy of the form you are trying to create. For example, if curating industries, companies,  employees , teams and departments, l3 would be teams.")
-    l4 = models.ForeignKey("cbh_core_model.CustomFieldConfig",
-                           related_name="l4",
-                           null=True,
-                           blank=True,
-                           default=None,
-                           help_text="The fifth level in the hierarchy of the form you are trying to create. For example, if curating industries, companies,  employees , teams and departments, l4 would be employees.")
-
-
-
-    class Meta:
-        unique_together = (('l0', 'l1', 'l2', 'l3', 'l4'),)
-        ordering = ('l0', 'l1', 'l2', 'l3', 'l4')
 
 
 
@@ -883,7 +843,6 @@ def flow_file_chunk_delete(sender, instance, **kwargs):
 
 def print_name(sender, instance, **kwargs):
     instance.project_key = slugify(instance.name)
-
     try:
         print sender.objects.get(sender.id).__dict__
     except:

@@ -11,16 +11,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='projecttype',
-            name='level_0',
-        ),
-        migrations.RemoveField(
-            model_name='projecttype',
-            name='level_1',
-        ),
-        migrations.RemoveField(
-            model_name='projecttype',
-            name='level_2',
-        ),
+       
     ]

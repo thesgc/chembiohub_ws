@@ -344,9 +344,31 @@ class CBHCompoundBatch(TimeStampedModel):
             self.project_counter = self.generate_project_counter()
         super(CBHCompoundBatch, self).save(*args, **kwargs)
         if self.blinded_batch_id:
-            uox_id_lookup = ChemblIdLookup.objects.get_or_create(chembl_id=self.blinded_batch_id,
-                                                              entity_type="DOCUMENT",
-                                                              entity_id=self.id)
+            uox_id_lookup, created = ChemblIdLookup.objects.get_or_create(entity_id= self.id,
+                                                                          entity_type="DOCUMENT", defaults={"chembl_id" :self.blinded_batch_id,})
+            if not created:
+                forced_uox_id = self.warnings.get("original_uox_id", None)
+                if forced_uox_id:
+                    id_needs_changing = True
+                    if uox_id_lookup.entity_type == "DOCUMENT":
+                        if uox_id_lookup.chembl_id != self.blinded_batch_id:
+                            count = self.objects.filter(id=uox_id_lookup.entity_id).count()
+                            if count == 0:
+                                uox_id_lookup.delete()
+                                uox_id_lookup, created = ChemblIdLookup.objects.get_or_create(entity_id= self.id,
+                                                                          entity_type="DOCUMENT", defaults={"chembl_id" :self.blinded_batch_id,})
+                                id_needs_changing = False
+                            else:
+                                raise Exception("Already existing chembl id on project restore, this should not happen...")
+                    if id_needs_changing:
+                        #A Chembl ID is already registered but it is for the wrong compound
+                        new_id = generate_uox_id()
+                        print ("Had to generate a new blinded ID for %s" % self.blinded_batch_id)
+                        self.blinded_batch_id = new_id
+                        super(CBHCompoundBatch, self).save(*args, **kwargs)
+                        ChemblIdLookup.objects.get_or_create(entity_id=self.id,
+                                                             entity_type="DOCUMENT", 
+                                                             defaults={"chembl_id" :self.blinded_batch_id,})
 
 
     def validate(self, temp_props=True):
@@ -391,7 +413,7 @@ def generate_structure_and_dictionary(batch):
             batch.save(validate=False)
             
         else:
-            if not batch.canonical_smiles:
+            if not batch.canonical_smiles or not batch.related_molregno_id:
                 try:
                     
 
@@ -419,7 +441,21 @@ def generate_structure_and_dictionary(batch):
                                                                  # chirality=chirality,
                                                                  structure_key=batch.standard_inchi_key)
                     except ObjectDoesNotExist:
-                        uox_id = generate_uox_id()
+                        uox_id = None
+                        forced_uox_id = batch.warnings.get("original_uox_id", None)
+                        if forced_uox_id:
+                            count_existing_objects = CBHCompoundBatch.objects.filter(related_molregno__chembl__chembl_id=forced_uox_id).count()
+                            count_existing_objects += CBHCompoundBatch.objects.filter(blinded_batch_id=forced_uox_id).count()
+                            if count_existing_objects == 0:
+                                uox_id = forced_uox_id
+                                #Now check if there is a chembl and remove if so
+                                ChemblIdLookup.objects.filter(chembl_id=uox_id).delete()
+                            else:
+                                print ("Had to generate a new compound ID for %s" % forced_uox_id)
+
+
+                        if not uox_id:
+                            uox_id = generate_uox_id()
                         rnd = random.randint(-1000000000, -2)
                         uox_id_lookup = ChemblIdLookup.objects.create(
                             chembl_id=uox_id, entity_type="COMPOUND", entity_id=rnd)
@@ -427,7 +463,6 @@ def generate_structure_and_dictionary(batch):
                         moldict = MoleculeDictionary.objects.get_or_create(chembl=uox_id_lookup,
                                                                            project=batch.project,
                                                                            structure_type="MOL",
-                                                                           # chirality=chirality,
                                                                            structure_key=batch.standard_inchi_key)[0]
                         uox_id_lookup.entity_id = moldict.molregno
                         uox_id_lookup.save()

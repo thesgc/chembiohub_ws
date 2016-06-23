@@ -25,13 +25,7 @@ class Migration(migrations.Migration):
                                     blank=True, to='cbh_core_model.PinnedCustomField', null=True),
             preserve_default=True,
         ),
-        migrations.AlterField(
-            model_name='dataformconfig',
-            name='parent',
-            field=models.ForeignKey(
-                related_name='children', default=None, blank=True, to='cbh_core_model.DataFormConfig', null=True),
-            preserve_default=True,
-        ),
+        
         migrations.AlterField(
             model_name='pinnedcustomfield',
             name='custom_field_config',

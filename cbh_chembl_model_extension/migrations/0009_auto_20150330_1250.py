@@ -11,10 +11,10 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(
-            model_name='project',
-            name='custom_field_config',
-        ),
+        # migrations.RemoveField(
+        #     model_name='project',
+        #     name='custom_field_config',
+        # ),
         migrations.AlterField(
             model_name='pinnedcustomfield',
             name='field_type',

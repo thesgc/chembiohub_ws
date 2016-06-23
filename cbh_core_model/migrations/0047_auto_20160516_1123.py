@@ -26,10 +26,6 @@ class Migration(migrations.Migration):
         ),
         migrations.RemoveField(
             model_name='project',
-            name='enabled_forms',
-        ),
-        migrations.RemoveField(
-            model_name='project',
             name='is_default',
         ),
         migrations.DeleteModel(

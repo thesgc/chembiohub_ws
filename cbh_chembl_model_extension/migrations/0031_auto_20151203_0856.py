@@ -11,10 +11,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterField(
-            model_name='cbhcompoundmultiplebatch',
-            name='uploaded_file',
-            field=models.ForeignKey(default=None, blank=True, to='flowjs.FlowFile', null=True),
-            preserve_default=True,
-        ),
+       
     ]

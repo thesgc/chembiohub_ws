@@ -11,8 +11,5 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.AlterModelOptions(
-            name='dataformconfig',
-            options={'ordering': ('l0', 'l1', 'l2', 'l3', 'l4')},
-        ),
+        
     ]
