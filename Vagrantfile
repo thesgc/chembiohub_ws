@@ -21,6 +21,6 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   end
 
   config.vm.synced_folder   ".", "/home/vagrant/syw" 
-  config.vm.provision :shell, :path => "" , :privileged => false
+  #config.vm.provision :shell, :path => "" , :privileged => false
   config.ssh.password = "vagrant"
 end
