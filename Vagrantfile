@@ -6,7 +6,7 @@ VAGRANTFILE_API_VERSION = "2"
 
 Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
 
-  config.vm.box = "https://chembiohub.ox.ac.uk/package.box"
+  config.vm.box = "https://chembiohub.ox.ac.uk/25102016package.box"
 
   config.vm.network "forwarded_port", guest: 8000, host: 8000, auto_correct: true
 
