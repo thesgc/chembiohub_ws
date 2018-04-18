@@ -57,7 +57,7 @@ def prepare_output(document, schema, export_type, slashed_json_pointer):
     if isinstance(input_data, basestring):
         return unicode(input_data)
     elif isinstance(input_data, list):
-        return ", ".join([unicode(datum) for dataum in input_data])
+        return ", ".join([unicode(dataum) for dataum in input_data])
     elif isinstance(input_data, dict):
         doc_id = document.get("id", "")        
         return prepare_file_output(input_data, schema, export_type, doc_id)
