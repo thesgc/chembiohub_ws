@@ -1,3 +1,5 @@
+**Please do not use this code in its current form. It contains significant security issues, primarily due to use of, now, old and unsupported libraries etc..**
+
 chembiohub_ws  [![Build Status](https://travis-ci.org/thesgc/chembiohub_ws.svg?branch=master)](https://travis-ci.org/thesgc/chembiohub_ws)
 =============
 
